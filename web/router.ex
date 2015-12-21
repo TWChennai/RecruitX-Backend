@@ -9,16 +9,16 @@ defmodule RecruitxBackend.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :api do
+  pipeline :api  do
     plug :accepts, ["json"]
   end
 
   scope "/", RecruitxBackend do
-    pipe_through :browser # Use the default browser stack
+    pipe_through :api # Use the default browser stack
 
-    get "/", PageController, :index
+    get "/candidates", CandidateController, :index
 
-    get "/candidate", CandidateController, :index
+    post "/candidates", CandidateController, :create
 
   end
 

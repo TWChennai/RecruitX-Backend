@@ -35,8 +35,8 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :recruitx_backend, RecruitxBackend.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "recruitx",
+  password: "recruitx",
   database: "recruitx_backend_dev",
   hostname: "localhost",
   pool_size: 10
