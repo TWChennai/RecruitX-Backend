@@ -3,6 +3,14 @@ defmodule RecruitxBackend.CandidateControllerTest do
 
     alias RecruitxBackend.Candidate
 
+    setup do
+        Mix.Tasks.Ecto.Migrate.run(["--all", "Candidate.Repo"])
+
+        on_exit fn ->
+            Mix.Tasks.Ecto.Rollback.run(["--all", "Candidate.Repo"])
+        end
+    end
+
     test "get /candidates returns a list of candidates" do
         candidate = %{"name" => "test"}
         Candidate.insert(candidate)

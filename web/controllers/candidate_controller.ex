@@ -4,7 +4,7 @@ defmodule RecruitxBackend.CandidateController do
     alias RecruitxBackend.Candidate
 
     def index(conn, _params) do
-        json conn, Candidate.all_posts
+        json conn, Candidate.all
     end
 
     def create(conn, candidate_params) do

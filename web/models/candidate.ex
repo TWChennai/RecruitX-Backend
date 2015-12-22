@@ -12,7 +12,7 @@ defmodule RecruitxBackend.Candidate do
     @required_fields ~w(name)
     @optional_fields ~w()
 
-    def all_posts do
+    def all do
         to_json(Repo.all(Candidate))
     end
 
