@@ -2,6 +2,7 @@ defmodule RecruitxBackend.CandidateControllerTest do
     use RecruitxBackend.ConnCase, async: false
 
     alias RecruitxBackend.Candidate
+    alias RecruitxBackend.Repo
 
     setup do
         Mix.Tasks.Ecto.Migrate.run(["--all", "Candidate.Repo"])
@@ -13,11 +14,11 @@ defmodule RecruitxBackend.CandidateControllerTest do
 
     test "get /candidates returns a list of candidates" do
         candidate = %{"name" => "test"}
-        Candidate.insert(candidate)
+        Repo.insert(Candidate.changeset(%Candidate{}, candidate))
 
         response = get conn(), "/candidates"
 
-        assert json_response(response, 200) === Candidate.to_json([candidate])
+        assert json_response(response, 200) === [candidate]
     end
 
     test "POST /candidates with valid post parameters" do
