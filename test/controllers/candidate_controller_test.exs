@@ -1,38 +1,38 @@
 defmodule RecruitxBackend.CandidateControllerTest do
     use RecruitxBackend.ConnCase, async: false
 
-    alias RecruitxBackend.Candidate
     alias RecruitxBackend.Repo
+    alias RecruitxBackend.Candidate
 
-    setup do
-        Mix.Tasks.Ecto.Migrate.run(["--all", "Candidate.Repo"])
-
-        on_exit fn ->
-            Mix.Tasks.Ecto.Rollback.run(["--all", "Candidate.Repo"])
-        end
-    end
+    import Mock
 
     test "get /candidates returns a list of candidates" do
-        candidate = %{"name" => "test"}
-        Repo.insert(Candidate.changeset(%Candidate{}, candidate))
+      candidate = [%{"name" => "test"}]
+      with_mock Repo, [all: fn(Candidate) -> candidate end] do
+      response = get conn(), "/candidates"
 
-        response = get conn(), "/candidates"
-
-        assert json_response(response, 200) === [candidate]
+      assert json_response(response, 200) === candidate
+      end
     end
 
-    test "POST /candidates with valid post parameters" do
+  test "POST /candidates with valid post parameters" do
+    valid_changeset = %{:valid? => true}
+    with_mock Candidate, [changeset: fn(%Candidate{}, _) -> valid_changeset end] do
+      with_mock Repo, [insert: fn(valid_changeset) -> true end] do
         conn = post conn(), "/candidates", [name: "test"]
+
+        assert called Repo.insert(valid_changeset)
         assert conn.status == 200
+      end
     end
+  end
 
-    test "POST /candidates with invalid post parameters should return 400(Bad Request)" do
-        conn = post conn(), "/candidates", [invalid: "invalid_post_param"]
-        assert conn.status == 400
-    end
+  test "POST /candidates with invalid post parameters" do
+    invalid_changeset = %{:valid? => false}
+    with_mock Candidate, [changeset: fn(%Candidate{}, _) -> invalid_changeset end] do
+      conn = post conn(), "/candidates", [name: "test"]
 
-    test "POST /candidates with no post parameters should return 400(Bad Request)" do
-        conn = post conn(), "/candidates"
-        assert conn.status == 400
+      assert conn.status == 400
     end
+  end
 end
