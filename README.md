@@ -4,9 +4,20 @@ To start your Phoenix app:
 
   1. Install dependencies with `mix deps.get`
   2. Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  3. Start Phoenix endpoint with `mix phoenix.server`
+  3. To seed the database, run
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+      `mix run priv/repo/seeds.exs`
+
+     or when you need in production:
+
+      `MIX_ENV=prod mix run priv/repo/seeds.exs`
+
+  4. Start Phoenix endpoint with `mix phoenix.server`
+     Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+
+  5. Run all tests with `mix test`
+  6. Run unit tests with `mix test --exclude integration`
+  7. Run integration tests with `mix test test/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
