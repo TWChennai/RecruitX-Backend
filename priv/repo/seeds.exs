@@ -12,8 +12,9 @@
 
 
 alias RecruitxBackend.Repo
-alias RecruitxBackend.Skill
 alias RecruitxBackend.Role
+alias RecruitxBackend.Skill
+alias RecruitxBackend.Interview
 
     find_by_name_or_create = fn modelName, model, data   ->
           case Repo.all(modelName.getByName(data.name)) do
@@ -35,5 +36,11 @@ alias RecruitxBackend.Role
     find_by_name_or_create.(Skill, %Skill{}, %{name: "C#"})
     find_by_name_or_create.(Skill, %Skill{}, %{name: "Ruby"})
     find_by_name_or_create.(Skill, %Skill{}, %{name: "Python"})
+
+    find_by_name_or_create.(Interview, %Interview{}, %{name: "Code Pairing", priority: 1})
+    find_by_name_or_create.(Interview, %Interview{}, %{name: "Technical1", priority: 2})
+    find_by_name_or_create.(Interview, %Interview{}, %{name: "Technical2", priority: 3})
+    find_by_name_or_create.(Interview, %Interview{}, %{name: "Leadership", priority: 4})
+    find_by_name_or_create.(Interview, %Interview{}, %{name: "P3", priority: 4})
 
 
