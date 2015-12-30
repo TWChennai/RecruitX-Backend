@@ -1,9 +1,10 @@
-defmodule RecruitxBackend.Skill do
+defmodule RecruitxBackend.Role do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.Skill
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.Repo
 
-  schema "skills" do
+  schema "roles" do
     field :name, :string
 
     timestamps
@@ -12,8 +13,8 @@ defmodule RecruitxBackend.Skill do
   @required_fields ~w(name)
   @optional_fields ~w()
 
-  def getByName(skill_name) do
-    from s in Skill, where: s.name == ^skill_name
+  def getByName(role_name) do
+    from r in Role, where: r.name == ^role_name
   end
 
   def changeset(model, params \\ :empty) do

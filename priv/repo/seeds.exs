@@ -13,8 +13,27 @@
 
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Skill
+alias RecruitxBackend.Role
 
-    Repo.insert!(%Skill{name: "Java"})
-    Repo.insert!(%Skill{name: "Ruby"})
-    Repo.insert!(%Skill{name: "C#"})
-    Repo.insert!(%Skill{name: "Python"})
+    find_by_name_or_create = fn modelName, model, data   ->
+          case Repo.all(modelName.getByName(data.name)) do
+           [] ->
+                changeset = modelName.changeset(model, data)
+                Repo.insert!(changeset)
+           _ ->
+                IO.puts " #{modelName} : #{data.name} already exists, skipping"
+          end
+    end
+
+    find_by_name_or_create.(Role, %Role{}, %{name: "Dev"})
+    find_by_name_or_create.(Role, %Role{}, %{name: "QA"})
+    find_by_name_or_create.(Role, %Role{}, %{name: "BA"})
+    find_by_name_or_create.(Role, %Role{}, %{name: "PM"})
+    find_by_name_or_create.(Role, %Role{}, %{name: "UI/UX"})
+
+    find_by_name_or_create.(Skill, %Skill{}, %{name: "Java"})
+    find_by_name_or_create.(Skill, %Skill{}, %{name: "C#"})
+    find_by_name_or_create.(Skill, %Skill{}, %{name: "Ruby"})
+    find_by_name_or_create.(Skill, %Skill{}, %{name: "Python"})
+
+
