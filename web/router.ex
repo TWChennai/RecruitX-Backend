@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.Router do
   use RecruitxBackend.Web, :router
 
+  # TODO: Probably review this block and delete it since you are only supporting JSON requests
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session

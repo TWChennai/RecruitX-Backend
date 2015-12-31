@@ -7,11 +7,11 @@ defmodule RecruitxBackend.CandidateControllerTest do
     import Mock
 
     test "get /candidates returns a list of candidates" do
-      candidate = [%{"name" => "test"}]
-      with_mock Repo, [all: fn(Candidate) -> candidate end] do
-      response = get conn(), "/candidates"
+      candidates = [%{"name" => "test"}]
+      with_mock Repo, [all: fn(Candidate) -> candidates end] do
+        response = get conn(), "/candidates"
 
-      assert json_response(response, 200) === candidate
+        assert json_response(response, 200) === candidates
       end
     end
 
@@ -21,6 +21,7 @@ defmodule RecruitxBackend.CandidateControllerTest do
       with_mock Repo, [insert: fn(valid_changeset) -> true end] do
         conn = post conn(), "/candidates", [name: "test"]
 
+        # TODO: check if there's a "verify_all" kind of API to check all mocks
         assert called Repo.insert(valid_changeset)
         assert conn.status == 200
       end

@@ -10,7 +10,7 @@ defmodule RecruitxBackend.CandidateController do
 
     def create(conn, candidate_params) do
       changeset = Candidate.changeset(%Candidate{}, candidate_params)
-      if(changeset.valid?) do
+      if changeset.valid? do
         Repo.insert(changeset)
         send_resp(conn, 200, "")
       else

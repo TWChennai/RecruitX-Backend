@@ -18,8 +18,10 @@ defmodule RecruitxBackend.Interview do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_length(:name, min: 1, max: 255)
     |> unique_constraint(:name)
+    # TODO: check for case-insensitive contraint
   end
 
+  # TODO: This is not used in the real runtime - so should be moved out of this class
   def getByName(interview_name) do
     from i in Interview, where: i.name == ^interview_name
   end

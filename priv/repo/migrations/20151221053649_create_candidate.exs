@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateCandidate do
 
   def change do
     create table(:candidates) do
-      add :name, :string
+      add :name, :string, null: false
 
       timestamps
     end
