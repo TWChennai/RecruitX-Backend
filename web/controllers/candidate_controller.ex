@@ -9,7 +9,8 @@ defmodule RecruitxBackend.CandidateController do
     end
 
     def create(conn, candidate_params) do
-      changeset = Candidate.changeset(%Candidate{}, candidate_params)
+      # HACKTAG: Want to checkin this change, but still haven't wired up the other parameters and the role association from the UI
+      changeset = Candidate.changeset(%Candidate{}, Dict.merge(candidate_params, %{"role_id" => 1, "experience" => Decimal.new(3)}))
       if changeset.valid? do
         Repo.insert(changeset)
         send_resp(conn, 200, "")

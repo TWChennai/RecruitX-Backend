@@ -2,10 +2,10 @@ defmodule RecruitxBackend.Role do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Role
-  alias RecruitxBackend.Repo
 
   schema "roles" do
     field :name, :string
+    has_many :candidates, RecruitxBackend.Candidate
 
     timestamps
   end
