@@ -2,10 +2,11 @@ defmodule RecruitxBackend.CandidateTest do
     use RecruitxBackend.ModelCase
 
     alias RecruitxBackend.Candidate
+    alias RecruitxBackend.Role
 
-    @valid_attrs %{name: "some content", experience: Decimal.new(3.3), role_id: 4, additional_information: "info"}
+    @role Repo.insert!(%Role{name: "test_role"})
+    @valid_attrs %{name: "some content", experience: Decimal.new(3.3), role_id: @role.id, additional_information: "info"}
     @invalid_attrs %{}
-
 
     test "changeset with valid attributes" do
         changeset = Candidate.changeset(%Candidate{}, @valid_attrs)
@@ -61,8 +62,5 @@ defmodule RecruitxBackend.CandidateTest do
 
         assert changeset.valid?
     end
-
-
-
 
 end
