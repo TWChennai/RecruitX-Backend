@@ -7,14 +7,14 @@ defmodule RecruitxBackend.Candidate do
     schema "candidates" do
         field :name, :string
         field :experience, :decimal
-        field :addtional_information, :string
+        field :additional_information, :string
 
         belongs_to :role, Role
         timestamps
     end
 
-    @required_fields ~w(name role_id experience)
-    @optional_fields ~w()
+    @required_fields ~w(name experience role_id)
+    @optional_fields ~w(additional_information)
 
     def changeset(model, params \\ :empty) do
         model

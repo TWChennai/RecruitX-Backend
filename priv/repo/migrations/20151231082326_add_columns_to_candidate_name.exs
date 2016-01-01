@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.AddColumnsToCandidateName do
     alter table(:candidates) do
       add :role_id, references(:roles), null: false
       add :experience, :decimal, null: false, precision: 4, scale: 2
-      add :addtional_information, :string
+      add :additional_information, :string
     end
   end
 end
