@@ -12,8 +12,10 @@ defmodule RecruitxBackend.CandidateController do
       changeset = Candidate.changeset(%Candidate{}, candidate_params)
       if changeset.valid? do
         Repo.insert(changeset)
+        # TODO: Need to send JSON response
         send_resp(conn, 200, "")
       else
+        # TODO: Need to send JSON response
         send_resp(conn, 400, "")
       end
     end
