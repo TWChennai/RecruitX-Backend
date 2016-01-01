@@ -13,7 +13,7 @@ defmodule RecruitxBackend.CandidateIntegrationTest do
 
         response = get conn(), "/candidates"
 
-        assert json_response(response, 200) === [%{"experience" => "2.00", "name" => "test"}]
+        assert json_response(response, 200) === [%{"additional_information" => nil, "experience" => "2.00", "name" => "test"}]
     end
 
     test "POST /candidates with valid post parameters" do
