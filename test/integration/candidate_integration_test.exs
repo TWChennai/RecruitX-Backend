@@ -17,25 +17,33 @@ defmodule RecruitxBackend.CandidateIntegrationTest do
     end
 
     test "POST /candidates with valid post parameters" do
+        initial_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
         role = Repo.insert!(%Role{name: "test_role"})
 
         conn = post conn(), "/candidates", [name: "test", role_id: role.id, experience: Decimal.new(3)]
+        final_candidate_count =  List.first Repo.all(from c in Candidate, select: count(c.id))
 
         assert conn.status == 200
-        # TODO: Validate that the count in the table has increased by 1
+        assert initial_candidate_count + 1 == final_candidate_count
     end
 
     test "POST /candidates with invalid post parameters should return 400(Bad Request)" do
+        initial_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
+
         conn = post conn(), "/candidates", [invalid: "invalid_post_param"]
+        final_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
 
         assert conn.status == 400
-        # TODO: Validate that the count in the table has remained the same
+        assert initial_candidate_count == final_candidate_count
     end
 
     test "POST /candidates with no post parameters should return 400(Bad Request)" do
+        initial_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
+
         conn = post conn(), "/candidates"
+        final_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
 
         assert conn.status == 400
-        # TODO: Validate that the count in the table has remained the same
+        assert initial_candidate_count == final_candidate_count
     end
 end
