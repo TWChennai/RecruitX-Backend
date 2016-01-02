@@ -23,7 +23,7 @@ defmodule RecruitxBackend.CandidateTest do
     end
 
     test "changeset should be invalid when candidate name is empty" do
-        candidate_with_empty_name = Dict.merge(@valid_attrs, %{name: ""})
+        candidate_with_empty_name = Map.merge(@valid_attrs, %{name: ""})
         changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_name)
 
         refute changeset.valid?
@@ -33,7 +33,7 @@ defmodule RecruitxBackend.CandidateTest do
     # TODO: Verifying when candidate name is blank
 
     test "changeset should be invalid when experience is nil" do
-        candidate_with_nil_experience = Dict.merge(@valid_attrs, %{experience: nil})
+        candidate_with_nil_experience = Map.merge(@valid_attrs, %{experience: nil})
         changeset = Candidate.changeset(%Candidate{}, candidate_with_nil_experience)
 
         refute changeset.valid?
@@ -41,7 +41,7 @@ defmodule RecruitxBackend.CandidateTest do
     end
 
     test "changeset should be invalid when experience is an empty string" do
-        candidate_with_empty_experience = Dict.merge(@valid_attrs, %{experience: ""})
+        candidate_with_empty_experience = Map.merge(@valid_attrs, %{experience: ""})
         changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_experience)
 
         refute changeset.valid?
@@ -49,7 +49,7 @@ defmodule RecruitxBackend.CandidateTest do
     end
 
     test "changeset should be invalid when no experience is given" do
-        candidate_with_no_experience = Dict.delete(@valid_attrs, :experience)
+        candidate_with_no_experience = Map.delete(@valid_attrs, :experience)
         changeset = Candidate.changeset(%Candidate{}, candidate_with_no_experience)
 
         refute changeset.valid?
@@ -57,7 +57,7 @@ defmodule RecruitxBackend.CandidateTest do
     end
 
     test "changeset should be valid when additional information is not given" do
-        candidate_with_no_additional_information = Dict.delete(@valid_attrs, :additional_information)
+        candidate_with_no_additional_information = Map.delete(@valid_attrs, :additional_information)
         changeset = Candidate.changeset(%Candidate{}, candidate_with_no_additional_information)
 
         assert changeset.valid?
