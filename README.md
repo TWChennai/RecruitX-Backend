@@ -29,9 +29,9 @@ After cloning the git repository, you will need the following pre-requisites
       `mix phoenix.server`
 
      Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-  5. Run all exunit tests with `mix test`
-  6. Run unit tests with `mix test --exclude integration`
-  7. Run integration tests with `mix test test/integration/*`
+  5. Run all espec tests with `mix espec --cover`
+  6. Run unit tests with `mix espec --exclude integration`
+  7. Run integration tests with `mix espec spec/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
