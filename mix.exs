@@ -19,7 +19,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-     applications: [:phoenix, :phoenix_html, :cowboy, :logger,
+     applications: [:phoenix, :cowboy, :logger,
                     :phoenix_ecto, :postgrex]]
   end
 
@@ -34,7 +34,6 @@ defmodule RecruitxBackend.Mixfile do
     [{:phoenix, "~> 1.1.0"},
      {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
-     {:phoenix_html, "~> 2.1"},   # TODO: Remove this once we are no longer referencing in the views
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
      {:mock, "~> 0.1.1", only: :test}
