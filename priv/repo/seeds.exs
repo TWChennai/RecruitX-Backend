@@ -10,37 +10,31 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-# TODO: Do not assume that seed will be run multiple times in production
-
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 alias RecruitxBackend.Interview
 
-find_by_name_or_create = fn modelName, model, data   ->
-      case Repo.all(modelName.getByName(data.name)) do
-       [] ->
-            changeset = modelName.changeset(model, data)
-            Repo.insert!(changeset)
-       _ ->
-            IO.puts " #{modelName} : #{data.name} already exists, skipping"
-      end
-end
+    Enum.map(["Dev",
+              "QA",
+              "BA",
+              "PM",
+              "UI/UX"], fn role_value ->
+        Repo.insert!(%Role{name: role_value})
+    end)
 
-# TODO: Use loops of tuples to be more concise
-find_by_name_or_create.(Role, %Role{}, %{name: "Dev"})
-find_by_name_or_create.(Role, %Role{}, %{name: "QA"})
-find_by_name_or_create.(Role, %Role{}, %{name: "BA"})
-find_by_name_or_create.(Role, %Role{}, %{name: "PM"})
-find_by_name_or_create.(Role, %Role{}, %{name: "UI/UX"})
+    Enum.map(["Java",
+              "Ruby",
+              "C#",
+              "Python"], fn skill_value ->
+        Repo.insert!(%Skill{name: skill_value})
+    end)
 
-find_by_name_or_create.(Skill, %Skill{}, %{name: "Java"})
-find_by_name_or_create.(Skill, %Skill{}, %{name: "C#"})
-find_by_name_or_create.(Skill, %Skill{}, %{name: "Ruby"})
-find_by_name_or_create.(Skill, %Skill{}, %{name: "Python"})
+    Enum.map(%{"Code Pairing" => 1,
+                "Technical1" => 2,
+                "Technical2" => 3,
+                "Leadership" => 4,
+                "P3" => 4}, fn {name_value, priority_value} ->
+        Repo.insert!(%Interview{name: name_value, priority: priority_value})
+    end)
 
-find_by_name_or_create.(Interview, %Interview{}, %{name: "Code Pairing", priority: 1})
-find_by_name_or_create.(Interview, %Interview{}, %{name: "Technical1", priority: 2})
-find_by_name_or_create.(Interview, %Interview{}, %{name: "Technical2", priority: 3})
-find_by_name_or_create.(Interview, %Interview{}, %{name: "Leadership", priority: 4})
-find_by_name_or_create.(Interview, %Interview{}, %{name: "P3", priority: 4})

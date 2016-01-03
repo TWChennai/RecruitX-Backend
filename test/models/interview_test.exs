@@ -44,16 +44,4 @@ defmodule RecruitxBackend.InterviewTest do
     assert {:error, changeset} = Repo.insert(valid_interview)
     assert changeset.errors[:name] === "has already been taken"
   end
-
-  test "getByName should return a query to get interview based on its name" do
-    valid_interview = Interview.changeset( %Interview{}, @valid_attrs)
-    Repo.insert!(valid_interview)
-
-    assert [interview_queried] = Repo.all(Interview.getByName(@valid_attrs.name))
-    assert interview_queried.name == @valid_attrs.name
-  end
-
-  test "getByName should return empty when queried based on non-existent interview" do
-    assert [] = Repo.all(Interview.getByName("non-existent-interview"))
-  end
 end

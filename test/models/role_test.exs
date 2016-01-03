@@ -33,16 +33,4 @@ defmodule RecruitxBackend.RoleTest do
     assert {:error, changeset} = Repo.insert(valid_role)
     assert changeset.errors[:name] == "has already been taken"
   end
-
-  test "getByName should return a query to get role based on its name" do
-    valid_role = Role.changeset( %Role{}, @valid_attrs)
-    Repo.insert!(valid_role)
-
-    assert [role_queried] = Repo.all(Role.getByName(@valid_attrs.name))
-    assert role_queried.name == @valid_attrs.name
-  end
-
-  test "getByName should return empty when queried based on non-existent role" do
-    assert [] = Repo.all(Role.getByName("non-existent-role"))
-  end
 end

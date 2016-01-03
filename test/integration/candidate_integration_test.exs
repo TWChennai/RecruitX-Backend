@@ -20,7 +20,7 @@ defmodule RecruitxBackend.CandidateIntegrationTest do
         initial_candidate_count = List.first Repo.all(from c in Candidate, select: count(c.id))
         role = Repo.insert!(%Role{name: "test_role"})
 
-        conn = post conn(), "/candidates", [name: "test", role_id: role.id, experience: Decimal.new(3)]
+        conn = post conn(), "/candidates", [name: "test", role_id: role.id, experience: Decimal.new(3), additional_information: "test info"]
         final_candidate_count =  List.first Repo.all(from c in Candidate, select: count(c.id))
 
         assert conn.status == 200

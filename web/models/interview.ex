@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.Interview do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.Interview
-
   schema "interviews" do
     field :name, :string
     field :priority, :integer
@@ -19,10 +17,5 @@ defmodule RecruitxBackend.Interview do
     |> validate_length(:name, min: 1, max: 255)
     |> unique_constraint(:name)
     # TODO: check for case-insensitive contraint
-  end
-
-  # TODO: This is not used in the real runtime - so should be moved out of this class
-  def getByName(interview_name) do
-    from i in Interview, where: i.name == ^interview_name
   end
 end
