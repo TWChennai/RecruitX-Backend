@@ -18,7 +18,7 @@ defmodule RecruitxBackend.CandidateControllerTest do
   test "POST /candidates with valid post parameters" do
     valid_changeset = %{:valid? => true}
     with_mock Candidate, [changeset: fn(%Candidate{}, _) -> valid_changeset end] do
-      with_mock Repo, [insert: fn(valid_changeset) -> true end] do
+      with_mock Repo, [insert: fn(_) -> true end] do
         conn = post conn(), "/candidates", [name: "test"]
 
         # TODO: check if there's a "verify_all" kind of API to check all mocks
