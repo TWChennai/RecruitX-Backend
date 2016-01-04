@@ -2,6 +2,7 @@ defmodule RecruitxBackend.Candidate do
     use RecruitxBackend.Web, :model
 
     alias RecruitxBackend.Role
+    alias RecruitxBackend.CandidateSkill
 
     @derive {Poison.Encoder, only: [:name, :experience, :additional_information]}
     schema "candidates" do
@@ -10,6 +11,7 @@ defmodule RecruitxBackend.Candidate do
         field :additional_information, :string
 
         belongs_to :role, Role
+        has_many :candidate_skills, CandidateSkill
         timestamps
     end
 
