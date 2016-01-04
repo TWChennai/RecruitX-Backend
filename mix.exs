@@ -10,7 +10,9 @@ defmodule RecruitxBackend.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases,
-     deps: deps
+     deps: deps,
+     preferred_cli_env: [espec: :test],
+     test_coverage: [tool: ExCoveralls, test_task: "espec"]
    ]
   end
 
@@ -36,7 +38,8 @@ defmodule RecruitxBackend.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
-     {:mock, "~> 0.1.1", only: :test}
+     {:espec_phoenix, github: "antonmi/espec_phoenix", only: :test, app: false},
+     {:excoveralls, "~> 0.4.3", only: [:dev, :test]}
    ]
   end
 
