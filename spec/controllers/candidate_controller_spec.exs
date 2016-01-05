@@ -29,7 +29,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     let :candidate, do: %Candidate{id: 1, title: "Candidate title", body: "some body content"}
     before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> candidate end))
 
-    subject do: action :show, %{"id" => 1}
+    subject do: action(:show, %{"id" => 1})
     it do: is_expected |> to(be_successful)
 
     context "not found" do

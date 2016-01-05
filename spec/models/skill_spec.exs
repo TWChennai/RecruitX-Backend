@@ -25,7 +25,33 @@ defmodule RecruitxBackend.SkillSpec do
       expect(changeset) |> to(have_errors(name: {"should be at least %{count} character(s)", [count: 1]}))
     end
 
-    it "should be invalid when name is a blank string"
+    it "should be invalid when name is nil" do
+      skill_with_nil_name = Dict.merge(valid_attrs, %{name: nil})
+      changeset = Skill.changeset(%Skill{}, skill_with_nil_name)
+
+      expect(changeset) |> to(have_errors([name: "can't be blank"]))
+    end
+
+    it "should be invalid when name is a blank string" do
+      skill_with_blank_name = Dict.merge(valid_attrs, %{name: "  "})
+      changeset = Skill.changeset(%Skill{}, skill_with_blank_name)
+
+      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+    end
+
+    it "should be invalid when name is only numbers" do
+      skill_with_numbers_name = Dict.merge(valid_attrs, %{name: "678"})
+      changeset = Skill.changeset(%Skill{}, skill_with_numbers_name)
+
+      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+    end
+
+    it "should be invalid when name starts with space" do
+      skill_starting_with_space_name = Dict.merge(valid_attrs, %{name: " space"})
+      changeset = Skill.changeset(%Skill{}, skill_starting_with_space_name)
+
+      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+    end
   end
 
   context "unique_constraint" do
@@ -35,6 +61,47 @@ defmodule RecruitxBackend.SkillSpec do
 
       {:error, changeset} = Repo.insert(valid_skill)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
+    end
+
+    it "should be invalid when skill already exists with same name but mixed case" do
+      valid_skill = Skill.changeset(%Skill{}, valid_attrs)
+      Repo.insert!(valid_skill)
+
+      valid_skill_in_caps = Skill.changeset(%Skill{}, %{name: "Some ContenT"})
+
+      {:error, changeset} = Repo.insert(valid_skill_in_caps)
+      expect(changeset) |> to(have_errors(name: "has already been taken"))
+    end
+
+    it "should be invalid when skill already exists with same name but upper case" do
+      valid_skill = Skill.changeset(%Skill{}, valid_attrs)
+      Repo.insert!(valid_skill)
+
+      valid_skill_in_caps = Skill.changeset(%Skill{}, %{name: String.capitalize(valid_attrs.name)})
+
+      {:error, changeset} = Repo.insert(valid_skill_in_caps)
+      expect(changeset) |> to(have_errors(name: "has already been taken"))
+    end
+  end
+
+  context "on delete" do
+    it "should raise an exception when it has foreign key references" do
+      role =  Repo.insert!(%RecruitxBackend.Role{name: "test_role"})
+      candidate = Repo.insert!(%RecruitxBackend.Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
+      skill =  Repo.insert!(%RecruitxBackend.Skill{name: "test_skill"})
+      candidate_skills = Repo.insert!(%RecruitxBackend.CandidateSkill{candidate_id: candidate.id, skill_id: skill.id})
+
+      delete = fn ->  Repo.delete!(skill) end
+
+      expect(delete).to raise_exception(Ecto.ConstraintError)
+    end
+
+    it "should not raise an exception when it has no foreign key references" do
+      skill =  Repo.insert!(%RecruitxBackend.Skill{name: "test_skill"})
+
+      delete = fn -> Repo.delete!(skill) end
+
+      expect(delete).to_not raise_exception(Ecto.ConstraintError)
     end
   end
 end
