@@ -12,6 +12,7 @@ defmodule RecruitxBackend.Candidate do
 
         belongs_to :role, Role
         has_many :candidate_skills, CandidateSkill
+        has_many :candidate_interview_schedule, CandidateInterviewSchedule
         timestamps
     end
 

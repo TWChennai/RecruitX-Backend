@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Interview do
   schema "interviews" do
     field :name, :string
     field :priority, :integer
-
+    has_many :candidate_interview_schedule, CandidateInterviewSchedule
     timestamps
   end
 

@@ -5,7 +5,7 @@
   "decimal": {:hex, :decimal, "1.1.1"},
   "ecto": {:hex, :ecto, "1.1.1"},
   "espec": {:hex, :espec, "0.8.7"},
-  "espec_phoenix": {:git, "git://github.com/antonmi/espec_phoenix.git", "7e3a3fc2624e386f316581b21b1227e01a0f7372", []},
+  "espec_phoenix": {:git, "https://github.com/antonmi/espec_phoenix.git", "7e3a3fc2624e386f316581b21b1227e01a0f7372", []},
   "excoveralls": {:hex, :excoveralls, "0.4.3"},
   "exjsx": {:hex, :exjsx, "3.2.0"},
   "floki": {:hex, :floki, "0.7.1"},
