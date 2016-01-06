@@ -18,5 +18,6 @@ defmodule RecruitxBackend.Role do
     |> cast(params, @required_fields, @optional_fields)
     |> unique_constraint(:name)
     |> validate_length(:name, min: 1, max: 255)
+    |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
   end
 end
