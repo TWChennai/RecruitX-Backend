@@ -23,7 +23,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     it do: should have_errors([candidate_id: "can't be blank", skill_id: "can't be blank"])
 
     it "when candidate id is nil" do
-      candidate_skill_with_candidate_id_nil = Dict.merge(valid_attrs, %{candidate_id: nil})
+      candidate_skill_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_id: nil})
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_candidate_id_nil)
 
@@ -31,7 +31,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     end
 
     it "when skill id is nil" do
-      candidate_skill_with_skill_id_nil = Dict.merge(valid_attrs, %{skill_id: nil})
+      candidate_skill_with_skill_id_nil = Map.merge(valid_attrs, %{skill_id: nil})
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_skill_id_nil)
 
@@ -39,7 +39,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     end
 
     it "when candidate id is not present" do
-      candidate_skill_with_no_candidate_id = Dict.delete(valid_attrs, :candidate_id)
+      candidate_skill_with_no_candidate_id = Map.delete(valid_attrs, :candidate_id)
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_no_candidate_id)
 
@@ -47,7 +47,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     end
 
     it "when skill id is not present" do
-      candidate_skill_with_no_skill_id = Dict.delete(valid_attrs, :skill_id)
+      candidate_skill_with_no_skill_id = Map.delete(valid_attrs, :skill_id)
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_no_skill_id)
 
@@ -59,7 +59,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     it "when candidate id not present in candidates table" do
       current_candidate_count = Repo.one(from candidate in RecruitxBackend.Candidate, select: count(candidate.id))
       candidate_id_not_present = current_candidate_count + 1
-      candidate_skill_with_invalid_candidate_id = Dict.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
+      candidate_skill_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{},candidate_skill_with_invalid_candidate_id)
 
@@ -70,7 +70,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     it "when skill id not present in skills table" do
       current_skill_count = Repo.one(from skill in RecruitxBackend.Skill, select: count(skill.id))
       skill_id_not_present = current_skill_count + 1
-      candidate_skill_with_invalid_skill_id = Dict.merge(valid_attrs, %{skill_id: skill_id_not_present})
+      candidate_skill_with_invalid_skill_id = Map.merge(valid_attrs, %{skill_id: skill_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{},candidate_skill_with_invalid_skill_id)
 

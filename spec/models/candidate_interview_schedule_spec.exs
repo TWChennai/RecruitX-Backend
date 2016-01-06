@@ -22,7 +22,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     it do: should have_errors([candidate_id: "can't be blank", interview_id: "can't be blank"])
 
     it "when candidate id is nil" do
-      candidate_interview_schedule_with_candidate_id_nil = Dict.merge(valid_attrs, %{candidate_id: nil})
+      candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_id: nil})
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_candidate_id_nil)
 
@@ -30,7 +30,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     end
 
     it "when interview id is nil" do
-      candidate_interview_schedule_with_interview_id_nil = Dict.merge(valid_attrs, %{interview_id: nil})
+      candidate_interview_schedule_with_interview_id_nil = Map.merge(valid_attrs, %{interview_id: nil})
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_id_nil)
 
@@ -38,7 +38,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     end
 
     it "when candidate id is not present" do
-      candidate_interview_schedule_with_no_candidate_id = Dict.delete(valid_attrs, :candidate_id)
+      candidate_interview_schedule_with_no_candidate_id = Map.delete(valid_attrs, :candidate_id)
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_candidate_id)
 
@@ -46,7 +46,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     end
 
     it "when interview id is not present" do
-      candidate_interview_schedule_with_no_interview_id = Dict.delete(valid_attrs, :interview_id)
+      candidate_interview_schedule_with_no_interview_id = Map.delete(valid_attrs, :interview_id)
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_interview_id)
 
@@ -58,7 +58,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     it "when candidate id not present in candidates table" do
       current_candidate_count = Repo.one(from candidate in RecruitxBackend.Candidate, select: count(candidate.id))
       candidate_id_not_present = current_candidate_count + 1
-      candidate_interview_schedule_with_invalid_candidate_id = Dict.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
+      candidate_interview_schedule_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_invalid_candidate_id)
 
@@ -69,7 +69,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     it "when interview id not present in interview table" do
       current_interview_count = Repo.one(from interview in RecruitxBackend.Interview, select: count(interview.id))
       interview_id_not_present = current_interview_count + 1
-      candidate_interview_schedule_with_invalid_interview_id = Dict.merge(valid_attrs, %{interview_id: interview_id_not_present})
+      candidate_interview_schedule_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_id: interview_id_not_present})
 
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},candidate_interview_schedule_with_invalid_interview_id)
 

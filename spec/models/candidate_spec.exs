@@ -14,14 +14,14 @@ defmodule RecruitxBackend.CandidateSpec do
     it do: should be_valid
 
     it "should be valid when additional information is not given" do
-      candidate_with_no_additional_information = Dict.delete(valid_attrs, :additional_information)
+      candidate_with_no_additional_information = Map.delete(valid_attrs, :additional_information)
       changeset = Candidate.changeset(%Candidate{}, candidate_with_no_additional_information)
 
       expect(changeset) |> to(be_valid)
     end
 
     it "should be valid when experience is 0" do
-      candidate_with_no_experience = Dict.merge(valid_attrs, %{experience: Decimal.new(0)})
+      candidate_with_no_experience = Map.merge(valid_attrs, %{experience: Decimal.new(0)})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_no_experience)
 
       expect(changeset) |> to(be_valid)
@@ -35,70 +35,70 @@ defmodule RecruitxBackend.CandidateSpec do
     it do: should have_errors(name: "can't be blank", role_id: "can't be blank", experience: "can't be blank")
 
     it "should be invalid when name is an empty string" do
-      candidate_with_empty_name = Dict.merge(valid_attrs, %{name: ""})
+      candidate_with_empty_name = Map.merge(valid_attrs, %{name: ""})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_name)
 
       expect(changeset) |> to(have_errors(name: {"should be at least %{count} character(s)", [count: 1]}))
     end
 
     it "should be invalid when name is nil" do
-      candidate_with_nil_name = Dict.merge(valid_attrs, %{name: nil})
+      candidate_with_nil_name = Map.merge(valid_attrs, %{name: nil})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_nil_name)
 
       expect(changeset) |> to(have_errors([name: "can't be blank"]))
     end
 
     it "should be invalid when name is a blank string" do
-      candidte_with_blank_name = Dict.merge(valid_attrs, %{name: "  "})
+      candidte_with_blank_name = Map.merge(valid_attrs, %{name: "  "})
       changeset = Candidate.changeset(%Candidate{}, candidte_with_blank_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
     end
 
     it "should be invalid when name is only numbers" do
-      candidate_with_numbers_name = Dict.merge(valid_attrs, %{name: "678"})
+      candidate_with_numbers_name = Map.merge(valid_attrs, %{name: "678"})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_numbers_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
     end
 
     it "should be invalid when name starts with space" do
-      candidate_starting_with_space_name = Dict.merge(valid_attrs, %{name: " space"})
+      candidate_starting_with_space_name = Map.merge(valid_attrs, %{name: " space"})
       changeset = Candidate.changeset(%Candidate{}, candidate_starting_with_space_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
     end
 
     it "should be invalid when experience is nil" do
-      candidate_with_nil_experience = Dict.merge(valid_attrs, %{experience: nil})
+      candidate_with_nil_experience = Map.merge(valid_attrs, %{experience: nil})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_nil_experience)
 
       expect(changeset) |> to(have_errors(experience: "can't be blank"))
     end
 
     it "should be invalid when experience is an empty string" do
-      candidate_with_empty_experience = Dict.merge(valid_attrs, %{experience: ""})
+      candidate_with_empty_experience = Map.merge(valid_attrs, %{experience: ""})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_experience)
 
       expect(changeset) |> to(have_errors(experience: "is invalid"))
     end
 
     it "should be invalid when experience is negative" do
-      candidate_with_negative_experience = Dict.merge(valid_attrs, %{experience: Decimal.new(-4)})
+      candidate_with_negative_experience = Map.merge(valid_attrs, %{experience: Decimal.new(-4)})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_negative_experience)
 
       expect(changeset) |> to(have_errors(experience: {"must be greater than or equal to %{count}", [count: Decimal.new(0)]}))
     end
 
     it "should be invalid when experience is more than or equal to 100" do
-      candidate_with_invalid_experience = Dict.merge(valid_attrs, %{experience: Decimal.new(100)})
+      candidate_with_invalid_experience = Map.merge(valid_attrs, %{experience: Decimal.new(100)})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_invalid_experience)
 
       expect(changeset) |> to(have_errors(experience: {"must be less than %{count}", [count: Decimal.new(100)]}))
     end
 
     it "should be invalid when no experience is given" do
-      candidate_with_no_experience = Dict.delete(valid_attrs, :experience)
+      candidate_with_no_experience = Map.delete(valid_attrs, :experience)
       changeset = Candidate.changeset(%Candidate{}, candidate_with_no_experience)
 
       expect(changeset) |> to(have_errors(experience: "can't be blank"))

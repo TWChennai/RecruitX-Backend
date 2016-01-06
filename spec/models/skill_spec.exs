@@ -19,35 +19,35 @@ defmodule RecruitxBackend.SkillSpec do
     it do: should have_errors(name: "can't be blank")
 
     it "should be invalid when name is an empty string" do
-      skill_with_empty_name = Dict.merge(valid_attrs, %{name: ""})
+      skill_with_empty_name = Map.merge(valid_attrs, %{name: ""})
       changeset = Skill.changeset(%Skill{}, skill_with_empty_name)
 
       expect(changeset) |> to(have_errors(name: {"should be at least %{count} character(s)", [count: 1]}))
     end
 
     it "should be invalid when name is nil" do
-      skill_with_nil_name = Dict.merge(valid_attrs, %{name: nil})
+      skill_with_nil_name = Map.merge(valid_attrs, %{name: nil})
       changeset = Skill.changeset(%Skill{}, skill_with_nil_name)
 
       expect(changeset) |> to(have_errors([name: "can't be blank"]))
     end
 
     it "should be invalid when name is a blank string" do
-      skill_with_blank_name = Dict.merge(valid_attrs, %{name: "  "})
+      skill_with_blank_name = Map.merge(valid_attrs, %{name: "  "})
       changeset = Skill.changeset(%Skill{}, skill_with_blank_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
     end
 
     it "should be invalid when name is only numbers" do
-      skill_with_numbers_name = Dict.merge(valid_attrs, %{name: "678"})
+      skill_with_numbers_name = Map.merge(valid_attrs, %{name: "678"})
       changeset = Skill.changeset(%Skill{}, skill_with_numbers_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
     end
 
     it "should be invalid when name starts with space" do
-      skill_starting_with_space_name = Dict.merge(valid_attrs, %{name: " space"})
+      skill_starting_with_space_name = Map.merge(valid_attrs, %{name: " space"})
       changeset = Skill.changeset(%Skill{}, skill_starting_with_space_name)
 
       expect(changeset) |> to(have_errors([name: "has invalid format"]))
