@@ -59,4 +59,28 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(changeset) |> to(have_errors(experience: "can't be blank"))
     end
   end
+
+  context "on delete" do
+    it "should raise an exception when it has foreign key reference in other tables" do
+      candidate_changeset = Candidate.changeset(%Candidate{}, valid_attrs)
+      candidate = Repo.insert!(candidate_changeset)
+      interview = Repo.insert!(%RecruitxBackend.Interview{name: "some_interview"})
+      valid_attrs_for_candidate_interview_schedule = %{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2016-01-01"), interview_time: Ecto.Time.cast!("12:00:00")}
+      changeset_for_candidate_interview_schedule = RecruitxBackend.CandidateInterviewSchedule.changeset(%RecruitxBackend.CandidateInterviewSchedule{}, valid_attrs_for_candidate_interview_schedule)
+      Repo.insert(changeset_for_candidate_interview_schedule)
+
+      delete = fn ->  Repo.delete!(candidate) end
+
+      expect(delete).to raise_exception(Ecto.ConstraintError)
+    end
+
+    it "should not raise an exception when it has no foreign key references in other tables" do
+      candidate_changeset = Candidate.changeset(%Candidate{}, valid_attrs)
+      candidate = Repo.insert(candidate_changeset)
+
+      delete = fn ->  Repo.delete!(candidate) end
+
+      expect(delete).to_not raise_exception(Ecto.ConstraintError)
+    end
+  end
 end
