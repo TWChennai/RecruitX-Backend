@@ -2,7 +2,6 @@ defmodule RecruitxBackend.CandidateController do
     use RecruitxBackend.Web, :controller
 
     alias RecruitxBackend.Candidate
-    alias RecruitxBackend.Repo
 
     def index(conn, _params) do
         json conn, Repo.all(Candidate)

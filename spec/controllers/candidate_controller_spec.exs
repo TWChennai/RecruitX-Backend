@@ -1,7 +1,6 @@
 defmodule RecruitxBackend.CandidateControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.CandidateController
 
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Role
 

@@ -6,7 +6,6 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
 
   describe "get /candidates" do

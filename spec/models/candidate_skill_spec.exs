@@ -2,7 +2,6 @@ defmodule RecruitxBackend.CandidateSkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.CandidateSkill
 
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Repo
 
   let :role, do: Repo.insert!(%RecruitxBackend.Role{name: "test_role"})
   let :candidate, do: Repo.insert!(%RecruitxBackend.Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
