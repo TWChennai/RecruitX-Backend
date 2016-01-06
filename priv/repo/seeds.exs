@@ -20,14 +20,14 @@ Enum.map(["Dev",
           "BA",
           "PM",
           "UI/UX"], fn role_value ->
-    Repo.insert!(%Role{name: role_value})
+  Repo.insert!(%Role{name: role_value})
 end)
 
 Enum.map(["Java",
           "Ruby",
           "C#",
           "Python"], fn skill_value ->
-    Repo.insert!(%Skill{name: skill_value})
+  Repo.insert!(%Skill{name: skill_value})
 end)
 
 Enum.map(%{"Code Pairing" => 1,
@@ -35,5 +35,5 @@ Enum.map(%{"Code Pairing" => 1,
             "Technical2" => 3,
             "Leadership" => 4,
             "P3" => 4}, fn {name_value, priority_value} ->
-    Repo.insert!(%Interview{name: name_value, priority: priority_value})
+  Repo.insert!(%Interview{name: name_value, priority: priority_value})
 end)
