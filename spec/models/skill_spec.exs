@@ -67,9 +67,9 @@ defmodule RecruitxBackend.SkillSpec do
       valid_skill = Skill.changeset(%Skill{}, valid_attrs)
       Repo.insert!(valid_skill)
 
-      valid_skill_in_caps = Skill.changeset(%Skill{}, %{name: "Some ContenT"})
+      skill_in_caps = Skill.changeset(%Skill{}, %{name: "Some ContenT"})
 
-      {:error, changeset} = Repo.insert(valid_skill_in_caps)
+      {:error, changeset} = Repo.insert(skill_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
@@ -77,9 +77,9 @@ defmodule RecruitxBackend.SkillSpec do
       valid_skill = Skill.changeset(%Skill{}, valid_attrs)
       Repo.insert!(valid_skill)
 
-      valid_skill_in_caps = Skill.changeset(%Skill{}, %{name: String.capitalize(valid_attrs.name)})
+      skill_in_caps = Skill.changeset(%Skill{}, %{name: String.capitalize(valid_attrs.name)})
 
-      {:error, changeset} = Repo.insert(valid_skill_in_caps)
+      {:error, changeset} = Repo.insert(skill_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end

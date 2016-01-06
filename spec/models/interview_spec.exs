@@ -88,9 +88,9 @@ defmodule RecruitxBackend.InterviewSpec do
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
-      valid_interview_in_caps = Interview.changeset(%Interview{}, %{name: "Some ContenT"})
+      interview_in_caps = Interview.changeset(%Interview{}, %{name: "Some ContenT"})
 
-      {:error, changeset} = Repo.insert(valid_interview_in_caps)
+      {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
@@ -98,9 +98,9 @@ defmodule RecruitxBackend.InterviewSpec do
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
-      valid_interview_in_caps = Interview.changeset(%Interview{}, %{name: String.capitalize(valid_attrs.name)})
+      interview_in_caps = Interview.changeset(%Interview{}, %{name: String.capitalize(valid_attrs.name)})
 
-      {:error, changeset} = Repo.insert(valid_interview_in_caps)
+      {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end

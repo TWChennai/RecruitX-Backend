@@ -67,9 +67,9 @@ defmodule RecruitxBackend.RoleSpec do
       valid_role = Role.changeset(%Role{}, valid_attrs)
       Repo.insert!(valid_role)
 
-      valid_role_in_caps = Role.changeset(%Role{}, %{name: "Some ContenT"})
+      role_in_caps = Role.changeset(%Role{}, %{name: "Some ContenT"})
 
-      {:error, changeset} = Repo.insert(valid_role_in_caps)
+      {:error, changeset} = Repo.insert(role_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
@@ -77,9 +77,9 @@ defmodule RecruitxBackend.RoleSpec do
       valid_role = Role.changeset(%Role{}, valid_attrs)
       Repo.insert!(valid_role)
 
-      valid_role_in_caps = Role.changeset(%Role{}, %{name: String.capitalize(valid_attrs.name)})
+      role_in_caps = Role.changeset(%Role{}, %{name: String.capitalize(valid_attrs.name)})
 
-      {:error, changeset} = Repo.insert(valid_role_in_caps)
+      {:error, changeset} = Repo.insert(role_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end
