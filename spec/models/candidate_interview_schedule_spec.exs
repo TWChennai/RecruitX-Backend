@@ -52,6 +52,8 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
       expect(result) |> to(have_errors(interview_id: "can't be blank"))
     end
+
+    it "when interview_date is nil"
   end
 
   context "foreign key constraint" do

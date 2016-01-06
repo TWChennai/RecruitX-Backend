@@ -4,12 +4,13 @@ defmodule RecruitxBackend.Interview do
   schema "interviews" do
     field :name, :string
     field :priority, :integer
-    has_many :candidate_interview_schedule, CandidateInterviewSchedule
     timestamps
+
+    has_many :candidate_interview_schedule, CandidateInterviewSchedule
   end
 
   @required_fields ~w(name)
-  @optional_fields ~w()
+  @optional_fields ~w(priority)
 
   def changeset(model, params \\ :empty) do
     model
@@ -17,6 +18,5 @@ defmodule RecruitxBackend.Interview do
     |> validate_length(:name, min: 1, max: 255)
     |> unique_constraint(:name)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z0-9]*$/i)
-
   end
 end

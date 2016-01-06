@@ -2,8 +2,8 @@ defmodule RecruitxBackend.CandidateSkill do
     use RecruitxBackend.Web, :model
 
     schema "candidate_skills" do
-      belongs_to :candidate, RecruitxBackend.Candidate
-      belongs_to :skill, RecruitxBackend.Skill
+      belongs_to :candidate, Candidate
+      belongs_to :skill, Skill
 
       timestamps
     end

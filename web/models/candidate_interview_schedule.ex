@@ -2,8 +2,8 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
     use RecruitxBackend.Web, :model
 
     schema "candidate_interview_schedule" do
-      belongs_to :candidate, RecruitxBackend.Candidate
-      belongs_to :interview, RecruitxBackend.Interview
+      belongs_to :candidate, Candidate
+      belongs_to :interview, Interview
       field :interview_date, Ecto.Date
       field :interview_time, Ecto.Time
 
@@ -19,5 +19,6 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
           |> unique_constraint(:candidate_interview_id_index, name: :candidate_interview_id_index)
           |> foreign_key_constraint(:candidate_id)
           |> foreign_key_constraint(:interview_id)
+          # TODO: interview_date can't be nil
     end
   end

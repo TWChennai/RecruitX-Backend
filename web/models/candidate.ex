@@ -1,19 +1,16 @@
 defmodule RecruitxBackend.Candidate do
     use RecruitxBackend.Web, :model
 
-    alias RecruitxBackend.Role
-    alias RecruitxBackend.CandidateSkill
-
     @derive {Poison.Encoder, only: [:name, :experience, :additional_information]}
     schema "candidates" do
         field :name, :string
         field :experience, :decimal
         field :additional_information, :string
-
         belongs_to :role, Role
+        timestamps
+
         has_many :candidate_skills, CandidateSkill
         has_many :candidate_interview_schedule, CandidateInterviewSchedule
-        timestamps
     end
 
     @required_fields ~w(name experience role_id)

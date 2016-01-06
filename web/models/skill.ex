@@ -1,11 +1,8 @@
 defmodule RecruitxBackend.Skill do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.Skill
-
   schema "skills" do
     field :name, :string
-
     timestamps
 
     has_many :candidate_skills, CandidateSkill
