@@ -1,14 +1,18 @@
 defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
   use ESpec.Phoenix, model: RecruitxBackend.CandidateInterviewSchedule
 
+  alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateInterviewSchedule
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.Role
 
-  let :role, do: Repo.insert!(%RecruitxBackend.Role{name: "test_role"})
-  let :candidate, do: Repo.insert!(%RecruitxBackend.Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-  let :interview, do: Repo.insert!(%RecruitxBackend.Interview{name: "test_interview"})
+  let :role, do: Repo.insert!(%Role{name: "test_role"})
+  let :candidate, do: Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
+  let :interview, do: Repo.insert!(%Interview{name: "test_interview"})
 
   let :valid_attrs, do: %{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2011-01-01"), interview_time: Ecto.Time.cast!("12:00:00")}
   let :invalid_attrs, do: %{}
+
   context "valid changeset" do
     subject do: CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, valid_attrs)
 
@@ -58,7 +62,8 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
   context "foreign key constraint" do
     it "when candidate id not present in candidates table" do
-      current_candidate_count = Repo.one(from candidate in RecruitxBackend.Candidate, select: count(candidate.id))
+      # TODO: Not sure why Ectoo.max(Repo, Candidate, :id) is failing - need to investigate
+      current_candidate_count = Ectoo.count(Repo, Candidate)
       candidate_id_not_present = current_candidate_count + 1
       candidate_interview_schedule_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
@@ -69,7 +74,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     end
 
     it "when interview id not present in interview table" do
-      current_interview_count = Repo.one(from interview in RecruitxBackend.Interview, select: count(interview.id))
+      current_interview_count = Ectoo.max(Repo, Interview, :id)
       interview_id_not_present = current_interview_count + 1
       candidate_interview_schedule_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_id: interview_id_not_present})
 

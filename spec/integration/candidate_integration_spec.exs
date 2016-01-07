@@ -1,10 +1,9 @@
 defmodule RecruitxBackend.CandidateIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.CandidateController
 
-  import Ecto.Query
-
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Role
 
@@ -59,7 +58,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
     def get_candidate_count do
-      Repo.one(from candidates in Candidate, select: count(candidates.id))
+      Ectoo.count(Repo, Candidate)
     end
   end
 end

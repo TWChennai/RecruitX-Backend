@@ -39,7 +39,8 @@ defmodule RecruitxBackend.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
-     {:excoveralls, "~> 0.4.3", only: [:dev, :test]}
+     {:excoveralls, "~> 0.4.3", only: [:dev, :test]},
+     {:ectoo, "> 0.0.0", only: [:test]}
    ]
   end
 

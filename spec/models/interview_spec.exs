@@ -1,7 +1,10 @@
 defmodule RecruitxBackend.InterviewSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Interview
 
+  alias RecruitxBackend.Candidate
+  alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Role
 
   let :valid_attrs, do: %{name: "some content", priority: 42}
   let :invalid_attrs, do: %{}
@@ -106,10 +109,10 @@ defmodule RecruitxBackend.InterviewSpec do
   end
   context "on delete" do
     it "should raise an exception when it has foreign key references in other tables" do
-      role = Repo.insert!(%RecruitxBackend.Role{name: "test_role"})
-      candidate = Repo.insert!(%RecruitxBackend.Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-      interview = Repo.insert!(%RecruitxBackend.Interview{name: "some_interview"})
-      Repo.insert!(%RecruitxBackend.CandidateInterviewSchedule{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2011-01-01"), interview_time: Ecto.Time.cast!("12:00:00")})
+      role = Repo.insert!(%Role{name: "test_role"})
+      candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
+      interview = Repo.insert!(%Interview{name: "some_interview"})
+      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2011-01-01"), interview_time: Ecto.Time.cast!("12:00:00")})
 
       delete = fn ->  Repo.delete!(interview) end
 

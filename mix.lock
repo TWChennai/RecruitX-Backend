@@ -4,6 +4,7 @@
   "cowlib": {:hex, :cowlib, "1.0.2"},
   "decimal": {:hex, :decimal, "1.1.1"},
   "ecto": {:hex, :ecto, "1.1.1"},
+  "ectoo": {:hex, :ectoo, "0.0.4"},
   "espec": {:hex, :espec, "0.8.7"},
   "espec_phoenix": {:hex, :espec_phoenix, "0.1.8"},
   "excoveralls": {:hex, :excoveralls, "0.4.3"},
