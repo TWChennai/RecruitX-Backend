@@ -1,5 +1,4 @@
 [app-servers]
-1.2.3.4
-4.5.6.7
+10.134.125.194
 
 # Delete the above IP addresses and add your server's IP addresses
