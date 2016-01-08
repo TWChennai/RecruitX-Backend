@@ -71,7 +71,8 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     end
 
     it "when skill id not present in skills table" do
-      current_skill_count = Ectoo.max(Repo, Skill, :id)
+      # TODO: Not sure why Ectoo.max(Repo, Skill, :id) is failing - need to investigate
+      current_skill_count = Ectoo.count(Repo, Skill)
       skill_id_not_present = current_skill_count + 1
       candidate_skill_with_invalid_skill_id = Map.merge(valid_attrs, %{skill_id: skill_id_not_present})
 
