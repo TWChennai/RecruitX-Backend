@@ -1,0 +1,4 @@
+---
+app_name: recruitx_backend
+repo_url: "git@github.com:TWChennai/RecruitX-Backend.git"
+app_port: 3001

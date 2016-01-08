@@ -27,3 +27,8 @@ import_config "#{Mix.env}.exs"
 config :phoenix, :generators,
   migration: true,
   binary_id: false
+
+# This line was automatically added by ansible-elixir-stack setup script
+if System.get_env("SERVER") do
+  config :phoenix, :serve_endpoints, true
+end
