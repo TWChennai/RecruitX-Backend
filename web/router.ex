@@ -10,6 +10,8 @@ defmodule RecruitxBackend.Router do
 
     get "/candidates", CandidateController, :index
     post "/candidates", CandidateController, :create
+    get "/roles", RoleController, :index
+    get "/skills", SkillController, :index
   end
 
   # Other scopes may use custom stacks.

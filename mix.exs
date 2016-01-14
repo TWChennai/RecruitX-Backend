@@ -22,7 +22,7 @@ defmodule RecruitxBackend.Mixfile do
   def application do
     [mod: {RecruitxBackend, []},
      applications: [:phoenix, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :httpotion]]
   end
 
   # Specifies which paths to compile per environment.
@@ -41,7 +41,11 @@ defmodule RecruitxBackend.Mixfile do
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
      {:excoveralls, "~> 0.4.3", only: [:dev, :test]},
      {:ectoo, "> 0.0.0", only: [:test]},
-     {:exrm, "~> 0.19.9"}
+     {:exrm, "~> 0.19.9"},
+     {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
+     {:httpotion, "~> 2.1.0"},
+     {:json,   "~> 0.3.0"},
+     {:corsica, "~> 0.4"}
    ]
   end
 

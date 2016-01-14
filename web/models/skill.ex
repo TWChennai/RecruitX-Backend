@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.Skill do
   use RecruitxBackend.Web, :model
 
+  @derive {Poison.Encoder, only: [:id, :name]}
   schema "skills" do
     field :name, :string
     timestamps

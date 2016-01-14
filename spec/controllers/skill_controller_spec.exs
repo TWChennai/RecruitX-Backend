@@ -1,0 +1,25 @@
+defmodule RecruitxBackend.SkillControllerSpec do
+  use ESpec.Phoenix, controller: RecruitxBackend.SkillController
+
+  alias RecruitxBackend.Skill
+
+  describe "index" do
+    let :skills do
+      [
+        %Skill{id: 1, name: "Java"},
+        %Skill{id: 2, name: "Ruby"},
+      ]
+    end
+
+    before do: allow Repo |> to(accept(:all, fn(_) -> skills end))
+    subject do: action :index
+
+    it do: should be_successful
+    it do: should have_http_status(:ok)
+    it "should return the array of skills as a JSON response" do
+      response = action(:index)
+
+      expect(response.resp_body) |> to(eq(Poison.encode!(skills, keys: :atoms!)))
+    end
+  end
+end
