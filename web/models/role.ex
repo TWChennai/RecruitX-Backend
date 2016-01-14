@@ -4,6 +4,7 @@ defmodule RecruitxBackend.Role do
   @derive {Poison.Encoder, only: [:id, :name]}
   schema "roles" do
     field :name, :string
+
     timestamps
 
     has_many :candidates, Candidate

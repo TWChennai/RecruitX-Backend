@@ -42,3 +42,4 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
   * Docs: http://hexdocs.pm/phoenix
   * Mailing list: http://groups.google.com/group/phoenix-talk
   * Source: https://github.com/phoenixframework/phoenix
+  * JSON API: https://medium.com/@luizvarela1/building-a-phoenix-api-d27902a1450a#.954p7dqx6

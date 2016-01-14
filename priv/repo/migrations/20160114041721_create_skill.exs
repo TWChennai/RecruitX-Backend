@@ -8,5 +8,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
       timestamps
     end
 
+    execute "CREATE UNIQUE INDEX skills_name_index ON skills (UPPER(name));"
   end
 end

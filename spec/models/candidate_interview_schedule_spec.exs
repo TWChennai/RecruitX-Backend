@@ -8,9 +8,9 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
   let :role, do: Repo.insert!(%Role{name: "test_role"})
   let :candidate, do: Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-  let :interview, do: Repo.insert!(%Interview{name: "test_interview"})
+  let :interview, do: Repo.insert!(%Interview{name: "test_interview", priority: 42})
 
-  let :valid_attrs, do: %{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2011-01-01"), interview_time: Ecto.Time.cast!("12:00:00")}
+  let :valid_attrs, do: %{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2011-01-01 12:00:00")}
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do

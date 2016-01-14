@@ -4,6 +4,7 @@ defmodule RecruitxBackend.Skill do
   @derive {Poison.Encoder, only: [:id, :name]}
   schema "skills" do
     field :name, :string
+
     timestamps
 
     has_many :candidate_skills, CandidateSkill

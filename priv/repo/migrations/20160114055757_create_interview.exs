@@ -8,6 +8,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterview do
 
       timestamps
     end
-    create unique_index(:interviews, [:name])
+
+    execute "CREATE UNIQUE INDEX interviews_name_index ON interviews (UPPER(name));"
   end
 end

@@ -7,6 +7,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRole do
 
       timestamps
     end
-    create unique_index(:roles, [:name])
+
+    execute "CREATE UNIQUE INDEX roles_name_index ON roles (UPPER(name));"
   end
 end

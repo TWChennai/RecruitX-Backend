@@ -1,26 +1,25 @@
-defmodule RecruitxBackend.SkillController do
-
+defmodule RecruitxBackend.InterviewController do
   use RecruitxBackend.Web, :controller
 
-  alias RecruitxBackend.Skill
+  alias RecruitxBackend.Interview
 
-  plug :scrub_params, "skill" when action in [:create, :update]
+  plug :scrub_params, "interview" when action in [:create, :update]
 
   def index(conn, _params) do
-    json conn, Repo.all(Skill)
-    # skills = Repo.all(Skill)
-    # render(conn, "index.json", skills: skills)
+    json conn, Repo.all(Interview)
+    # interviews = Repo.all(Interview)
+    # render(conn, "index.json", interviews: interviews)
   end
 
-  # def create(conn, %{"skill" => skill_params}) do
-  #   changeset = Skill.changeset(%Skill{}, skill_params)
+  # def create(conn, %{"interview" => interview_params}) do
+  #   changeset = Interview.changeset(%Interview{}, interview_params)
   #
   #   # case Repo.insert(changeset) do
-  #   #   {:ok, skill} ->
+  #   #   {:ok, interview} ->
   #   #     conn
   #   #     |> put_status(:created)
-  #   #     |> put_resp_header("location", skill_path(conn, :show, skill))
-  #   #     # |> render("show.json", skill: skill)
+  #   #     |> put_resp_header("location", interview_path(conn, :show, interview))
+  #   #     # |> render("show.json", interview: interview)
   #   #   {:error, changeset} ->
   #   #     conn
   #   #     |> put_status(:unprocessable_entity)
@@ -37,17 +36,17 @@ defmodule RecruitxBackend.SkillController do
   # end
 
   # def show(conn, %{"id" => id}) do
-  #   skill = Repo.get!(Skill, id)
-  #   render(conn, "show.json", skill: skill)
+  #   interview = Repo.get!(Interview, id)
+  #   render(conn, "show.json", interview: interview)
   # end
   #
-  # def update(conn, %{"id" => id, "skill" => skill_params}) do
-  #   skill = Repo.get!(Skill, id)
-  #   changeset = Skill.changeset(skill, skill_params)
+  # def update(conn, %{"id" => id, "interview" => interview_params}) do
+  #   interview = Repo.get!(Interview, id)
+  #   changeset = Interview.changeset(interview, interview_params)
   #
   #   case Repo.update(changeset) do
-  #     {:ok, skill} ->
-  #       render(conn, "show.json", skill: skill)
+  #     {:ok, interview} ->
+  #       render(conn, "show.json", interview: interview)
   #     {:error, changeset} ->
   #       conn
   #       |> put_status(:unprocessable_entity)
@@ -56,11 +55,11 @@ defmodule RecruitxBackend.SkillController do
   # end
   #
   # def delete(conn, %{"id" => id}) do
-  #   skill = Repo.get!(Skill, id)
+  #   interview = Repo.get!(Interview, id)
   #
   #   # Here we use delete! (with a bang) because we expect
   #   # it to always work (and if it does not, it will raise).
-  #   Repo.delete!(skill)
+  #   Repo.delete!(interview)
   #
   #   send_resp(conn, :no_content, "")
   # end

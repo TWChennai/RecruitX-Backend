@@ -21,19 +21,19 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(changeset) |> to(be_valid)
     end
 
-    it "should be valid when priority is nil" do
+    it "should not be valid when priority is nil" do
       interview_with_nil_priority = Map.merge(valid_attrs, %{priority: nil})
       changeset = Interview.changeset(%Interview{}, interview_with_nil_priority)
 
-      expect(changeset) |> to(be_valid)
+      expect(changeset) |> to(have_errors(priority: "can't be blank"))
     end
 
-    it "should be valid when no priority is given" do
-      interview_with_no_priority = Map.delete(valid_attrs, :priority)
-      changeset = Interview.changeset(%Interview{}, interview_with_no_priority)
-
-      expect(changeset) |> to(be_valid)
-    end
+    # it "should be valid when no priority is given" do
+    #   interview_with_no_priority = Map.delete(valid_attrs, :priority)
+    #   changeset = Interview.changeset(%Interview{}, interview_with_no_priority)
+    #
+    #   expect(changeset) |> to(be_valid)
+    # end
   end
 
   context "invalid changeset" do
@@ -91,7 +91,7 @@ defmodule RecruitxBackend.InterviewSpec do
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
-      interview_in_caps = Interview.changeset(%Interview{}, %{name: "Some ContenT"})
+      interview_in_caps = Interview.changeset(%Interview{}, %{name: "Some ContenT", priority: 42})
 
       {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
@@ -101,7 +101,7 @@ defmodule RecruitxBackend.InterviewSpec do
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
-      interview_in_caps = Interview.changeset(%Interview{}, %{name: String.capitalize(valid_attrs.name)})
+      interview_in_caps = Interview.changeset(%Interview{}, %{name: String.capitalize(valid_attrs.name), priority: 42})
 
       {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
@@ -111,8 +111,8 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should raise an exception when it has foreign key references in other tables" do
       role = Repo.insert!(%Role{name: "test_role"})
       candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-      interview = Repo.insert!(%Interview{name: "some_interview"})
-      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2011-01-01"), interview_time: Ecto.Time.cast!("12:00:00")})
+      interview = Repo.insert!(%Interview{name: "some_interview", priority: 42})
+      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2011-01-01 12:00:00")})
 
       delete = fn ->  Repo.delete!(interview) end
 

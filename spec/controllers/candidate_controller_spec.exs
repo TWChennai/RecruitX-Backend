@@ -41,8 +41,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   describe "create" do
     let :role, do: Repo.insert!(%Role{name: "test_role"})
-    let :valid_attrs, do: %{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"}
-    let :invalid_attrs, do: %{}
+    let :valid_attrs, do: %{"candidate" =>%{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"}}
+    let :invalid_attrs, do: %{"candidate" =>%{}}
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
 

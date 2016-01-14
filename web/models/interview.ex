@@ -1,16 +1,18 @@
 defmodule RecruitxBackend.Interview do
   use RecruitxBackend.Web, :model
 
+  @derive {Poison.Encoder, only: [:name, :priority]}
   schema "interviews" do
     field :name, :string
     field :priority, :integer
+
     timestamps
 
-    has_many :candidate_interview_schedule, CandidateInterviewSchedule
+    has_many :candidate_interview_schedules, CandidateInterviewSchedule
   end
 
-  @required_fields ~w(name)
-  @optional_fields ~w(priority)
+  @required_fields ~w(name priority)
+  @optional_fields ~w()
 
   # TODO: Default sort order by priority
 

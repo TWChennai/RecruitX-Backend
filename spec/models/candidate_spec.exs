@@ -111,8 +111,8 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should raise an exception when it has foreign key reference in other tables" do
       candidate_changeset = Candidate.changeset(%Candidate{}, valid_attrs)
       candidate = Repo.insert!(candidate_changeset)
-      interview = Repo.insert!(%Interview{name: "some_interview"})
-      valid_attrs_for_candidate_interview_schedule = %{candidate_id: candidate.id, interview_id: interview.id, interview_date: Ecto.Date.cast!("2016-01-01"), interview_time: Ecto.Time.cast!("12:00:00")}
+      interview = Repo.insert!(%Interview{name: "some_interview", priority: 42})
+      valid_attrs_for_candidate_interview_schedule = %{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2016-01-01 12:00:00")}
       changeset_for_candidate_interview_schedule = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, valid_attrs_for_candidate_interview_schedule)
       Repo.insert(changeset_for_candidate_interview_schedule)
 
