@@ -1,12 +1,14 @@
 defmodule RecruitxBackend.InterviewSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Interview
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Role
 
-  let :valid_attrs, do: %{name: "some content", priority: 42}
+  let :valid_attrs, do: fields_for(:interview, priority: trunc(:random.uniform * 10))
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -21,19 +23,12 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(changeset) |> to(be_valid)
     end
 
-    it "should not be valid when priority is nil" do
-      interview_with_nil_priority = Map.merge(valid_attrs, %{priority: nil})
-      changeset = Interview.changeset(%Interview{}, interview_with_nil_priority)
+    it "should be valid when no priority is given" do
+      interview_with_no_priority = Map.delete(valid_attrs, :priority)
+      changeset = Interview.changeset(%Interview{}, interview_with_no_priority)
 
-      expect(changeset) |> to(have_errors(priority: "can't be blank"))
+      expect(changeset) |> to(be_valid)
     end
-
-    # it "should be valid when no priority is given" do
-    #   interview_with_no_priority = Map.delete(valid_attrs, :priority)
-    #   changeset = Interview.changeset(%Interview{}, interview_with_no_priority)
-    #
-    #   expect(changeset) |> to(be_valid)
-    # end
   end
 
   context "invalid changeset" do
@@ -87,26 +82,17 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
-    it "should be invalid when interview already exists with same name but mixed case" do
+    it "should be invalid when interview already exists with same name but different case" do
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
-      interview_in_caps = Interview.changeset(%Interview{}, %{name: "Some ContenT", priority: 42})
-
-      {:error, changeset} = Repo.insert(interview_in_caps)
-      expect(changeset) |> to(have_errors(name: "has already been taken"))
-    end
-
-    it "should be invalid when interview already exists with same name but upper case" do
-      valid_interview = Interview.changeset(%Interview{}, valid_attrs)
-      Repo.insert!(valid_interview)
-
-      interview_in_caps = Interview.changeset(%Interview{}, %{name: String.capitalize(valid_attrs.name), priority: 42})
+      interview_in_caps = Interview.changeset(%Interview{}, fields_for(:interview, name: String.upcase(valid_attrs.name)))
 
       {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end
+
   context "on delete" do
     it "should raise an exception when it has foreign key references in other tables" do
       role = Repo.insert!(%Role{name: "test_role"})

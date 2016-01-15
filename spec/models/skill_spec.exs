@@ -1,12 +1,14 @@
 defmodule RecruitxBackend.SkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Skill
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
 
-  let :valid_attrs, do: %{name: "some content"}
+  let :valid_attrs, do: fields_for(:skill)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -66,21 +68,11 @@ defmodule RecruitxBackend.SkillSpec do
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
-    it "should be invalid when skill already exists with same name but mixed case" do
+    it "should be invalid when skill already exists with same name but different case" do
       valid_skill = Skill.changeset(%Skill{}, valid_attrs)
       Repo.insert!(valid_skill)
 
-      skill_in_caps = Skill.changeset(%Skill{}, %{name: "Some ContenT"})
-
-      {:error, changeset} = Repo.insert(skill_in_caps)
-      expect(changeset) |> to(have_errors(name: "has already been taken"))
-    end
-
-    it "should be invalid when skill already exists with same name but upper case" do
-      valid_skill = Skill.changeset(%Skill{}, valid_attrs)
-      Repo.insert!(valid_skill)
-
-      skill_in_caps = Skill.changeset(%Skill{}, %{name: String.capitalize(valid_attrs.name)})
+      skill_in_caps = Skill.changeset(%Skill{}, %{name: String.upcase(valid_attrs.name)})
 
       {:error, changeset} = Repo.insert(skill_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))

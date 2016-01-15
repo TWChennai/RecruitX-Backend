@@ -1,13 +1,15 @@
 defmodule RecruitxBackend.SkillControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.SkillController
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Skill
 
   describe "index" do
     let :skills do
       [
-        %Skill{id: 1, name: "Java"},
-        %Skill{id: 2, name: "Ruby"},
+        build(:skill),
+        build(:skill)
       ]
     end
 
@@ -16,6 +18,7 @@ defmodule RecruitxBackend.SkillControllerSpec do
 
     it do: should be_successful
     it do: should have_http_status(:ok)
+
     it "should return the array of skills as a JSON response" do
       response = action(:index)
 

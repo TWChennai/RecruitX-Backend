@@ -26,7 +26,7 @@ defmodule RecruitxBackend.Mixfile do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "web", "spec/support"]
   defp elixirc_paths(_),     do: ["lib", "web"]
 
   # Specifies your project dependencies.
@@ -36,16 +36,18 @@ defmodule RecruitxBackend.Mixfile do
     [{:phoenix, "~> 1.1.0"},
      {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
-     {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:cowboy, "~> 1.0"},
-     {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
-     {:excoveralls, "~> 0.4.3", only: [:dev, :test]},
-     {:ectoo, "> 0.0.0", only: [:test]},
      {:exrm, "~> 0.19.9"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
      {:httpotion, "~> 2.1.0"},
      {:json,   "~> 0.3.0"},
-     {:corsica, "~> 0.4"}
+     {:corsica, "~> 0.4"},
+     {:phoenix_live_reload, "~> 1.0", only: :dev},
+     {:ectoo, "> 0.0.0", only: [:test]},
+     {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
+     {:excoveralls, "~> 0.4.3", only: [:dev, :test]},
+     {:ex_machina, "~> 0.6.1", only: :test, app: false},
+     {:faker, "~> 0.5", only: :test, app: false}
    ]
   end
 

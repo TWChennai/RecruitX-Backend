@@ -1,15 +1,16 @@
 defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
   use ESpec.Phoenix, model: RecruitxBackend.CandidateInterviewSchedule
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Role
 
-  let :role, do: Repo.insert!(%Role{name: "test_role"})
-  let :candidate, do: Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-  let :interview, do: Repo.insert!(%Interview{name: "test_interview", priority: 42})
+  let :candidate, do: create(:candidate)
+  let :interview, do: create(:interview)
 
+  # TODO: Use factory
   let :valid_attrs, do: %{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2011-01-01 12:00:00")}
   let :invalid_attrs, do: %{}
 

@@ -1,13 +1,15 @@
 defmodule RecruitxBackend.RoleControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.RoleController
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Role
 
   describe "index" do
     let :roles do
       [
-        %Role{id: 1, name: "Dev"},
-        %Role{id: 2, name: "QA"},
+        build(:role),
+        build(:role),
       ]
     end
 
@@ -16,6 +18,7 @@ defmodule RecruitxBackend.RoleControllerSpec do
 
     it do: should be_successful
     it do: should have_http_status(:ok)
+
     it "should return the array of roles as a JSON response" do
       response = action(:index)
 

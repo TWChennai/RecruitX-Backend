@@ -4,13 +4,13 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Role
 
   describe "get /candidates" do
     it "should return a list of candidates" do
-      role = Repo.insert!(%Role{name: "test_role"})
-      {:ok, candidate} = Repo.insert(Candidate.changeset(%Candidate{}, %{"name" => "test", "experience" => Decimal.new(2.12), "role_id" => role.id}))
+      candidate = create(:candidate)
 
       response = get conn(), "/candidates"
 
@@ -22,10 +22,10 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   describe "POST /candidates" do
     context "with valid params" do
       it "should create a new candidate in the db" do
-        role = Repo.insert!(%Role{name: "test_role"})
+        role = create(:role)
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" =>%{name: "test", role_id: role.id, experience: Decimal.new(3)}}
+        response = post conn(), "/candidates", %{"candidate" => fields_for(:candidate, role_id: role.id)}
 
         expect(response.status) |> to(be(200))
         new_candidate_count = get_candidate_count
@@ -37,7 +37,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       it "should not create a new candidate in the db" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" =>%{invalid: "invalid_post_param"}}
+        response = post conn(), "/candidates", %{"candidate" => %{invalid: "invalid_post_param"}}
 
         expect(response.status) |> to(be(400))
         new_candidate_count = get_candidate_count

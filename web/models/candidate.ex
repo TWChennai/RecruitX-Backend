@@ -20,9 +20,9 @@ defmodule RecruitxBackend.Candidate do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-            |> validate_length(:name, min: 1)
-            |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
-            |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100))
-            |> foreign_key_constraint(:role_id)
+    |> validate_length(:name, min: 1)
+    |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100))
+    |> foreign_key_constraint(:role_id)
   end
 end

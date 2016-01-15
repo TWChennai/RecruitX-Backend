@@ -1,17 +1,18 @@
 defmodule RecruitxBackend.CandidateSkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.CandidateSkill
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
 
-  let :role, do: Repo.insert!(%Role{name: "test_role"})
-  let :candidate, do: Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-  let :skill, do: Repo.insert!(%Skill{name: "test_skill"})
+  let :candidate, do: create(:candidate, additional_information: "info")
+  let :skill, do: create(:skill)
 
-  let :valid_attrs, do: %{candidate_id: candidate.id, skill_id: skill.id}
+  let :valid_attrs, do: fields_for(:candidate_skill, candidate_id: candidate.id, skill_id: skill.id)
   let :invalid_attrs, do: %{}
+
   context "valid changeset" do
     subject do: CandidateSkill.changeset(%CandidateSkill{}, valid_attrs)
 

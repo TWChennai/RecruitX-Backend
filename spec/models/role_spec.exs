@@ -1,9 +1,11 @@
 defmodule RecruitxBackend.RoleSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Role
 
+  import RecruitxBackend.Factory
+
   alias RecruitxBackend.Role
 
-  let :valid_attrs, do: %{name: "some content"}
+  let :valid_attrs, do: fields_for(:role)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -63,21 +65,11 @@ defmodule RecruitxBackend.RoleSpec do
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
-    it "should be invalid when role already exists with same name but mixed case" do
+    it "should be invalid when role already exists with same name but different case" do
       valid_role = Role.changeset(%Role{}, valid_attrs)
       Repo.insert!(valid_role)
 
-      role_in_caps = Role.changeset(%Role{}, %{name: "Some ContenT"})
-
-      {:error, changeset} = Repo.insert(role_in_caps)
-      expect(changeset) |> to(have_errors(name: "has already been taken"))
-    end
-
-    it "should be invalid when role already exists with same name but upper case" do
-      valid_role = Role.changeset(%Role{}, valid_attrs)
-      Repo.insert!(valid_role)
-
-      role_in_caps = Role.changeset(%Role{}, %{name: String.capitalize(valid_attrs.name)})
+      role_in_caps = Role.changeset(%Role{}, %{name: String.upcase(valid_attrs.name)})
 
       {:error, changeset} = Repo.insert(role_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
