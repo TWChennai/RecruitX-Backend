@@ -11,28 +11,17 @@ After cloning the git repository, you will need the following pre-requisites
   2. Run the `credo` hex package to find issues (credo is a static code analyzer)
 
       `mix credo --strict`
+
 #### To start your Phoenix app:
-  1. Install dependencies with
-
-      `mix deps.get`
-  2. Create and migrate your database with
-
-      `mix ecto.create && mix ecto.migrate`
-  3. To seed the database, run
-
-      `mix run priv/repo/seeds.exs`
-
-     or when you need in production:
-
-      `MIX_ENV=prod mix run priv/repo/seeds.exs`
-  4. Start Phoenix endpoint with
-
-      `mix phoenix.server`
-
-     Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-  5. Run all espec tests with `mix espec --cover`
-  6. Run unit tests with `mix espec --exclude integration`
-  7. Run integration tests with `mix espec spec/integration/*`
+  1. Install dependencies with `mix deps.get`
+  2. Create, migrate and seed your database with `mix ecto.setup`
+  3. Drop, Create, migrate and seed your database with `mix ecto.reset`
+  4. Seed the database with `mix run priv/repo/seeds.exs`
+  5. Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  6. To run whatever's necessary before committing: `MIX_ENV=test mix commit`
+  7. Run all espec tests with `MIX_ENV=test mix espec --cover`
+  8. Run unit tests with `MIX_ENV=test mix espec --exclude integration`
+  9. Run integration tests with `MIX_ENV=test mix espec spec/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
