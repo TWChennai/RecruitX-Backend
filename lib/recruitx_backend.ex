@@ -1,6 +1,8 @@
 defmodule RecruitxBackend do
   use Application
 
+  alias RecruitxBackend.Endpoint
+
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
@@ -8,7 +10,7 @@ defmodule RecruitxBackend do
 
     children = [
       # Start the endpoint when the application starts
-      supervisor(RecruitxBackend.Endpoint, []),
+      supervisor(Endpoint, []),
       # Start the Ecto repository
       worker(RecruitxBackend.Repo, []),
       # Here you could define other workers and supervisors as children
@@ -24,7 +26,7 @@ defmodule RecruitxBackend do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    RecruitxBackend.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

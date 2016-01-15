@@ -7,10 +7,11 @@ After cloning the git repository, you will need the following pre-requisites
       `create role recruitx login createdb;`
 
 #### Coding style
-2 spaces instead of tabs for all indentation
+  1. Use 2 spaces instead of tabs for all indentation
+  2. Run the `credo` hex package to find issues (credo is a static code analyzer)
 
+      `mix credo --strict`
 #### To start your Phoenix app:
-
   1. Install dependencies with
 
       `mix deps.get`
