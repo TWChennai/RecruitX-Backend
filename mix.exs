@@ -43,10 +43,10 @@ defmodule RecruitxBackend.Mixfile do
      {:json,   "~> 0.3.0"},
      {:corsica, "~> 0.4"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
-     {:credo, "~> 0.2", only: [:dev, :test]},
-     {:ectoo, "> 0.0.0", only: [:test]},
+     {:credo, "~> 0.2", only: :test, app: false},
+     {:ectoo, "> 0.0.0", only: :test, app: false},
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
-     {:excoveralls, "~> 0.4.5", only: [:dev, :test]},
+     {:excoveralls, "~> 0.4.5", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
      {:faker, "~> 0.5", only: :test, app: false}
    ]
