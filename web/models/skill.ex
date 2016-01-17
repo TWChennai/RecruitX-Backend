@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Skill do
 
     timestamps
 
-    has_many :candidate_skills, CandidateSkill
+    has_many :candidate_skills, RecruitxBackend.CandidateSkill
   end
 
   @required_fields ~w(name)

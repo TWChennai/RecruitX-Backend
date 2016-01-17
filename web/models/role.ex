@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Role do
 
     timestamps
 
-    has_many :candidates, Candidate
+    has_many :candidates, RecruitxBackend.Candidate
   end
 
   @required_fields ~w(name)

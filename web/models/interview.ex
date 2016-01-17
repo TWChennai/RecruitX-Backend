@@ -8,7 +8,7 @@ defmodule RecruitxBackend.Interview do
 
     timestamps
 
-    has_many :candidate_interview_schedules, CandidateInterviewSchedule
+    has_many :candidate_interview_schedules, RecruitxBackend.CandidateInterviewSchedule
   end
 
   @required_fields ~w(name)

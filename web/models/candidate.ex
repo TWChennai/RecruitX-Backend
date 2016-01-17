@@ -6,12 +6,12 @@ defmodule RecruitxBackend.Candidate do
     field :name, :string
     field :experience, :decimal
     field :additional_information, :string
-    belongs_to :role, Role
+    belongs_to :role, RecruitxBackend.Role
 
     timestamps
 
-    has_many :candidate_skills, CandidateSkill
-    has_many :candidate_interview_schedules, CandidateInterviewSchedule
+    has_many :candidate_skills, RecruitxBackend.CandidateSkill
+    has_many :candidate_interview_schedules, RecruitxBackend.CandidateInterviewSchedule
   end
 
   @required_fields ~w(name experience role_id)
