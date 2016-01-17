@@ -14,16 +14,35 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def create(conn, %{"candidate" => post_params}) do
-    skill_ids = readSkillIdsOrRaiseError(post_params)
+    skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
     {status, result_of_db_transaction} = Repo.transaction fn ->
+      candidate_skill_insertion_status = :error
       {candidate_insertion_status, result_of_db_transaction} = insertCandidate(post_params)
+
       if candidate_insertion_status == :ok do
-          insertCandidateSkills(result_of_db_transaction, skill_ids)
-      else
-          Repo.rollback(result_of_db_transaction)
+          {candidate_skill_insertion_status, result_of_db_transaction} = insertCandidateSkills(result_of_db_transaction, skill_ids)
       end
+
+      #Error by changeset validation before db insertion
+      if candidate_insertion_status == :changeset_error || candidate_skill_insertion_status == :changeset_error do
+        Repo.rollback(result_of_db_transaction)
+      end
+
+      #Error while inserting into db like forein keys do not exist error
+      if candidate_insertion_status == :error  || candidate_skill_insertion_status == :error do
+        Repo.rollback(getChangesetErrorsInReadableFormat(result_of_db_transaction))
+      end
+      #TODO: Sending errors in json format instead of strings
     end
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
+  end
+
+  def readQueryParamOrRaiseError(key, post_params) do
+    read_query_params = post_params[key]
+    unless read_query_params  && Enum.count(read_query_params) != 0 do
+      raise Phoenix.MissingParamError, key: key
+    end
+    Enum.uniq(read_query_params)
   end
 
   def insertCandidate(post_params) do
@@ -31,41 +50,40 @@ defmodule RecruitxBackend.CandidateController do
     if candidate_changeset.valid? do
       {status, candidate} = Repo.insert(candidate_changeset)
     else
-      errors = for n <- Keyword.keys(candidate_changeset.errors), do: "#{n} #{Keyword.get(candidate_changeset.errors,n)}"
-      {:error, errors}
+      {:changeset_error,getChangesetErrorsInReadableFormat(candidate_changeset)}
     end
-  end
-
-  def readSkillIdsOrRaiseError(post_params) do
-    skill_ids=post_params["skill_ids"]
-      unless skill_ids do
-        raise Phoenix.MissingParamError, key: "skill_ids"
-      end
-    skill_ids
   end
 
   def insertCandidateSkills(candidate, skill_ids) do
     candidate_skill_changesets = for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
-      result = Enum.all?(candidate_skill_changesets, fn(changeset) ->
-        changeset.valid?
+    result = Enum.all?(candidate_skill_changesets, fn(changeset) ->
+      changeset.valid?
+    end)
+    if result do
+      {status,changeset} = Enum.reduce_while(candidate_skill_changesets, [], fn i, acc ->
+        {status, result} = Repo.insert(i)
+        acc = {status, result}
+        if( status == :error) do
+          {:halt, acc}
+        else
+          {:cont, acc}
+        end
       end)
-      if result do
-        Enum.each(candidate_skill_changesets, fn(x) -> Repo.insert(x) end)
-      else
-        #TODO: send changeset errors
-        Repo.rollback("Invalid Data")
-      end
+    else
+      errors = for n <- candidate_skill_changesets, do: getChangesetErrorsInReadableFormat(n)
+      {:changeset_error, errors}
+    end
   end
 
   def sendResponseBasedOnResult(conn, status, response) do
-      if status == :ok do
-        conn
-          |> put_status(200)
-          |> json(response)
-      else
-        conn
-          |> put_status(400)
-          |> json(response)
+    if status == :ok do
+      conn
+        |> put_status(200)
+        |> json(response)
+    else
+      conn
+        |> put_status(400)
+        |> json(response)
     end
   end
 
@@ -73,8 +91,12 @@ defmodule RecruitxBackend.CandidateController do
     candidate_name = post_params["name"]
     candidate_experience = post_params["experience"]
     role_id = post_params["role_id"]
-    additional_skills = post_params["additional_information"]
-    %{name: candidate_name, role_id: role_id, experience: candidate_experience, additional_information: additional_skills}
+    additional_information = post_params["additional_information"]
+    %{name: candidate_name, role_id: role_id, experience: candidate_experience, additional_information: additional_information}
+  end
+
+  def getChangesetErrorsInReadableFormat(changeset) do
+    for n <- Keyword.keys(changeset.errors), do: "#{n} #{Keyword.get(changeset.errors,n)}"
   end
 
   # def show(conn, %{"id" => id}) do

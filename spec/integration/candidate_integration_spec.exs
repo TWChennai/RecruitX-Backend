@@ -48,7 +48,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       it "should not create a new candidate in the db" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" => %{skill_ids: "invalid_post_param"}}
+        response = post conn(), "/candidates", %{"candidate" => %{skill_ids: [1]}}
 
         expect(response.status) |> to(be(400))
         new_candidate_count = get_candidate_count

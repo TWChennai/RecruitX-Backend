@@ -46,7 +46,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   describe "create" do
     let :valid_attrs, do: %{"candidate" => fields_for(:candidate, role_id: create(:role).id, additional_information: "info")}
-    let :invalid_attrs, do: %{"candidate" => %{"skill_ids" => []}}
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
 
@@ -59,12 +58,18 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it do: should(have_http_status(200))
     end
 
-    context "invalid params" do
-      before do: allow Repo |> to(accept(:insert, fn(_) -> {:error, "invalid data"} end))
+    context "invalid query params" do
+      let :invalid_attrs_with_empty_skill_id, do: %{"candidate" => %{"skill_ids" => []}}
+      let :invalid_attrs_with_no_skill_id, do: %{"candidate" => %{}}
+      let :invalid_attrs_with_no_candidate_key, do: %{}
 
-      subject do: action(:create, invalid_attrs)
+      it "raises exception when skill_ids is empty" do
+        expect(fn -> action(:create, invalid_attrs_with_empty_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
+      end
 
-      it do: should(have_http_status(400))
+      it "raises exception when skill_ids is not given" do
+        expect(fn -> action(:create, invalid_attrs_with_no_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
+      end
     end
   end
 end
