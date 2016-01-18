@@ -39,7 +39,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count + 1))
 
-        [candidate_skill] = get_candidate_skill_for(post_parameters[:name])
+        candidate_skill = get_candidate_skill_for(post_parameters[:name])
         expect(candidate_skill.skill_id) |> to(be(skill_id_for_candidate))
       end
     end
@@ -73,7 +73,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     def get_candidate_skill_for(name) do
       q = CandidateSkill |> Ecto.Query.join(:inner, [cs], c in Candidate, c.name == ^name and c.id == cs.candidate_id)
-      Repo.all q
+      Repo.one q
     end
   end
 end

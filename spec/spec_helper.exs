@@ -14,6 +14,7 @@ ESpec.configure fn(config) ->
     Ecto.Adapters.SQL.restart_test_transaction(RecruitxBackend.Repo, [])
   end
 
-  # config.finally fn(shared) ->
-  # end
+  config.finally fn ->
+    Ecto.Adapters.SQL.rollback_test_transaction(RecruitxBackend.Repo, [])
+  end
 end
