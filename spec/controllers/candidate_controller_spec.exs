@@ -45,12 +45,12 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   describe "create" do
-    let :valid_attrs, do: %{"candidate" => fields_for(:candidate, role_id: create(:role).id, additional_information: "info")}
+    let :valid_attrs, do: %{"candidate" => %{"experience" => 2, "name" => "test", "role_id" => create(:role).id, "skill_ids" => [2]}}
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
 
-    xdescribe "valid params" do
-      before do: allow Repo |> to(accept(:insert, fn(_) -> valid_changeset end))
+    describe "valid params" do
+      before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, create(:candidate)} end))
 
       subject do: action(:create, valid_attrs)
 

@@ -5,7 +5,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   @endpoint RecruitxBackend.Endpoint
 
   import RecruitxBackend.Factory
-  import Ecto.Query
+  require Ecto.Query
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
