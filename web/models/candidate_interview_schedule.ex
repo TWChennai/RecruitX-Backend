@@ -1,11 +1,14 @@
 defmodule RecruitxBackend.CandidateInterviewSchedule do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Interview
+
   @derive {Poison.Encoder, only: [:candidate_interview_date_time, :candidate_id, :interview_id]}
   schema "candidate_interview_schedules" do
     field :candidate_interview_date_time, Ecto.DateTime
-    belongs_to :candidate, RecruitxBackend.Candidate
-    belongs_to :interview, RecruitxBackend.Interview
+    belongs_to :candidate, Candidate
+    belongs_to :interview, Interview
 
     timestamps
   end
