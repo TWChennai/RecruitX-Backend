@@ -45,17 +45,20 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   describe "create" do
-    let :valid_attrs, do: %{"candidate" => %{"experience" => 2, "name" => "test", "role_id" => create(:role).id, "skill_ids" => [2]}}
+    let :valid_attrs, do: fields_for(:candidate, role_id: create(:role).id, skill_ids: [2])
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
 
     describe "valid params" do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, create(:candidate)} end))
 
-      subject do: action(:create, valid_attrs)
+      it "should return 200 and be successful" do
+        post_params_with_string_keys = for {key, val} <- valid_attrs, into: %{}, do: {to_string(key), val}
+        conn = action(:create, %{"candidate" => post_params_with_string_keys})
 
-      it do: should(be_successful)
-      it do: should(have_http_status(200))
+        conn |> should(be_successful)
+        conn |> should(have_http_status(200))
+      end
     end
 
     context "invalid query params" do
