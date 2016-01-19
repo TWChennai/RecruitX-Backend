@@ -3,6 +3,9 @@ defmodule RecruitxBackend.CandidateController do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.JSONError
+
 
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -70,7 +73,7 @@ defmodule RecruitxBackend.CandidateController do
         end
       end)
     else
-      errors = for n <- candidate_skill_changesets, do: getChangesetErrorsInReadableFormat(n)
+      errors = for n <- candidate_skill_changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
       {:changeset_error, errors}
     end
   end
@@ -83,7 +86,7 @@ defmodule RecruitxBackend.CandidateController do
     else
       conn
         |> put_status(400)
-        |> json(response)
+        |> json(%JSONError{errors: response})
     end
   end
 
@@ -96,7 +99,13 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def getChangesetErrorsInReadableFormat(changeset) do
-    for n <- Keyword.keys(changeset.errors), do: "#{n} #{Keyword.get(changeset.errors,n)}"
+    for n <- Keyword.keys(changeset.errors) do
+      value = Keyword.get(changeset.errors,n)
+      if is_tuple(value) do
+        value = elem(value, 0)
+      end
+      %JSONErrorReason{field_name: n, reason: value}
+    end
   end
 
   # def show(conn, %{"id" => id}) do

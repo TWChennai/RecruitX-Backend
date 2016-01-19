@@ -89,14 +89,14 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate_with_negative_experience = Map.merge(valid_attrs, %{experience: Decimal.new(-4)})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_negative_experience)
 
-      expect(changeset) |> to(have_errors(experience: {"must be greater than or equal to %{count}", [count: Decimal.new(0)]}))
+      expect(changeset) |> to(have_errors(experience: {"must be in the range 0-100", [count: Decimal.new(0)]}))
     end
 
     it "should be invalid when experience is more than or equal to 100" do
       candidate_with_invalid_experience = Map.merge(valid_attrs, %{experience: Decimal.new(100)})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_invalid_experience)
 
-      expect(changeset) |> to(have_errors(experience: {"must be less than %{count}", [count: Decimal.new(100)]}))
+      expect(changeset) |> to(have_errors(experience: {"must be in the range 0-100", [count: Decimal.new(100)]}))
     end
 
     it "should be invalid when no experience is given" do

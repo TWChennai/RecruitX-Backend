@@ -4,6 +4,11 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   import RecruitxBackend.Factory
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.JSONError
+
+  let :valid_attrs, do: fields_for(:candidate, role_id: create(:role).id, skill_ids: [2])
+  let :post_parameters, do: convertKeysFromAtomsToStrings(valid_attrs)
 
   describe "index" do
     let :candidates do
@@ -45,7 +50,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   describe "create" do
-    let :valid_attrs, do: fields_for(:candidate, role_id: create(:role).id, skill_ids: [2])
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
 
@@ -53,8 +57,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, create(:candidate)} end))
 
       it "should return 200 and be successful" do
-        post_params_with_string_keys = for {key, val} <- valid_attrs, into: %{}, do: {to_string(key), val}
-        conn = action(:create, %{"candidate" => post_params_with_string_keys})
+        conn = action(:create, %{"candidate" => post_parameters})
 
         conn |> should(be_successful)
         conn |> should(have_http_status(200))
@@ -73,6 +76,58 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "raises exception when skill_ids is not given" do
         expect(fn -> action(:create, invalid_attrs_with_no_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
       end
+
+      it "when name is of invalid format" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"name" => "1test"})})
+
+        response |> should(have_http_status(400))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "name", reason: "has invalid format"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
+      end
+
+      it "when role_id is invalid" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"role_id" => "1.2"})})
+
+        response |> should(have_http_status(400))
+        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedRoleErrorReason]})))
+      end
+
+      it "when experience is invalid" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => ""})})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
+
+      it "when experience is out of range" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "-1"})})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
+
+      it "when experience is out of range" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "-1"})})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
+
+      it "when skill_id is invalid" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => [1.2]})})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "skill_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
     end
+  end
+
+  def convertKeysFromAtomsToStrings(input) do
+    for {key, val} <- input, into: %{}, do: {to_string(key), val}
   end
 end
