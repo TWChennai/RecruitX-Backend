@@ -37,7 +37,7 @@ defmodule RecruitxBackend.Mixfile do
      {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
-     {:exrm, "~> 1.0.0-rc7"},
+     {:exrm, "~> 0.19.9"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
      {:httpotion, "~> 2.1.0"},
      {:json,   "~> 0.3.0"},

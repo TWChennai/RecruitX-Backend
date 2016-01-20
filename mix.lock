@@ -17,7 +17,7 @@
   "ex_machina": {:hex, :ex_machina, "0.6.1"},
   "excoveralls": {:hex, :excoveralls, "0.4.5"},
   "exjsx": {:hex, :exjsx, "3.2.0"},
-  "exrm": {:hex, :exrm, "1.0.0-rc7"},
+  "exrm": {:hex, :exrm, "0.19.9"},
   "faker": {:hex, :faker, "0.6.0"},
   "floki": {:hex, :floki, "0.7.1"},
   "fs": {:hex, :fs, "0.9.2"},
