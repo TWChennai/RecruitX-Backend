@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Mixfile do
 
   def project do
     [app: :recruitx_backend,
-     version: "0.0.2",
+     version: "0.0.3",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
@@ -21,7 +21,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-     applications: [:phoenix, :cowboy, :logger,
+     applications: [:phoenix, :cowboy, :logger, :connection, :json, :corsica,
                     :phoenix_ecto, :postgrex, :httpotion]]
   end
 
@@ -37,7 +37,7 @@ defmodule RecruitxBackend.Mixfile do
      {:phoenix_ecto, "~> 2.0"},
      {:postgrex, ">= 0.0.0"},
      {:cowboy, "~> 1.0"},
-     {:exrm, "~> 0.19.9"},
+     {:exrm, "~> 1.0.0-rc7"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
      {:httpotion, "~> 2.1.0"},
      {:json,   "~> 0.3.0"},
