@@ -29,7 +29,8 @@ end)
 Enum.map(["Java",
           "Ruby",
           "C#",
-          "Python"], fn skill_value ->
+          "Python",
+          "Other"], fn skill_value ->
   Repo.insert!(%Skill{name: skill_value})
 end)
 
