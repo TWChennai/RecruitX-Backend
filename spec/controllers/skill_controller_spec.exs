@@ -1,10 +1,6 @@
 defmodule RecruitxBackend.SkillControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.SkillController
 
-  import RecruitxBackend.Factory
-
-  alias RecruitxBackend.Skill
-
   describe "index" do
     let :skills do
       [

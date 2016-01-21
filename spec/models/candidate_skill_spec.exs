@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.CandidateSkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.CandidateSkill
 
-  import RecruitxBackend.Factory
-
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Skill

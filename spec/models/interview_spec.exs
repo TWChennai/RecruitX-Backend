@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.InterviewSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Interview
 
-  import RecruitxBackend.Factory
-
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.Interview

@@ -1,10 +1,6 @@
 defmodule RecruitxBackend.InterviewControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
-  import RecruitxBackend.Factory
-
-  alias RecruitxBackend.Interview
-
   describe "index" do
     let :interviews do
       [

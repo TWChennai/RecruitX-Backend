@@ -1,10 +1,6 @@
 defmodule RecruitxBackend.RoleControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.RoleController
 
-  import RecruitxBackend.Factory
-
-  alias RecruitxBackend.Role
-
   describe "index" do
     let :roles do
       [

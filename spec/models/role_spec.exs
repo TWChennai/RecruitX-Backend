@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.RoleSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Role
 
-  import RecruitxBackend.Factory
-
   alias RecruitxBackend.Role
 
   let :valid_attrs, do: fields_for(:role)

@@ -2,6 +2,7 @@ defmodule ESpec.Phoenix.Extend do
   def model do
     quote do
       alias RecruitxBackend.Repo
+      import RecruitxBackend.Factory
     end
   end
 
@@ -9,6 +10,7 @@ defmodule ESpec.Phoenix.Extend do
     quote do
       alias RecruitxBackend.Repo
       import RecruitxBackend.Router.Helpers
+      import RecruitxBackend.Factory
     end
   end
 
@@ -16,12 +18,14 @@ defmodule ESpec.Phoenix.Extend do
     quote do
       alias RecruitxBackend.Repo
       import RecruitxBackend.Router.Helpers
+      import RecruitxBackend.Factory
     end
   end
 
   def view do
     quote do
       import RecruitxBackend.Router.Helpers
+      import RecruitxBackend.Factory
     end
   end
 

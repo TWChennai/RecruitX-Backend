@@ -1,9 +1,6 @@
 defmodule RecruitxBackend.CandidateControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.CandidateController
 
-  import RecruitxBackend.Factory
-
-  alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateController
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
@@ -35,7 +32,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   xdescribe "show" do
-    let :candidate, do: %Candidate{id: 1, title: "Candidate title", body: "some body content"}
+    let :candidate, do: build(:candidate, id: 1)
 
     before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> candidate end))
 
@@ -45,6 +42,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
     context "not found" do
       before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> nil end))
+
       it "raises exception" do
         expect(fn -> action(:show, %{"id" => 1}) end) |> to(raise_exception)
       end

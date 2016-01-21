@@ -4,9 +4,9 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
-  import RecruitxBackend.Factory
   require Ecto.Query
 
+  alias Ecto.Query
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
 
@@ -56,13 +56,13 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
      context "with no POST params" do
-       it "should return 400(Bad Request)" do
-       #  orig_candidate_count = get_candidate_count
+       xit "should return 400(Bad Request)" do
+        orig_candidate_count = get_candidate_count
 
-       #  response = post conn(), "/candidates"
-       #  expect(response.status) |> to(be(400))
-       #  new_candidate_count = get_candidate_count
-       #  expect(new_candidate_count) |> to(be(orig_candidate_count))
+        response = post conn(), "/candidates"
+        expect(response.status) |> to(be(400))
+        new_candidate_count = get_candidate_count
+        expect(new_candidate_count) |> to(be(orig_candidate_count))
        end
      end
 
@@ -72,8 +72,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     def get_candidate_skill_ids_for(name) do
       q = CandidateSkill
-        |> Ecto.Query.join(:inner, [cs], c in Candidate, c.name == ^name and c.id == cs.candidate_id)
-        |> Ecto.Query.select([cs], cs.skill_id)
+        |> Query.join(:inner, [cs], c in Candidate, c.name == ^name and c.id == cs.candidate_id)
+        |> Query.select([cs], cs.skill_id)
       Repo.all q
     end
   end

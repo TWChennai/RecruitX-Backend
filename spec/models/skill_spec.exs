@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.SkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Skill
 
-  import RecruitxBackend.Factory
-
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Role
@@ -84,7 +82,7 @@ defmodule RecruitxBackend.SkillSpec do
       role =  Repo.insert!(%Role{name: "test_role"})
       candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
       skill =  Repo.insert!(%Skill{name: "test_skill"})
-      candidate_skills = Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: skill.id})
+      Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: skill.id})
 
       delete = fn ->  Repo.delete!(skill) end
 
