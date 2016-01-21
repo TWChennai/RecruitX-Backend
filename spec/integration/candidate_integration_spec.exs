@@ -28,19 +28,18 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     context "with valid params" do
       it "should create a new candidate and insert corresponding skill in the db" do
-        role = create(:role)
-        skill_id_for_candidate = 1
         orig_candidate_count = get_candidate_count
-        post_parameters = fields_for(:candidate, role_id: role.id, skill_ids: [skill_id_for_candidate])
+        post_skill_params = build(:skill_ids)
+        post_parameters = Map.merge(fields_for(:candidate),Map.merge(post_skill_params, build(:interview_rounds)))
         response = post conn(), "/candidates", %{"candidate" => post_parameters}
 
         expect(response.status) |> to(be(200))
 
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count + 1))
-
-        candidate_skill = get_candidate_skill_for(post_parameters[:name])
-        expect(candidate_skill.skill_id) |> to(be(skill_id_for_candidate))
+        candidate_skill = get_candidate_skill_ids_for(post_parameters[:name])
+        unique_skill_ids = Enum.uniq(post_skill_params.skill_ids)
+        expect(candidate_skill) |> to(be(unique_skill_ids))
       end
     end
 
@@ -48,7 +47,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       it "should not create a new candidate in the db" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" => %{skill_ids: [1]}}
+        response = post conn(), "/candidates", %{"candidate" => Map.merge(build(:skill_ids), build(:interview_rounds))}
 
         expect(response.status) |> to(be(400))
         new_candidate_count = get_candidate_count
@@ -71,9 +70,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       Ectoo.count(Repo, Candidate)
     end
 
-    def get_candidate_skill_for(name) do
-      q = CandidateSkill |> Ecto.Query.join(:inner, [cs], c in Candidate, c.name == ^name and c.id == cs.candidate_id)
-      Repo.one q
+    def get_candidate_skill_ids_for(name) do
+      q = CandidateSkill
+        |> Ecto.Query.join(:inner, [cs], c in Candidate, c.name == ^name and c.id == cs.candidate_id)
+        |> Ecto.Query.select([cs], cs.skill_id)
+      Repo.all q
     end
   end
 end

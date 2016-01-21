@@ -10,8 +10,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
   let :candidate, do: create(:candidate)
   let :interview, do: create(:interview)
 
-  # TODO: Use factory
-  let :valid_attrs, do: %{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2011-01-01 12:00:00")}
+  let :valid_attrs, do: fields_for(:candidate_interview_schedule)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -34,20 +33,20 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       expect(result) |> to(have_errors(candidate_id: "can't be blank"))
     end
 
-    it "when interview id is nil" do
-      candidate_interview_schedule_with_interview_id_nil = Map.merge(valid_attrs, %{interview_id: nil})
-
-      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_id_nil)
-
-      expect(result) |> to(have_errors(interview_id: "can't be blank"))
-    end
-
     it "when candidate id is not present" do
       candidate_interview_schedule_with_no_candidate_id = Map.delete(valid_attrs, :candidate_id)
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_candidate_id)
 
       expect(result) |> to(have_errors(candidate_id: "can't be blank"))
+    end
+
+    it "when interview id is nil" do
+      candidate_interview_schedule_with_interview_id_nil = Map.merge(valid_attrs, %{interview_id: nil})
+
+      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_id_nil)
+
+      expect(result) |> to(have_errors(interview_id: "can't be blank"))
     end
 
     it "when interview id is not present" do
@@ -58,7 +57,29 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       expect(result) |> to(have_errors(interview_id: "can't be blank"))
     end
 
-    it "when interview_date is nil"
+    it "when interview date time is nil" do
+      candidate_interview_schedule_with_interview_date_time_nil = Map.merge(valid_attrs, %{candidate_interview_date_time: nil})
+
+      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_date_time_nil)
+
+      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+    end
+
+    it "when interview date time is not present" do
+      candidate_interview_schedule_with_no_interview_date_time = Map.delete(valid_attrs, :candidate_interview_date_time)
+
+      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_interview_date_time)
+
+      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+    end
+
+    it "when interview date time is invalid" do
+      candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_interview_date_time: "invalid"})
+
+      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_candidate_id_nil)
+
+      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+    end
   end
 
   context "foreign key constraint" do

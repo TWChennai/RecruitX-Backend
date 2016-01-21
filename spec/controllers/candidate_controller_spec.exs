@@ -8,7 +8,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
 
-  let :valid_attrs, do: fields_for(:candidate, role_id: create(:role).id, skill_ids: [2])
+  let :interview_rounds, do: convertKeysFromAtomsToStrings(build(:interview_rounds))
+  let :valid_attrs, do: Map.merge(fields_for(:candidate), Map.merge(interview_rounds, build(:skill_ids)))
   let :post_parameters, do: convertKeysFromAtomsToStrings(valid_attrs)
 
   describe "index" do
@@ -68,7 +69,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     context "invalid query params" do
       let :invalid_attrs_with_empty_skill_id, do: %{"candidate" => %{"skill_ids" => []}}
       let :invalid_attrs_with_no_skill_id, do: %{"candidate" => %{}}
-      let :invalid_attrs_with_no_candidate_key, do: %{}
+      let :invalid_attrs_with_empty_interview_rounds, do: %{"candidate" => %{"interview_rounds" => []}}
+      let :invalid_attrs_with_no_interview_round, do: %{"candidate" => %{}}
 
       it "raises exception when skill_ids is empty" do
         expect(fn -> action(:create, invalid_attrs_with_empty_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
@@ -76,6 +78,14 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
       it "raises exception when skill_ids is not given" do
         expect(fn -> action(:create, invalid_attrs_with_no_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
+      end
+
+      it "raises exception when interview_rounds is empty" do
+        expect(fn -> action(:create, invalid_attrs_with_empty_interview_rounds) end) |> to(raise_exception(Phoenix.MissingParamError))
+      end
+
+      it "raises exception when interview_rounds is not given" do
+        expect(fn -> action(:create, invalid_attrs_with_no_interview_round) end) |> to(raise_exception(Phoenix.MissingParamError))
       end
     end
 

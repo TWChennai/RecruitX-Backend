@@ -19,9 +19,15 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-          |> unique_constraint(:candidate_interview_id_index, name: :candidate_interview_id_index)
-          |> foreign_key_constraint(:candidate_id)
-          |> foreign_key_constraint(:interview_id)
-          # TODO: interview_date can't be nil
+    |> validate_date_time(:candidate_interview_date_time)
+    |> unique_constraint(:candidate_interview_id_index, name: :candidate_interview_id_index)
+    |> foreign_key_constraint(:candidate_id)
+    |> foreign_key_constraint(:interview_id)
+  end
+
+  def validate_date_time(existing_changeset, field) do
+    value = get_field(existing_changeset, field)
+    cast_date_time = Ecto.DateTime.cast(value)
+    if cast_date_time == :error, do: add_error(existing_changeset, :"#{field}", "is invalid"), else: existing_changeset
   end
 end

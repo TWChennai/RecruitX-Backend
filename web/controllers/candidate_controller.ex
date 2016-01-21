@@ -3,6 +3,7 @@ defmodule RecruitxBackend.CandidateController do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
 
@@ -18,22 +19,19 @@ defmodule RecruitxBackend.CandidateController do
 
   def create(conn, %{"candidate" => post_params}) do
     skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
+    interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
     {status, result_of_db_transaction} = Repo.transaction fn ->
-      candidate_skill_insertion_status = :error
-      {candidate_insertion_status, result_of_db_transaction} = insertCandidate(post_params)
+      try do
 
-      if candidate_insertion_status == :ok do
-          {candidate_skill_insertion_status, result_of_db_transaction} = insertCandidateSkills(result_of_db_transaction, skill_ids)
-      end
+        {_, candidate} = insertCandidate(post_params)
+        candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
+        insertChangesets(candidate_skill_changesets)
 
-      #Error by changeset validation before db insertion
-      if candidate_insertion_status == :changeset_error || candidate_skill_insertion_status == :changeset_error do
+        candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
+        insertChangesets(candidate_interview_rounds_changeset)
+
+      catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)
-      end
-
-      #Error while inserting into db like forein keys do not exist error
-      if candidate_insertion_status == :error  || candidate_skill_insertion_status == :error do
-        Repo.rollback(getChangesetErrorsInReadableFormat(result_of_db_transaction))
       end
     end
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
@@ -45,48 +43,6 @@ defmodule RecruitxBackend.CandidateController do
       raise Phoenix.MissingParamError, key: key
     end
     Enum.uniq(read_query_params)
-  end
-
-  def insertCandidate(post_params) do
-    candidate_changeset = Candidate.changeset(%Candidate{}, getCandidateProfileParams(post_params))
-    if candidate_changeset.valid? do
-      {status, candidate} = Repo.insert(candidate_changeset)
-    else
-      {:changeset_error,getChangesetErrorsInReadableFormat(candidate_changeset)}
-    end
-  end
-
-  def insertCandidateSkills(candidate, skill_ids) do
-    candidate_skill_changesets = for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
-    result = Enum.all?(candidate_skill_changesets, fn(changeset) ->
-      changeset.valid?
-    end)
-    if result do
-      {status,changeset} = Enum.reduce_while(candidate_skill_changesets, [], fn i, acc ->
-        {status, result} = Repo.insert(i)
-        acc = {status, result}
-        if( status == :error) do
-          {:halt, acc}
-        else
-          {:cont, acc}
-        end
-      end)
-    else
-      errors = for n <- candidate_skill_changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
-      {:changeset_error, errors}
-    end
-  end
-
-  def sendResponseBasedOnResult(conn, status, response) do
-    if status == :ok do
-      conn
-        |> put_status(200)
-        |> json(response)
-    else
-      conn
-        |> put_status(400)
-        |> json(%JSONError{errors: response})
-    end
   end
 
   def getCandidateProfileParams(post_params) do
@@ -108,6 +64,63 @@ defmodule RecruitxBackend.CandidateController do
       end
     else
       []
+    end
+  end
+
+  def insertCandidate(post_params) do
+    candidate_changeset = Candidate.changeset(%Candidate{}, getCandidateProfileParams(post_params))
+    if candidate_changeset.valid? do
+      {status, candidate} = Repo.insert(candidate_changeset)
+      if( status == :error) do
+        throw {status, getChangesetErrorsInReadableFormat(candidate)}
+      else
+        {status, candidate}
+      end
+    else
+      throw {:changeset_error,getChangesetErrorsInReadableFormat(candidate_changeset)}
+    end
+  end
+
+  def generateCandidateSkillChangesets(candidate, skill_ids) do
+    for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
+  end
+
+  def generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
+    for single_round <- interview_rounds, do:
+      CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},
+        %{candidate_id: candidate.id, interview_id: single_round["interview_id"], candidate_interview_date_time: single_round["interview_date_time"]})
+  end
+
+  def insertChangesets(changesets) do
+    result = Enum.all?(changesets, fn(changeset) ->
+      changeset.valid?
+    end)
+    if result do
+      {status,changeset} = Enum.reduce_while(changesets, [], fn i, acc ->
+        {status, result} = Repo.insert(i)
+        acc = {status, result}
+        if( status == :error) do
+          throw {status, getChangesetErrorsInReadableFormat(result)}
+        else
+          {:cont, acc}
+        end
+      end)
+    else
+      errors = for n <- changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
+      errors_without_nil_values = Enum.filter(errors, fn(error) -> error != nil end)
+      throw ({:changeset_error, errors_without_nil_values})
+    end
+  end
+
+  def sendResponseBasedOnResult(conn, status, response) do
+    if status == :ok do
+      conn
+        |> put_status(200)
+        |> json("success")
+    else
+      conn
+        |> put_status(400)
+        |> json(%JSONError{errors: response})
     end
   end
 
