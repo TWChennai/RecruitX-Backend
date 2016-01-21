@@ -35,7 +35,6 @@ defmodule RecruitxBackend.CandidateController do
       if candidate_insertion_status == :error  || candidate_skill_insertion_status == :error do
         Repo.rollback(getChangesetErrorsInReadableFormat(result_of_db_transaction))
       end
-      #TODO: Sending errors in json format instead of strings
     end
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
   end
@@ -99,12 +98,16 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def getChangesetErrorsInReadableFormat(changeset) do
-    for n <- Keyword.keys(changeset.errors) do
-      value = Keyword.get(changeset.errors,n)
-      if is_tuple(value) do
-        value = elem(value, 0)
+    if Map.has_key?(changeset, :errors) do
+      for n <- Keyword.keys(changeset.errors) do
+        value = Keyword.get(changeset.errors,n)
+        if is_tuple(value) do
+          value = elem(value, 0)
+        end
+        %JSONErrorReason{field_name: n, reason: value}
       end
-      %JSONErrorReason{field_name: n, reason: value}
+    else
+      []
     end
   end
 
