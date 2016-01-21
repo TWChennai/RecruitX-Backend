@@ -2,4 +2,6 @@
 app_name: recruitx_backend
 repo_url: https://github.com/TWChennai/RecruitX-Backend
 app_port: 3001
+domains: ["recrutix.com"]
+deploy_type: upgrade
 build_frontend: False
