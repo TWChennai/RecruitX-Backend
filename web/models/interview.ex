@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Interview do
 
   alias RecruitxBackend.CandidateInterviewSchedule
 
-  @derive {Poison.Encoder, only: [:id, :name, :priority]}
+  @derive {Poison.Encoder, only: [:id, :priority]}
   schema "interviews" do
     field :name, :string
     field :priority, :integer
