@@ -2,8 +2,10 @@ defmodule RecruitxBackend.Mixfile do
   use Mix.Project
 
   def project do
+    {git_sha, _exit_code} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
+
     [app: :recruitx_backend,
-     version: "0.0.8",
+     version: "0.0.8-#{git_sha}",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
