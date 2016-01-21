@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Mixfile do
 
   def project do
     {result, _exit_code} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
-    git_sha = String.slice(result, 0, 7)
+    git_sha = String.strip(result)
 
     [app: :recruitx_backend,
      version: "0.0.8-#{git_sha}",
@@ -24,6 +24,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
+    # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:phoenix, :cowboy, :logger, :connection, :json, :corsica,
                     :phoenix_ecto, :postgrex, :httpotion]]
   end
