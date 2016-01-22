@@ -2,4 +2,5 @@
 
 # From: https://github.com/HashNuke/ansible-elixir-stack
 ansible-playbook playbooks/deploy.yml
-sudo /home/deployer/projects/recruitx_backend/rel/recruitx_backend/bin/recruitx_backend upgrade "0.0.8-$(git rev-parse --short HEAD)"
+sudo /home/deployer/projects/recruitx_backend/rel/recruitx_backend/bin/recruitx_backend stop
+sudo /home/deployer/projects/recruitx_backend/rel/recruitx_backend/bin/recruitx_backend start
