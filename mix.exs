@@ -14,7 +14,7 @@ defmodule RecruitxBackend.Mixfile do
      start_permanent: Mix.env == :prod,
      aliases: aliases,
      deps: deps,
-     preferred_cli_env: [espec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, commit: :test],
+     preferred_cli_env: [espec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, commit: :test, credo: :test],
      test_coverage: [tool: ExCoveralls, test_task: "espec"]
    ]
   end

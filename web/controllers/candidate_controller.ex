@@ -7,7 +7,6 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
 
-
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
 
@@ -22,14 +21,12 @@ defmodule RecruitxBackend.CandidateController do
     interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
     {status, result_of_db_transaction} = Repo.transaction fn ->
       try do
-
         {_, candidate} = insertCandidate(post_params)
         candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
         insertChangesets(candidate_skill_changesets)
 
         candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
         insertChangesets(candidate_interview_rounds_changeset)
-
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)
       end
@@ -37,12 +34,24 @@ defmodule RecruitxBackend.CandidateController do
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
   end
 
-  def readQueryParamOrRaiseError(key, post_params) do
+  defp readQueryParamOrRaiseError(key, post_params) do
     read_query_params = post_params[key]
-    unless read_query_params  && Enum.count(read_query_params) != 0 do
-      raise Phoenix.MissingParamError, key: key
-    end
+    # TODO: API call should not raise an error. The exception should be converted to JSON and sent with valid reponse status code
+    # otherwise, it will show up as "500 internal server error"
+    if !read_query_params || Enum.empty?(read_query_params), do: raise Phoenix.MissingParamError, key: key
     Enum.uniq(read_query_params)
+  end
+
+  def sendResponseBasedOnResult(conn, status, response) do
+    if status == :ok do
+      conn
+        |> put_status(200)
+        |> json("success")
+    else
+      conn
+        |> put_status(400)
+        |> json(%JSONError{errors: response})
+    end
   end
 
   def getCandidateProfileParams(post_params) do
@@ -67,39 +76,39 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  def insertCandidate(post_params) do
+  defp insertCandidate(post_params) do
     candidate_changeset = Candidate.changeset(%Candidate{}, getCandidateProfileParams(post_params))
     if candidate_changeset.valid? do
       {status, candidate} = Repo.insert(candidate_changeset)
-      if( status == :error) do
+      if (status == :error) do
         throw {status, getChangesetErrorsInReadableFormat(candidate)}
       else
         {status, candidate}
       end
     else
-      throw {:changeset_error,getChangesetErrorsInReadableFormat(candidate_changeset)}
+      throw {:changeset_error, getChangesetErrorsInReadableFormat(candidate_changeset)}
     end
   end
 
-  def generateCandidateSkillChangesets(candidate, skill_ids) do
+  defp generateCandidateSkillChangesets(candidate, skill_ids) do
     for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
   end
 
-  def generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
+  defp generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
     for single_round <- interview_rounds, do:
       CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},
         %{candidate_id: candidate.id, interview_id: single_round["interview_id"], candidate_interview_date_time: single_round["interview_date_time"]})
   end
 
-  def insertChangesets(changesets) do
+  defp insertChangesets(changesets) do
     result = Enum.all?(changesets, fn(changeset) ->
       changeset.valid?
     end)
     if result do
-      {status,changeset} = Enum.reduce_while(changesets, [], fn i, acc ->
+      {status, changeset} = Enum.reduce_while(changesets, [], fn i, _ ->
         {status, result} = Repo.insert(i)
         acc = {status, result}
-        if( status == :error) do
+        if (status == :error) do
           throw {status, getChangesetErrorsInReadableFormat(result)}
         else
           {:cont, acc}
@@ -109,18 +118,6 @@ defmodule RecruitxBackend.CandidateController do
       errors = for n <- changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
       errors_without_nil_values = Enum.filter(errors, fn(error) -> error != nil end)
       throw ({:changeset_error, errors_without_nil_values})
-    end
-  end
-
-  def sendResponseBasedOnResult(conn, status, response) do
-    if status == :ok do
-      conn
-        |> put_status(200)
-        |> json("success")
-    else
-      conn
-        |> put_status(400)
-        |> json(%JSONError{errors: response})
     end
   end
 
