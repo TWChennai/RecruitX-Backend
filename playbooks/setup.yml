@@ -1,7 +1,6 @@
 ---
 - hosts: localhost
   remote_user: deploy
-  sudo: yes
 
   vars_files:
     - vars/main.yml
