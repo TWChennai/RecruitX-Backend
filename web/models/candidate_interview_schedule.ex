@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.CandidateInterviewSchedule do
   use RecruitxBackend.Web, :model
 
+  alias Ecto.DateTime
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
 
@@ -27,7 +28,7 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
 
   def validate_date_time(existing_changeset, field) do
     value = get_field(existing_changeset, field)
-    cast_date_time = Ecto.DateTime.cast(value)
+    cast_date_time = DateTime.cast(value)
     if cast_date_time == :error, do: add_error(existing_changeset, :"#{field}", "is invalid"), else: existing_changeset
   end
 end

@@ -3,7 +3,8 @@ defmodule RecruitxBackend.InterviewController do
 
   alias RecruitxBackend.Interview
 
-  plug :scrub_params, "interview" when action in [:create, :update]
+  # TODO: Uncomment if/when implementing the create/update actions
+  # plug :scrub_params, "interview" when action in [:create, :update]
 
   def index(conn, _params) do
     json conn, Repo.all(Interview)

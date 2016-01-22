@@ -3,7 +3,8 @@ defmodule RecruitxBackend.CandidateInterviewScheduleController do
 
   alias RecruitxBackend.CandidateInterviewSchedule
 
-  plug :scrub_params, "candidate_interview_schedule" when action in [:create, :update]
+  # TODO: Uncomment if/when implementing the create/update actions
+  # plug :scrub_params, "candidate_interview_schedule" when action in [:create, :update]
 
   def index(conn, _params) do
     json conn, Repo.all(CandidateInterviewSchedule)

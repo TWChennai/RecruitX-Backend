@@ -8,11 +8,11 @@ defmodule RecruitxBackend.Router do
   scope "/", RecruitxBackend do
     pipe_through :api
 
-    resources "/roles", RoleController, except: [:new, :edit]
-    resources "/skills", SkillController, except: [:new, :edit]
-    resources "/candidates", CandidateController, except: [:new, :edit]
-    resources "/interviews", InterviewController, except: [:new, :edit]
-    resources "/candidate_interview_schedules", CandidateInterviewScheduleController, except: [:new, :edit]
+    resources "/roles", RoleController, only: [:index]
+    resources "/skills", SkillController, only: [:index]
+    resources "/candidates", CandidateController, only: [:index, :create]
+    resources "/interviews", InterviewController, only: [:index]
+    resources "/candidate_interview_schedules", CandidateInterviewScheduleController, only: [:index]
   end
 
   # Other scopes may use custom stacks.

@@ -1,10 +1,10 @@
 defmodule RecruitxBackend.RoleController do
-
   use RecruitxBackend.Web, :controller
 
   alias RecruitxBackend.Role
 
-  plug :scrub_params, "role" when action in [:create, :update]
+  # TODO: Uncomment if/when implementing the create/update actions
+  # plug :scrub_params, "role" when action in [:create, :update]
 
   def index(conn, _params) do
     json conn, Repo.all(Role)
