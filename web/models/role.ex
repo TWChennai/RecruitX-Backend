@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Role do
 
   alias RecruitxBackend.Candidate
 
-  @derive {Poison.Encoder, only: [:id, :name]}
+  @derive {Poison.Encoder, only: [:name]}
   schema "roles" do
     field :name, :string
 
