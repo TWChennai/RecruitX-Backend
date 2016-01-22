@@ -7,7 +7,7 @@ ESpec.configure fn(config) ->
     # Random seed generation from: http://neo.com/2014/02/24/pseudo-random-number-generation-in-elixir/
     << a :: 32, b :: 32, c :: 32 >> = :crypto.rand_bytes(12)
     :random.seed(a, b, c)
-    # Get a new random number using: `:random.uniform`
+    # Get a new random number using: `:rand.uniform`
 
     Faker.start
     #restart transactions

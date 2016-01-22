@@ -24,14 +24,14 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:skill_ids) do
     current_skill_count = Ectoo.count(Repo, Skill)
-    skill_ids = for n <- 1..:random.uniform(current_skill_count), do: :random.uniform(current_skill_count)
+    skill_ids = for n <- 1..:rand.uniform(current_skill_count), do: :rand.uniform(current_skill_count)
     %{skill_ids: skill_ids}
   end
 
   def factory(:interview_rounds) do
     current_interview_count = Ectoo.count(Repo, Interview)
-    interview_rounds = for n <- 1..:random.uniform(current_interview_count) do
-      %{"interview_id" => :random.uniform(current_interview_count), "interview_date_time" => getRandomDateTimeString}
+    interview_rounds = for n <- 1..:rand.uniform(current_interview_count) do
+      %{"interview_id" => :rand.uniform(current_interview_count), "interview_date_time" => getRandomDateTimeString}
     end
     %{interview_rounds: interview_rounds}
   end
@@ -53,7 +53,7 @@ defmodule RecruitxBackend.Factory do
   def factory(:candidate) do
     %Candidate{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
-      experience: Decimal.new(Float.round(:random.uniform * 10, 2)),
+      experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
       role_id: create(:role).id
     }
   end

@@ -51,5 +51,5 @@ Enum.map(["Dinesh",
           "Sivasubramanian",
           "Subha",
           "Vijay"], fn name_value ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:random.uniform * 10, 2)), role_id: Enum.random(role_ids)})
+  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), role_id: Enum.random(role_ids)})
 end)

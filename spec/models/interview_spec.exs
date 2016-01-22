@@ -6,7 +6,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Role
 
-  let :valid_attrs, do: fields_for(:interview, priority: trunc(:random.uniform * 10))
+  let :valid_attrs, do: fields_for(:interview, priority: trunc(:rand.uniform * 10))
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
