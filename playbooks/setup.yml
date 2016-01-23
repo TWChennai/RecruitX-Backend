@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: app-servers
   remote_user: deploy
   sudo: yes
 
