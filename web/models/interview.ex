@@ -16,7 +16,9 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(name)
   @optional_fields ~w(priority)
 
-  # TODO: Default sort order by priority
+  def default_order(query) do
+    from i in query, order_by: [asc: i.priority, asc: i.id]
+  end
 
   def changeset(model, params \\ :empty) do
     model

@@ -112,4 +112,28 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(delete).to_not raise_exception(Ecto.ConstraintError)
     end
   end
+
+  context "default_order" do
+    before do: Repo.delete_all(Interview)
+
+    it "should sort by ascending order of priority" do
+      interview_with_priority_2 = create(:interview, priority: 2)
+      interview_with_priority_1 = create(:interview, priority: 1)
+      interview_with_priority_3 = create(:interview, priority: 3)
+
+      interviews = Interview |> Interview.default_order |> Repo.all
+
+      expect(interviews) |> to(eq([interview_with_priority_1, interview_with_priority_2, interview_with_priority_3]))
+    end
+
+    it "should tie-break on id for the same priority" do
+      interview_with_priority_2_id_1 = create(:interview, priority: 2)
+      interview_with_priority_2_id_2 = create(:interview, priority: 2)
+      interview_with_priority_1 = create(:interview, priority: 1)
+
+      interviews = Interview |> Interview.default_order |> Repo.all
+
+      expect(interviews) |> to(eq([interview_with_priority_1, interview_with_priority_2_id_1, interview_with_priority_2_id_2]))
+    end
+  end
 end
