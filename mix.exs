@@ -37,22 +37,22 @@ defmodule RecruitxBackend.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    [{:phoenix, "~> 1.1.2"},
-     {:phoenix_ecto, "~> 2.0"},
-     {:postgrex, ">= 0.0.0"},
-     {:cowboy, "~> 1.0"},
+    [{:phoenix, "~> 1.1.3"},
+     {:phoenix_ecto, "~> 2.0.1"},
+     {:postgrex, "~> 0.11.0"},
+     {:cowboy, "~> 1.0.4"},
      {:exrm, "~> 0.19.9"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
      {:httpotion, "~> 2.1.0"},
-     {:json,   "~> 0.3.0"},
-     {:corsica, "~> 0.4"},
+     {:json,   "~> 0.3.2"},
+     {:corsica, "~> 0.4.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.2", only: :test, app: false},
-     {:ectoo, "> 0.0.0", only: :test, app: false},
+     {:ectoo, "~> 0.0.4", only: :test, app: false},
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
      {:excoveralls, "~> 0.4.5", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
-     {:faker, "~> 0.5", only: :test, app: false}
+     {:faker, "~> 0.6.0", only: :test, app: false}
    ]
   end
 
@@ -67,7 +67,7 @@ defmodule RecruitxBackend.Mixfile do
       "ecto.seed": "run priv/repo/seeds.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      commit: ["deps.get --only #{Mix.env}", "espec --cover", "credo -i todo, duplicatedcode"]
+      commit: ["deps.get --only #{Mix.env}", "espec --cover", "credo -i todo, duplicatedcode --strict"]
     ]
   end
 end
