@@ -28,6 +28,10 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
+# TODO: Find how to and enable compression in cowboy
+# config :cowboy,
+  # compress: false
+
 # This line was automatically added by ansible-elixir-stack setup script
 if System.get_env("SERVER") do
   config :phoenix, :serve_endpoints, true

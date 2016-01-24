@@ -31,6 +31,18 @@ defmodule RecruitxBackend.CandidateController do
         Repo.rollback(result_of_db_transaction)
       end
     end
+    # TODO: Need to follow something like the below block to render the successful create call via JSON endpoint
+    # case Repo.insert(changeset) do
+    #   {:ok, candidate} ->
+    #     conn
+    #     |> put_status(:created)
+    #     |> put_resp_header("location", candidate_path(conn, :show, candidate))
+    #     |> render("show.json", candidate: candidate)
+    #   {:error, changeset} ->
+    #     conn
+    #     |> put_status(:unprocessable_entity)
+    #     |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+    # end
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
   end
 
@@ -55,6 +67,7 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def getCandidateProfileParams(post_params) do
+    # TODO: Is there an easier way to convert/extract from the post_params hash into the required struct?
     candidate_name = post_params["name"]
     candidate_experience = post_params["experience"]
     role_id = post_params["role_id"]
