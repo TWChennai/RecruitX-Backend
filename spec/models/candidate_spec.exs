@@ -107,23 +107,17 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "on delete" do
     it "should raise an exception when it has foreign key reference in other tables" do
-      candidate_changeset = Candidate.changeset(%Candidate{}, valid_attrs)
-      candidate = Repo.insert!(candidate_changeset)
-      interview = Repo.insert!(%Interview{name: "some_interview", priority: 42})
+      # TODO: Fix factory usage (Ecto 2 will fix it)
+      candidate = create(:candidate)
+      candidate_interview_schedule = create(:candidate_interview_schedule, candidate_id: candidate.id)
 
-      # TODO: Use factory
-      valid_attrs_for_candidate_interview_schedule = %{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2016-01-01 12:00:00")}
-      changeset_for_candidate_interview_schedule = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, valid_attrs_for_candidate_interview_schedule)
-      Repo.insert(changeset_for_candidate_interview_schedule)
-
-      delete = fn ->  Repo.delete!(candidate) end
+      delete = fn -> Repo.delete!(candidate) end
 
       expect(delete).to raise_exception(Ecto.ConstraintError)
     end
 
     it "should not raise an exception when it has no foreign key references in other tables" do
-      candidate_changeset = Candidate.changeset(%Candidate{}, valid_attrs)
-      candidate = Repo.insert(candidate_changeset)
+      candidate = create(:candidate)
 
       delete = fn ->  Repo.delete!(candidate) end
 

@@ -85,33 +85,36 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       # TODO: Not sure why Ectoo.max(Repo, Candidate, :id) is failing - need to investigate
       current_candidate_count = Ectoo.count(Repo, Candidate)
       candidate_id_not_present = current_candidate_count + 1
+      # TODO: Use factory
       candidate_interview_schedule_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_invalid_candidate_id)
 
-      {:error , error_changeset} = Repo.insert(changeset)
+      {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([candidate_id: "does not exist"]))
     end
 
     it "when interview id not present in interview table" do
       # TODO: Not sure why Ectoo.max(Repo, Interview, :id) is failing - need to investigate
       current_interview_count = Ectoo.count(Repo, Interview)
+      # TODO: Use factory
       interview_id_not_present = current_interview_count + 1
       candidate_interview_schedule_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_id: interview_id_not_present})
 
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},candidate_interview_schedule_with_invalid_interview_id)
 
-      {:error , error_changeset} = Repo.insert(changeset)
+      {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([interview_id: "does not exist"]))
     end
 end
 
   context "unique_index constraint will fail" do
     it "when same interview is scheduled more than once for a candidate" do
+      # TODO: Use factory
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, valid_attrs)
       Repo.insert(changeset)
 
-      {:error , error_changeset} = Repo.insert(changeset)
+      {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([candidate_interview_id_index: "has already been taken"]))
     end
   end

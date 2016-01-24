@@ -73,6 +73,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "unique_constraint" do
     it "should be invalid when interview already exists with same name" do
+      # TODO: Use factory
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
@@ -81,6 +82,7 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should be invalid when interview already exists with same name but different case" do
+      # TODO: Use factory
       valid_interview = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert!(valid_interview)
 
@@ -93,10 +95,8 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "on delete" do
     it "should raise an exception when it has foreign key references in other tables" do
-      role = Repo.insert!(%Role{name: "test_role"})
-      candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
-      interview = Repo.insert!(%Interview{name: "some_interview", priority: 42})
-      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_id: interview.id, candidate_interview_date_time: Ecto.DateTime.cast!("2011-01-01 12:00:00")})
+      interview = create(:interview)
+      create(:candidate_interview_schedule, interview_id: interview.id)
 
       delete = fn ->  Repo.delete!(interview) end
 
@@ -104,8 +104,7 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should not raise an exception when it has no foreign key references in other tables" do
-      interview_changeset = Interview.changeset(%Interview{}, valid_attrs)
-      interview = Repo.insert(interview_changeset)
+      interview = create(:interview)
 
       delete = fn -> Repo.delete!(interview) end
 

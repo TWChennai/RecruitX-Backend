@@ -56,6 +56,7 @@ defmodule RecruitxBackend.RoleSpec do
 
   context "unique_constraint" do
     it "should be invalid when role already exists with same name" do
+      # TODO: Use factory
       valid_role = Role.changeset(%Role{}, valid_attrs)
       Repo.insert!(valid_role)
 
@@ -64,6 +65,7 @@ defmodule RecruitxBackend.RoleSpec do
     end
 
     it "should be invalid when role already exists with same name but different case" do
+      # TODO: Use factory
       valid_role = Role.changeset(%Role{}, valid_attrs)
       Repo.insert!(valid_role)
 

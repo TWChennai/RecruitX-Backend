@@ -66,6 +66,6 @@ defmodule RecruitxBackend.Factory do
   end
 
   def getRandomDateTimeString do
-    DateTime.utc |> DateTime.to_string
+    DateTime.cast!(DateTime.utc |> DateTime.to_string)
   end
 end

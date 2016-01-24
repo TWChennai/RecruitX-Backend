@@ -65,6 +65,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_candidate_id)
 
+      # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([candidate_id: "does not exist"]))
     end
@@ -77,6 +78,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_skill_id)
 
+      # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([skill_id: "does not exist"]))
     end
