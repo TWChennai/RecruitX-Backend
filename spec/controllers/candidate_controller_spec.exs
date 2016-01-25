@@ -36,7 +36,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   xdescribe "show" do
-    let :candidate, do: %Candidate{id: 1, title: "Candidate title", body: "some body content"}
+    let :candidate, do: build(:candidate, id: 1)
 
     before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> candidate end))
 
