@@ -1,9 +1,13 @@
 defmodule RecruitxBackend.CandidateControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.CandidateController
 
+  import RecruitxBackend.Factory
+
+  alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateController
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
+  alias Ecto.DateTime
 
   let :interview_rounds, do: convertKeysFromAtomsToStrings(build(:interview_rounds))
   let :valid_attrs, do: Map.merge(fields_for(:candidate), Map.merge(interview_rounds, build(:skill_ids)))
@@ -32,7 +36,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   xdescribe "show" do
-    let :candidate, do: build(:candidate, id: 1)
+    let :candidate, do: %Candidate{id: 1, title: "Candidate title", body: "some body content"}
 
     before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> candidate end))
 
@@ -146,6 +150,26 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "skill_id", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
+
+      it "when interview_date_time is invalid" do
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1,"interview_date_time" => ""}]})
+
+        response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "candidate_interview_date_time", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
+
+      it "when interview_id is invalid" do
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1.2,"interview_date_time" => DateTime.utc |> DateTime.to_string}]})
+
+        response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
+
+        response |> should(have_http_status(400))
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "interview_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+      end
     end
   end
 
@@ -156,6 +180,15 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
         expect(result.field_name) |> to(eql(:test))
         expect(result.reason) |> to(eql("is invalid"))
+      end
+
+      it "when there are multiple errors" do
+        [result1,result2] = CandidateController.getChangesetErrorsInReadableFormat(%{errors: [error1: "is invalid", error2: "is also invalid"]})
+
+        expect(result1.field_name) |> to(eql(:error1))
+        expect(result1.reason) |> to(eql("is invalid"))
+        expect(result2.field_name) |> to(eql(:error2))
+        expect(result2.reason) |> to(eql("is also invalid"))
       end
 
       it "when errors is in the form of tuple" do

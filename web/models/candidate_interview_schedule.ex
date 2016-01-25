@@ -29,6 +29,7 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
   def validate_date_time(existing_changeset, field) do
     value = get_field(existing_changeset, field)
     cast_date_time = DateTime.cast(value)
-    if cast_date_time == :error, do: add_error(existing_changeset, :"#{field}", "is invalid"), else: existing_changeset
+    if cast_date_time == :error && value != "", do: add_error(existing_changeset, :"#{field}", "is invalid"), else: existing_changeset
+    existing_changeset
   end
 end

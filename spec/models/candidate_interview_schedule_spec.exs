@@ -60,7 +60,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_date_time_nil)
 
-      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+      expect(result) |> to(have_errors(candidate_interview_date_time: "can't be blank"))
     end
 
     it "when interview date time is not present" do
@@ -68,7 +68,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_interview_date_time)
 
-      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+      expect(result) |> to(have_errors(candidate_interview_date_time: "can't be blank"))
     end
 
     it "when interview date time is invalid" do
@@ -77,6 +77,14 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_candidate_id_nil)
 
       expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+    end
+
+    it "when interview id and date time are  invalid" do
+      candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_id: 1.2, candidate_interview_date_time: "invalid"})
+
+      result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_candidate_id_nil)
+
+      expect(result) |> to(have_errors([interview_id: "is invalid", candidate_interview_date_time: "is invalid"]))
     end
   end
 
