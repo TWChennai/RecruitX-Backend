@@ -11,8 +11,8 @@ config :recruitx_backend, RecruitxBackend.Endpoint,
   root: Path.dirname(__DIR__),
   secret_key_base: "7XiwvpwOfCMr4RfxZjKwUkdIplKq9K01Pve9W4eooXM3v3/60CF4quYDpbiBM2l4",
   render_errors: [accepts: ~w(json)],
-  pubsub: [name: RecruitxBackend.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: RecruitxBackend.PubSub, adapter: Phoenix.PubSub.PG2],
+  http: [compress: true]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -27,10 +27,6 @@ import_config "#{Mix.env}.exs"
 config :phoenix, :generators,
   migration: true,
   binary_id: false
-
-# TODO: Find how to and enable compression in cowboy
-# config :cowboy,
-  # compress: false
 
 # This line was automatically added by ansible-elixir-stack setup script
 if System.get_env("SERVER") do
