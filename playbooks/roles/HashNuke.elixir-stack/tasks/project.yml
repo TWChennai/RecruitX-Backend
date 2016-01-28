@@ -1,0 +1,94 @@
+---
+- name: "clone project"
+  git:
+    repo: "{{ repo_url }}"
+    version: "{{ git_ref }}"
+    dest: "{{ project_path }}"
+    accept_hostkey: True
+    force: True
+  remote_user: "{{ deployer }}"
+
+
+- name: "install tool versions"
+  command: bash -lc 'asdf install' chdir="{{ project_path }}"
+  async: 1800
+  remote_user: "{{ deployer }}"
+
+
+- name: "generate secret key base"
+  command: "openssl rand -base64 {{ secret_key_base_length }}"
+  register: openssl_random_string
+
+
+- name: set secret_key_base
+  set_fact: secret_key_base="{{ openssl_random_string.stdout }}"
+
+
+- name: detect endpoint module
+  command: grep -m 1 -o '[[:alnum:]]*.Endpoint' {{ project_path }}/config/dev.exs
+  register: grep_endpoint_module
+
+
+- name: set app_endpoint_module fact
+  set_fact: app_endpoint_module="{{ grep_endpoint_module.stdout }}"
+
+
+- name: detect repo module
+  command: grep -m 1 -o '[[:alnum:]]*.Repo' {{ project_path }}/config/dev.exs
+  register: grep_repo_module
+
+
+- name: set app_repo_module fact
+  set_fact: app_repo_module="{{ grep_repo_module.stdout }}"
+
+
+- name: check if custom template for prod.secret.exs exists
+  local_action: stat path="templates/prod.secret.exs.j2"
+  register: custom_prod_secret_template
+
+
+- when: custom_prod_secret_template.stat.exists == False
+  name: add prod.secret.exs from default template
+  template:
+    src: default-prod.secret.exs.j2
+    dest: "{{ project_path }}/config/prod.secret.exs"
+  remote_user: "{{ deployer }}"
+
+
+- when: custom_prod_secret_template.stat.exists == True
+  name: add prod.secret.exs from custom template provided
+  template:
+    src: templates/prod.secret.exs.j2
+    dest: "{{ project_path }}/config/prod.secret.exs"
+  remote_user: "{{ deployer }}"
+
+
+- name: check if conform config exists
+  local_action: stat path="templates/{{ app_name }}.conf.j2"
+  register: conform_config_template
+
+
+- when: conform_config_template.stat.exists == True
+  name: add conform config from custom template provided
+  template:
+    src: "templates/{{ app_name }}.conf.j2"
+    dest: "{{ project_path }}/config/{{ app_name }}.conf"
+  remote_user: "{{ deployer }}"
+
+
+- name: install hex
+  command: bash -lc "mix local.hex --force" chdir="{{ project_path }}"
+  remote_user: "{{ deployer }}"
+
+
+- name: install rebar
+  command: bash -lc "mix local.rebar --force" chdir="{{ project_path }}"
+  remote_user: "{{ deployer }}"
+
+
+- name: "fetch mix dependencies"
+  command: bash -lc 'mix deps.get' chdir="{{ project_path }}"
+  async: 900
+  remote_user: "{{ deployer }}"
+  environment:
+    MIX_ENV: "{{ mix_env }}"

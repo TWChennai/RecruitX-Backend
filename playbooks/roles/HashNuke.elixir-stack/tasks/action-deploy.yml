@@ -1,0 +1,18 @@
+---
+- when: setup_postgres == True
+  include: postgres-facts.yml
+
+
+- include: project.yml
+
+
+- when: build_frontend == True
+  include: frontend.yml
+
+
+- include: release.yml
+
+
+- name: start nginx using monit
+  sudo: yes
+  monit: name="nginx" state=started

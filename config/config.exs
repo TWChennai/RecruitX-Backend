@@ -32,3 +32,4 @@ config :phoenix, :generators,
 if System.get_env("SERVER") do
   config :phoenix, :serve_endpoints, true
 end
+

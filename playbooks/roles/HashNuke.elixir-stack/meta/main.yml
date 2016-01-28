@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Akash Manohar
+  description: Tool to setup servers for Elixir & Phoenix framework apps
+  license: MIT
+  min_ansible_version: 1.9
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - all
+
+  categories:
+    - cloud
+    - development
+    - monitoring
+    - system
+    - web
+
+dependencies: []

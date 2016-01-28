@@ -1,8 +1,6 @@
 ---
 - hosts: app-servers
-  remote_user: deploy
-  sudo: yes
-
+  remote_user: go
   vars_files:
     - vars/main.yml
 

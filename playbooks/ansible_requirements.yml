@@ -1,0 +1,3 @@
+- src: https://github.com/arunvelsriram/ansible-elixir-stack
+  version: master
+  name: HashNuke.elixir-stack

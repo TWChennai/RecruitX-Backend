@@ -1,0 +1,46 @@
+---
+- include: common.yml
+
+- name: "check for swap file path"
+  stat: path="/swap"
+  register: swap_info
+
+
+- when: create_swap_file == True and swap_info.stat.exists == False
+  sudo: yes
+  include: create-swap-file.yml
+
+
+- include: pip.yml
+- include: deployer-user.yml
+- include: asdf.yml
+
+
+- when: setup_postgres == True
+  include: postgres-facts.yml
+
+
+- when: setup_postgres == True
+  include: postgres.yml
+
+
+- include: project.yml
+
+
+- when: build_frontend == True
+  include: frontend.yml
+
+
+- include: nginx.yml
+- include: monit.yml
+- include: release.yml
+
+
+- name: start nginx using monit
+  sudo: yes
+  monit: name="nginx" state=started
+
+
+- name: reload nginx config
+  sudo: yes
+  service: name=nginx state=reloaded
