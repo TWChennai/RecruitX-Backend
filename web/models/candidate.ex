@@ -29,4 +29,8 @@ defmodule RecruitxBackend.Candidate do
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> foreign_key_constraint(:role_id)
   end
+
+  def with_name(query, name) do
+    from c in query, where: ilike(c.name, ^"%#{name}%")
+  end
 end
