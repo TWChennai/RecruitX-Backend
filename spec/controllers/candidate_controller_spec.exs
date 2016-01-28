@@ -56,15 +56,17 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   describe "create" do
     let :valid_changeset, do: %{:valid? => true}
     let :invalid_changeset, do: %{:valid? => false}
+    let :created_candidate, do: create(:candidate)
 
     describe "valid params" do
-      before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, create(:candidate)} end))
+      before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, created_candidate} end))
 
-      it "should return 200 and be successful" do
+      it "should return 201 and be successful" do
         conn = action(:create, %{"candidate" => post_parameters})
 
         conn |> should(be_successful)
-        conn |> should(have_http_status(200))
+        conn |> should(have_http_status(:created))
+        List.keyfind(conn.resp_headers, "location", 0) |> should(be({"location", "/candidates/#{created_candidate.id}"}))
       end
     end
 
@@ -94,9 +96,9 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     context "invalid changeset due to constraints on insertion to database" do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:error, %Ecto.Changeset{ errors: [test: "does not exist"]}} end))
 
-      it "should return bad request and the reason" do
+      it "should return 422(Unprocessable entity) and the reason" do
         response = action(:create, %{"candidate" => post_parameters})
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedNameErrorReason = %JSONErrorReason{field_name: "test", reason: "does not exist"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
@@ -106,7 +108,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when name is of invalid format" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"name" => "1test"})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedNameErrorReason = %JSONErrorReason{field_name: "name", reason: "has invalid format"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
@@ -114,7 +116,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when role_id is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"role_id" => "1.2"})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "can't be blank"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedRoleErrorReason]})))
       end
@@ -122,7 +124,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when experience is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => ""})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "can't be blank"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -130,7 +132,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when experience is out of range" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "-1"})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -138,7 +140,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when experience is out of range" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "100"})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -146,7 +148,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "when skill_id is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => [1.2]})})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "skill_id", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -156,7 +158,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "candidate_interview_date_time", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -166,7 +168,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedExperienceErrorReason = %JSONErrorReason{field_name: "interview_id", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
@@ -206,25 +208,27 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     end
 
     context "sendResponseBasedOnResult" do
-      it "should send 400(Bad request) when status is error" do
+      it "should send 422(Unprocessable entity) when status is error" do
         response = CandidateController.sendResponseBasedOnResult(conn(), :error, "error")
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "error"}
         expect(response.resp_body) |> to(be(Poison.encode!(expectedJSONError)))
       end
 
-      it "should send 200 when status is ok" do
-        response = CandidateController.sendResponseBasedOnResult(conn(), :ok, "success")
+      it "should send 201 when status is ok" do
+        candidate = build(:candidate, id: 1)
+        response = CandidateController.sendResponseBasedOnResult(conn(), :ok, candidate)
 
-        response |> should(have_http_status(200))
-        expect(response.resp_body) |> to(be(Poison.encode!("success")))
+        response |> should(have_http_status(:created))
+        expect(response.resp_body) |> to(be(Poison.encode!(candidate)))
+        List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/candidates/#{candidate.id}"}))
       end
 
-      it "should send 400 when status is unknown" do
+      it "should send 422(Unprocessable entity) when status is unknown" do
         response = CandidateController.sendResponseBasedOnResult(conn(), :unknown, "unknown")
 
-        response |> should(have_http_status(400))
+        response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "unknown"}
         expect(response.resp_body) |> to(be(Poison.encode!(expectedJSONError)))
       end

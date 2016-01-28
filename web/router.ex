@@ -10,7 +10,7 @@ defmodule RecruitxBackend.Router do
 
     resources "/roles", RoleController, only: [:index]
     resources "/skills", SkillController, only: [:index]
-    resources "/candidates", CandidateController, only: [:index, :create]
+    resources "/candidates", CandidateController, only: [:index, :create, :show]
     resources "/interviews", InterviewController, only: [:index]
     resources "/candidate_interview_schedules", CandidateInterviewScheduleController, only: [:index]
   end

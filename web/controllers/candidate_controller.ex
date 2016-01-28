@@ -30,22 +30,11 @@ defmodule RecruitxBackend.CandidateController do
 
         candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
         insertChangesets(candidate_interview_rounds_changeset)
+        candidate
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)
       end
     end
-    # TODO: Need to follow something like the below block to render the successful create call via JSON endpoint
-    # case Repo.insert(changeset) do
-    #   {:ok, candidate} ->
-    #     conn
-    #     |> put_status(:created)
-    #     |> put_resp_header("location", candidate_path(conn, :show, candidate))
-    #     |> render("show.json", candidate: candidate)
-    #   {:error, changeset} ->
-    #     conn
-    #     |> put_status(:unprocessable_entity)
-    #     |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
-    # end
     sendResponseBasedOnResult(conn, status, result_of_db_transaction)
   end
 
@@ -60,11 +49,12 @@ defmodule RecruitxBackend.CandidateController do
   def sendResponseBasedOnResult(conn, status, response) do
     if status == :ok do
       conn
-        |> put_status(200)
-        |> json("success")
+        |> put_status(:created)
+        |> put_resp_header("location", candidate_path(conn, :show, response))
+        |> json(response)
     else
       conn
-        |> put_status(400)
+        |> put_status(:unprocessable_entity)
         |> json(%JSONError{errors: response})
     end
   end
