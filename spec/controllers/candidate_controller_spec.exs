@@ -11,7 +11,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   let :interview_rounds, do: convertKeysFromAtomsToStrings(build(:interview_rounds))
   let :valid_attrs, do: Map.merge(fields_for(:candidate), Map.merge(interview_rounds, build(:skill_ids)))
-  let :post_parameters, do: convertKeysFromAtomsToStrings(valid_attrs)
+  let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{additional_information: "addn info"}))
 
   describe "index" do
     let :candidates do
@@ -115,7 +115,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"role_id" => "1.2"})})
 
         response |> should(have_http_status(400))
-        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "is invalid"}
+        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "can't be blank"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedRoleErrorReason]})))
       end
 
@@ -123,7 +123,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => ""})})
 
         response |> should(have_http_status(400))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "is invalid"}
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "can't be blank"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
 
@@ -162,7 +162,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       end
 
       it "when interview_id is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1.2,"interview_date_time" => DateTime.utc |> DateTime.to_string}]})
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1.2, "interview_date_time" => DateTime.utc |> DateTime.to_string}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
@@ -237,24 +237,20 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         expect(result.name) |> to(eql(valid_attrs.name))
         expect(result.role_id) |> to(eql(valid_attrs.role_id))
         expect(result.experience) |> to(eql(valid_attrs.experience))
-        expect(result.additional_information) |> to(eql(valid_attrs.additional_information))
+        expect(result.additional_information) |> to(eql(post_parameters["additional_information"]))
       end
 
       it "should pick valid fields from post request paramters and rest of the fields as nil" do
         result = CandidateController.getCandidateProfileParams(Map.delete(post_parameters, "name"))
 
-        expect(result.name) |> to(eql(nil))
         expect(result.role_id) |> to(eql(valid_attrs.role_id))
         expect(result.experience) |> to(eql(valid_attrs.experience))
-        expect(result.additional_information) |> to(eql(valid_attrs.additional_information))
+        expect(result.additional_information) |> to(eql(post_parameters["additional_information"]))
       end
 
       it "should return all fields as nil if post parameter is empty map" do
         result = CandidateController.getCandidateProfileParams(%{})
-        expect(result.name) |> to(be nil)
-        expect(result.role_id) |> to(be nil)
-        expect(result.experience) |> to(be nil)
-        expect(result.additional_information) |> to(be nil)
+        expect(result) |> to(eql(%{}))
       end
     end
   end

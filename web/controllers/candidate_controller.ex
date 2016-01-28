@@ -6,13 +6,16 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.QueryFilter
 
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
 
-  def index(conn, _params) do
-    json conn, Repo.all(Candidate)
-    # candidates = Repo.all(Candidate)
+  def index(conn, params) do
+    candidates = Candidate
+                  |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
+                  |> Repo.all
+    json conn, candidates
     # render(conn, "index.json", candidates: candidates)
   end
 
@@ -67,18 +70,13 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def getCandidateProfileParams(post_params) do
-    # TODO: Is there an easier way to convert/extract from the post_params hash into the required struct?
-    candidate_name = post_params["name"]
-    candidate_experience = post_params["experience"]
-    role_id = post_params["role_id"]
-    additional_information = post_params["additional_information"]
-    %{name: candidate_name, role_id: role_id, experience: candidate_experience, additional_information: additional_information}
+    QueryFilter.cast(%Candidate{}, post_params, [:name, :role_id, :experience, :additional_information])
   end
 
   def getChangesetErrorsInReadableFormat(changeset) do
     if Map.has_key?(changeset, :errors) do
       for n <- Keyword.keys(changeset.errors) do
-        value = Keyword.get(changeset.errors,n)
+        value = Keyword.get(changeset.errors, n)
         if is_tuple(value) do
           value = elem(value, 0)
         end
