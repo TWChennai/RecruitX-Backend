@@ -35,7 +35,7 @@ defmodule RecruitxBackend.CandidateController do
         Repo.rollback(result_of_db_transaction)
       end
     end
-    sendResponseBasedOnResult(conn, status, result_of_db_transaction)
+    sendResponseBasedOnResult(conn, :create, status, result_of_db_transaction)
   end
 
   defp readQueryParamOrRaiseError(key, post_params) do
@@ -46,16 +46,17 @@ defmodule RecruitxBackend.CandidateController do
     Enum.uniq(read_query_params)
   end
 
-  def sendResponseBasedOnResult(conn, status, response) do
-    if status == :ok do
-      conn
-        |> put_status(:created)
-        |> put_resp_header("location", candidate_path(conn, :show, response))
-        |> json(response)
-    else
-      conn
-        |> put_status(:unprocessable_entity)
-        |> json(%JSONError{errors: response})
+  def sendResponseBasedOnResult(conn, action, status, response) do
+    case {action, status} do
+      {:create, :ok} ->
+        conn
+          |> put_status(:created)
+          |> put_resp_header("location", candidate_path(conn, :show, response))
+          |> json(response)
+      {:create, _} ->
+        conn
+          |> put_status(:unprocessable_entity)
+          |> json(%JSONError{errors: response})
     end
   end
 

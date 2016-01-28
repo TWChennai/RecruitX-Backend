@@ -209,7 +209,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
     context "sendResponseBasedOnResult" do
       it "should send 422(Unprocessable entity) when status is error" do
-        response = CandidateController.sendResponseBasedOnResult(conn(), :error, "error")
+        response = CandidateController.sendResponseBasedOnResult(conn(), :create, :error, "error")
 
         response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "error"}
@@ -218,7 +218,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
       it "should send 201 when status is ok" do
         candidate = build(:candidate, id: 1)
-        response = CandidateController.sendResponseBasedOnResult(conn(), :ok, candidate)
+        response = CandidateController.sendResponseBasedOnResult(conn(), :create, :ok, candidate)
 
         response |> should(have_http_status(:created))
         expect(response.resp_body) |> to(be(Poison.encode!(candidate)))
@@ -226,7 +226,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       end
 
       it "should send 422(Unprocessable entity) when status is unknown" do
-        response = CandidateController.sendResponseBasedOnResult(conn(), :unknown, "unknown")
+        response = CandidateController.sendResponseBasedOnResult(conn(), :create, :unknown, "unknown")
 
         response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "unknown"}
