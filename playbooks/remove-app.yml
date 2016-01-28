@@ -1,6 +1,6 @@
 ---
 - hosts: app-servers
-  remote_user: go
+  remote_user: root
   vars_files:
     - vars/main.yml
 

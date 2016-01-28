@@ -1,6 +1,6 @@
 ---
 app_name: recruitx_backend
-repo_url: "git@github.com:TWChennai/RecruitX-Backend.git"
-app_port: 4001
-deployer: go
+repo_url: https://github.com/TWChennai/RecruitX-Backend
+app_port: 3001
+domains: ["recrutix.com"]
 build_frontend: False
