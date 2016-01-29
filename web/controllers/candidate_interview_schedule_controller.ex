@@ -7,7 +7,9 @@ defmodule RecruitxBackend.CandidateInterviewScheduleController do
   # plug :scrub_params, "candidate_interview_schedule" when action in [:create, :update]
 
   def index(conn, _params) do
-    json conn, Repo.all(CandidateInterviewSchedule)
+    json conn, Repo.all(from cis in CandidateInterviewSchedule, join: c in assoc(cis, :candidate),
+                        join: r in assoc(c, :role), join: i in assoc(cis, :interview), preload:
+                        [candidate: {c, role: r}], preload: [:interview], select: cis)
     # candidate_interview_schedules = Repo.all(CandidateInterviewSchedule)
     # render(conn, "index.json", candidate_interview_schedules: candidate_interview_schedules)
   end
