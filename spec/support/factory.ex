@@ -54,7 +54,7 @@ defmodule RecruitxBackend.Factory do
     %Candidate{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
-      role_id: create(:role).id
+      role: create(:role)
     }
   end
 

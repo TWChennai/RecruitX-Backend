@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.CandidateController do
   use RecruitxBackend.Web, :controller
 
+  import Ecto.Query
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.CandidateInterviewSchedule
@@ -13,6 +14,7 @@ defmodule RecruitxBackend.CandidateController do
 
   def index(conn, params) do
     candidates = Candidate
+                  |> preload(:role)
                   |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
                   |> Repo.all
     json conn, candidates

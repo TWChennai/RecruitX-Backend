@@ -9,8 +9,9 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   alias RecruitxBackend.JSONError
   alias Ecto.DateTime
 
+  let :role, do: create(role)
   let :interview_rounds, do: convertKeysFromAtomsToStrings(build(:interview_rounds))
-  let :valid_attrs, do: Map.merge(fields_for(:candidate), Map.merge(interview_rounds, build(:skill_ids)))
+  let :valid_attrs, do: Map.merge(fields_for(:candidate, role_id: role.id), Map.merge(interview_rounds, build(:skill_ids)))
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{additional_information: "addn info"}))
 
   describe "index" do
