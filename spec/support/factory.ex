@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
   alias RecruitxBackend.CandidateInterviewSchedule
@@ -29,28 +29,28 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:interview_rounds) do
-    current_interview_count = Ectoo.count(Repo, Interview)
+    current_interview_count = Ectoo.count(Repo, InterviewType)
     interview_rounds = for n <- 1..:rand.uniform(current_interview_count) do
-      %{"interview_id" => n, "interview_date_time" => getRandomDateTimeString}
+      %{"interview_type_id" => n, "interview_date_time" => getRandomDateTimeString}
     end
     %{interview_rounds: interview_rounds}
   end
 
-  def factory(:interview) do
-    %Interview{
+  def factory(:interview_type) do
+    %InterviewType{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:candidate_interview_schedule) do
     candidate = create(:candidate)
-    interview = create(:interview)
+    interview_type = create(:interview_type)
     %CandidateInterviewSchedule{
       candidate_interview_date_time: getRandomDateTimeString,
       candidate: candidate,
       candidate_id: candidate.id,
-      interview: interview,
-      interview_id: interview.id,
+      interview_type: interview_type,
+      interview_type_id: interview_type.id,
     }
   end
 

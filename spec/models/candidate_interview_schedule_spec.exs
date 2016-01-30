@@ -3,10 +3,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateInterviewSchedule
-  alias RecruitxBackend.Interview
-
-  let :candidate, do: create(:candidate)
-  let :interview, do: create(:interview)
+  alias RecruitxBackend.InterviewType
 
   let :valid_attrs, do: fields_for(:candidate_interview_schedule)
   let :invalid_attrs, do: %{}
@@ -21,7 +18,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     subject do: CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, invalid_attrs)
 
     it do: should_not be_valid
-    it do: should have_errors([candidate_id: "can't be blank", interview_id: "can't be blank"])
+    it do: should have_errors([candidate_id: "can't be blank", interview_type_id: "can't be blank"])
 
     it "when candidate id is nil" do
       candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_id: nil})
@@ -39,20 +36,20 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       expect(result) |> to(have_errors(candidate_id: "can't be blank"))
     end
 
-    it "when interview id is nil" do
-      candidate_interview_schedule_with_interview_id_nil = Map.merge(valid_attrs, %{interview_id: nil})
+    it "when interview_type id is nil" do
+      candidate_interview_schedule_with_interview_id_nil = Map.merge(valid_attrs, %{interview_type_id: nil})
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_interview_id_nil)
 
-      expect(result) |> to(have_errors(interview_id: "can't be blank"))
+      expect(result) |> to(have_errors(interview_type_id: "can't be blank"))
     end
 
     it "when interview id is not present" do
-      candidate_interview_schedule_with_no_interview_id = Map.delete(valid_attrs, :interview_id)
+      candidate_interview_schedule_with_no_interview_id = Map.delete(valid_attrs, :interview_type_id)
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_no_interview_id)
 
-      expect(result) |> to(have_errors(interview_id: "can't be blank"))
+      expect(result) |> to(have_errors(interview_type_id: "can't be blank"))
     end
 
     it "when interview date time is nil" do
@@ -80,11 +77,11 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
     end
 
     it "when interview id and date time are  invalid" do
-      candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_id: 1.2, candidate_interview_date_time: "invalid"})
+      candidate_interview_schedule_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_type_id: 1.2, candidate_interview_date_time: "invalid"})
 
       result = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_candidate_id_nil)
 
-      expect(result) |> to(have_errors([interview_id: "is invalid", candidate_interview_date_time: "is invalid"]))
+      expect(result) |> to(have_errors([interview_type_id: "is invalid", candidate_interview_date_time: "is invalid"]))
     end
   end
 
@@ -102,17 +99,17 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       expect(error_changeset) |> to(have_errors([candidate: "does not exist"]))
     end
 
-    it "when interview id not present in interview table" do
-      # TODO: Not sure why Ectoo.max(Repo, Interview, :id) is failing - need to investigate
-      current_interview_count = Ectoo.count(Repo, Interview)
+    it "when interview id not present in interview_type table" do
+      # TODO: Not sure why Ectoo.max(Repo, InterviewType, :id) is failing - need to investigate
+      current_interview_type_count = Ectoo.count(Repo, InterviewType)
       # TODO: Use factory
-      interview_id_not_present = current_interview_count + 1
-      candidate_interview_schedule_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_id: interview_id_not_present})
+      interview_type_id_not_present = current_interview_type_count + 1
+      candidate_interview_schedule_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_type_id: interview_type_id_not_present})
 
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},candidate_interview_schedule_with_invalid_interview_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([interview: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([interview_type: "does not exist"]))
     end
 end
 

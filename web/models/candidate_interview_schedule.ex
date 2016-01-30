@@ -3,18 +3,18 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
 
   alias Ecto.DateTime
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
 
-  @derive {Poison.Encoder, only: [:candidate_interview_date_time, :candidate, :interview]}
+  @derive {Poison.Encoder, only: [:candidate_interview_date_time, :candidate, :interview_type]}
   schema "candidate_interview_schedules" do
     field :candidate_interview_date_time, Ecto.DateTime
     belongs_to :candidate, Candidate
-    belongs_to :interview, Interview
+    belongs_to :interview_type, InterviewType
 
     timestamps
   end
 
-  @required_fields ~w(candidate_id interview_id candidate_interview_date_time)
+  @required_fields ~w(candidate_id interview_type_id candidate_interview_date_time)
   @optional_fields ~w()
 
   def changeset(model, params \\ :empty) do
@@ -23,7 +23,7 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
     |> validate_date_time(:candidate_interview_date_time)
     |> unique_constraint(:candidate_interview_id_index, name: :candidate_interview_id_index)
     |> assoc_constraint(:candidate)
-    |> assoc_constraint(:interview)
+    |> assoc_constraint(:interview_type)
   end
 
   def validate_date_time(existing_changeset, field) do

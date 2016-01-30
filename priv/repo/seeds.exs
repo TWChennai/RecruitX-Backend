@@ -16,7 +16,7 @@ alias RecruitxBackend.Candidate
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
-alias RecruitxBackend.Interview
+alias RecruitxBackend.InterviewType
 
 Enum.map(["Dev",
           "QA",
@@ -39,7 +39,7 @@ Enum.map(%{"Code Pairing" => 1,
            "Technical2" => 3,
            "Leadership" => 4,
            "P3" => 4}, fn {name_value, priority_value} ->
-  Repo.insert!(%Interview{name: name_value, priority: priority_value})
+  Repo.insert!(%InterviewType{name: name_value, priority: priority_value})
 end)
 
 role_ids = Repo.all(from role in Role, select: role.id)

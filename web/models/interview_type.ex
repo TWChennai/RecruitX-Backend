@@ -1,10 +1,10 @@
-defmodule RecruitxBackend.Interview do
+defmodule RecruitxBackend.InterviewType do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.CandidateInterviewSchedule
 
   @derive {Poison.Encoder, only: [:id, :name, :priority]}
-  schema "interviews" do
+  schema "interview_types" do
     field :name, :string
     field :priority, :integer
 

@@ -95,10 +95,10 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       interview_inserted = candidate.candidate_interview_schedules
 
       for index <- 0..Dict.size(interview_to_insert) - 1 do
-        %{"interview_id" => id, "interview_date_time" => date_time} = Enum.at(interview_to_insert, index)
+        %{"interview_type_id" => id, "interview_date_time" => date_time} = Enum.at(interview_to_insert, index)
         interview_round = Enum.at(interview_inserted, index)
 
-        expect(interview_round.interview_id) |> to(be(id))
+        expect(interview_round.interview_type_id) |> to(be(id))
         expect(interview_round.candidate_interview_date_time) |> to(be(date_time))
       end
     end

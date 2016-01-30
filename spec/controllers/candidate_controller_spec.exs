@@ -158,7 +158,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       end
 
       it "when interview_date_time is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1,"interview_date_time" => ""}]})
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1,"interview_date_time" => ""}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
@@ -167,13 +167,13 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
 
-      it "when interview_id is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_id" => 1.2, "interview_date_time" => DateTime.utc |> DateTime.to_string}]})
+      it "when interview_type_id is invalid" do
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1.2, "interview_date_time" => DateTime.utc |> DateTime.to_string}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "interview_id", reason: "is invalid"}
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "interview_type_id", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
     end
