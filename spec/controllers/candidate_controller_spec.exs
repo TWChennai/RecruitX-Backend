@@ -72,25 +72,32 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     end
 
     context "invalid query params" do
-      let :invalid_attrs_with_empty_skill_id, do: %{"candidate" => %{"skill_ids" => []}}
-      let :invalid_attrs_with_no_skill_id, do: %{"candidate" => %{}}
-      let :invalid_attrs_with_empty_interview_rounds, do: %{"candidate" => %{"interview_rounds" => []}}
-      let :invalid_attrs_with_no_interview_round, do: %{"candidate" => %{}}
-
-      it "raises exception when skill_ids is empty" do
-        expect(fn -> action(:create, invalid_attrs_with_empty_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
+      it "returns error when skill_ids is empty" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => []})})
+        response |> should(have_http_status(:unprocessable_entity))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "skill_ids", reason: "missing required key"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
 
-      it "raises exception when skill_ids is not given" do
-        expect(fn -> action(:create, invalid_attrs_with_no_skill_id) end) |> to(raise_exception(Phoenix.MissingParamError))
+      it "returns error when skill_ids is not given" do
+        response = action(:create, %{"candidate" => Map.delete(post_parameters, "skill_ids")})
+        response |> should(have_http_status(:unprocessable_entity))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "skill_ids", reason: "missing required key"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
 
-      it "raises exception when interview_rounds is empty" do
-        expect(fn -> action(:create, invalid_attrs_with_empty_interview_rounds) end) |> to(raise_exception(Phoenix.MissingParamError))
+      it "returns error when interview_rounds is empty" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"interview_rounds" => []})})
+        response |> should(have_http_status(:unprocessable_entity))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "interview_rounds", reason: "missing required key"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
 
-      it "raises exception when interview_rounds is not given" do
-        expect(fn -> action(:create, invalid_attrs_with_no_interview_round) end) |> to(raise_exception(Phoenix.MissingParamError))
+      it "returns error when interview_rounds is not given" do
+        response = action(:create, %{"candidate" => Map.delete(post_parameters, "interview_rounds")})
+        response |> should(have_http_status(:unprocessable_entity))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "interview_rounds", reason: "missing required key"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
     end
 
@@ -118,7 +125,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"role_id" => "1.2"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "can't be blank"}
+        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedRoleErrorReason]})))
       end
 
@@ -126,7 +133,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => ""})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "can't be blank"}
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
 
@@ -232,30 +239,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "unknown"}
         expect(response.resp_body) |> to(be(Poison.encode!(expectedJSONError)))
-      end
-    end
-
-    context "getCandidateProfileParams" do
-      it "should pick valid fields from post request paramters" do
-        result = CandidateController.getCandidateProfileParams(post_parameters)
-
-        expect(result.name) |> to(eql(valid_attrs.name))
-        expect(result.role_id) |> to(eql(valid_attrs.role_id))
-        expect(result.experience) |> to(eql(valid_attrs.experience))
-        expect(result.additional_information) |> to(eql(post_parameters["additional_information"]))
-      end
-
-      it "should pick valid fields from post request paramters and rest of the fields as nil" do
-        result = CandidateController.getCandidateProfileParams(Map.delete(post_parameters, "name"))
-
-        expect(result.role_id) |> to(eql(valid_attrs.role_id))
-        expect(result.experience) |> to(eql(valid_attrs.experience))
-        expect(result.additional_information) |> to(eql(post_parameters["additional_information"]))
-      end
-
-      it "should return all fields as nil if post parameter is empty map" do
-        result = CandidateController.getCandidateProfileParams(%{})
-        expect(result) |> to(eql(%{}))
       end
     end
   end

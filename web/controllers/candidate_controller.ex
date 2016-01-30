@@ -22,29 +22,33 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def create(conn, %{"candidate" => post_params}) do
-    skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
-    interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
-    {status, result_of_db_transaction} = Repo.transaction fn ->
-      try do
-        {_, candidate} = insertCandidate(post_params)
-        candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
-        insertChangesets(candidate_skill_changesets)
+    try do
+      skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
+      interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
+      {status, result_of_db_transaction} = Repo.transaction fn ->
+        try do
+          candidate_changesets = generateCandidateChangeset(post_params)
+          {_, candidate} = insertChangesets([candidate_changesets])
 
-        candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
-        insertChangesets(candidate_interview_rounds_changeset)
-        Repo.preload candidate, :role
-      catch {_, result_of_db_transaction} ->
-        Repo.rollback(result_of_db_transaction)
+          candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
+          insertChangesets(candidate_skill_changesets)
+
+          candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
+          insertChangesets(candidate_interview_rounds_changeset)
+          Repo.preload candidate, :role
+        catch {_, result_of_db_transaction} ->
+          Repo.rollback(result_of_db_transaction)
+        end
       end
+      sendResponseBasedOnResult(conn, :create, status, result_of_db_transaction)
+    catch {:missing_param_error, key} ->
+      sendResponseBasedOnResult(conn, :create, :error, [%JSONErrorReason{field_name: key, reason: "missing required key"}])
     end
-    sendResponseBasedOnResult(conn, :create, status, result_of_db_transaction)
   end
 
   defp readQueryParamOrRaiseError(key, post_params) do
     read_query_params = post_params[key]
-    # TODO: API call should not raise an error. The exception should be converted to JSON and sent with valid reponse status code
-    # otherwise, it will show up as "500 internal server error"
-    if !read_query_params || Enum.empty?(read_query_params), do: raise Phoenix.MissingParamError, key: key
+    if !read_query_params || Enum.empty?(read_query_params), do: throw {:missing_param_error, key}
     Enum.uniq(read_query_params)
   end
 
@@ -62,10 +66,6 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  def getCandidateProfileParams(post_params) do
-    QueryFilter.cast(%Candidate{}, post_params, [:name, :role_id, :experience, :additional_information])
-  end
-
   def getChangesetErrorsInReadableFormat(changeset) do
     if Map.has_key?(changeset, :errors) do
       for n <- Keyword.keys(changeset.errors) do
@@ -80,18 +80,8 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  defp insertCandidate(post_params) do
-    candidate_changeset = Candidate.changeset(%Candidate{}, getCandidateProfileParams(post_params))
-    if candidate_changeset.valid? do
-      {status, candidate} = Repo.insert(candidate_changeset)
-      if (status == :error) do
-        throw {status, getChangesetErrorsInReadableFormat(candidate)}
-      else
-        {status, candidate}
-      end
-    else
-      throw {:changeset_error, getChangesetErrorsInReadableFormat(candidate_changeset)}
-    end
+  defp generateCandidateChangeset(post_params) do
+    Candidate.changeset(%Candidate{}, post_params)
   end
 
   defp generateCandidateSkillChangesets(candidate, skill_ids) do
