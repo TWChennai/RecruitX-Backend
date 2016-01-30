@@ -1,3 +1,4 @@
+# TODO: For associations, should we do 'build', or 'create' or do the association using the 'fk_id'?
 defmodule RecruitxBackend.Factory do
   use ExMachina.Ecto, repo: RecruitxBackend.Repo
 
