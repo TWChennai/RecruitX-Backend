@@ -44,25 +44,35 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:candidate_interview_schedule) do
+    candidate = create(:candidate)
+    interview = create(:interview)
     %CandidateInterviewSchedule{
       candidate_interview_date_time: getRandomDateTimeString,
-      candidate_id: create(:candidate).id,
-      interview_id: create(:interview).id
+      candidate: candidate,
+      candidate_id: candidate.id,
+      interview: interview,
+      interview_id: interview.id,
     }
   end
 
   def factory(:candidate) do
+    role = create(:role)
     %Candidate{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
-      role: create(:role)
+      role: role,
+      role_id: role.id
     }
   end
 
   def factory(:candidate_skill) do
+    candidate = create(:candidate)
+    skill = create(:skill)
     %CandidateSkill{
-      candidate: build(:candidate),
-      skill: build(:skill),
+      candidate: candidate,
+      candidate_id: candidate.id,
+      skill: skill,
+      skill_id: skill.id
     }
   end
 

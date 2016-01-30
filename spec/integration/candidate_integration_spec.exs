@@ -30,7 +30,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         post_skill_params = build(:skill_ids)
         candidate_params = fields_for(:candidate, experience: 6.21)
         interview_round_params = build(:interview_rounds)
-        post_parameters = Map.merge(candidate_params,Map.merge(post_skill_params, interview_round_params))
+        post_parameters = Map.merge(candidate_params, Map.merge(post_skill_params, interview_round_params))
 
         response = post conn(), "/candidates", %{"candidate" => post_parameters}
 

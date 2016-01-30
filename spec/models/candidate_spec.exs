@@ -109,7 +109,7 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should raise an exception when it has foreign key reference in other tables" do
       # TODO: Fix factory usage (Ecto 2 will fix it)
       candidate = create(:candidate)
-      candidate_interview_schedule = create(:candidate_interview_schedule, candidate_id: candidate.id)
+      candidate_interview_schedule = create(:candidate_interview_schedule, candidate_id: candidate.id, candidate: candidate)
 
       delete = fn -> Repo.delete!(candidate) end
 
