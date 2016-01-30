@@ -12,7 +12,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     before do:  Repo.delete_all(Candidate)
 
     it "should return a list of candidates" do
-      candidate = create(:candidate)
+      candidate_skill = create(:candidate_skill)
+      candidate = candidate_skill.candidate |> Repo.preload([:role, :skills])
 
       response = get conn(), "/candidates"
 
@@ -71,7 +72,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     # TODO: Just an example - still incomplete.
     def getCandidateWithName(name) do
-      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :candidate_skills, :candidate_interview_schedules]
+      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :skills, :candidate_skills, :candidate_interview_schedules]
       Repo.one(query)
     end
 

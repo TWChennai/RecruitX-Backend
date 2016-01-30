@@ -2,8 +2,6 @@ defmodule RecruitxBackend.CandidateSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Candidate
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateInterviewSchedule
-  alias RecruitxBackend.Interview
 
   let :valid_attrs, do: fields_for(:candidate, additional_information: "info", role_id: create(:role).id)
   let :invalid_attrs, do: %{}
@@ -109,7 +107,7 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should raise an exception when it has foreign key reference in other tables" do
       # TODO: Fix factory usage (Ecto 2 will fix it)
       candidate = create(:candidate)
-      candidate_interview_schedule = create(:candidate_interview_schedule, candidate_id: candidate.id, candidate: candidate)
+      create(:candidate_interview_schedule, candidate_id: candidate.id, candidate: candidate)
 
       delete = fn -> Repo.delete!(candidate) end
 

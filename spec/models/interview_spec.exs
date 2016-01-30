@@ -1,10 +1,7 @@
 defmodule RecruitxBackend.InterviewSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Interview
 
-  alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateInterviewSchedule
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Role
 
   let :valid_attrs, do: fields_for(:interview, priority: trunc(:rand.uniform * 10))
   let :invalid_attrs, do: %{}

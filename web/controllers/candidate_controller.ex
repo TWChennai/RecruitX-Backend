@@ -14,7 +14,7 @@ defmodule RecruitxBackend.CandidateController do
 
   def index(conn, params) do
     candidates = Candidate
-                  |> preload(:role)
+                  |> preload([:role, :skills])
                   |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
                   |> Repo.all
     json conn, candidates
@@ -35,7 +35,7 @@ defmodule RecruitxBackend.CandidateController do
 
           candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
           insertChangesets(candidate_interview_rounds_changeset)
-          Repo.preload candidate, :role
+          Repo.preload(candidate, [:role, :skills])
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)
         end

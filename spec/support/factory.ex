@@ -9,6 +9,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Skill
   alias RecruitxBackend.CandidateInterviewSchedule
   alias Ecto.DateTime
+  import Ecto.Query
 
   def factory(:role) do
     %Role{
@@ -23,8 +24,7 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:skill_ids) do
-    current_skill_count = Ectoo.count(Repo, Skill)
-    skill_ids = for n <- 1..:rand.uniform(current_skill_count), do: :rand.uniform(current_skill_count)
+    skill_ids = Repo.all(from s in Skill, select: s.id) |> Enum.shuffle
     %{skill_ids: skill_ids}
   end
 
