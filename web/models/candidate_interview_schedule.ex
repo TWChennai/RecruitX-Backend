@@ -22,8 +22,8 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_date_time(:candidate_interview_date_time)
     |> unique_constraint(:candidate_interview_id_index, name: :candidate_interview_id_index)
-    |> foreign_key_constraint(:candidate_id)
-    |> foreign_key_constraint(:interview_id)
+    |> assoc_constraint(:candidate)
+    |> assoc_constraint(:interview)
   end
 
   def validate_date_time(existing_changeset, field) do

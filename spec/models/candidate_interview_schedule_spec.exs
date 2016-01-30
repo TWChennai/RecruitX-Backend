@@ -99,7 +99,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{}, candidate_interview_schedule_with_invalid_candidate_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([candidate_id: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([candidate: "does not exist"]))
     end
 
     it "when interview id not present in interview table" do
@@ -112,7 +112,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       changeset = CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},candidate_interview_schedule_with_invalid_interview_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([interview_id: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([interview: "does not exist"]))
     end
 end
 

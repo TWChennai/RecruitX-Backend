@@ -17,7 +17,7 @@ defmodule RecruitxBackend.CandidateSkill do
   def changeset(model, params) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> foreign_key_constraint(:candidate_id)
-    |> foreign_key_constraint(:skill_id)
+    |> assoc_constraint(:candidate)
+    |> assoc_constraint(:skill)
   end
 end

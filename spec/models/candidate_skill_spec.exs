@@ -67,7 +67,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([candidate_id: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([candidate: "does not exist"]))
     end
 
     it "when skill id not present in skills table" do
@@ -80,7 +80,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([skill_id: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([skill: "does not exist"]))
     end
   end
 end
