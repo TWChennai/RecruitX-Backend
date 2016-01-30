@@ -11,8 +11,8 @@ defmodule RecruitxBackend.CandidateInterviewScheduleController do
                         join: c in assoc(cis, :candidate),
                         join: r in assoc(c, :role),
                         join: s in assoc(c, :skills),
-                        join: i in assoc(cis, :interview),
-                        preload: [:interview, candidate: {c, role: r, skills: s}],
+                        join: i in assoc(cis, :interview_type),
+                        preload: [:interview_type, candidate: {c, role: r, skills: s}],
                         select: cis)
     # candidate_interview_schedules = Repo.all(CandidateInterviewSchedule)
     # render(conn, "index.json", candidate_interview_schedules: candidate_interview_schedules)
