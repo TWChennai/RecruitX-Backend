@@ -32,7 +32,7 @@ defmodule RecruitxBackend.CandidateController do
 
         candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
         insertChangesets(candidate_interview_rounds_changeset)
-        candidate
+        Repo.preload candidate, :role
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)
       end
@@ -95,6 +95,7 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   defp generateCandidateSkillChangesets(candidate, skill_ids) do
+    # TODO: Use 'Ecto.build_assoc' instead of this
     for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
   end
 

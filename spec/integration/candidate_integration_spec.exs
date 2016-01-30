@@ -70,8 +70,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
      end
 
     def getCandidateWithName(name) do
-      query = from c in Candidate, where: c.name == ^name
-      Repo.one(query) |> Repo.preload(:candidate_skills) |> Repo.preload(:candidate_interview_schedules)
+      query = from c in Candidate, where: c.name == ^name, preload: [:role, :candidate_skills, :candidate_interview_schedules]
+      Repo.one(query)
     end
 
     def get_candidate_count do
