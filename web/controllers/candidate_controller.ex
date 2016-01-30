@@ -42,7 +42,7 @@ defmodule RecruitxBackend.CandidateController do
       end
       sendResponseBasedOnResult(conn, :create, status, result_of_db_transaction)
     catch {:missing_param_error, key} ->
-      sendResponseBasedOnResult(conn, :create, :error, [%JSONErrorReason{field_name: key, reason: "missing required key"}])
+      sendResponseBasedOnResult(conn, :create, :error, [%JSONErrorReason{field_name: key, reason: "missing/empty required key"}])
     end
   end
 
