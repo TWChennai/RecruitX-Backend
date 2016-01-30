@@ -69,8 +69,9 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
        end
      end
 
+    # TODO: Just an example - still incomplete.
     def getCandidateWithName(name) do
-      query = from c in Candidate, where: c.name == ^name, preload: [:role, :candidate_skills, :candidate_interview_schedules]
+      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :candidate_skills, :candidate_interview_schedules]
       Repo.one(query)
     end
 

@@ -29,9 +29,4 @@ defmodule RecruitxBackend.Candidate do
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
   end
-
-  # TODO: Just an example - still incomplete.
-  def with_name(query, name) do
-    from c in query, where: ilike(c.name, ^"%#{name}%")
-  end
 end

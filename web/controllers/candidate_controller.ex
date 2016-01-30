@@ -27,7 +27,7 @@ defmodule RecruitxBackend.CandidateController do
       interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          candidate_changesets = generateCandidateChangeset(post_params)
+          candidate_changesets = Candidate.changeset(%Candidate{}, post_params)
           {_, candidate} = insertChangesets([candidate_changesets])
 
           candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
@@ -78,10 +78,6 @@ defmodule RecruitxBackend.CandidateController do
     else
       []
     end
-  end
-
-  defp generateCandidateChangeset(post_params) do
-    Candidate.changeset(%Candidate{}, post_params)
   end
 
   defp generateCandidateSkillChangesets(candidate, skill_ids) do
