@@ -14,7 +14,7 @@ defmodule RecruitxBackend.Mixfile do
      start_permanent: Mix.env == :prod,
      aliases: aliases,
      deps: deps,
-     preferred_cli_env: [espec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, commit: :test, credo: :test],
+     preferred_cli_env: [espec: :test, spec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, commit: :test, credo: :test],
      test_coverage: [tool: ExCoveralls, test_task: "espec"]
    ]
   end
@@ -64,6 +64,7 @@ defmodule RecruitxBackend.Mixfile do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
+      "spec": "espec",
       "ecto.seed": "run priv/repo/seeds.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
