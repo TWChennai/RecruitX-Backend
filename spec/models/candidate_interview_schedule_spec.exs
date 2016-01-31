@@ -111,7 +111,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([interview_type: "does not exist"]))
     end
-end
+  end
 
   context "unique_index constraint will fail" do
     it "when same interview is scheduled more than once for a candidate" do
