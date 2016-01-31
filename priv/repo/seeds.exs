@@ -43,15 +43,15 @@ interview_types = Enum.map(%{"Code Pairing1" => 1,
   Repo.insert!(%InterviewType{name: name_value, priority: priority_value})
 end)
 
-candidates = Enum.map(["Dinesh",
-          "Kausalya",
-          "Maha",
-          "Navaneetha",
-          "Pranjal",
-          "Sivasubramanian",
-          "Subha",
-          "Vijay"], fn name_value ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), role_id: Enum.random(roles).id})
+candidates = Enum.map(%{"Dinesh" => "Hadoop",
+          "Kausalya" => "Hbase",
+          "Maha" => "IOT",
+          "Navaneetha" => "Hadoop, IOT",
+          "Pranjal" => "Elixir",
+          "Sivasubramanian" => "AngularJS",
+          "Subha" => "NodeJS",
+          "Vijay" => "Haskell"}, fn {name_value, additional_information_value} ->
+  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), additional_information: additional_information_value, role_id: Enum.random(roles).id})
 end)
 
 Enum.each(candidates, fn candidate ->

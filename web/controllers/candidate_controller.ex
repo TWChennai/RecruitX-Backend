@@ -46,6 +46,13 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
+  def show(conn, %{"id" => id}) do
+      candidate = Candidate
+                  |> preload([:role, :skills])
+                  |> Repo.get!(id)
+      json conn, candidate
+  end
+
   defp readQueryParamOrRaiseError(key, post_params) do
     read_query_params = post_params[key]
     if !read_query_params || Enum.empty?(read_query_params), do: throw {:missing_param_error, key}
@@ -112,11 +119,6 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  # def show(conn, %{"id" => id}) do
-  #   candidate = Repo.get!(Candidate, id)
-  #   render(conn, "show.json", candidate: candidate)
-  # end
-  #
   # def update(conn, %{"id" => id, "candidate" => candidate_params}) do
   #   candidate = Repo.get!(Candidate, id)
   #   changeset = Candidate.changeset(candidate, candidate_params)
