@@ -12,6 +12,8 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
     belongs_to :interview_type, InterviewType
 
     timestamps
+
+    has_many :interview_panelist, InterviewPanelist
   end
 
   @required_fields ~w(candidate_id interview_type_id candidate_interview_date_time)
