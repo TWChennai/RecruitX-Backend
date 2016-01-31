@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias Ecto.DateTime
+alias Ecto.ConstraintError
 alias RecruitxBackend.Candidate
 alias RecruitxBackend.CandidateInterviewSchedule
 alias RecruitxBackend.CandidateSkill
@@ -55,25 +56,21 @@ candidates = Enum.map(%{"Dinesh" => "Hadoop",
 end)
 
 Enum.each(candidates, fn candidate ->
-  # TODO: Need to figure out how to capture the unique contraint violation error and still continue
-  # Once the above is done, we can uncomment the random for loop
-  # for _ <- 1..:rand.uniform(2) do
+  for _ <- 1..:rand.uniform(2) do
     try do
       Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: Enum.random(skills).id})
-    catch {_, _} -> :ignored
-      # ignore the unique constraint violation errors
+    rescue
+      ConstraintError -> {} # ignore the unique constraint violation errors
     end
-  # end
+  end
 end)
 
 Enum.each(candidates, fn candidate ->
-  # TODO: Need to figure out how to capture the unique contraint violation error and still continue
-  # Once the above is done, we can uncomment the random for loop
-  # for _ <- 1..:rand.uniform(2) do
+  for _ <- 1..:rand.uniform(2) do
     try do
       Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, candidate_interview_date_time: DateTime.utc})
-    catch {_, _} -> :ignored
-      # ignore the unique constraint violation errors
+    rescue
+      ConstraintError -> {} # ignore the unique constraint violation errors
     end
-  # end
+  end
 end)
