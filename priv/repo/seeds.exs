@@ -10,15 +10,16 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-import Ecto.Query
-
+alias Ecto.DateTime
 alias RecruitxBackend.Candidate
+alias RecruitxBackend.CandidateInterviewSchedule
+alias RecruitxBackend.CandidateSkill
+alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
-alias RecruitxBackend.InterviewType
 
-Enum.map(["Dev",
+roles = Enum.map(["Dev",
           "QA",
           "BA",
           "PM",
@@ -26,7 +27,7 @@ Enum.map(["Dev",
   Repo.insert!(%Role{name: role_value})
 end)
 
-Enum.map(["Java",
+skills = Enum.map(["Java",
           "Ruby",
           "C#",
           "Python",
@@ -34,16 +35,15 @@ Enum.map(["Java",
   Repo.insert!(%Skill{name: skill_value})
 end)
 
-Enum.map(%{"Code Pairing" => 1,
-           "Technical1" => 2,
-           "Technical2" => 3,
-           "Leadership" => 4,
-           "P3" => 4}, fn {name_value, priority_value} ->
+interview_types = Enum.map(%{"Code Pairing1" => 1,
+           "Technical11" => 2,
+           "Technical21" => 3,
+           "Leadersh1ip" => 4,
+           "P13" => 4}, fn {name_value, priority_value} ->
   Repo.insert!(%InterviewType{name: name_value, priority: priority_value})
 end)
 
-role_ids = Repo.all(from role in Role, select: role.id)
-Enum.map(["Dinesh",
+candidates = Enum.map(["Dinesh",
           "Kausalya",
           "Maha",
           "Navaneetha",
@@ -51,5 +51,29 @@ Enum.map(["Dinesh",
           "Sivasubramanian",
           "Subha",
           "Vijay"], fn name_value ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), role_id: Enum.random(role_ids)})
+  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), role_id: Enum.random(roles).id})
+end)
+
+Enum.each(candidates, fn candidate ->
+  # TODO: Need to figure out how to capture the unique contraint violation error and still continue
+  # Once the above is done, we can uncomment the random for loop
+  # for _ <- 1..:rand.uniform(2) do
+    try do
+      Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: Enum.random(skills).id})
+    catch {_, _} -> :ignored
+      # ignore the unique constraint violation errors
+    end
+  # end
+end)
+
+Enum.each(candidates, fn candidate ->
+  # TODO: Need to figure out how to capture the unique contraint violation error and still continue
+  # Once the above is done, we can uncomment the random for loop
+  # for _ <- 1..:rand.uniform(2) do
+    try do
+      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, candidate_interview_date_time: DateTime.utc})
+    catch {_, _} -> :ignored
+      # ignore the unique constraint violation errors
+    end
+  # end
 end)
