@@ -91,7 +91,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([candidate_skill_id_index: "has already been taken"]))
+      expect(error_changeset) |> to(have_errors([skill_id: "has already been taken"]))
     end
   end
 end

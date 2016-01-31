@@ -17,7 +17,7 @@ defmodule RecruitxBackend.CandidateSkill do
   def changeset(model, params) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> unique_constraint(:candidate_skill_id_index, name: :candidate_skill_id_index)
+    |> unique_constraint(:skill_id, name: :candidate_skill_id_index)
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:skill)
   end

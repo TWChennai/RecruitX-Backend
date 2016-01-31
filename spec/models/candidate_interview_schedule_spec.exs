@@ -120,7 +120,7 @@ defmodule RecruitxBackend.CandidateInterviewScheduleSpec do
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([candidate_interview_id_index: "has already been taken"]))
+      expect(error_changeset) |> to(have_errors([interview_type_id: "has already been taken"]))
     end
   end
 end
