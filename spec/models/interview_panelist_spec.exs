@@ -69,7 +69,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([interview_panelist_login_name: "has already been taken"]))
+      expect(error_changeset) |> to(have_errors([panelist_login_name: "has already been taken"]))
     end
   end
 

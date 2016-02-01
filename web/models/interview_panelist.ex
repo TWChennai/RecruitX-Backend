@@ -20,8 +20,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, ~r/^[a-z]+[\sa-z]*$/i)
-    |> unique_constraint(:interview_panelist_login_name, name: :interview_panelist_login_name_index)
+    |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index)
     |> assoc_constraint(:interview)
   end
-
 end
