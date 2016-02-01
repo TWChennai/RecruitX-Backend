@@ -24,11 +24,13 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:skill_ids) do
+    create(:skill)
     skill_ids = Repo.all(from s in Skill, select: s.id) |> Enum.shuffle
     %{skill_ids: skill_ids}
   end
 
   def factory(:interview_rounds) do
+    array_of_interview_rounds = [create(:interview_type, id: 1), create(:interview_type, id: 2)]
     current_interview_count = Ectoo.count(Repo, InterviewType)
     interview_rounds = for n <- 1..:rand.uniform(current_interview_count) do
       %{"interview_type_id" => n, "interview_date_time" => getRandomDateTimeString}

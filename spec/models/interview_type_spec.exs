@@ -2,6 +2,7 @@ defmodule RecruitxBackend.InterviewTypeSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewType
 
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.Interview
 
   let :valid_attrs, do: fields_for(:interview_type, priority: trunc(:rand.uniform * 10))
   let :invalid_attrs, do: %{}
@@ -110,6 +111,7 @@ defmodule RecruitxBackend.InterviewTypeSpec do
   end
 
   context "default_order" do
+    before do: Repo.delete_all(Interview)
     before do: Repo.delete_all(InterviewType)
 
     it "should sort by ascending order of priority" do

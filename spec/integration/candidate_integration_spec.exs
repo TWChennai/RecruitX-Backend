@@ -7,6 +7,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   import Ecto.Query, only: [from: 2]
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.InterviewType
 
   describe "get /candidates" do
     before do:  Repo.delete_all(Candidate)
@@ -24,6 +25,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
   describe "POST /candidates" do
     before do:  Repo.delete_all(Candidate)
+    before do:  Repo.delete_all(InterviewType)
 
     context "with valid params" do
       it "should create a new candidate and insert corresponding skill, interview round in the db" do
