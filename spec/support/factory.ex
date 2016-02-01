@@ -31,10 +31,11 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:interview_rounds) do
-    array_of_interview_rounds = [create(:interview_type, id: 1), create(:interview_type, id: 2)]
     current_interview_count = Ectoo.count(Repo, InterviewType)
-    interview_rounds = for n <- 1..:rand.uniform(current_interview_count) do
-      %{"interview_type_id" => n, "interview_date_time" => getRandomDateTimeString}
+    create(:interview_type, id: current_interview_count + 1)
+    create(:interview_type, id: current_interview_count + 2)
+    interview_rounds = for n <- 1..:rand.uniform(2) do
+      %{"interview_type_id" => current_interview_count + n, "interview_date_time" => getRandomDateTimeString}
     end
     %{interview_rounds: interview_rounds}
   end
