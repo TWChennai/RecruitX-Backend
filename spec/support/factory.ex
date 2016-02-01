@@ -48,7 +48,7 @@ defmodule RecruitxBackend.Factory do
     candidate = create(:candidate)
     interview_type = create(:interview_type)
     %Interview{
-      candidate_interview_date_time: getRandomDateTimeString,
+      start_time: getRandomDateTimeString,
       candidate: candidate,
       candidate_id: candidate.id,
       interview_type: interview_type,

@@ -95,7 +95,7 @@ defmodule RecruitxBackend.CandidateController do
   defp generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
     for single_round <- interview_rounds, do:
       Interview.changeset(%Interview{},
-        %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], candidate_interview_date_time: single_round["interview_date_time"]})
+        %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], start_time: single_round["interview_date_time"]})
   end
 
   defp insertChangesets(changesets) do

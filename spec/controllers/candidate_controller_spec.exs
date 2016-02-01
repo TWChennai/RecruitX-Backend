@@ -163,7 +163,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "candidate_interview_date_time", reason: "is invalid"}
+        expectedExperienceErrorReason = %JSONErrorReason{field_name: "start_time", reason: "is invalid"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
 

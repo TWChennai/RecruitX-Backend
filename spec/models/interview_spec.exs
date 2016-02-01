@@ -53,35 +53,35 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is nil" do
-      interview_with_interview_date_time_nil = Map.merge(valid_attrs, %{candidate_interview_date_time: nil})
+      interview_with_interview_date_time_nil = Map.merge(valid_attrs, %{start_time: nil})
 
       result = Interview.changeset(%Interview{}, interview_with_interview_date_time_nil)
 
-      expect(result) |> to(have_errors(candidate_interview_date_time: "can't be blank"))
+      expect(result) |> to(have_errors(start_time: "can't be blank"))
     end
 
     it "when interview date time is not present" do
-      interview_with_no_interview_date_time = Map.delete(valid_attrs, :candidate_interview_date_time)
+      interview_with_no_interview_date_time = Map.delete(valid_attrs, :start_time)
 
       result = Interview.changeset(%Interview{}, interview_with_no_interview_date_time)
 
-      expect(result) |> to(have_errors(candidate_interview_date_time: "can't be blank"))
+      expect(result) |> to(have_errors(start_time: "can't be blank"))
     end
 
     it "when interview date time is invalid" do
-      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_interview_date_time: "invalid"})
+      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{start_time: "invalid"})
 
       result = Interview.changeset(%Interview{}, interview_with_candidate_id_nil)
 
-      expect(result) |> to(have_errors(candidate_interview_date_time: "is invalid"))
+      expect(result) |> to(have_errors(start_time: "is invalid"))
     end
 
     it "when interview id and date time are  invalid" do
-      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_type_id: 1.2, candidate_interview_date_time: "invalid"})
+      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_type_id: 1.2, start_time: "invalid"})
 
       result = Interview.changeset(%Interview{}, interview_with_candidate_id_nil)
 
-      expect(result) |> to(have_errors([interview_type_id: "is invalid", candidate_interview_date_time: "is invalid"]))
+      expect(result) |> to(have_errors([interview_type_id: "is invalid", start_time: "is invalid"]))
     end
   end
 

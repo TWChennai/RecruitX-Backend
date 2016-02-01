@@ -13,7 +13,7 @@ defmodule RecruitxBackend.InterviewController do
                         join: s in assoc(c, :skills),
                         join: i in assoc(cis, :interview_type),
                         preload: [:interview_type, candidate: {c, role: r, skills: s}],
-                        where: cis.candidate_interview_date_time >= ^Ecto.DateTime.utc,
+                        where: cis.start_time >= ^Ecto.DateTime.utc,
                         select: cis)
     # interviews = Repo.all(Interview)
     # render(conn, "index.json", interviews: interviews)

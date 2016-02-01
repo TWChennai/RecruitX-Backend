@@ -5,9 +5,9 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.InterviewType
 
-  @derive {Poison.Encoder, only: [:id, :candidate_interview_date_time, :candidate, :interview_type]}
+  @derive {Poison.Encoder, only: [:id, :start_time, :candidate, :interview_type]}
   schema "interviews" do
-    field :candidate_interview_date_time, Ecto.DateTime
+    field :start_time, Ecto.DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
 
@@ -16,13 +16,13 @@ defmodule RecruitxBackend.Interview do
     has_many :interview_panelist, InterviewPanelist
   end
 
-  @required_fields ~w(candidate_id interview_type_id candidate_interview_date_time)
+  @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w()
 
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> validate_date_time(:candidate_interview_date_time)
+    |> validate_date_time(:start_time)
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
