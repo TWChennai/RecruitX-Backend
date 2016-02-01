@@ -5,11 +5,11 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Role
 
-  @derive {Poison.Encoder, only: [:id, :name, :experience, :additional_information, :role, :skills]}
+  @derive {Poison.Encoder, only: [:id, :name, :experience, :other_skills, :role, :skills]}
   schema "candidates" do
     field :name, :string
     field :experience, :decimal
-    field :additional_information, :string
+    field :other_skills, :string
     belongs_to :role, Role
 
     timestamps
@@ -20,7 +20,7 @@ defmodule RecruitxBackend.Candidate do
   end
 
   @required_fields ~w(name experience role_id)
-  @optional_fields ~w(additional_information)
+  @optional_fields ~w(other_skills)
 
   def changeset(model, params \\ :empty) do
     model

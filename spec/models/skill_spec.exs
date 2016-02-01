@@ -80,7 +80,7 @@ defmodule RecruitxBackend.SkillSpec do
   context "on delete" do
     it "should raise an exception when it has foreign key references" do
       role =  Repo.insert!(%Role{name: "test_role"})
-      candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, additional_information: "info"})
+      candidate = Repo.insert!(%Candidate{name: "some content", experience: Decimal.new(3.3), role_id: role.id, other_skills: "other skills"})
       skill =  Repo.insert!(%Skill{name: "test_skill"})
       Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: skill.id})
 

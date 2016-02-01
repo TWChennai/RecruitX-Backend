@@ -51,8 +51,8 @@ candidates = Enum.map(%{"Dinesh" => "Hadoop",
           "Pranjal" => "Elixir",
           "Sivasubramanian" => "AngularJS",
           "Subha" => "NodeJS",
-          "Vijay" => "Haskell"}, fn {name_value, additional_information_value} ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), additional_information: additional_information_value, role_id: Enum.random(roles).id})
+          "Vijay" => "Haskell"}, fn {name_value, other_skills} ->
+  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id})
 end)
 
 Enum.each(candidates, fn candidate ->

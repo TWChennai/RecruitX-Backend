@@ -5,7 +5,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Skill
 
-  let :candidate, do: create(:candidate, additional_information: "info")
+  let :candidate, do: create(:candidate, other_skills: "other skills")
   let :skill, do: create(:skill)
 
   let :valid_attrs, do: fields_for(:candidate_skill, candidate_id: candidate.id, skill_id: skill.id)

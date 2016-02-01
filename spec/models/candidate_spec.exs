@@ -3,7 +3,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
   alias RecruitxBackend.Candidate
 
-  let :valid_attrs, do: fields_for(:candidate, additional_information: "info", role_id: create(:role).id)
+  let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -12,8 +12,8 @@ defmodule RecruitxBackend.CandidateSpec do
     it do: should be_valid
 
     it "should be valid when additional information is not given" do
-      candidate_with_no_additional_information = Map.delete(valid_attrs, :additional_information)
-      changeset = Candidate.changeset(%Candidate{}, candidate_with_no_additional_information)
+      candidate_with_no_additional_skills = Map.delete(valid_attrs, :other_skills)
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_no_additional_skills)
 
       expect(changeset) |> to(be_valid)
     end
