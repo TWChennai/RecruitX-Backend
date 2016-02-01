@@ -7,15 +7,14 @@ defmodule RecruitxBackend.InterviewController do
   # plug :scrub_params, "interview" when action in [:create, :update]
 
   def index(conn, _params) do
-    json conn, Repo.all(from cis in Interview,
-                        join: c in assoc(cis, :candidate),
-                        join: r in assoc(c, :role),
-                        join: s in assoc(c, :skills),
-                        join: i in assoc(cis, :interview_type),
-                        preload: [:interview_type, candidate: {c, role: r, skills: s}],
-                        where: cis.start_time >= ^Ecto.DateTime.utc,
-                        select: cis)
-    # interviews = Repo.all(Interview)
+    interviews = (from cis in Interview,
+                  join: c in assoc(cis, :candidate),
+                  join: r in assoc(c, :role),
+                  join: s in assoc(c, :skills),
+                  join: i in assoc(cis, :interview_type),
+                  preload: [:interview_type, candidate: {c, role: r, skills: s}],
+                  select: cis) |> Interview.now_or_in_future |> Repo.all
+    json conn, interviews
     # render(conn, "index.json", interviews: interviews)
   end
 

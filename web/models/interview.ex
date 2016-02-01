@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Interview do
 
   @derive {Poison.Encoder, only: [:id, :start_time, :candidate, :interview_type]}
   schema "interviews" do
-    field :start_time, Ecto.DateTime
+    field :start_time, DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
 
@@ -19,6 +19,10 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w()
 
+  def now_or_in_future(query) do
+    from i in query, where: i.start_time >= ^DateTime.utc
+  end
+
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
@@ -28,10 +32,11 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:interview_type)
   end
 
+  # TODO: Move this into a utility module that is imported?
   def validate_date_time(existing_changeset, field) do
     value = get_field(existing_changeset, field)
     cast_date_time = DateTime.cast(value)
-    if cast_date_time == :error && value != "", do: add_error(existing_changeset, :"#{field}", "is invalid"), else: existing_changeset
+    if cast_date_time == :error && value != "", do: add_error(existing_changeset, :"#{field}", "is invalid")
     existing_changeset
   end
 end
