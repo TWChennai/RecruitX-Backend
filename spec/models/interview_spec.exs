@@ -123,4 +123,23 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(error_changeset) |> to(have_errors([interview_type_id: "has already been taken"]))
     end
   end
+    context "on delete" do
+      it "should raise an exception when it has foreign key reference in other tables" do
+        interview = create(:interview)
+        create(:interview_panelist, interview_id: interview.id)
+
+        delete = fn -> Repo.delete!(interview) end
+
+        expect(delete).to raise_exception(Ecto.ConstraintError)
+      end
+
+      it "should not raise an exception when it has no foreign key references in other tables" do
+        interview = create(:interview)
+
+        delete = fn ->  Repo.delete!(interview) end
+
+        expect(delete).to_not raise_exception(Ecto.ConstraintError)
+      end
+    end
+
 end

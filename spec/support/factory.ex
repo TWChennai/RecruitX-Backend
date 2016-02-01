@@ -8,6 +8,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
   alias Ecto.DateTime
   import Ecto.Query
 
@@ -74,6 +75,13 @@ defmodule RecruitxBackend.Factory do
       candidate_id: candidate.id,
       skill: skill,
       skill_id: skill.id
+    }
+  end
+
+  def factory(:interview_panelist) do
+    %InterviewPanelist{
+      panelist_login_name: Faker.Name.first_name,
+      interview_id: create(:interview).id
     }
   end
 
