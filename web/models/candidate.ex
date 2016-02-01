@@ -1,7 +1,7 @@
 defmodule RecruitxBackend.Candidate do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.CandidateInterviewSchedule
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Role
 
@@ -15,7 +15,7 @@ defmodule RecruitxBackend.Candidate do
     timestamps
 
     has_many :candidate_skills, CandidateSkill
-    has_many :candidate_interview_schedules, CandidateInterviewSchedule
+    has_many :interviews, Interview
     has_many :skills, through: [:candidate_skills, :skill]
   end
 

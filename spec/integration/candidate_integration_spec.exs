@@ -72,7 +72,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     # TODO: Just an example - still incomplete.
     def getCandidateWithName(name) do
-      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :skills, :candidate_skills, :candidate_interview_schedules]
+      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :skills, :candidate_skills, :interviews]
       Repo.one(query)
     end
 
@@ -92,7 +92,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     def assertInsertedInterviewRoundsFor(candidate, interview_rounds_params) do
       interview_to_insert = interview_rounds_params[:interview_rounds]
-      interview_inserted = candidate.candidate_interview_schedules
+      interview_inserted = candidate.interviews
 
       for index <- 0..Dict.size(interview_to_insert) - 1 do
         %{"interview_type_id" => id, "interview_date_time" => date_time} = Enum.at(interview_to_insert, index)

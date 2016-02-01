@@ -1,13 +1,13 @@
 defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.CandidateInterviewSchedule
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.Panelist
 
   @derive {Poison.Encoder, only: [:id, :interview, :panelist]}
   schema "interview_panelist" do
     belongs_to :panelist, Panelist
-    belongs_to :interview, CandidateInterviewSchedule
+    belongs_to :interview, Interview
 
     timestamps
   end

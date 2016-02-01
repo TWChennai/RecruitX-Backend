@@ -4,7 +4,7 @@ defmodule RecruitxBackend.CandidateController do
   import Ecto.Query
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.CandidateInterviewSchedule
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.QueryFilter
@@ -94,7 +94,7 @@ defmodule RecruitxBackend.CandidateController do
 
   defp generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
     for single_round <- interview_rounds, do:
-      CandidateInterviewSchedule.changeset(%CandidateInterviewSchedule{},
+      Interview.changeset(%Interview{},
         %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], candidate_interview_date_time: single_round["interview_date_time"]})
   end
 

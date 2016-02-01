@@ -13,7 +13,7 @@
 alias Ecto.DateTime
 alias Ecto.ConstraintError
 alias RecruitxBackend.Candidate
-alias RecruitxBackend.CandidateInterviewSchedule
+alias RecruitxBackend.Interview
 alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
@@ -68,7 +68,7 @@ end)
 Enum.each(candidates, fn candidate ->
   for _ <- 1..:rand.uniform(2) do
     try do
-      Repo.insert!(%CandidateInterviewSchedule{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, candidate_interview_date_time: DateTime.utc})
+      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, candidate_interview_date_time: DateTime.utc})
     rescue
       ConstraintError -> {} # ignore the unique constraint violation errors
     end

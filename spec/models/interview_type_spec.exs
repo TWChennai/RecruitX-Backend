@@ -93,7 +93,7 @@ defmodule RecruitxBackend.InterviewTypeSpec do
   context "on delete" do
     it "should raise an exception when it has foreign key references in other tables" do
       interview_type = create(:interview_type)
-      create(:candidate_interview_schedule, interview_type_id: interview_type.id, interview_type: interview_type)
+      create(:interview, interview_type_id: interview_type.id, interview_type: interview_type)
 
       delete = fn ->  Repo.delete!(interview_type) end
 

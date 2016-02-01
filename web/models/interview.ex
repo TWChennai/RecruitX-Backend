@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.CandidateInterviewSchedule do
+defmodule RecruitxBackend.Interview do
   use RecruitxBackend.Web, :model
 
   alias Ecto.DateTime
@@ -6,7 +6,7 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
   alias RecruitxBackend.InterviewType
 
   @derive {Poison.Encoder, only: [:id, :candidate_interview_date_time, :candidate, :interview_type]}
-  schema "candidate_interview_schedules" do
+  schema "interviews" do
     field :candidate_interview_date_time, Ecto.DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
@@ -23,7 +23,7 @@ defmodule RecruitxBackend.CandidateInterviewSchedule do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_date_time(:candidate_interview_date_time)
-    |> unique_constraint(:interview_type_id, name: :candidate_interview_id_index)
+    |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
   end

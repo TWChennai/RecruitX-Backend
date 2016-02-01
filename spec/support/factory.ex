@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.CandidateInterviewSchedule
+  alias RecruitxBackend.Interview
   alias Ecto.DateTime
   import Ecto.Query
 
@@ -42,10 +42,10 @@ defmodule RecruitxBackend.Factory do
     }
   end
 
-  def factory(:candidate_interview_schedule) do
+  def factory(:interview) do
     candidate = create(:candidate)
     interview_type = create(:interview_type)
-    %CandidateInterviewSchedule{
+    %Interview{
       candidate_interview_date_time: getRandomDateTimeString,
       candidate: candidate,
       candidate_id: candidate.id,
