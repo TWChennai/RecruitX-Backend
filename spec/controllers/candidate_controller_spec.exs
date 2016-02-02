@@ -208,8 +208,4 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       end
     end
   end
-
-  def convertKeysFromAtomsToStrings(input) do
-    for {key, val} <- input, into: %{}, do: {to_string(key), val}
-  end
 end
