@@ -4,7 +4,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Panelist
 
-  @derive {Poison.Encoder, only: [:id, :interview, :panelist_login_name]}
+  @derive {Poison.Encoder, only: [:id, :panelist_login_name]}
   schema "interview_panelists" do
     field :panelist_login_name, :string
 
