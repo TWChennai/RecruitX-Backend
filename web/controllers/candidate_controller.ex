@@ -8,6 +8,7 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.QueryFilter
+  alias RecruitxBackend.ChangesetInserter
 
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -28,13 +29,13 @@ defmodule RecruitxBackend.CandidateController do
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
           candidate_changesets = Candidate.changeset(%Candidate{}, post_params)
-          {_, candidate} = insertChangesets([candidate_changesets])
+          {_, candidate} = ChangesetInserter.insertChangesets([candidate_changesets])
 
           candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
-          insertChangesets(candidate_skill_changesets)
+          ChangesetInserter.insertChangesets(candidate_skill_changesets)
 
           candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
-          insertChangesets(candidate_interview_rounds_changeset)
+          ChangesetInserter.insertChangesets(candidate_interview_rounds_changeset)
           Repo.preload(candidate, [:role, :skills])
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)
@@ -73,20 +74,6 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  def getChangesetErrorsInReadableFormat(changeset) do
-    if Map.has_key?(changeset, :errors) do
-      for n <- Keyword.keys(changeset.errors) do
-        value = Keyword.get(changeset.errors, n)
-        if is_tuple(value) do
-          value = elem(value, 0)
-        end
-        %JSONErrorReason{field_name: n, reason: value}
-      end
-    else
-      []
-    end
-  end
-
   defp generateCandidateSkillChangesets(candidate, skill_ids) do
     # TODO: Use 'Ecto.build_assoc' instead of this
     for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
@@ -96,27 +83,6 @@ defmodule RecruitxBackend.CandidateController do
     for single_round <- interview_rounds, do:
       Interview.changeset(%Interview{},
         %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], start_time: single_round["interview_date_time"]})
-  end
-
-  defp insertChangesets(changesets) do
-    result = Enum.all?(changesets, fn(changeset) ->
-      changeset.valid?
-    end)
-    if result do
-      {status, changeset} = Enum.reduce_while(changesets, [], fn i, _ ->
-        {status, result} = Repo.insert(i)
-        acc = {status, result}
-        if (status == :error) do
-          throw {status, getChangesetErrorsInReadableFormat(result)}
-        else
-          {:cont, acc}
-        end
-      end)
-    else
-      errors = for n <- changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
-      errors_without_nil_values = Enum.filter(errors, fn(error) -> error != nil end)
-      throw ({:changeset_error, errors_without_nil_values})
-    end
   end
 
   # def update(conn, %{"id" => id, "candidate" => candidate_params}) do

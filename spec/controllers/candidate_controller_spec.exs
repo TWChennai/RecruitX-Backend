@@ -180,37 +180,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   end
 
   describe "methods" do
-    context "getChangesetErrorsInReadableFormat" do
-      it "when errors is in the form of string" do
-        [result] = CandidateController.getChangesetErrorsInReadableFormat(%{errors: [test: "is invalid"]})
-
-        expect(result.field_name) |> to(eql(:test))
-        expect(result.reason) |> to(eql("is invalid"))
-      end
-
-      it "when there are multiple errors" do
-        [result1,result2] = CandidateController.getChangesetErrorsInReadableFormat(%{errors: [error1: "is invalid", error2: "is also invalid"]})
-
-        expect(result1.field_name) |> to(eql(:error1))
-        expect(result1.reason) |> to(eql("is invalid"))
-        expect(result2.field_name) |> to(eql(:error2))
-        expect(result2.reason) |> to(eql("is also invalid"))
-      end
-
-      it "when errors is in the form of tuple" do
-        [result] = CandidateController.getChangesetErrorsInReadableFormat(%{errors: [test: {"value1", "value2"}]})
-
-        expect(result.field_name) |> to(eql(:test))
-        expect(result.reason) |> to(eql("value1"))
-      end
-
-      it "when there are no errors" do
-        result = CandidateController.getChangesetErrorsInReadableFormat(%{})
-
-        expect(result) |> to(eql([]))
-      end
-    end
-
     context "sendResponseBasedOnResult" do
       it "should send 422(Unprocessable entity) when status is error" do
         response = CandidateController.sendResponseBasedOnResult(conn(), :create, :error, "error")
