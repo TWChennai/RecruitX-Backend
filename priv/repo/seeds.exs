@@ -56,7 +56,7 @@ candidates = Enum.map(%{"Dinesh" => "Hadoop",
 end)
 
 Enum.each(candidates, fn candidate ->
-  for _ <- 1..:rand.uniform(2) do
+  for _ <- 1..:rand.uniform(5) do
     try do
       Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: Enum.random(skills).id})
     rescue
@@ -66,7 +66,7 @@ Enum.each(candidates, fn candidate ->
 end)
 
 Enum.each(candidates, fn candidate ->
-  for _ <- 1..:rand.uniform(2) do
+  for _ <- 1..:rand.uniform(5) do
     try do
       Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: DateTime.utc})
     rescue
