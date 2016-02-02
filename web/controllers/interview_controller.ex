@@ -1,21 +1,34 @@
 defmodule RecruitxBackend.InterviewController do
   use RecruitxBackend.Web, :controller
 
+  import Ecto.Query
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.QueryFilter
 
   # TODO: Uncomment if/when implementing the create/update actions
   # plug :scrub_params, "interview" when action in [:create, :update]
 
-  def index(conn, _params) do
+  def index(conn, params) do
     interviews = (from cis in Interview,
                   join: c in assoc(cis, :candidate),
                   join: r in assoc(c, :role),
                   join: s in assoc(c, :skills),
                   join: i in assoc(cis, :interview_type),
                   preload: [:interview_type, candidate: {c, role: r, skills: s}],
-                  select: cis) |> Interview.now_or_in_future |> Repo.all
+                  select: cis) |> QueryFilter.filter(%Interview{}, params, [:candidate_id]) |> Repo.all
     json conn, interviews
     # render(conn, "index.json", interviews: interviews)
+  end
+
+  def show(conn, %{"id" => id}) do
+    interview = (from i in Interview,
+      join: c in assoc(i, :candidate),
+      join: r in assoc(c, :role),
+      join: s in assoc(c, :skills),
+      join: it in assoc(i, :interview_type),
+      preload: [:interview_type, candidate: {c, role: r, skills: s}],
+      select: i) |> Repo.get!(id)
+    json conn, interview
   end
 
   # def create(conn, %{"interview" => interview_params}) do
