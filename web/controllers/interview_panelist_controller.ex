@@ -5,8 +5,6 @@ defmodule RecruitxBackend.InterviewPanelistController do
   alias RecruitxBackend.ChangesetInserter
   alias RecruitxBackend.JSONError
 
-  require Logger;
-
   def create(conn, %{"interview_panelist" => post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     try do
