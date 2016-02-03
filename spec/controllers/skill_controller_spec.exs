@@ -18,7 +18,7 @@ defmodule RecruitxBackend.SkillControllerSpec do
     it "should return the array of skills as a JSON response" do
       response = action(:index)
 
-      expect(response.resp_body) |> to(eq(Poison.encode!(skills, keys: :atoms!)))
+      expect(response.assigns.skills) |> to(eq(skills))
     end
   end
 end

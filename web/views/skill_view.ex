@@ -1,15 +1,13 @@
 defmodule RecruitxBackend.SkillView do
   use RecruitxBackend.Web, :view
 
- def render("skill.json", %{skill: skill}) do
-    %{
-      id: skill.id,
-      name: skill.name
-    }
+  def render("index.json", %{skills: skills}) do
+   render_many(skills, RecruitxBackend.SkillView, "skill.json")
   end
 
- def render("skill_without_id.json", %{skill: skill}) do
+  def render("skill.json", %{skill: skill}) do
     %{
+      id: skill.id,
       name: skill.name
     }
   end

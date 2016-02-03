@@ -3,7 +3,6 @@ defmodule RecruitxBackend.Skill do
 
   alias RecruitxBackend.CandidateSkill
 
-  @derive {Poison.Encoder, only: [:id, :name]}
   schema "skills" do
     field :name, :string
 

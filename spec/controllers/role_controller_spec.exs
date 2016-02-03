@@ -18,7 +18,7 @@ defmodule RecruitxBackend.RoleControllerSpec do
     it "should return the array of roles as a JSON response" do
       response = action(:index)
 
-      expect(response.resp_body) |> to(eq(Poison.encode!(roles, keys: :atoms!)))
+      expect(response.assigns.roles) |> to(eq(roles))
     end
   end
 end
