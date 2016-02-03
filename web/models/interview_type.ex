@@ -3,7 +3,6 @@ defmodule RecruitxBackend.InterviewType do
 
   alias RecruitxBackend.Interview
 
-  @derive {Poison.Encoder, only: [:id, :name, :priority]}
   schema "interview_types" do
     field :name, :string
     field :priority, :integer

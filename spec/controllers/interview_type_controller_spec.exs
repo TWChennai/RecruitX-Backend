@@ -18,7 +18,7 @@ defmodule RecruitxBackend.InterviewTypeControllerSpec do
     it "should return the array of interview_types as a JSON response" do
       response = action(:index)
 
-      expect(response.resp_body) |> to(eq(Poison.encode!(interview_types, keys: :atoms!)))
+      expect(response.assigns.interview_types) |> to(eq(interview_types))
     end
   end
 end
