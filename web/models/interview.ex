@@ -24,7 +24,8 @@ defmodule RecruitxBackend.Interview do
     from i in query, where: i.start_time >= ^DateTime.utc
   end
 
-  def getCandidateIdsInterviewedBy(panelist_login_name) do
+  def get_candidate_ids_interviewed_by(panelist_login_name) do
+    #TODO: Use assoc in join
     from ip in InterviewPanelist,
       where: ip.panelist_login_name == ^panelist_login_name,
       join: i in Interview, on: ip.interview_id == i.id,

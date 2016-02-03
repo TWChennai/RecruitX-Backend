@@ -13,41 +13,46 @@ defmodule RecruitxBackend.InterviewControllerSpec do
     it do: should have_http_status(:ok)
   end
 
-  xdescribe "index" do
+  describe "index" do
+    it "should report missing panelist_login_name param" do
+      conn = action(:index, %{})
+      conn |> should(have_http_status(:unprocessable_entity))
+      expect(conn.assigns.param) |> to(eql("panelist_login_name"))
+    end
   end
 
   describe "helper methods" do
-    context "addSignUpEigibityFor" do
+    context "add_signup_eligibity_for" do
       it "should add sign up as false if panelist has interviewed candidate" do
         allow Repo |> to(accept(:all, fn(_) -> [1] end))
         interview = build(:interview, candidate_id: 1)
 
-        [resultWithSignUpStatus] = InterviewController.addSignUpEigibityFor([interview], "test")
-        expect(resultWithSignUpStatus.sign_up) |> to(eql(false))
+        [resultWithSignUpStatus] = InterviewController.add_signup_eligibity_for([interview], "test")
+        expect(resultWithSignUpStatus.signup) |> to(eql(false))
       end
 
       it "should add sign up as true if panelist has not interviewed any candidate" do
         allow Repo |> to(accept(:all, fn(_) -> [] end))
         interviews = [build(:interview)]
 
-        [resultWithSignUpStatus] = InterviewController.addSignUpEigibityFor(interviews, "test")
+        [resultWithSignUpStatus] = InterviewController.add_signup_eligibity_for(interviews, "test")
 
-        expect(resultWithSignUpStatus.sign_up) |> to(eql(true))
+        expect(resultWithSignUpStatus.signup) |> to(eql(true))
       end
     end
 
-    context "hasPanelistNotInterviewedCandidate" do
+    context "has_panelist_not_interviewed_candidate" do
       it "should return true when panelist has not interviewed current candidate" do
         interview = build(:interview)
 
-        expect(InterviewController.hasPanelistNotInterviewedCandidate([], interview)) |> to(eql(true))
+        expect(InterviewController.has_panelist_not_interviewed_candidate([], interview)) |> to(eql(true))
       end
 
       it "should return false when panelist has interviewed current candidate" do
         interview = build(:interview, candidate_id: 1)
         candidates_interviewed = [interview.candidate_id]
 
-        expect(InterviewController.hasPanelistNotInterviewedCandidate(candidates_interviewed, interview)) |> to(eql(false))
+        expect(InterviewController.has_panelist_not_interviewed_candidate(candidates_interviewed, interview)) |> to(eql(false))
       end
     end
   end

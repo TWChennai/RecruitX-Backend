@@ -146,11 +146,11 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "query" do
-    context "getCandidateIdsInterviewedBy" do
+    context "get_candidate_ids_interviewed_by" do
       before do:  Repo.delete_all(InterviewPanelist)
 
       it "should return no candidate_ids when none were interviewed by panelist" do
-        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("dummy")
+        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("dummy")
 
         expect(candidate_ids) |> to(be([]))
       end
@@ -161,7 +161,7 @@ defmodule RecruitxBackend.InterviewSpec do
         create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
         create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
 
-        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("test")
+        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("test")
 
         expect(Enum.sort(candidate_ids)) |> to(be([interview1.candidate_id, interview2.candidate_id]))
 
@@ -177,7 +177,7 @@ defmodule RecruitxBackend.InterviewSpec do
         create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
         create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "dummy")
 
-        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("test")
+        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("test")
 
         expect(candidate_ids) |> to(be([interview1.candidate_id]))
       end
