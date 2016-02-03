@@ -7,7 +7,6 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
 
-  @derive {Poison.Encoder, only: [:id, :start_time, :candidate, :interview_type]}
   schema "interviews" do
     field :start_time, DateTime
     belongs_to :candidate, Candidate

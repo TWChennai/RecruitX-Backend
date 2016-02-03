@@ -4,7 +4,6 @@ defmodule RecruitxBackend.CandidateSkill do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Skill
 
-  @derive {Poison.Encoder, only: [:skill_id]}
   schema "candidate_skills" do
     belongs_to :candidate, Candidate
     belongs_to :skill, Skill

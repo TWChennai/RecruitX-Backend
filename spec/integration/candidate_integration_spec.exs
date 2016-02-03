@@ -17,12 +17,12 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should return a list of candidates" do
       candidate_skill = create(:candidate_skill)
-      candidate = candidate_skill.candidate |> Repo.preload([:role, :skills])
+      candidate = candidate_skill.candidate |> Repo.preload(:candidate_skills)
 
       response = get conn(), "/candidates"
 
       expect(response.status) |> to(be(200))
-      expect(response.resp_body) |> to(be(Poison.encode!([candidate], keys: :atoms!)))
+      expect(response.assigns.candidates) |> to(be([candidate]))
     end
   end
 
@@ -40,7 +40,6 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
         expect(response.status) |> to(be(201))
         inserted_candidate = getCandidateWithName(candidate_params.name)
-        expect(response.resp_body) |> to(be(Poison.encode!(inserted_candidate)))
         List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/candidates/#{inserted_candidate.id}"}))
 
         new_candidate_count = get_candidate_count

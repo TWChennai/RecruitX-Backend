@@ -50,7 +50,7 @@ defmodule RecruitxBackend.CandidateController do
       candidate = Candidate
                   |> preload([:role, :skills])
                   |> Repo.get!(id)
-      json conn, candidate
+      render(conn, "show.json", candidate: candidate)
   end
 
   defp readQueryParamOrRaiseError(key, post_params) do
@@ -65,7 +65,6 @@ defmodule RecruitxBackend.CandidateController do
         conn
           |> put_status(:created)
           |> put_resp_header("location", candidate_path(conn, :show, response))
-          |> json(response)
       {:create, _} ->
         conn
           |> put_status(:unprocessable_entity)

@@ -191,11 +191,10 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
       it "should send 201 when status is ok" do
         candidate_skill = create(:candidate_skill)
-        candidate = candidate_skill.candidate |> Repo.preload([:role, :skills])
+        candidate = candidate_skill.candidate
         response = CandidateController.sendResponseBasedOnResult(conn(), :create, :ok, candidate)
 
         response |> should(have_http_status(:created))
-        expect(response.resp_body) |> to(be(Poison.encode!(candidate)))
         List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/candidates/#{candidate.id}"}))
       end
 

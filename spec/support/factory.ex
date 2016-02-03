@@ -74,7 +74,6 @@ defmodule RecruitxBackend.Factory do
     %CandidateSkill{
       candidate: candidate,
       candidate_id: candidate.id,
-      skill: skill,
       skill_id: skill.id
     }
   end

@@ -10,7 +10,7 @@ defmodule RecruitxBackend.CandidateSkillView do
 
  def render("candidate_skill_id.json", %{candidate_skill: candidate_skill}) do
     %{
-      skill_id: candidate_skill.skill_id
+      id: candidate_skill.skill_id
     }
   end
 end
