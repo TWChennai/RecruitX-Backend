@@ -36,6 +36,7 @@ defmodule RecruitxBackend.RoleController do
   # end
 
   # def show(conn, %{"id" => id}) do
+  # TODO: Handle error scenario of 'Repo.get!' - ie when an invalid/missing record is hit
   #   role = Repo.get!(Role, id)
   #   render(conn, "show.json", role: role)
   # end

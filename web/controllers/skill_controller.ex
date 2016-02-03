@@ -37,6 +37,7 @@ defmodule RecruitxBackend.SkillController do
   # end
 
   # def show(conn, %{"id" => id}) do
+  # TODO: Handle error scenario of 'Repo.get!' - ie when an invalid/missing record is hit
   #   skill = Repo.get!(Skill, id)
   #   render(conn, "show.json", skill: skill)
   # end

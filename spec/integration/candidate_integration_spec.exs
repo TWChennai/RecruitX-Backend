@@ -27,7 +27,6 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   end
 
   describe "POST /candidates" do
-
     context "with valid params" do
       it "should create a new candidate and insert corresponding skill, interview round in the db" do
         orig_candidate_count = get_candidate_count
@@ -73,26 +72,26 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
      end
 
     # TODO: Just an example - still incomplete.
-    def getCandidateWithName(name) do
-      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:role, :skills, :candidate_skills, :interviews]
+    defp getCandidateWithName(name) do
+      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:candidate_skills, :interviews]
       Repo.one(query)
     end
 
-    def get_candidate_count do
+    defp get_candidate_count do
       Ectoo.count(Repo, Candidate)
     end
 
-    def get_candidate_skill_ids_for(candidate) do
+    defp get_candidate_skill_ids_for(candidate) do
       for skill <- candidate.candidate_skills, do: skill.skill_id
     end
 
-    def assertInsertedSkillIdsFor(inserted_candidate, skill_ids) do
-        candidate_skills = get_candidate_skill_ids_for(inserted_candidate)
-        unique_skill_ids = Enum.uniq(skill_ids)
-        expect(candidate_skills) |> to(be(unique_skill_ids))
+    defp assertInsertedSkillIdsFor(inserted_candidate, skill_ids) do
+      candidate_skills = get_candidate_skill_ids_for(inserted_candidate)
+      unique_skill_ids = Enum.uniq(skill_ids)
+      expect(candidate_skills) |> to(be(unique_skill_ids))
     end
 
-    def assertInsertedInterviewRoundsFor(candidate, interview_rounds_params) do
+    defp assertInsertedInterviewRoundsFor(candidate, interview_rounds_params) do
       interview_to_insert = interview_rounds_params[:interview_rounds]
       interview_inserted = candidate.interviews
 

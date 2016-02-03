@@ -2,7 +2,6 @@ defmodule RecruitxBackend.InterviewControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
   alias RecruitxBackend.InterviewController
-  alias RecruitxBackend.Interview
 
   describe "show" do
     let :interview, do: build(:interview, id: 1)

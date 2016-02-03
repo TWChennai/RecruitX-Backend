@@ -18,6 +18,7 @@ defmodule RecruitxBackend.InterviewController do
                     join: c in assoc(cis, :candidate),
                     join: cs in assoc(c, :candidate_skills),
                     join: i in assoc(cis, :interview_type),
+                    # TODO: Remove preload of master data (interview_type)
                     preload: [:interview_type, candidate: {c, [candidate_skills: cs]}],
                     select: cis) |> QueryFilter.filter(%Interview{}, params, [:candidate_id]) |> Repo.all
 
@@ -29,10 +30,12 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   def show(conn, %{"id" => id}) do
+    # TODO: Handle scenario of 'Repo.get!' - ie when an invalid/missing record is hit
     interview = (from i in Interview,
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
       join: it in assoc(i, :interview_type),
+      # TODO: Remove preload of master data (interview_type)
       preload: [:interview_type, candidate: {c, candidate_skills: cs}],
       select: i) |> Repo.get(id)
     render(conn, "show.json", interview: interview)
@@ -41,6 +44,9 @@ defmodule RecruitxBackend.InterviewController do
   def add_signup_eligibity_for(interviews, panelist_login_name) do
     candidate_ids_interviewed = Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
     Enum.map(interviews, fn(interview) ->
+      # TODO: Can the "behaviour" (that the interview cannot accept any more signups) be on the model itself as a single method?
+      # TODO: Move the magic number (4) into the db
+      # TODO: Could we make this into a validation also? (UI-agnosticity will mandate that be done)
       signup_eligiblity = has_panelist_not_interviewed_candidate(candidate_ids_interviewed,interview) and is_signup_lesser_than(interview, 4)
       Map.put(interview, :signup, signup_eligiblity)
     end)
@@ -80,11 +86,6 @@ defmodule RecruitxBackend.InterviewController do
   #   end
   # end
 
-  # def show(conn, %{"id" => id}) do
-  #   interview = Repo.get!(Interview, id)
-  #   render(conn, "show.json", interview: interview)
-  # end
-  #
   # def update(conn, %{"id" => id, "interview" => interview_params}) do
   #   interview = Repo.get!(Interview, id)
   #   changeset = Interview.changeset(interview, interview_params)
