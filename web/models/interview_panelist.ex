@@ -2,6 +2,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
 
   @derive {Poison.Encoder, only: [:id, :panelist_login_name]}
   schema "interview_panelists" do
@@ -10,6 +11,15 @@ defmodule RecruitxBackend.InterviewPanelist do
     belongs_to :interview, Interview
 
     timestamps
+  end
+
+  def get_interview_type_based_count_of_sign_ups do
+    #TODO: use assoc in join
+    from ip in InterviewPanelist,
+      join: i in Interview, on: ip.interview_id == i.id,
+      group_by: ip.interview_id,
+      group_by: i.interview_type_id,
+      select: %{"interview_id": ip.interview_id,"signup_count": count(ip.interview_id),"interview_type": i.interview_type_id}
   end
 
   @required_fields ~w(panelist_login_name interview_id)

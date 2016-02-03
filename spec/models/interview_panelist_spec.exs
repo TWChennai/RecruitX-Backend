@@ -95,4 +95,21 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     end
   end
 
+  context "get_interview_type_based_count_of_sign_ups" do
+    it "should return {interview_id, count_of_signups, interview_type_id" do
+      result = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+
+      expect(result) |> to(eql([]))
+    end
+
+    it "should return {interview_id, count_of_signups, interview_type_id}" do
+      interview = create(:interview)
+      interview_panelist = create(:interview_panelist, interview_id: interview.id)
+      [result] = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+      %{"interview_id": interview_id,"signup_count": count_of_signups,"interview_type": type_id} = result
+      expect(interview_id) |> to(eql(interview_panelist.interview_id))
+      expect(count_of_signups) |> to(eql(1))
+      expect(type_id) |> to(eql(interview.interview_type_id))
+    end
+  end
 end

@@ -2,6 +2,7 @@ defmodule RecruitxBackend.InterviewControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
   alias RecruitxBackend.InterviewController
+  alias RecruitxBackend.Interview
 
   describe "show" do
     let :interview, do: build(:interview, id: 1)
@@ -22,22 +23,26 @@ defmodule RecruitxBackend.InterviewControllerSpec do
   end
 
   describe "helper methods" do
-    context "add_signup_eligibity_for" do
-      it "should add sign up as false if panelist has interviewed candidate" do
-        allow Repo |> to(accept(:all, fn(_) -> [1] end))
-        interview = build(:interview, candidate_id: 1)
+    context "is_signup_lesser_than" do
+      it "should return true when signups are lesser than max" do
+        interview = create(:interview)
+        allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id,"signup_count": 1,"interview_type": 1}] end))
 
-        [resultWithSignUpStatus] = InterviewController.add_signup_eligibity_for([interview], "test")
-        expect(resultWithSignUpStatus.signup) |> to(eql(false))
+        expect(InterviewController.is_signup_lesser_than(interview, 4)) |> to(be_true)
       end
 
-      it "should add sign up as true if panelist has not interviewed any candidate" do
-        allow Repo |> to(accept(:all, fn(_) -> [] end))
-        interviews = [build(:interview)]
+      it "should return false when signups are greater than max" do
+        interview = create(:interview)
+        allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id,"signup_count": 5,"interview_type": 1}] end))
 
-        [resultWithSignUpStatus] = InterviewController.add_signup_eligibity_for(interviews, "test")
+        expect(InterviewController.is_signup_lesser_than(interview, 4)) |> to(be_false)
+      end
 
-        expect(resultWithSignUpStatus.signup) |> to(eql(true))
+      it "should return false when signups are equal to max" do
+        interview = create(:interview)
+        allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id,"signup_count": 5,"interview_type": 1}] end))
+
+        expect(InterviewController.is_signup_lesser_than(interview, 4)) |> to(be_false)
       end
     end
 

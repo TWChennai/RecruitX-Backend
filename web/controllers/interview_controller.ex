@@ -3,6 +3,7 @@ defmodule RecruitxBackend.InterviewController do
 
   import Ecto.Query
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.QueryFilter
 
   # TODO: Uncomment if/when implementing the create/update actions
@@ -40,13 +41,21 @@ defmodule RecruitxBackend.InterviewController do
   def add_signup_eligibity_for(interviews, panelist_login_name) do
     candidate_ids_interviewed = Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
     Enum.map(interviews, fn(interview) ->
-      Map.put(interview, :signup, has_panelist_not_interviewed_candidate(candidate_ids_interviewed, interview))
+      signup_eligiblity = has_panelist_not_interviewed_candidate(candidate_ids_interviewed,interview) and is_signup_lesser_than(interview, 4)
+      Map.put(interview, :signup, signup_eligiblity)
     end)
   end
 
   def has_panelist_not_interviewed_candidate(candidate_ids_interviewed, interview) do
     !Enum.member?(candidate_ids_interviewed, interview.candidate_id)
   end
+
+  def is_signup_lesser_than(interview, max_count) do
+    signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == interview.id end)
+    result != [] and List.first(result).signup_count < max_count
+  end
+
   # def create(conn, %{"interview" => interview_params}) do
   #   changeset = Interview.changeset(%Interview{}, interview_params)
   #
