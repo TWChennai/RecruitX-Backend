@@ -2,7 +2,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Panelist
 
   @derive {Poison.Encoder, only: [:id, :panelist_login_name]}
   schema "interview_panelists" do
