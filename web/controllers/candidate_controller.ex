@@ -15,11 +15,10 @@ defmodule RecruitxBackend.CandidateController do
 
   def index(conn, params) do
     candidates = Candidate
-                  |> preload([:role, :skills])
+                  |> preload([:role, :candidate_skills])
                   |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
                   |> Repo.all
-    json conn, candidates
-    # render(conn, "index.json", candidates: candidates)
+    render(conn, "index.json", candidates: candidates)
   end
 
   def create(conn, %{"candidate" => post_params}) do

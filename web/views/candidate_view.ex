@@ -1,13 +1,18 @@
 defmodule RecruitxBackend.CandidateView do
   use RecruitxBackend.Web, :view
 
+def render("index.json", %{candidates: candidates}) do
+   render_many(candidates, RecruitxBackend.CandidateView, "candidate.json")
+ end
+
  def render("candidate.json", %{candidate: candidate}) do
     %{
       id: candidate.id,
       name: candidate.name,
       role_id: candidate.role_id,
       other_skills: candidate.other_skills,
-      skills: render_many(candidate.skills, RecruitxBackend.SkillView, "skill_without_id.json")
+      experience: candidate.experience,
+      candidate_skills: render_many(candidate.candidate_skills, RecruitxBackend.CandidateSkillView, "candidate_skill_id.json")
     }
   end
 end

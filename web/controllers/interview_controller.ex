@@ -11,9 +11,10 @@ defmodule RecruitxBackend.InterviewController do
   def index(conn, params) do
     interviews = (from cis in Interview,
                   join: c in assoc(cis, :candidate),
-                  join: s in assoc(c, :skills),
+                  join: cs in assoc(c, :candidate_skills),
                   join: i in assoc(cis, :interview_type),
-                  preload: [:interview_type, candidate: {c, skills: s}],
+                  join: r in assoc(c, :role),
+                  preload: [:interview_type, candidate: {c, [candidate_skills: cs, role: r]}],
                   select: cis) |> QueryFilter.filter(%Interview{}, params, [:candidate_id]) |> Repo.all
     render(conn, "index.json", interviews: interviews)
   end
