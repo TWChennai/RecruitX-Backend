@@ -15,7 +15,9 @@ defmodule RecruitxBackend.InterviewController do
                   join: i in assoc(cis, :interview_type),
                   preload: [:interview_type, candidate: {c, [candidate_skills: cs]}],
                   select: cis) |> QueryFilter.filter(%Interview{}, params, [:candidate_id]) |> Repo.all
-    render(conn, "index.json", interviews: interviews)
+
+    interviewWithSignupStatus = addSignUpEigibityFor(interviews, params["panelist_login_name"])
+    render(conn, "index.json", interviews: interviewWithSignupStatus)
   end
 
   def show(conn, %{"id" => id}) do
@@ -28,6 +30,16 @@ defmodule RecruitxBackend.InterviewController do
     render(conn, "show.json", interview: interview)
   end
 
+  def addSignUpEigibityFor(interviews, panelist_login_name) do
+    candidate_ids_interviewed = Interview.getCandidateIdsInterviewedBy(panelist_login_name) |> Repo.all
+    Enum.map(interviews, fn(interview) ->
+      Map.put(interview, :sign_up, hasPanelistNotInterviewedCandidate(candidate_ids_interviewed, interview))
+    end)
+  end
+
+  def hasPanelistNotInterviewedCandidate(candidate_ids_interviewed, interview) do
+    !Enum.member?(candidate_ids_interviewed, interview.candidate_id)
+  end
   # def create(conn, %{"interview" => interview_params}) do
   #   changeset = Interview.changeset(%Interview{}, interview_params)
   #

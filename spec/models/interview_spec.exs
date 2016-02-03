@@ -4,6 +4,8 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Repo
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -140,6 +142,45 @@ defmodule RecruitxBackend.InterviewSpec do
       delete = fn ->  Repo.delete!(interview) end
 
       expect(delete).to_not raise_exception(Ecto.ConstraintError)
+    end
+  end
+
+  describe "query" do
+    context "getCandidateIdsInterviewedBy" do
+      before do:  Repo.delete_all(InterviewPanelist)
+
+      it "should return no candidate_ids when none were interviewed by panelist" do
+        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("dummy")
+
+        expect(candidate_ids) |> to(be([]))
+      end
+
+      it "should return candidate_ids who were interviewed by panelist" do
+        interview1 = create(:interview)
+        interview2 = create(:interview)
+        create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+        create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
+
+        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("test")
+
+        expect(Enum.sort(candidate_ids)) |> to(be([interview1.candidate_id, interview2.candidate_id]))
+
+      end
+
+      it "should not return candidate_ids who were not interviewed by panelist" do
+        candidateInterviewed = create(:candidate)
+        candidateNotInterviewed = create(:candidate)
+
+        interview1 = create(:interview, candidate: candidateInterviewed, candidate_id: candidateInterviewed.id)
+        interview2 = create(:interview, candidate: candidateNotInterviewed, candidate_id: candidateNotInterviewed.id)
+
+        create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+        create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "dummy")
+
+        candidate_ids = Repo.all Interview.getCandidateIdsInterviewedBy("test")
+
+        expect(candidate_ids) |> to(be([interview1.candidate_id]))
+      end
     end
   end
 end

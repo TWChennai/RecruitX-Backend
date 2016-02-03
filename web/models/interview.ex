@@ -3,7 +3,9 @@ defmodule RecruitxBackend.Interview do
 
   alias Ecto.DateTime
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.InterviewPanelist
 
   @derive {Poison.Encoder, only: [:id, :start_time, :candidate, :interview_type]}
   schema "interviews" do
@@ -21,6 +23,14 @@ defmodule RecruitxBackend.Interview do
 
   def now_or_in_future(query) do
     from i in query, where: i.start_time >= ^DateTime.utc
+  end
+
+  def getCandidateIdsInterviewedBy(panelist_login_name) do
+    from ip in InterviewPanelist,
+      where: ip.panelist_login_name == ^panelist_login_name,
+      join: i in Interview, on: ip.interview_id == i.id,
+      group_by: i.candidate_id,
+      select: i.candidate_id
   end
 
   def changeset(model, params \\ :empty) do

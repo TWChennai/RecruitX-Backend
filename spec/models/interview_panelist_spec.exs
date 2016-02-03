@@ -77,7 +77,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       Repo.insert(changeset)
       new_interview = create(:interview)
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, Map.merge(valid_attrs, %{interview_id: new_interview.id}))
-      {status, result} = Repo.insert(changeset)
+      {status, _} = Repo.insert(changeset)
       expect(status) |> to(eql(:ok))
     end
   end
