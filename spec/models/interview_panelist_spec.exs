@@ -63,13 +63,22 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     end
   end
 
-  context "unique_index constraint will fail" do
-    it "when same panelist is added more than once for a interview" do
+  context "unique_index constraint" do
+    it "should not allow same panelist to be added more than once for same interview" do
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([panelist_login_name: "has already been taken"]))
+    end
+
+    it "should allow same panelist to be added more than once for a different interview" do
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)
+      Repo.insert(changeset)
+      new_interview = create(:interview)
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, Map.merge(valid_attrs, %{interview_id: new_interview.id}))
+      {status, result} = Repo.insert(changeset)
+      expect(status) |> to(eql(:ok))
     end
   end
 
