@@ -13,4 +13,14 @@ defmodule RecruitxBackend.QueryFilter do
   def cast(model, params, filters) do
     Changeset.cast(model, params, [], filters) |> Map.fetch!(:changes)
   end
+
+  require Ecto.Query
+  #query = Ecto.Query.from c in Candidate
+  #filters = %{name: ["Subha", "Maha"],role_id: [4,2]}
+  def filter_new(query, filters) do
+    Enum.reduce(Map.keys(filters), query, fn(key,acc) ->
+      field_value = Map.get(filters, key)
+      Ecto.Query.from c in acc, where: field(c,^key) in ^field_value
+    end)
+  end
 end
