@@ -11,9 +11,11 @@ defmodule RecruitxBackend.InterviewController do
 
   def index(conn, params) do
     panelist_login_name = params["panelist_login_name"]
-    candidate_id = params["id"]
+    candidate_id = params["candidate_id"]
+    panelist_name = params["panelist_name"]
     if !is_nil(panelist_login_name), do: conn = get_interviews_for_signup(panelist_login_name, conn)
     if !is_nil(candidate_id), do: conn = get_interviews_for_candidate(candidate_id, conn)
+    if !is_nil(panelist_name), do: conn = get_interviews_for_panelist(panelist_name, conn)
     render(conn|> put_status(400), "missing_param_error.json", param: "error")
   end
 
@@ -32,6 +34,12 @@ defmodule RecruitxBackend.InterviewController do
   defp get_interviews_for_candidate(id, conn) do
       interviews = Interview.get_interviews_with_associated_data
                     |> QueryFilter.filter_new(%{candidate_id: [id]})
+                    |> Repo.all
+      render(conn, "index.json", interviews: interviews)
+  end
+
+  defp get_interviews_for_panelist(panelist_name, conn) do
+      interviews = Interview.get_interviews_with_panelist_and_associated_data(panelist_name)
                     |> Repo.all
       render(conn, "index.json", interviews: interviews)
   end
