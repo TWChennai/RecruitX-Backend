@@ -23,6 +23,13 @@ defmodule RecruitxBackend.InterviewControllerSpec do
 
   describe "helper methods" do
     context "is_signup_lesser_than" do
+      it "should return true when there are no signups" do
+        interview = create(:interview)
+        allow Repo |> to(accept(:all, fn(_) -> [] end))
+
+        expect(InterviewController.is_signup_lesser_than(interview, 4)) |> to(be_true)
+      end
+
       it "should return true when signups are lesser than max" do
         interview = create(:interview)
         allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id,"signup_count": 1,"interview_type": 1}] end))

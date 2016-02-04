@@ -46,9 +46,9 @@ defmodule RecruitxBackend.InterviewController do
     candidate_ids_interviewed = Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
     Enum.map(interviews, fn(interview) ->
       # TODO: Can the "behaviour" (that the interview cannot accept any more signups) be on the model itself as a single method?
-      # TODO: Move the magic number (4) into the db
+      # TODO: Move the magic number (2) into the db
       # TODO: Could we make this into a validation also? (UI-agnosticity will mandate that be done)
-      signup_eligiblity = has_panelist_not_interviewed_candidate(candidate_ids_interviewed,interview) and is_signup_lesser_than(interview, 4)
+      signup_eligiblity = has_panelist_not_interviewed_candidate(candidate_ids_interviewed,interview) and is_signup_lesser_than(interview, 2)
       Map.put(interview, :signup, signup_eligiblity)
     end)
   end
@@ -60,7 +60,7 @@ defmodule RecruitxBackend.InterviewController do
   def is_signup_lesser_than(interview, max_count) do
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == interview.id end)
-    result != [] and List.first(result).signup_count < max_count
+    result == [] or List.first(result).signup_count < max_count
   end
 
   # def create(conn, %{"interview" => interview_params}) do
