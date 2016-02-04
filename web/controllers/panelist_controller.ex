@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.InterviewPanelistController do
+defmodule RecruitxBackend.PanelistController do
   use RecruitxBackend.Web, :controller
 
   alias RecruitxBackend.InterviewPanelist
@@ -20,7 +20,7 @@ defmodule RecruitxBackend.InterviewPanelistController do
       {:create, :ok} ->
         conn
           |> put_status(:created)
-          |> put_resp_header("location", interview_panelist_path(conn, :show, response))
+          |> put_resp_header("location", panelist_path(conn, :show, response))
           |> json(response)
       {:create, _} ->
         conn

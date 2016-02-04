@@ -1,7 +1,7 @@
 defmodule RecruitxBackend.InterviewPanelistControllerSpec do
-  use ESpec.Phoenix, controller: RecruitxBackend.InterviewPanelistController
+  use ESpec.Phoenix, controller: RecruitxBackend.PanelistController
 
-  alias RecruitxBackend.InterviewPanelistController
+  alias RecruitxBackend.PanelistController
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
 
@@ -18,7 +18,7 @@ defmodule RecruitxBackend.InterviewPanelistControllerSpec do
 
         conn |> should(be_successful)
         conn |> should(have_http_status(:created))
-        List.keyfind(conn.resp_headers, "location", 0) |> should(be({"location", "/interview_panelists/#{interview_panelist.id}"}))
+        List.keyfind(conn.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{interview_panelist.id}"}))
       end
     end
 
@@ -67,7 +67,7 @@ defmodule RecruitxBackend.InterviewPanelistControllerSpec do
   describe "methods" do
     context "sendResponseBasedOnResult" do
       it "should send 422(Unprocessable entity) when status is error" do
-        response = InterviewPanelistController.sendResponseBasedOnResult(conn(), :create, :error, "error")
+        response = PanelistController.sendResponseBasedOnResult(conn(), :create, :error, "error")
 
         response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "error"}
@@ -76,15 +76,15 @@ defmodule RecruitxBackend.InterviewPanelistControllerSpec do
 
       it "should send 201 when status is ok" do
         interview_panelist = create(:interview_panelist)
-        response = InterviewPanelistController.sendResponseBasedOnResult(conn(), :create, :ok, interview_panelist)
+        response = PanelistController.sendResponseBasedOnResult(conn(), :create, :ok, interview_panelist)
 
         response |> should(have_http_status(:created))
         expect(response.resp_body) |> to(be(Poison.encode!(interview_panelist)))
-        List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/interview_panelists/#{interview_panelist.id}"}))
+        List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{interview_panelist.id}"}))
       end
 
       it "should send 422(Unprocessable entity) when status is unknown" do
-        response = InterviewPanelistController.sendResponseBasedOnResult(conn(), :create, :unknown, "unknown")
+        response = PanelistController.sendResponseBasedOnResult(conn(), :create, :unknown, "unknown")
 
         response |> should(have_http_status(:unprocessable_entity))
         expectedJSONError = %JSONError{errors: "unknown"}
