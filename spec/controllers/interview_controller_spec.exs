@@ -16,8 +16,8 @@ defmodule RecruitxBackend.InterviewControllerSpec do
   describe "index" do
     it "should report missing panelist_login_name param" do
       conn = action(:index, %{})
-      conn |> should(have_http_status(:unprocessable_entity))
-      expect(conn.assigns.param) |> to(eql("panelist_login_name"))
+      conn |> should(have_http_status(400))
+      expect(conn.assigns.param) |> to(eql("error"))
     end
   end
 

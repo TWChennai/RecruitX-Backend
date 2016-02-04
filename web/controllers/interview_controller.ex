@@ -10,23 +10,11 @@ defmodule RecruitxBackend.InterviewController do
   # plug :scrub_params, "interview" when action in [:create, :update]
 
   def index(conn, params) do
-    try do
-      panelist_login_name = params["panelist_login_name"]
-      if is_nil(panelist_login_name),do: throw {:missing_param_error,"panelist_login_name"}
-
-      interviews = (from cis in Interview,
-                    join: c in assoc(cis, :candidate),
-                    join: cs in assoc(c, :candidate_skills),
-                    join: i in assoc(cis, :interview_type),
-                    # TODO: Remove preload of master data (interview_type)
-                    preload: [:interview_type, candidate: {c, [candidate_skills: cs]}],
-                    select: cis) |> QueryFilter.filter(%Interview{}, params, [:candidate_id]) |> Repo.all
-
-      interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
-      render(conn, "index.json", interviews: interviews_with_signup_status)
-    catch {:missing_param_error, param} ->
-      render(conn|> put_status(:unprocessable_entity), "missing_param_error.json", param: param)
-    end
+    panelist_login_name = params["panelist_login_name"]
+    candidate_id = params["id"]
+    if !is_nil(panelist_login_name), do: conn = get_interviews_for_signup(panelist_login_name, conn)
+    if !is_nil(candidate_id), do: conn = get_interviews_for_candidate(candidate_id, conn)
+    render(conn|> put_status(400), "missing_param_error.json", param: "error")
   end
 
   def show(conn, %{"id" => id}) do
@@ -39,6 +27,19 @@ defmodule RecruitxBackend.InterviewController do
       preload: [:interview_type, candidate: {c, candidate_skills: cs}],
       select: i) |> Repo.get(id)
     render(conn, "show.json", interview: interview)
+  end
+
+  defp get_interviews_for_candidate(id, conn) do
+      interviews = Interview.get_interviews_with_associated_data
+                    |> QueryFilter.filter_new(%{candidate_id: [id]})
+                    |> Repo.all
+      render(conn, "index.json", interviews: interviews)
+  end
+
+  defp get_interviews_for_signup(panelist_login_name, conn) do
+      interviews = Interview.get_interviews_with_associated_data |> Repo.all
+      interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
+      render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
   def add_signup_eligibity_for(interviews, panelist_login_name) do

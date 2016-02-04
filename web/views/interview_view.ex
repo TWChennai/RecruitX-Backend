@@ -1,8 +1,12 @@
 defmodule RecruitxBackend.InterviewView do
   use RecruitxBackend.Web, :view
 
-  def render("index.json", %{interviews: interviews}) do
+  def render("index.json", %{interviews_with_signup: interviews}) do
     render_many(interviews, RecruitxBackend.InterviewView, "interview_with_signup.json")
+  end
+
+  def render("index.json", %{interviews: interviews}) do
+    render_many(interviews, RecruitxBackend.InterviewView, "interview.json")
   end
 
   def render("show.json", %{interview: interview}) do

@@ -33,6 +33,16 @@ defmodule RecruitxBackend.Interview do
       select: i.candidate_id
   end
 
+  def get_interviews_with_associated_data do
+    (from cis in Interview,
+      join: c in assoc(cis, :candidate),
+      join: cs in assoc(c, :candidate_skills),
+      join: i in assoc(cis, :interview_type),
+      # TODO: Remove preload of master data (interview_type)
+      preload: [:interview_type, candidate: {c, [candidate_skills: cs]}],
+      select: cis)
+  end
+
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
