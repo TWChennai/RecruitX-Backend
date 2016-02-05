@@ -18,9 +18,9 @@ defmodule RecruitxBackend.QueryFilter do
   #query = Ecto.Query.from c in Candidate
   #filters = %{name: ["Subha", "Maha"],role_id: [4,2]}
   def filter_new(query, filters) do
-    Enum.reduce(Map.keys(filters), query, fn(key,acc) ->
+    Enum.reduce(Map.keys(filters), query, fn(key, acc) ->
       field_value = Map.get(filters, key)
-      Ecto.Query.from c in acc, where: field(c,^key) in ^field_value
+      Ecto.Query.from c in acc, where: field(c, ^key) in ^field_value
     end)
   end
 end

@@ -32,22 +32,22 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   defp get_interviews_for_candidate(id, conn) do
-      interviews = Interview.get_interviews_with_associated_data
-                    |> QueryFilter.filter_new(%{candidate_id: [id]})
-                    |> Repo.all
-      render(conn, "index.json", interviews: interviews)
+    interviews = Interview.get_interviews_with_associated_data
+                  |> QueryFilter.filter_new(%{candidate_id: [id]})
+                  |> Repo.all
+    render(conn, "index.json", interviews: interviews)
   end
 
   defp get_interviews_for_panelist(panelist_name, conn) do
-      interviews = Interview.get_interviews_with_panelist_and_associated_data(panelist_name)
-                    |> Repo.all
-      render(conn, "index.json", interviews: interviews)
+    interviews = Interview.get_interviews_with_panelist_and_associated_data(panelist_name)
+                  |> Repo.all
+    render(conn, "index.json", interviews: interviews)
   end
 
   defp get_interviews_for_signup(panelist_login_name, conn) do
-      interviews = Interview.get_interviews_with_associated_data |> Repo.all
-      interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
-      render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
+    interviews = Interview.get_interviews_with_associated_data |> Repo.all
+    interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
+    render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
   def add_signup_eligibity_for(interviews, panelist_login_name) do
@@ -55,7 +55,6 @@ defmodule RecruitxBackend.InterviewController do
     Enum.map(interviews, fn(interview) ->
       # TODO: Can the "behaviour" (that the interview cannot accept any more signups) be on the model itself as a single method?
       # TODO: Move the magic number (2) into the db
-      # TODO: Could we make this into a validation also? (UI-agnosticity will mandate that be done)
       signup_eligiblity = has_panelist_not_interviewed_candidate(candidate_ids_interviewed,interview) and is_signup_lesser_than(interview, 2)
       Map.put(interview, :signup, signup_eligiblity)
     end)
@@ -87,10 +86,8 @@ defmodule RecruitxBackend.InterviewController do
   #   # end
   #   if changeset.valid? do
   #     Repo.insert(changeset)
-  #     # TODO: Need to send JSON response
   #     send_resp(conn, 200, "")
   #   else
-  #     # TODO: Need to send JSON response
   #     send_resp(conn, 400, "")
   #   end
   # end

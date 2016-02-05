@@ -17,7 +17,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   def get_interview_type_based_count_of_sign_ups do
-    # TODO: Do we need to join on both interview and interview_type?
     # TODO: use assoc in join
     from ip in InterviewPanelist,
       join: i in Interview, on: ip.interview_id == i.id,
@@ -45,7 +44,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> assoc_constraint(:interview)
   end
 
-  def validate_signup_count(existing_changeset, field) do
+  defp validate_signup_count(existing_changeset, field) do
     id = get_field(existing_changeset, field)
     if !is_nil(id) do
       count = get_signup_count_for_interview_id(id) |> Repo.one
