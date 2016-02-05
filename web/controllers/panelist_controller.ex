@@ -21,6 +21,7 @@ defmodule RecruitxBackend.PanelistController do
         conn
           |> put_status(:created)
           |> put_resp_header("location", panelist_path(conn, :show, response))
+          |> json("")
       {:create, _} ->
         conn
           |> put_status(:unprocessable_entity)

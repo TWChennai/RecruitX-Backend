@@ -69,7 +69,7 @@ defmodule RecruitxBackend.CandidateController do
         conn
           |> put_status(:created)
           |> put_resp_header("location", candidate_path(conn, :show, response))
-          |> render("show.json", candidate: response)
+          |> json("")
       {:create, _} ->
         conn
           |> put_status(:unprocessable_entity)

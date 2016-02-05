@@ -189,9 +189,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         expect(response.resp_body) |> to(be(Poison.encode!(expectedJSONError)))
       end
 
-      # TODO: Need to find a way to fix view module error
-
-      xit "should send 201 when status is ok" do
+      it "should send 201 when status is ok" do
         candidate_skill = create(:candidate_skill)
         candidate = candidate_skill.candidate
         response = CandidateController.sendResponseBasedOnResult(conn(), :create, :ok, candidate)
