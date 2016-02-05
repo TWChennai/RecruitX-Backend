@@ -79,7 +79,6 @@ defmodule RecruitxBackend.InterviewPanelistControllerSpec do
         response = PanelistController.sendResponseBasedOnResult(conn(), :create, :ok, interview_panelist)
 
         response |> should(have_http_status(:created))
-        expect(response.resp_body) |> to(be(Poison.encode!(interview_panelist)))
         List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{interview_panelist.id}"}))
       end
 

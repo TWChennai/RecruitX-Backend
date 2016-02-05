@@ -7,7 +7,6 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   @max_count 2
 
-  @derive {Poison.Encoder, only: [:id, :panelist_login_name]}
   schema "interview_panelists" do
     field :panelist_login_name, :string
 

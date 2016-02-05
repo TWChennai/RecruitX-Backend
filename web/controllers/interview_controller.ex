@@ -45,7 +45,11 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   defp get_interviews_for_panelist(panelist_name, conn) do
-    interviews = Interview.get_interviews_with_panelist_and_associated_data(panelist_name)
+    interview_id_for_panelist = (from ip in InterviewPanelist, select: ip.interview_id)
+                                  |> QueryFilter.filter_new(%{panelist_login_name: [panelist_name]})
+                                  |> Repo.all
+    interviews = Interview.get_interviews_with_associated_data
+                  |> QueryFilter.filter_new(%{id: interview_id_for_panelist})
                   |> Repo.all
     render(conn, "index.json", interviews: interviews)
   end
