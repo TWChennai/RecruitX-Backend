@@ -17,7 +17,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should return a list of candidates" do
       candidate_skill = create(:candidate_skill)
-      candidate = candidate_skill.candidate |> Repo.preload(:candidate_skills)
+      # Can't take the complete candidate object since it has 'role' associated
+      candidate = Repo.get!(Candidate, candidate_skill.candidate_id) |> Repo.preload(:candidate_skills)
 
       response = get conn(), "/candidates"
 

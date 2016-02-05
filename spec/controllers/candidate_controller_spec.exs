@@ -16,7 +16,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   describe "index" do
     let :candidates do
-      Enum.map(create_list(3, :candidate_skill), fn(cs) -> cs.candidate |> Repo.preload([:role, :skills]) end)
+      Enum.map(create_list(3, :candidate_skill), fn(cs) -> cs.candidate |> Repo.preload(:candidate_skills) end)
     end
 
     subject do: action :index

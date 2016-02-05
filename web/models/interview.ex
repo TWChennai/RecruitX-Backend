@@ -38,8 +38,7 @@ defmodule RecruitxBackend.Interview do
       join: c in assoc(cis, :candidate),
       join: cs in assoc(c, :candidate_skills),
       join: i in assoc(cis, :interview_type),
-      # TODO: Remove preload of master data (interview_type)
-      preload: [:interview_type, candidate: {c, [candidate_skills: cs]}],
+      preload: [candidate: {c, [candidate_skills: cs]}],
       select: cis)
   end
 

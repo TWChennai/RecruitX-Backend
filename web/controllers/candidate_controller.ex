@@ -15,8 +15,7 @@ defmodule RecruitxBackend.CandidateController do
 
   def index(conn, params) do
     candidates = Candidate
-                  # TODO: Remove preload of master data (role)
-                  |> preload([:role, :candidate_skills])
+                  |> preload(:candidate_skills)
                   |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
                   |> Repo.all
     render(conn, "index.json", candidates: candidates)
@@ -36,8 +35,7 @@ defmodule RecruitxBackend.CandidateController do
 
           candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
           ChangesetInserter.insertChangesets(candidate_interview_rounds_changeset)
-          # TODO: Remove preload of master data (role)
-          Repo.preload(candidate, [:role, :skills])
+          Repo.preload(candidate, :candidate_skills)
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)
         end
@@ -51,8 +49,7 @@ defmodule RecruitxBackend.CandidateController do
   def show(conn, %{"id" => id}) do
     # TODO: Handle error scenario of 'Repo.get!' - ie when an invalid/missing record is hit
     candidate = Candidate
-                # TODO: Remove preload of master data (role)
-                |> preload([:role, :skills])
+                |> preload(:candidate_skills)
                 |> Repo.get!(id)
     render(conn, "show.json", candidate: candidate)
   end

@@ -31,8 +31,7 @@ defmodule RecruitxBackend.InterviewController do
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
       join: it in assoc(i, :interview_type),
-      # TODO: Remove preload of master data (interview_type)
-      preload: [:interview_type, candidate: {c, candidate_skills: cs}],
+      preload: [candidate: {c, candidate_skills: cs}],
       select: i) |> Repo.get(id)
     render(conn, "show.json", interview: interview)
   end
