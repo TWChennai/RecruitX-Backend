@@ -13,10 +13,16 @@ defmodule RecruitxBackend.InterviewController do
     panelist_login_name = params["panelist_login_name"]
     candidate_id = params["candidate_id"]
     panelist_name = params["panelist_name"]
-    if !is_nil(panelist_login_name), do: conn = get_interviews_for_signup(panelist_login_name, conn)
-    if !is_nil(candidate_id), do: conn = get_interviews_for_candidate(candidate_id, conn)
-    if !is_nil(panelist_name), do: conn = get_interviews_for_panelist(panelist_name, conn)
-    render(conn|> put_status(400), "missing_param_error.json", param: "error")
+    cond do
+      !is_nil(panelist_login_name) ->
+        get_interviews_for_signup(panelist_login_name, conn)
+      !is_nil(candidate_id) ->
+        get_interviews_for_candidate(candidate_id, conn)
+      !is_nil(panelist_name) ->
+        get_interviews_for_panelist(panelist_name, conn)
+      true ->
+        render(conn|> put_status(400), "missing_param_error.json", param: "panelist_login_name")
+    end
   end
 
   def show(conn, %{"id" => id}) do
