@@ -8,7 +8,8 @@ defmodule RecruitxBackend.InterviewTypeView do
   def render("interview_type.json", %{interview_type: interview_type}) do
      %{
        id: interview_type.id,
-       name: interview_type.name
+       name: interview_type.name,
+       priority: interview_type.priority
      }
    end
  def render("interview_type_without_id.json", %{interview_type: interview_type}) do
