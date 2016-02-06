@@ -24,6 +24,7 @@ defmodule RecruitxBackend.InterviewView do
     %{
       id: interview.id,
       start_time: interview.start_time,
+      interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json"),
       signup: interview.signup
     }
@@ -33,6 +34,7 @@ defmodule RecruitxBackend.InterviewView do
     %{
       id: interview.id,
       start_time: interview.start_time,
+      interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json")
     }
   end

@@ -37,7 +37,6 @@ defmodule RecruitxBackend.Interview do
     (from cis in Interview,
       join: c in assoc(cis, :candidate),
       join: cs in assoc(c, :candidate_skills),
-      join: i in assoc(cis, :interview_type),
       preload: [candidate: {c, [candidate_skills: cs]}],
       select: cis)
   end

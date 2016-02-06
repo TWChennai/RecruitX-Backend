@@ -30,7 +30,6 @@ defmodule RecruitxBackend.InterviewController do
     interview = (from i in Interview,
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
-      join: it in assoc(i, :interview_type),
       preload: [candidate: {c, candidate_skills: cs}],
       select: i) |> Repo.get(id)
     render(conn, "show.json", interview: interview)
