@@ -30,10 +30,9 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_candidate_ids_interviewed_by(panelist_login_name) do
-    #TODO: Use assoc in join
     from ip in InterviewPanelist,
       where: ip.panelist_login_name == ^panelist_login_name,
-      join: i in Interview, on: ip.interview_id == i.id,
+      join: i in assoc(ip, :interview),
       group_by: i.candidate_id,
       select: i.candidate_id
   end

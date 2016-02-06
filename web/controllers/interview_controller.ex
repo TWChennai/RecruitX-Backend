@@ -26,9 +26,12 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   def show(conn, %{"id" => id}) do
-    # TODO: Handle scenario of 'Repo.get!' - ie when an invalid/missing record is hit
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
-    render(conn, "show.json", interview: interview)
+    if interview != nil do
+      render(conn, "show.json", interview: interview)
+    else
+      render(conn, RecruitxBackend.ErrorView, "404.json")
+    end
   end
 
   defp get_interviews_for_candidate(id, conn) do

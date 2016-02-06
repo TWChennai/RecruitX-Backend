@@ -47,11 +47,14 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def show(conn, %{"id" => id}) do
-    # TODO: Handle error scenario of 'Repo.get!' - ie when an invalid/missing record is hit
     candidate = Candidate
                 |> preload(:candidate_skills)
-                |> Repo.get!(id)
-    render(conn, "show.json", candidate: candidate)
+                |> Repo.get(id)
+    if candidate != nil do
+      render(conn, "show.json", candidate: candidate)
+    else
+      render(conn, RecruitxBackend.ErrorView, "404.json")
+    end
   end
 
   defp readQueryParamOrRaiseError(key, post_params) do
