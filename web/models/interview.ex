@@ -6,6 +6,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Repo
 
   schema "interviews" do
     field :start_time, DateTime
@@ -54,11 +55,27 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:interview_type)
   end
 
+  # TODO: Should this be added as a validation?
+  def signup(model, candidate_ids_interviewed) do
+    # TODO: Move the magic number (2) into the db
+    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model, 2)
+  end
+
   # TODO: Move this into a utility module that is imported?
   def validate_date_time(existing_changeset, field) do
     value = get_field(existing_changeset, field)
     cast_date_time = DateTime.cast(value)
     if cast_date_time == :error && value != "", do: add_error(existing_changeset, :"#{field}", "is invalid")
     existing_changeset
+  end
+
+  def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
+    !Enum.member?(candidate_ids_interviewed, model.candidate_id)
+  end
+
+  def is_signup_lesser_than(model, max_count) do
+    signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model.id end)
+    result == [] or List.first(result).signup_count < max_count
   end
 end
