@@ -6,6 +6,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
+  alias Ecto.DateTime
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -142,6 +143,34 @@ defmodule RecruitxBackend.InterviewSpec do
       delete = fn ->  Repo.delete!(interview) end
 
       expect(delete).to_not raise_exception(Ecto.ConstraintError)
+    end
+  end
+
+  context "default_order" do
+    before do: Repo.delete_all(Interview)
+
+    it "should sort by ascending order of start time" do
+      interview_with_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"))
+      interview_with_start_date2 = create(:interview, start_time: DateTime.cast!("2014-05-17T14:00:00Z"))
+      interview_with_start_date3 = create(:interview, start_time: DateTime.cast!("2014-06-17T14:00:00Z"))
+
+      [interview1, interview2, interview3] = Interview |> Interview.default_order |> Repo.all
+
+      expect(interview1.start_time) |> to(eq(interview_with_start_date1.start_time))
+      expect(interview2.start_time) |> to(eq(interview_with_start_date2.start_time))
+      expect(interview3.start_time) |> to(eq(interview_with_start_date3.start_time))
+    end
+
+    it "should tie-break on id for the same start time" do
+      interview_with_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"), id: 1)
+      interview_with_same_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"), id: interview_with_start_date1.id + 1)
+      interview_with_start_date2 = create(:interview, start_time: DateTime.cast!("2014-05-17T14:00:00Z"))
+
+      [interview1, interview2, interview3] = Interview |> Interview.default_order |> Repo.all
+
+      expect(interview1.start_time) |> to(eq(interview_with_start_date1.start_time))
+      expect(interview2.start_time) |> to(eq(interview_with_same_start_date1.start_time))
+      expect(interview3.start_time) |> to(eq(interview_with_start_date2.start_time))
     end
   end
 

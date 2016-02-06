@@ -24,6 +24,10 @@ defmodule RecruitxBackend.Interview do
     from i in query, where: i.start_time >= ^DateTime.utc
   end
 
+  def default_order(query) do
+    from i in query, order_by: [asc: i.start_time, asc: i.id]
+  end
+
   def get_candidate_ids_interviewed_by(panelist_login_name) do
     #TODO: Use assoc in join
     from ip in InterviewPanelist,

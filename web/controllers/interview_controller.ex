@@ -48,12 +48,13 @@ defmodule RecruitxBackend.InterviewController do
                                   |> Repo.all
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter_new(%{id: interview_id_for_panelist})
+                  |> Interview.default_order
                   |> Repo.all
     render(conn, "index.json", interviews: interviews)
   end
 
   defp get_interviews_for_signup(panelist_login_name, conn) do
-    interviews = Interview.get_interviews_with_associated_data |> Repo.all
+    interviews = Interview.get_interviews_with_associated_data |> Interview.default_order |> Repo.all
     interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
     render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
   end
