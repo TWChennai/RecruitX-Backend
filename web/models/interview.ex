@@ -38,11 +38,11 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_interviews_with_associated_data do
-    (from cis in Interview,
-      join: c in assoc(cis, :candidate),
+    (from i in Interview,
+      join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
       preload: [candidate: {c, [candidate_skills: cs]}],
-      select: cis)
+      select: i)
   end
 
   def changeset(model, params \\ :empty) do
