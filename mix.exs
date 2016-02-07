@@ -44,13 +44,13 @@ defmodule RecruitxBackend.Mixfile do
      {:exrm, "~> 0.19.9"},
      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.2"},
      {:httpotion, "~> 2.1.0"},
-     {:json,   "~> 0.3.2"},
+     {:json, "~> 0.3.3"},
      {:corsica, "~> 0.4.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.2", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
-     {:excoveralls, "~> 0.4.5", only: :test, app: false},
+     {:excoveralls, "~> 0.4.6", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
      {:faker, "~> 0.6.0", only: :test, app: false}
    ]
