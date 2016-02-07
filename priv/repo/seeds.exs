@@ -20,29 +20,10 @@ alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 
-roles = Enum.map(["Dev",
-          "QA",
-          "BA",
-          "PM",
-          "UI/UX"], fn role_value ->
-  Repo.insert!(%Role{name: role_value})
-end)
-
-skills = Enum.map(["Java",
-          "Ruby",
-          "C#",
-          "Python",
-          "Other"], fn skill_value ->
-  Repo.insert!(%Skill{name: skill_value})
-end)
-
-interview_types = Enum.map(%{"Code Pairing1" => 1,
-           "Technical11" => 2,
-           "Technical21" => 3,
-           "Leadersh1ip" => 4,
-           "P13" => 4}, fn {name_value, priority_value} ->
-  Repo.insert!(%InterviewType{name: name_value, priority: priority_value})
-end)
+# NOTE: Non-transactional data should never be in this file - only as part of migrations.
+roles = Repo.all(Role)
+skills = Repo.all(Skill)
+interview_types = Repo.all(InterviewType)
 
 candidates = Enum.map(%{"Dinesh" => "Hadoop",
           "Kausalya" => "Hbase",
