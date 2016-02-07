@@ -36,14 +36,14 @@ defmodule RecruitxBackend.InterviewController do
 
   defp get_interviews_for_candidate(id, conn) do
     interviews = Interview.get_interviews_with_associated_data
-                  |> QueryFilter.filter_new(%{candidate_id: [id]}, Interview)
+                  |> QueryFilter.filter_new(%{candidate_id: id}, Interview)
                   |> Repo.all
     render(conn, "index.json", interviews: interviews)
   end
 
   defp get_interviews_for_panelist(panelist_name, conn) do
     interview_id_for_panelist = (from ip in InterviewPanelist, select: ip.interview_id)
-                                  |> QueryFilter.filter_new(%{panelist_login_name: [panelist_name]}, InterviewPanelist)
+                                  |> QueryFilter.filter_new(%{panelist_login_name: panelist_name}, InterviewPanelist)
                                   |> Repo.all
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter_new(%{id: interview_id_for_panelist}, Interview)

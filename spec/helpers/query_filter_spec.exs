@@ -23,6 +23,17 @@ defmodule RecruitxBackend.QueryFilterSpec do
     expect(result1.role_id) |> to(eql(c1.role_id))
   end
 
+  it "should filter fields when their values are not passed as arrays" do
+    c1 = create(:candidate)
+    query = Ecto.Query.from c in Candidate
+    model = Candidate
+    filters = %{role_id: c1.role_id}
+
+    [result1] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+
+    expect(result1.role_id) |> to(eql(c1.role_id))
+  end
+
   it "should filter multiple fields when their values are passed as arrays" do
     c1 = create(:candidate)
     c2 = create(:candidate)

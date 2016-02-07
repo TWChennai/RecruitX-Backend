@@ -20,7 +20,8 @@ defmodule RecruitxBackend.QueryFilter do
   #model = Candidate
   def filter_new(query, filters, model) do
     Enum.reduce(Map.keys(filters), query, fn(key, acc) ->
-      field_value = Map.get(filters, key)
+      value = Map.get(filters, key)
+      field_value = if is_list(value), do: value, else: [value]
       case {model.__changeset__[key]} do
         {nil} ->
           acc
