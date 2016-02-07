@@ -1,15 +1,18 @@
 defmodule RecruitxBackend.Factory do
   use ExMachina.Ecto, repo: RecruitxBackend.Repo
 
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.Role
-  alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
-  alias Ecto.DateTime
+  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.Skill
+  alias Timex.Date
+  alias Timex.DateFormat
+  alias Timex.Ecto.DateTime
+
   import Ecto.Query
 
   def factory(:role) do
@@ -86,7 +89,7 @@ defmodule RecruitxBackend.Factory do
   end
 
   def getRandomDateTimeString do
-    {_, value} = Timex.Ecto.DateTime.cast(Timex.DateFormat.format!(Timex.Date.now, "%Y-%m-%d %H:%M:%S", :strftime))
+    {_, value} = DateTime.cast(DateFormat.format!(Date.now, "%Y-%m-%d %H:%M:%S", :strftime))
     value
   end
 end

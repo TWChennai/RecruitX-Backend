@@ -6,7 +6,6 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
-  alias Ecto.DateTime
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}

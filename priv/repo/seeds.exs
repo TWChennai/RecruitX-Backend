@@ -48,8 +48,9 @@ end)
 Enum.each(candidates, fn candidate ->
   now = Timex.Date.now
   for _ <- 1..:rand.uniform(5) do
+    multiplier = if :rand.uniform(2) == 2, do: 1, else: -1
     try do
-      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: :rand.uniform(10))})
+      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: (multiplier * :rand.uniform(10)))})
     rescue
       ConstraintError -> {} # ignore the unique constraint violation errors
     end
