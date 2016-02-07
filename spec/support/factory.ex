@@ -35,7 +35,7 @@ defmodule RecruitxBackend.Factory do
     create(:interview_type, id: current_interview_count + 1)
     create(:interview_type, id: current_interview_count + 2)
     interview_rounds = for n <- 1..:rand.uniform(2) do
-      %{"interview_type_id" => current_interview_count + n, "interview_date_time" => getRandomDateTimeString}
+      %{"interview_type_id" => current_interview_count + n, "start_time" => getRandomDateTimeString}
     end
     %{interview_rounds: interview_rounds}
   end

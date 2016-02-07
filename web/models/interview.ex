@@ -50,6 +50,7 @@ defmodule RecruitxBackend.Interview do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    # TODO: Shouldn't the start_time only be in the future if the record is being created for the first time?
     |> validate_date_time(:start_time)
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> assoc_constraint(:candidate)

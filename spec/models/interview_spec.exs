@@ -56,17 +56,17 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is nil" do
-      interview_with_interview_date_time_nil = Map.merge(valid_attrs, %{start_time: nil})
+      interview_with_start_time_nil = Map.merge(valid_attrs, %{start_time: nil})
 
-      result = Interview.changeset(%Interview{}, interview_with_interview_date_time_nil)
+      result = Interview.changeset(%Interview{}, interview_with_start_time_nil)
 
       expect(result) |> to(have_errors(start_time: "can't be blank"))
     end
 
     it "when interview date time is not present" do
-      interview_with_no_interview_date_time = Map.delete(valid_attrs, :start_time)
+      interview_with_no_start_time = Map.delete(valid_attrs, :start_time)
 
-      result = Interview.changeset(%Interview{}, interview_with_no_interview_date_time)
+      result = Interview.changeset(%Interview{}, interview_with_no_start_time)
 
       expect(result) |> to(have_errors(start_time: "can't be blank"))
     end

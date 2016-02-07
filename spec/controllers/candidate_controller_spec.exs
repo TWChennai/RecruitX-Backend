@@ -157,8 +157,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
       end
 
-      it "when interview_date_time is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1,"interview_date_time" => ""}]})
+      it "when start_time is invalid" do
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1,"start_time" => ""}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
@@ -168,7 +168,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       end
 
       it "when interview_type_id is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1.2, "interview_date_time" => DateTime.utc |> DateTime.to_string}]})
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1.2, "start_time" => DateTime.utc |> DateTime.to_string}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
