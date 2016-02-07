@@ -1,7 +1,17 @@
-defmodule RecruitxBackend.Repo.Migrations.AddingInsertUpdateTriggersToEnsureNotMoreThan_2SignupsForEachInterview do
+defmodule RecruitxBackend.Repo.Migrations.CreateInterviewPanelist do
   use Ecto.Migration
 
   def change do
+    create table(:interview_panelists) do
+      add :panelist_login_name, :string, null: false
+      add :interview_id, references(:interviews), null: false
+
+      timestamps
+    end
+
+    create unique_index(:interview_panelists, [:panelist_login_name, :interview_id], name: :interview_panelist_login_name_index)
+    create index(:interview_panelists, [:panelist_login_name])
+    create index(:interview_panelists, [:interview_id])
 
     execute "create OR replace function check_validity() returns trigger as $check_valid$
     begin
