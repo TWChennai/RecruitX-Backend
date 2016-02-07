@@ -10,7 +10,6 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias Ecto.DateTime
 alias Ecto.ConstraintError
 alias RecruitxBackend.Candidate
 alias RecruitxBackend.Interview
@@ -47,9 +46,10 @@ Enum.each(candidates, fn candidate ->
 end)
 
 Enum.each(candidates, fn candidate ->
+  now = Timex.Date.now
   for _ <- 1..:rand.uniform(5) do
     try do
-      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: DateTime.utc})
+      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: :rand.uniform(10))})
     rescue
       ConstraintError -> {} # ignore the unique constraint violation errors
     end

@@ -150,21 +150,25 @@ defmodule RecruitxBackend.InterviewSpec do
     before do: Repo.delete_all(Interview)
 
     it "should sort by ascending order of start time" do
-      interview_with_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"))
-      interview_with_start_date2 = create(:interview, start_time: DateTime.cast!("2014-05-17T14:00:00Z"))
-      interview_with_start_date3 = create(:interview, start_time: DateTime.cast!("2014-06-17T14:00:00Z"))
+      now = Timex.Date.now
+      interview_with_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1))
+      interview_with_start_date2 = create(:interview, start_time: now |> Timex.Date.shift(days: 3))
+      interview_with_start_date3 = create(:interview, start_time: now |> Timex.Date.shift(days: -2))
+      interview_with_start_date4 = create(:interview, start_time: now |> Timex.Date.shift(days: -5))
 
-      [interview1, interview2, interview3] = Interview |> Interview.default_order |> Repo.all
+      [interview1, interview2, interview3, interview4] = Interview |> Interview.default_order |> Repo.all
 
-      expect(interview1.start_time) |> to(eq(interview_with_start_date1.start_time))
-      expect(interview2.start_time) |> to(eq(interview_with_start_date2.start_time))
-      expect(interview3.start_time) |> to(eq(interview_with_start_date3.start_time))
+      expect(interview1.start_time) |> to(eq(interview_with_start_date4.start_time))
+      expect(interview2.start_time) |> to(eq(interview_with_start_date3.start_time))
+      expect(interview3.start_time) |> to(eq(interview_with_start_date1.start_time))
+      expect(interview4.start_time) |> to(eq(interview_with_start_date2.start_time))
     end
 
     it "should tie-break on id for the same start time" do
-      interview_with_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"), id: 1)
-      interview_with_same_start_date1 = create(:interview, start_time: DateTime.cast!("2014-04-17T14:00:00Z"), id: interview_with_start_date1.id + 1)
-      interview_with_start_date2 = create(:interview, start_time: DateTime.cast!("2014-05-17T14:00:00Z"))
+      now = Timex.Date.now
+      interview_with_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1), id: 1)
+      interview_with_same_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1), id: interview_with_start_date1.id + 1)
+      interview_with_start_date2 = create(:interview, start_time: now |> Timex.Date.shift(days: 2))
 
       [interview1, interview2, interview3] = Interview |> Interview.default_order |> Repo.all
 

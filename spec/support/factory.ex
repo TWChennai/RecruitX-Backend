@@ -86,6 +86,7 @@ defmodule RecruitxBackend.Factory do
   end
 
   def getRandomDateTimeString do
-    DateTime.cast!(DateTime.utc |> DateTime.to_string)
+    {_, value} = Timex.Ecto.DateTime.cast(Timex.DateFormat.format!(Timex.Date.now, "%Y-%m-%d %H:%M:%S", :strftime))
+    value
   end
 end

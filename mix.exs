@@ -25,8 +25,8 @@ defmodule RecruitxBackend.Mixfile do
   def application do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
-     applications: [:phoenix, :cowboy, :logger, :connection, :json, :corsica,
-                    :phoenix_ecto, :postgrex, :httpotion]]
+     applications: [:timex, :phoenix, :cowboy, :logger, :connection,
+                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion]]
   end
 
   # Specifies which paths to compile per environment.
@@ -46,6 +46,8 @@ defmodule RecruitxBackend.Mixfile do
      {:httpotion, "~> 2.1.0"},
      {:json, "~> 0.3.3"},
      {:corsica, "~> 0.4.0"},
+     {:timex, "~> 0.19.5"},
+     {:timex_ecto, "~> 0.8.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.2", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},

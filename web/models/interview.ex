@@ -11,7 +11,7 @@ defmodule RecruitxBackend.Interview do
   import RecruitxBackend.CustomValidators
 
   schema "interviews" do
-    field :start_time, DateTime
+    field :start_time, Timex.Ecto.DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
 
