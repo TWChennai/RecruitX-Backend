@@ -38,15 +38,15 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, ~r/^[a-z]+[\sa-z]*$/i)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
-    |> validate_signup_count(:interview_id)
+    |> validate_signup_count
     |> assoc_constraint(:interview)
   end
 
-  defp validate_signup_count(existing_changeset, field) do
-    id = get_field(existing_changeset, field)
+  defp validate_signup_count(existing_changeset) do
+    id = get_field(existing_changeset, :interview_id)
     if !is_nil(id) do
       count = get_signup_count_for_interview_id(id) |> Repo.one
-      if !is_nil(count) and count >= @max_count, do: existing_changeset = add_error(existing_changeset,  :signup, "More than #{@max_count} signups are not allowed")
+      if !is_nil(count) and count >= @max_count, do: existing_changeset = add_error(existing_changeset, :signup, "More than #{@max_count} signups are not allowed")
     end
     existing_changeset
   end
