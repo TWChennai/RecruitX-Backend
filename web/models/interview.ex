@@ -8,6 +8,8 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
 
+  import RecruitxBackend.CustomValidators
+
   schema "interviews" do
     field :start_time, DateTime
     belongs_to :candidate, Candidate
@@ -58,14 +60,6 @@ defmodule RecruitxBackend.Interview do
   def signup(model, candidate_ids_interviewed) do
     # TODO: Move the magic number (2) into the db
     has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model, 2)
-  end
-
-  # TODO: Move this into a utility module that is imported?
-  def validate_date_time(existing_changeset, field) do
-    value = get_field(existing_changeset, field)
-    cast_date_time = DateTime.cast(value)
-    if cast_date_time == :error && value != "", do: add_error(existing_changeset, :"#{field}", "is invalid")
-    existing_changeset
   end
 
   def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
