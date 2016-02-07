@@ -1,6 +1,8 @@
 defmodule RecruitxBackend.InterviewView do
   use RecruitxBackend.Web, :view
 
+  alias Timex.DateFormat
+
   def render("index.json", %{interviews_with_signup: interviews}) do
     render_many(interviews, RecruitxBackend.InterviewView, "interview_with_signup.json")
   end
@@ -23,7 +25,7 @@ defmodule RecruitxBackend.InterviewView do
   def render("interview_with_signup.json", %{interview: interview}) do
     %{
       id: interview.id,
-      start_time: interview.start_time,
+      start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json"),
       signup: interview.signup
@@ -33,7 +35,7 @@ defmodule RecruitxBackend.InterviewView do
   def render("interview.json", %{interview: interview}) do
     %{
       id: interview.id,
-      start_time: interview.start_time,
+      start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json")
     }
