@@ -44,7 +44,7 @@ defmodule RecruitxBackend.Interview do
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
       preload: [candidate: {c, [candidate_skills: cs]}],
-      select: i)
+      select: i) |> default_order
   end
 
   def changeset(model, params \\ :empty) do

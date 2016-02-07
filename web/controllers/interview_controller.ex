@@ -53,7 +53,7 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   defp get_interviews_for_signup(panelist_login_name, conn) do
-    interviews = Interview.get_interviews_with_associated_data |> Interview.default_order |> Interview.now_or_in_future |> Repo.all
+    interviews = Interview.get_interviews_with_associated_data |> Interview.now_or_in_future |> Repo.all
     interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
     render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
   end
