@@ -83,7 +83,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, interview_panelist)
 
-      expect(changeset) |> to(have_errors([signup: "You can't sign up more than 1 interview for same candidate"]))
+      expect(changeset) |> to(have_errors([signup: "You have already signed up an interview for this candidate"]))
     end
   end
 

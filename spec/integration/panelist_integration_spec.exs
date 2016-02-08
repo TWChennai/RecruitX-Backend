@@ -30,7 +30,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn(), "/panelists", %{"interview_panelist" => interview_panelist_params}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You can't sign up more than 1 interview for same candidate"}
+      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You have already signed up an interview for this candidate"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
 
@@ -45,7 +45,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn(), "/panelists", %{"interview_panelist" => interview_panelist2}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You can't sign up more than 1 interview for same candidate"}
+      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You have already signed up an interview for this candidate"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
 

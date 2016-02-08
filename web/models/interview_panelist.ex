@@ -52,7 +52,7 @@ defmodule RecruitxBackend.InterviewPanelist do
       interview = Interview |> Repo.get(interview_id)
       candidate_ids_interviewed = (Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all)
       if !is_nil(interview) and !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed) do
-        existing_changeset = add_error(existing_changeset,  :signup, "You can't sign up more than 1 interview for same candidate")
+        existing_changeset = add_error(existing_changeset,  :signup, "You have already signed up an interview for this candidate")
       end
     end
     existing_changeset
