@@ -4,7 +4,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.QueryFilter
 
   @max_count 2
 
@@ -60,9 +59,8 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   defp validate_signup_count(existing_changeset) do
     id = get_field(existing_changeset, :interview_id)
-    if !is_nil(id) do
-      count = get_signup_count_for_interview_id(id) |> Repo.one
-      if !is_nil(count) and count >= @max_count, do: existing_changeset = add_error(existing_changeset,  :signup_count, "More than #{@max_count} signups are not allowed")
+    if !is_nil(id) and !Interview.is_signup_lesser_than(id, @max_count) do
+      existing_changeset = add_error(existing_changeset,  :signup_count, "More than #{@max_count} signups are not allowed")
     end
     existing_changeset
   end

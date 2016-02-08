@@ -60,16 +60,16 @@ defmodule RecruitxBackend.Interview do
   # TODO: Should this be added as a validation?
   def signup(model, candidate_ids_interviewed) do
     # TODO: Move the magic number (2) into the db
-    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model, 2)
+    has_panelist_not_interviewed_candidate(model.id, candidate_ids_interviewed) and is_signup_lesser_than(model, 2)
   end
 
   def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
     !Enum.member?(candidate_ids_interviewed, model.candidate_id)
   end
 
-  def is_signup_lesser_than(model, max_count) do
+  def is_signup_lesser_than(model_id, max_count) do
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
-    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model.id end)
+    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
     result == [] or List.first(result).signup_count < max_count
   end
 end
