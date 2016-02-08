@@ -70,7 +70,20 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, interview_panelist)
 
-      expect(changeset) |> to(have_errors([signup: "More than 2 signups are not allowed"]))
+      expect(changeset) |> to(have_errors([signup_count: "More than 2 signups are not allowed"]))
+    end
+
+    it "should be invalid when panelist has already done a previous interview for the candidate" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview2 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+
+      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, interview_panelist)
+
+      expect(changeset) |> to(have_errors([signup: "You can't sign up more than 1 interview for same candidate"]))
     end
   end
 

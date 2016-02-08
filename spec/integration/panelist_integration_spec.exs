@@ -8,6 +8,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.Repo
 
   describe "create" do
     it "should insert valid data in db and return location path in a success response" do
@@ -29,7 +30,22 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn(), "/panelists", %{"interview_panelist" => interview_panelist_params}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "panelist_login_name", reason: "You have already signed up for this interview"}
+      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You can't sign up more than 1 interview for same candidate"}
+      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+    end
+
+
+    it "should respond with errors when trying to sign up for the same candidate's different interview" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview2 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
+      interview_panelist2 = %{interview_id: interview2.id, panelist_login_name: interview_panelist1.panelist_login_name}
+
+      response = post conn(), "/panelists", %{"interview_panelist" => interview_panelist2}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You can't sign up more than 1 interview for same candidate"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
 
@@ -41,7 +57,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn(), "/panelists", %{"interview_panelist" => fields_for(:interview_panelist, interview_id: interview.id)}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "More than 2 signups are not allowed"}
+      expectedErrorReason = %JSONErrorReason{field_name: "signup_count", reason: "More than 2 signups are not allowed"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
   end
