@@ -25,7 +25,7 @@ defmodule RecruitxBackend.Mixfile do
   def application do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
-     applications: [:timex, :phoenix, :cowboy, :logger, :connection,
+     applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
                     :json, :corsica, :phoenix_ecto, :postgrex, :httpotion]]
   end
 
