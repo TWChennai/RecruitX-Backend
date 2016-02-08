@@ -12,7 +12,7 @@ defmodule RecruitxBackend.InterviewView do
   end
 
   def render("show.json", %{interview: interview}) do
-    render_one(interview, RecruitxBackend.InterviewView, "interview.json")
+    render_one(interview, RecruitxBackend.InterviewView, "interview_with_panelists.json")
   end
 
   def render("missing_param_error.json", %{param: param}) do
@@ -38,6 +38,16 @@ defmodule RecruitxBackend.InterviewView do
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json")
+    }
+  end
+
+  def render("interview_with_panelists.json", %{interview: interview}) do
+    %{
+      id: interview.id,
+      start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      interview_type_id: interview.interview_type_id,
+      candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json"),
+      panelists: interview.panelists
     }
   end
 end
