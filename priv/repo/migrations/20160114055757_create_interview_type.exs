@@ -16,11 +16,11 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewType do
 
     flush
 
-    Enum.map(%{"Code Pairing1" => 1,
-               "Technical11" => 2,
-               "Technical21" => 3,
-               "Leadersh1ip" => 4,
-               "P13" => 4}, fn {name_value, priority_value} ->
+    Enum.map(%{"Coding" => 1,
+               "Tech-1" => 2,
+               "Tech-2" => 3,
+               "Ldrshp" => 4,
+               "P3" => 4}, fn {name_value, priority_value} ->
       Repo.insert!(%InterviewType{name: name_value, priority: priority_value})
     end)
   end
