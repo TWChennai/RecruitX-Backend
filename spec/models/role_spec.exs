@@ -56,21 +56,15 @@ defmodule RecruitxBackend.RoleSpec do
 
   context "unique_constraint" do
     it "should be invalid when role already exists with same name" do
-      # TODO: Use factory
-      valid_role = Role.changeset(%Role{}, valid_attrs)
-      Repo.insert!(valid_role)
-
+      new_role = create(:role)
+      valid_role = Role.changeset(%Role{}, %{name: new_role.name})
       {:error, changeset} = Repo.insert(valid_role)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
     it "should be invalid when role already exists with same name but different case" do
-      # TODO: Use factory
-      valid_role = Role.changeset(%Role{}, valid_attrs)
-      Repo.insert!(valid_role)
-
-      role_in_caps = Role.changeset(%Role{}, %{name: String.upcase(valid_attrs.name)})
-
+      new_role = create(:role)
+      role_in_caps = Role.changeset(%Role{}, %{name: String.upcase(new_role.name)})
       {:error, changeset} = Repo.insert(role_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end

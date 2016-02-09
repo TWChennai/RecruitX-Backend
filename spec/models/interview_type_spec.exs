@@ -71,21 +71,15 @@ defmodule RecruitxBackend.InterviewTypeSpec do
 
   context "unique_constraint" do
     it "should be invalid when interview already exists with same name" do
-      # TODO: Use factory
-      valid_interview = InterviewType.changeset(%InterviewType{}, valid_attrs)
-      Repo.insert!(valid_interview)
-
+      new_interview_type = create(:interview_type)
+      valid_interview = InterviewType.changeset(%InterviewType{}, %{name: new_interview_type.name})
       {:error, changeset} = Repo.insert(valid_interview)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
     it "should be invalid when interview already exists with same name but different case" do
-      # TODO: Use factory
-      valid_interview = InterviewType.changeset(%InterviewType{}, valid_attrs)
-      Repo.insert!(valid_interview)
-
-      interview_in_caps = InterviewType.changeset(%InterviewType{}, fields_for(:interview_type, name: String.upcase(valid_attrs.name)))
-
+      new_interview_type = create(:interview_type)
+      valid_interview = InterviewType.changeset(%InterviewType{}, %{name: String.upcase(new_interview_type.name)})
       {:error, changeset} = Repo.insert(interview_in_caps)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
