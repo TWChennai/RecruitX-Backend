@@ -1,7 +1,7 @@
 defmodule RecruitxBackend.Interview do
   use RecruitxBackend.Web, :model
 
-  alias Ecto.DateTime
+  alias Timex.Date
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
@@ -23,8 +23,8 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w()
 
-  def now_or_in_future(query) do
-    from i in query, where: i.start_time >= ^DateTime.utc
+  def now_or_in_next_seven_days(query) do
+    from i in query, where: i.start_time >= ^Date.now and i.start_time <= ^(Date.now |> Date.shift(days: 7))
   end
 
   def default_order(query) do
