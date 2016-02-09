@@ -80,7 +80,7 @@ defmodule RecruitxBackend.InterviewTypeSpec do
     it "should be invalid when interview already exists with same name but different case" do
       new_interview_type = create(:interview_type)
       valid_interview = InterviewType.changeset(%InterviewType{}, %{name: String.upcase(new_interview_type.name)})
-      {:error, changeset} = Repo.insert(interview_in_caps)
+      {:error, changeset} = Repo.insert(valid_interview)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end
