@@ -9,6 +9,7 @@ defmodule RecruitxBackend.Router do
     pipe_through :api
 
     resources "/roles", RoleController, only: [:index]
+    resources "/is_recruiter", JigsawController, only: [:show]
     resources "/skills", SkillController, only: [:index]
     resources "/candidates", CandidateController, only: [:index, :create, :show]
     resources "/candidates/:candidate_id/interviews", InterviewController, only: [:index]
