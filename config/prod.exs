@@ -14,7 +14,8 @@ use Mix.Config
 config :recruitx_backend, RecruitxBackend.Endpoint,
   http: [port: 4001],
   url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/manifest.json"
+  cache_static_manifest: "priv/static/manifest.json",
+  path_to_store_images: "../uploaded_images"
 
 # Do not print debug messages in production
 config :logger, level: :info
