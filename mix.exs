@@ -54,7 +54,8 @@ defmodule RecruitxBackend.Mixfile do
      {:espec_phoenix, "~> 0.1.8", only: :test, app: false},
      {:excoveralls, "~> 0.4.6", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
-     {:faker, "~> 0.6.0", only: :test, app: false}
+     {:faker, "~> 0.6.0", only: :test, app: false},
+     {:gettext, "~> 0.9"}
    ]
   end
 
