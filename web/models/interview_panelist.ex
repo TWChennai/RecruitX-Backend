@@ -31,6 +31,8 @@ defmodule RecruitxBackend.InterviewPanelist do
       select: count(ip.interview_id)
   end
 
+  # TODO: This can be preloaded into the query for Interview so that it runs as a single query - as opposed to hitting the db twice
+  # Look at the places where its invoked
   def get_panelists_for_a_interview(id) do
     (from ip in InterviewPanelist, select: ip.panelist_login_name)
       |> QueryFilter.filter_new(%{interview_id: id}, InterviewPanelist)
@@ -58,7 +60,7 @@ defmodule RecruitxBackend.InterviewPanelist do
       interview = Interview |> Repo.get(interview_id)
       candidate_ids_interviewed = (Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all)
       if !is_nil(interview) and !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed) do
-        existing_changeset = add_error(existing_changeset,  :signup, "You have already signed up an interview for this candidate")
+        existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
       end
     end
     existing_changeset
@@ -67,7 +69,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   defp validate_signup_count(existing_changeset) do
     id = get_field(existing_changeset, :interview_id)
     if !is_nil(id) and !Interview.is_signup_lesser_than(id, @max_count) do
-      existing_changeset = add_error(existing_changeset,  :signup_count, "More than #{@max_count} signups are not allowed")
+      existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
     end
     existing_changeset
   end

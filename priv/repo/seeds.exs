@@ -12,8 +12,9 @@
 
 alias Ecto.ConstraintError
 alias RecruitxBackend.Candidate
-alias RecruitxBackend.Interview
 alias RecruitxBackend.CandidateSkill
+alias RecruitxBackend.Interview
+alias RecruitxBackend.InterviewPanelist
 alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
@@ -45,12 +46,20 @@ Enum.each(candidates, fn candidate ->
   end
 end)
 
+panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
 Enum.each(candidates, fn candidate ->
   now = Timex.Date.now
   for _ <- 1..:rand.uniform(5) do
     multiplier = if :rand.uniform(2) == 2, do: 1, else: -1
     try do
-      Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: (multiplier * :rand.uniform(10)))})
+      interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: (multiplier * :rand.uniform(10)))})
+      for _ <- 1..:rand.uniform(2) do
+        try do
+          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
+        rescue
+          ConstraintError -> {} # ignore the unique constraint violation errors
+        end
+      end
     rescue
       ConstraintError -> {} # ignore the unique constraint violation errors
     end

@@ -27,8 +27,7 @@ defmodule RecruitxBackend.InterviewController do
 
   def show(conn, %{"id" => id}) do
     interview_panelists = InterviewPanelist.get_panelists_for_a_interview(id)
-    interview = Interview.get_interviews_with_associated_data
-                |> Repo.get(id)
+    interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
     interview = Map.put(interview, :panelists, interview_panelists)
     if interview != nil do
       render(conn, "show.json", interview: interview)
