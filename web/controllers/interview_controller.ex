@@ -26,9 +26,7 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   def show(conn, %{"id" => id}) do
-    interview_panelists = (from ip in InterviewPanelist, select: ip.panelist_login_name)
-                          |> QueryFilter.filter_new(%{interview_id: id}, InterviewPanelist)
-                          |> Repo.all
+    interview_panelists = InterviewPanelist.get_panelists_for_a_interview(id)
     interview = Interview.get_interviews_with_associated_data
                 |> Repo.get(id)
     interview = Map.put(interview, :panelists, interview_panelists)
@@ -67,6 +65,8 @@ defmodule RecruitxBackend.InterviewController do
     candidate_ids_interviewed = Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
     Enum.map(interviews, fn(interview) ->
       signup_eligiblity = interview |> Interview.signup(candidate_ids_interviewed)
+      interview_panelists = InterviewPanelist.get_panelists_for_a_interview(interview.id)
+      interview = Map.put(interview, :panelists, interview_panelists)
       Map.put(interview, :signup, signup_eligiblity)
     end)
   end

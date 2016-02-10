@@ -4,6 +4,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.QueryFilter
 
   @max_count 2
 
@@ -28,6 +29,12 @@ defmodule RecruitxBackend.InterviewPanelist do
       where: ip.interview_id == ^id,
       group_by: ip.interview_id,
       select: count(ip.interview_id)
+  end
+
+  def get_panelists_for_a_interview(id) do
+    (from ip in InterviewPanelist, select: ip.panelist_login_name)
+      |> QueryFilter.filter_new(%{interview_id: id}, InterviewPanelist)
+      |> Repo.all
   end
 
   @required_fields ~w(panelist_login_name interview_id)
