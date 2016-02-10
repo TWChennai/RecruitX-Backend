@@ -7,6 +7,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
@@ -92,6 +93,13 @@ defmodule RecruitxBackend.Factory do
   def factory(:interview_status) do
     %InterviewStatus{
       name: "#{Faker.Name.first_name}"
+    }
+  end
+
+  def factory(:feedback_image) do
+    %FeedbackImage{
+      file_name: "#{Faker.Name.first_name}",
+      interview_id: create(:interview).id
     }
   end
 
