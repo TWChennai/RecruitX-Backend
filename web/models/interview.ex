@@ -24,7 +24,8 @@ defmodule RecruitxBackend.Interview do
   @optional_fields ~w()
 
   def now_or_in_next_seven_days(query) do
-    from i in query, where: i.start_time >= ^Date.now and i.start_time <= ^(Date.now |> Date.shift(days: 7))
+    start_of_today = Date.set(Date.now, time: {0,0,0})
+    from i in query, where: i.start_time >= ^start_of_today and i.start_time <= ^(start_of_today |> Date.shift(days: 7))
   end
 
   def default_order(query) do
