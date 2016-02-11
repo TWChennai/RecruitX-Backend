@@ -72,4 +72,27 @@ defmodule RecruitxBackend.FeedbackImageSpec do
       expect(error_changeset) |> to(have_errors([interview: "does not exist"]))
     end
   end
+
+  context "unique_constraint" do
+    it "should be invalid when file_name already exists with same name for a different interview" do
+      feedback_image = create(:feedback_image)
+      new_feedback_image = FeedbackImage.changeset(%FeedbackImage{}, %{file_name: feedback_image.file_name, interview_id: create(:interview).id})
+      {:error, changeset} = Repo.insert(new_feedback_image)
+      expect(changeset) |> to(have_errors(file_name: "has already been taken"))
+    end
+
+    it "should be invalid when file_name already exists with same name for same interview" do
+      feedback_image = create(:feedback_image)
+      new_feedback_image = FeedbackImage.changeset(%FeedbackImage{}, %{file_name: feedback_image.file_name, interview_id: feedback_image.interview_id})
+      {:error, changeset} = Repo.insert(new_feedback_image)
+      expect(changeset) |> to(have_errors(file_name_unique: "This file has already been uploaded"))
+    end
+
+    it "should be invalid when feedback_image already exists with same file_name but different case" do
+      feedback_image = create(:feedback_image)
+      feedback_image_in_caps = FeedbackImage.changeset(%FeedbackImage{}, %{file_name: String.upcase(feedback_image.file_name), interview_id: create(:interview).id})
+      {:error, changeset} = Repo.insert(feedback_image_in_caps)
+      expect(changeset) |> to(have_errors(file_name: "has already been taken"))
+    end
+  end
 end

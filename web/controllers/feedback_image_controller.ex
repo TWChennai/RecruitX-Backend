@@ -14,15 +14,9 @@ defmodule RecruitxBackend.FeedbackImageController do
     # TODO: Can't this check to create the path be done only once when the app starts up?
     # Otherwise, the same check is happening for each request - which is a performance hit
     if !(File.exists?(path) and File.dir?(path)), do: File.mkdir!(path)
-
-    new_file_name = "interview_#{id}_#{Date.now(:secs)}" <> ".jpg"
-    new_file_path = path <> "/" <> new_file_name
-    File.cp!(data.path, new_file_path)
-
     try do
-      feedback_image_changeset = FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})
-      {status, feedback_image} = ChangesetInserter.insertChangesets([feedback_image_changeset])
-      sendResponseBasedOnResult(conn, :create, status, feedback_image)
+      ChangesetInserter.insertChangesets(store_image_and_generate_changesets(path, data, id))
+      sendResponseBasedOnResult(conn, :create, :ok, "Files uploaded")
     catch {status, error} ->
       sendResponseBasedOnResult(conn, :create, status, error)
     end
@@ -39,12 +33,21 @@ defmodule RecruitxBackend.FeedbackImageController do
     end
   end
 
-  def sendResponseBasedOnResult(conn, action, status, response) do
+  defp store_image_and_generate_changesets(path, data, id) do
+    Enum.reduce(Map.keys(data),[], fn(key, acc) ->
+      new_file_name = "interview_#{id}_#{Date.now(:secs)}" <> ".jpg"
+      new_file_path = path <> "/" <> new_file_name
+      File.cp!(Map.get(data, key).path, new_file_path)
+      acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
+    end)
+  end
+
+  defp sendResponseBasedOnResult(conn, action, status, response) do
     case {action, status} do
       {:create, :ok} ->
         conn
           |> put_status(:created)
-          |> json("Files uploaded!")
+          |> json(response)
       {:create, _} ->
         conn
           |> put_status(:unprocessable_entity)
