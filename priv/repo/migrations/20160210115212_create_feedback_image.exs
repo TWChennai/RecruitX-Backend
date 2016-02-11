@@ -8,6 +8,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateFeedbackImage do
 
       timestamps
     end
-
+    # TODO: Should there be a unique constraint on the file_name?
   end
 end

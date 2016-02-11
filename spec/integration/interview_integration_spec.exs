@@ -17,7 +17,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     before do: Repo.delete_all(Candidate)
 
     it "should return empty when panelist has taken no interviews" do
-      interview = create(:interview)
+      create(:interview)
 
       response = get conn(), "/panelists/recruitx/interviews"
 
