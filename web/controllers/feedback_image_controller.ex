@@ -29,13 +29,13 @@ defmodule RecruitxBackend.FeedbackImageController do
     if File.exists?(file_path) do
       send_file(conn, 200, file_path, 0, :all)
     else
-      conn |> put_status(:not_found) |> json("file not found")
+      conn |> put_status(:not_found)
     end
   end
 
   defp store_image_and_generate_changesets(path, data, id) do
     Enum.reduce(Map.keys(data),[], fn(key, acc) ->
-      new_file_name = "interview_#{id}_#{Date.now(:secs)}" <> ".jpg"
+      new_file_name = "interview_#{id}_#{:rand.uniform(Date.now(:secs))}" <> ".jpg"
       new_file_path = path <> "/" <> new_file_name
       File.cp!(Map.get(data, key).path, new_file_path)
       acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
