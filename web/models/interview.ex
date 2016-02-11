@@ -6,6 +6,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
 
   import RecruitxBackend.CustomValidators
@@ -18,6 +19,7 @@ defmodule RecruitxBackend.Interview do
     timestamps
 
     has_many :interview_panelist, InterviewPanelist
+    has_many :feedback_image, FeedbackImage
   end
 
   @required_fields ~w(candidate_id interview_type_id start_time)
