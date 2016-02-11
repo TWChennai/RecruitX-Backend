@@ -18,7 +18,7 @@ defmodule RecruitxBackend.FeedbackImage do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_length(:file_name, min: 1)
-    |> validate_format(:file_name, ~r/^[a-z]+[\sa-z0-9_]*$/i)
+    |> validate_format(:file_name, ~r/^[a-z]+[\sa-z0-9_.]*$/i)
     |> assoc_constraint(:interview)
   end
 end

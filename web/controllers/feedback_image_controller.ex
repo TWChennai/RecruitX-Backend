@@ -11,11 +11,12 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   def create(conn, %{"feedback_image" => data, "interview_id" => id}) do
     path = Endpoint.config(:path_to_store_images)
-    new_file_name = "interview_#{id}_#{Date.now(:secs)}" <> ".jpg"
-    new_file_path = path <> "/" <> new_file_name
     # TODO: Can't this check to create the path be done only once when the app starts up?
     # Otherwise, the same check is happening for each request - which is a performance hit
     if !(File.exists?(path) and File.dir?(path)), do: File.mkdir!(path)
+
+    new_file_name = "interview_#{id}_#{Date.now(:secs)}" <> ".jpg"
+    new_file_path = path <> "/" <> new_file_name
     File.cp!(data.path, new_file_path)
 
     try do
@@ -28,12 +29,13 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   def show(conn, params) do
+    file_name = params["id"]
     path = Endpoint.config(:path_to_store_images)
-    if File.exists?(path) and File.dir?(path) do
-      # TODO: Hardcoded filename
-      send_file(conn, 200, path <> "/trial1.jpg", 0, :all)
+    file_path = path <> "/" <> file_name
+    if File.exists?(file_path) do
+      send_file(conn, 200, file_path, 0, :all)
     else
-      conn |> put_status(200) |> json("file not found")
+      conn |> put_status(400) |> json("file not found")
     end
   end
 
@@ -42,8 +44,7 @@ defmodule RecruitxBackend.FeedbackImageController do
       {:create, :ok} ->
         conn
           |> put_status(:created)
-          |> put_resp_header("location", feedback_image_path(conn, :show, response))
-          |> json("")
+          |> json("Files uploaded!")
       {:create, _} ->
         conn
           |> put_status(:unprocessable_entity)
