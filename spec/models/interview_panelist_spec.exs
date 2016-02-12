@@ -164,25 +164,4 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       expect(create).to raise_exception(Elixir.Postgrex.Error, "ERROR (raise_exception): More than 2 sign-ups not allowed")
     end
   end
-
-  describe "get panelists for a candidate" do
-    it "should return empty list if there is no panelist" do
-      interview = create(:interview)
-
-      expect([]) |> to(be(InterviewPanelist.get_panelists_for_a_interview(interview.id)))
-    end
-
-    it "should return list with one panelist if there is a panelist" do
-      interview_panelist = create(:interview_panelist)
-
-      expect([interview_panelist.panelist_login_name]) |> to(be(InterviewPanelist.get_panelists_for_a_interview(interview_panelist.interview_id)))
-    end
-
-    it "should return list with two panelist if there are two panelist" do
-      interview_panelist_one = create(:interview_panelist)
-      interview_panelist_two = create(:interview_panelist, interview_id: interview_panelist_one.interview_id)
-
-      expect([interview_panelist_two.panelist_login_name, interview_panelist_one.panelist_login_name]) |> to(be(InterviewPanelist.get_panelists_for_a_interview(interview_panelist_one.interview_id)))
-    end
-  end
 end

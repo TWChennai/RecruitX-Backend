@@ -30,7 +30,7 @@ defmodule RecruitxBackend.InterviewView do
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json"),
       status_id: interview.interview_status_id,
       signup: interview.signup,
-      panelists: interview.panelists
+      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json")
     }
   end
 
@@ -51,7 +51,7 @@ defmodule RecruitxBackend.InterviewView do
       interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate.json"),
       status_id: interview.interview_status_id,
-      panelists: interview.panelists
+      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json")
     }
   end
 end

@@ -48,7 +48,7 @@ defmodule RecruitxBackend.Interview do
     (from i in Interview,
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
-      preload: [candidate: {c, [candidate_skills: cs]}],
+      preload: [:interview_panelist, candidate: {c, [candidate_skills: cs]}],
       select: i) |> default_order
   end
 
