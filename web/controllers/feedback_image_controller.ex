@@ -18,7 +18,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     try do
       Interview.update_status(id, status_id)
       ChangesetInserter.insertChangesets(store_image_and_generate_changesets(path, data, id))
-      sendResponseBasedOnResult(conn, :create, :ok, "Files uploaded")
+      sendResponseBasedOnResult(conn, :create, :ok, "Thanks for submitting feedback!")
     catch {status, error} ->
       sendResponseBasedOnResult(conn, :create, status, error)
     end

@@ -18,10 +18,21 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => interview_status.id}
 
       conn |> should(have_http_status(201))
-      expect(conn.resp_body) |> to(be("\"Files uploaded\""))
+      expect(conn.resp_body) |> to(be("\"Thanks for submitting feedback!\""))
       expect File |> to(accepted :cp!)
       updated_interview = Interview |> Repo.get(interview.id)
       expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+    end
+
+    it "should not update status and feedback images when status has already been updated" do
+      allow File |> to(accept(:exists?, fn(_) -> true end))
+      interview = create(:interview, interview_status_id: create(:interview_status).id)
+
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => create(:interview_status).id}
+
+      conn |> should(have_http_status(:unprocessable_entity))
+      expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}
+      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: expected_reason})))
     end
 
     it "should not update status and feedback images when status_id is invalid" do
@@ -56,7 +67,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
 
       expect File |> to(accepted :mkdir!)
       conn |> should(have_http_status(201))
-      expect(conn.resp_body) |> to(be("\"Files uploaded\""))
+      expect(conn.resp_body) |> to(be("\"Thanks for submitting feedback!\""))
     end
   end
 end
