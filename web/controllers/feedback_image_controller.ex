@@ -31,7 +31,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     if File.exists?(file_path) do
       send_file(conn, 200, file_path, 0, :all)
     else
-      conn |> put_status(:not_found)
+      render(conn |> put_status(:not_found), RecruitxBackend.ErrorView, "404.json")
     end
   end
 

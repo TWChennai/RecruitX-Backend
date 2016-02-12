@@ -85,7 +85,7 @@ defmodule RecruitxBackend.Interview do
     try do
       base_query = from i in Interview
       QueryFilter.filter_new(base_query, %{id: id}, Interview) |> Repo.update_all(set: [interview_status_id: status_id])
-    rescue _ in Postgrex.Error -> throw {:error, "Invalid interview status"}
+    rescue e in Postgrex.Error -> throw {:error, e.postgres.code}
     end
   end
 end

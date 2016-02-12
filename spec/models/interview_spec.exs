@@ -291,7 +291,7 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should not update interview when status is invalid" do
       interview = create(:interview)
       update = fn ->  Interview.update_status(interview.id, 0) end
-      expected_error = {:error, "Invalid interview status"}
+      expected_error = {:error, :foreign_key_violation}
 
       expect update |> to(throw_term expected_error)
     end
