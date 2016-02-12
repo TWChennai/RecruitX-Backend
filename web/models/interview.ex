@@ -5,6 +5,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
@@ -15,15 +16,16 @@ defmodule RecruitxBackend.Interview do
     field :start_time, Timex.Ecto.DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
+    belongs_to :interview_status, InterviewStatus
 
     timestamps
 
     has_many :interview_panelist, InterviewPanelist
-    has_many :feedback_image, FeedbackImage
+    has_many :feedback_images, FeedbackImage
   end
 
   @required_fields ~w(candidate_id interview_type_id start_time)
-  @optional_fields ~w()
+  @optional_fields ~w(interview_status_id)
 
   def now_or_in_next_seven_days(query) do
     start_of_today = Date.set(Date.now, time: {0,0,0})
@@ -58,6 +60,7 @@ defmodule RecruitxBackend.Interview do
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
+    |> assoc_constraint(:interview_status)
   end
 
   # TODO: Should this be added as a validation?

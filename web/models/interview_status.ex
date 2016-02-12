@@ -1,8 +1,12 @@
 defmodule RecruitxBackend.InterviewStatus do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.Interview
+
   schema "interview_status" do
     field :name, :string
+
+    has_many :interviews, Interview
 
     timestamps
   end

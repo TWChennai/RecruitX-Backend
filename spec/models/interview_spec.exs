@@ -14,6 +14,14 @@ defmodule RecruitxBackend.InterviewSpec do
     subject do: Interview.changeset(%Interview{}, valid_attrs)
 
     it do: should be_valid
+
+    it "should be valid when interview status is present" do
+      interview = Map.merge(valid_attrs, %{interview_status_id: create(:interview_status).id})
+
+      result = Interview.changeset(%Interview{}, interview)
+
+      expect(result) |> to(be_valid)
+    end
   end
 
   context "invalid changeset" do
@@ -112,6 +120,15 @@ defmodule RecruitxBackend.InterviewSpec do
 
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([interview_type: "does not exist"]))
+    end
+
+    it "when interview_status not present in interview_status table" do
+      interview_with_invalid_status_id = Map.merge(valid_attrs, %{interview_status_id: 0})
+
+      changeset = Interview.changeset(%Interview{},interview_with_invalid_status_id)
+
+      {:error, error_changeset} = Repo.insert(changeset)
+      expect(error_changeset) |> to(have_errors([interview_status: "does not exist"]))
     end
   end
 
