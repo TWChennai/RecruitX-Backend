@@ -277,4 +277,23 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(Interview.has_panelist_not_interviewed_candidate(interview, candidates_interviewed)) |> to(be_false)
     end
   end
+
+  describe "update_status" do
+    it "should update status for interview given" do
+      interview = create(:interview)
+      interview_status = create(:interview_status)
+      Interview.update_status(interview.id, interview_status.id)
+
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+    end
+
+    it "should not update interview when status is invalid" do
+      interview = create(:interview)
+      update = fn ->  Interview.update_status(interview.id, 0) end
+      expected_error = {:error, "Invalid interview status"}
+
+      expect update |> to(throw_term expected_error)
+    end
+  end
 end

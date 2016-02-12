@@ -9,8 +9,10 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.QueryFilter
 
   import RecruitxBackend.CustomValidators
+  import Ecto.Query
 
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
@@ -77,5 +79,13 @@ defmodule RecruitxBackend.Interview do
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
     result == [] or List.first(result).signup_count < max_count
+  end
+
+  def update_status(id, status_id) do
+    try do
+      base_query = from i in Interview
+      QueryFilter.filter_new(base_query, %{id: id}, Interview) |> Repo.update_all(set: [interview_status_id: status_id])
+    rescue _ in Postgrex.Error -> throw {:error, "Invalid interview status"}
+    end
   end
 end

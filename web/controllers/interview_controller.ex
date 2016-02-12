@@ -28,6 +28,8 @@ defmodule RecruitxBackend.InterviewController do
   def show(conn, %{"id" => id}) do
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
     if interview != nil do
+      interview_with_feedback_images = Repo.preload interview, :feedback_images
+      interview = Map.put(interview_with_feedback_images, :panelists, interview_panelists)
       render(conn, "show.json", interview: interview)
     else
       render(conn, RecruitxBackend.ErrorView, "404.json")

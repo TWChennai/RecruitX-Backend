@@ -3,18 +3,20 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Endpoint
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
   alias Timex.Date
   alias RecruitxBackend.ChangesetInserter
 
   #plug :scrub_params, "feedback_image" when action in [:create, :update]
 
-  def create(conn, %{"feedback_image" => data, "interview_id" => id}) do
+  def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     path = Endpoint.config(:path_to_store_images)
     # TODO: Can't this check to create the path be done only once when the app starts up?
     # Otherwise, the same check is happening for each request - which is a performance hit
     if !(File.exists?(path) and File.dir?(path)), do: File.mkdir!(path)
     try do
+      Interview.update_status(id, status_id)
       ChangesetInserter.insertChangesets(store_image_and_generate_changesets(path, data, id))
       sendResponseBasedOnResult(conn, :create, :ok, "Files uploaded")
     catch {status, error} ->
