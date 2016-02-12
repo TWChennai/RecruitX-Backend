@@ -34,8 +34,9 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   defp store_image_and_generate_changesets(path, data, id) do
-    Enum.reduce(Map.keys(data),[], fn(key, acc) ->
-      new_file_name = "interview_#{id}_#{:rand.uniform(Date.now(:secs))}" <> ".jpg"
+    Enum.reduce(Map.keys(data), [], fn(key, acc) ->
+      # TODO: Why do we need a random for the runtime code?
+      new_file_name = "interview_#{id}_#{:rand.uniform(Date.now(:secs))}.jpg"
       new_file_path = path <> "/" <> new_file_name
       File.cp!(Map.get(data, key).path, new_file_path)
       acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
