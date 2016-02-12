@@ -48,6 +48,7 @@ defmodule RecruitxBackend.Factory do
   def factory(:interview_type) do
     %InterviewType{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
+      priority: :rand.uniform(4)
     }
   end
 

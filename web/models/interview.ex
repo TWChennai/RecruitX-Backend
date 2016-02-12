@@ -9,6 +9,8 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ChangesetManipulator
+  alias RecruitxBackend.QueryFilter
+  alias Ecto.Changeset
 
   import RecruitxBackend.CustomValidators
   import Ecto.Query
@@ -82,6 +84,35 @@ defmodule RecruitxBackend.Interview do
     end)
   end
 
+  def validate_with_other_rounds(changeset) do
+    new_time = Changeset.get_field(changeset, :start_time)
+    candidate_id = Changeset.get_field(changeset, :candidate_id)
+    current_priority = (Changeset.get_field(changeset, :interview_type)).priority
+
+    previous_interview = get_interview(candidate_id, current_priority - 1)
+    next_interview = get_interview(candidate_id, current_priority + 1);
+
+    failure = -1
+    error_message = ""
+    result = case {previous_interview, next_interview} do
+      {nil, nil} -> 1
+      {nil, next_interview} ->
+        error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
+        (next_interview.start_time |> Date.shift(hours: -1))
+          |> Date.compare(new_time)
+      {previous_interview, nil} ->
+        error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
+        new_time
+          |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1))
+      {previous_interview, next_interview} ->
+        error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
+        (next_interview.start_time |> Date.shift(hours: -1) |> Date.compare(new_time)) && (new_time |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1)))
+    end
+
+    if result == failure, do: changeset = Changeset.add_error(changeset, :start_time,  error_message)
+    changeset
+  end
+
   # TODO: Should this be added as a validation?
   defp signup(model, candidate_ids_interviewed) do
     # TODO: Move the magic number (2) into the db
@@ -105,5 +136,15 @@ defmodule RecruitxBackend.Interview do
 
   defp retrieve_interview(id) do
     __MODULE__ |> Repo.get(id)
+  end
+
+  defp get_interview(candidate_id, priority) do
+    interviews = (from i in __MODULE__,
+      join: it in assoc(i, :interview_type),
+      preload: [:interview_type],
+      where: i.candidate_id == ^candidate_id and
+      it.priority == ^priority)
+      |> Repo.all
+    Enum.at(interviews, 0);
   end
 end

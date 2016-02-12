@@ -6,8 +6,7 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.QueryFilter
 
-  # TODO: Uncomment if/when implementing the create/update actions
-  # plug :scrub_params, "interview" when action in [:create, :update]
+  plug :scrub_params, "interview" when action in [:update]
 
   #TODO:To use guard classes
   def index(conn, params) do
@@ -58,6 +57,22 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
+  def update(conn, %{"id" => id, "interview" => interview_params}) do
+    interview = Interview |> preload(:interview_type) |> Repo.get(id)
+    changeset = Interview.changeset(interview, interview_params)
+    changeset = Interview.validate_with_other_rounds(changeset)
+
+    case Repo.update(changeset) do
+      {:ok, _interview} ->
+        conn
+        |> render(RecruitxBackend.SuccessView, "success.json", message: "Updated successfully")
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   # def create(conn, %{"interview" => interview_params}) do
   #   changeset = Interview.changeset(%Interview{}, interview_params)
   #
@@ -77,20 +92,6 @@ defmodule RecruitxBackend.InterviewController do
   #     send_resp(conn, 200, "")
   #   else
   #     send_resp(conn, 400, "")
-  #   end
-  # end
-
-  # def update(conn, %{"id" => id, "interview" => interview_params}) do
-  #   interview = Repo.get!(Interview, id)
-  #   changeset = Interview.changeset(interview, interview_params)
-  #
-  #   case Repo.update(changeset) do
-  #     {:ok, interview} ->
-  #       render(conn, "show.json", interview: interview)
-  #     {:error, changeset} ->
-  #       conn
-  #       |> put_status(:unprocessable_entity)
-  #       |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
   #   end
   # end
   #
