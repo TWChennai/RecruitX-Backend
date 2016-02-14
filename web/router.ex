@@ -18,7 +18,7 @@ defmodule RecruitxBackend.Router do
     resources "/interviews", InterviewController, only: [:index, :show]
     resources "/interviews/:interview_id/feedback_images", FeedbackImageController, only: [:create, :show]
     resources "/panelists", PanelistController, only: [:create, :show]
-    resources "/interview_status", InterviewStatusController, only: [:index]
+    resources "/interview_statuses", InterviewStatusController, only: [:index]
   end
 
   # Other scopes may use custom stacks.
