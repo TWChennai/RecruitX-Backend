@@ -25,6 +25,7 @@ defmodule RecruitxBackend.CandidateController do
     try do
       skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
       interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
+      # TODO: Need to remove the try-rescue block
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
           candidate_changesets = Candidate.changeset(%Candidate{}, post_params)
@@ -59,6 +60,7 @@ defmodule RecruitxBackend.CandidateController do
 
   defp readQueryParamOrRaiseError(key, post_params) do
     read_query_params = post_params[key]
+    # TODO: Do not 'throw' return a tuple with an error code
     if !read_query_params || Enum.empty?(read_query_params), do: throw {:missing_param_error, key}
     Enum.uniq(read_query_params)
   end

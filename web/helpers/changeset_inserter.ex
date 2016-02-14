@@ -25,6 +25,7 @@ defmodule RecruitxBackend.ChangesetInserter do
         {status, result} = Repo.insert(i)
         acc = {status, result}
         if (status == :error) do
+          # TODO: Do not 'throw' return a tuple with an error code
           throw {status, getChangesetErrorsInReadableFormat(result)}
         else
           {:cont, acc}
@@ -33,6 +34,7 @@ defmodule RecruitxBackend.ChangesetInserter do
     else
       errors = for n <- changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
       errors_without_nil_values = Enum.filter(errors, fn(error) -> error != nil end)
+      # TODO: Do not 'throw' return a tuple with an error code
       throw ({:changeset_error, errors_without_nil_values})
     end
   end

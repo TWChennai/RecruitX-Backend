@@ -85,9 +85,11 @@ defmodule RecruitxBackend.Interview do
   def update_status(id, status_id) do
     try do
       interview = Interview |> Repo.get(id)
+      # TODO: Do not 'throw' return a tuple with an error code
       if interview != nil and interview.interview_status_id != nil, do: throw {:error, %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}}
       base_query = from i in Interview
       QueryFilter.filter_new(base_query, %{id: id}, Interview) |> Repo.update_all(set: [interview_status_id: status_id])
+      # TODO: Do not 'throw' return a tuple with an error code
     rescue e in Postgrex.Error -> throw {:error, e.postgres.code}
     end
   end
