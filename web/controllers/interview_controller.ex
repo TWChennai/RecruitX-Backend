@@ -9,6 +9,7 @@ defmodule RecruitxBackend.InterviewController do
   # TODO: Uncomment if/when implementing the create/update actions
   # plug :scrub_params, "interview" when action in [:create, :update]
 
+  #TODO:To use guard classes
   def index(conn, params) do
     panelist_login_name = params["panelist_login_name"]
     candidate_id = params["candidate_id"]
