@@ -17,12 +17,23 @@ defmodule RecruitxBackend.ChangesetInserter do
   end
 
   def insertChangesets(changesets) do
+    manipulate_changesets(changesets, :insert)
+  end
+
+  def updateChangesets(changesets) do
+    manipulate_changesets(changesets, :update)
+  end
+
+  defp manipulate_changesets(changesets, action) do
     result = Enum.all?(changesets, fn(changeset) ->
       changeset.valid?
     end)
     if result do
       {status, changeset} = Enum.reduce_while(changesets, [], fn i, _ ->
-        {status, result} = Repo.insert(i)
+        {status, result} = case action do
+          :insert -> Repo.insert(i)
+          :update -> Repo.update(i)
+        end
         acc = {status, result}
         if (status == :error) do
           # TODO: Do not 'throw' return a tuple with an error code

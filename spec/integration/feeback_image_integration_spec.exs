@@ -32,17 +32,18 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
 
       conn |> should(have_http_status(:unprocessable_entity))
       expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}
-      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: expected_reason})))
+      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expected_reason]})))
     end
 
     it "should not update status and feedback images when status_id is invalid" do
       allow File |> to(accept(:exists?, fn(_) -> true end))
       interview = create(:interview)
+      expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "does not exist"}
 
       conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => 0}
 
       conn |> should(have_http_status(:unprocessable_entity))
-      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: "foreign_key_violation"})))
+      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expected_reason]})))
     end
 
     it "should not update status and feedback images when interview_id is invalid" do

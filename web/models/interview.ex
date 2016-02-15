@@ -11,6 +11,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.ChangesetInserter
 
   import RecruitxBackend.CustomValidators
   import Ecto.Query
@@ -61,9 +62,19 @@ defmodule RecruitxBackend.Interview do
     # TODO: Shouldn't the start_time only be in the future if the record is being created for the first time?
     |> validate_date_time(:start_time)
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
+    |> validate_single_update_of_status()
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
+  end
+
+  defp validate_single_update_of_status(existing_changeset) do
+    id = get_field(existing_changeset, :id)
+    if !is_nil(id) and existing_changeset.errors[:interview_status_id] == nil do
+      interview = Interview |> Repo.get(id)
+      if interview != nil and interview.interview_status_id != nil, do: existing_changeset = add_error(existing_changeset, :interview_status, "Feedback has already been entered")
+    end
+    existing_changeset
   end
 
   # TODO: Should this be added as a validation?
@@ -83,14 +94,10 @@ defmodule RecruitxBackend.Interview do
   end
 
   def update_status(id, status_id) do
-    try do
-      interview = Interview |> Repo.get(id)
-      # TODO: Do not 'throw' return a tuple with an error code
-      if interview != nil and interview.interview_status_id != nil, do: throw {:error, %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}}
-      base_query = from i in Interview
-      QueryFilter.filter_new(base_query, %{id: id}, Interview) |> Repo.update_all(set: [interview_status_id: status_id])
-      # TODO: Do not 'throw' return a tuple with an error code
-    rescue e in Postgrex.Error -> throw {:error, e.postgres.code}
+    interview = Interview |> Repo.get(id)
+    if !is_nil(interview) do
+      interview_changeset = Interview.changeset(interview, %{"interview_status_id": status_id})
+      ChangesetInserter.updateChangesets([interview_changeset])
     end
   end
 end

@@ -296,14 +296,14 @@ defmodule RecruitxBackend.InterviewSpec do
 
       update = fn ->  Interview.update_status(interview.id, 0) end
 
-      expected_error = {:error, %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}}
+      expected_error = {:changeset_error, [%JSONErrorReason{field_name: :interview_status, reason: "Feedback has already been entered"}]}
       expect update |> to(throw_term expected_error)
     end
 
     it "should not update interview when status is invalid" do
       interview = create(:interview)
       update = fn ->  Interview.update_status(interview.id, 0) end
-      expected_error = {:error, :foreign_key_violation}
+      expected_error = {:error, [%JSONErrorReason{field_name: :interview_status, reason: "does not exist"}]}
 
       expect update |> to(throw_term expected_error)
     end
