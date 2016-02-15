@@ -2,7 +2,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
 
   @max_count 2
@@ -16,7 +15,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   def get_interview_type_based_count_of_sign_ups do
-    from ip in InterviewPanelist,
+    from ip in __MODULE__,
       join: i in assoc(ip, :interview),
       group_by: ip.interview_id,
       group_by: i.interview_type_id,
@@ -24,7 +23,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   def get_signup_count_for_interview_id(id) do
-    from ip in InterviewPanelist,
+    from ip in __MODULE__,
       where: ip.interview_id == ^id,
       group_by: ip.interview_id,
       select: count(ip.interview_id)

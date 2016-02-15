@@ -28,7 +28,7 @@ defmodule RecruitxBackend.InterviewController do
 
   def show(conn, %{"id" => id}) do
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
-    if interview != nil do
+    if !is_nil(interview) do
       interview_with_feedback_images = Repo.preload interview, :feedback_images
       render(conn, "show.json", interview: interview_with_feedback_images)
     else
@@ -56,16 +56,8 @@ defmodule RecruitxBackend.InterviewController do
 
   defp get_interviews_for_signup(panelist_login_name, conn) do
     interviews = Interview.get_interviews_with_associated_data |> Interview.now_or_in_next_seven_days |> Repo.all
-    interviews_with_signup_status = add_signup_eligibity_for(interviews, panelist_login_name)
+    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name)
     render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
-  end
-
-  def add_signup_eligibity_for(interviews, panelist_login_name) do
-    candidate_ids_interviewed = Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
-    Enum.map(interviews, fn(interview) ->
-      signup_eligiblity = interview |> Interview.signup(candidate_ids_interviewed)
-      Map.put(interview, :signup, signup_eligiblity)
-    end)
   end
 
   # def create(conn, %{"interview" => interview_params}) do

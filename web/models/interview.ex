@@ -3,14 +3,11 @@ defmodule RecruitxBackend.Interview do
 
   alias Timex.Date
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.ChangesetInserter
 
   import RecruitxBackend.CustomValidators
@@ -32,7 +29,7 @@ defmodule RecruitxBackend.Interview do
   @optional_fields ~w(interview_status_id)
 
   def now_or_in_next_seven_days(query) do
-    start_of_today = Date.set(Date.now, time: {0,0,0})
+    start_of_today = Date.set(Date.now, time: {0, 0, 0})
     from i in query, where: i.start_time >= ^start_of_today and i.start_time <= ^(start_of_today |> Date.shift(days: 7))
   end
 
@@ -49,7 +46,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_interviews_with_associated_data do
-    (from i in Interview,
+    (from i in __MODULE__,
       join: c in assoc(i, :candidate),
       join: cs in assoc(c, :candidate_skills),
       preload: [:interview_panelist, candidate: {c, [candidate_skills: cs]}],
@@ -70,15 +67,23 @@ defmodule RecruitxBackend.Interview do
 
   defp validate_single_update_of_status(existing_changeset) do
     id = get_field(existing_changeset, :id)
-    if !is_nil(id) and existing_changeset.errors[:interview_status_id] == nil do
-      interview = Interview |> Repo.get(id)
-      if interview != nil and interview.interview_status_id != nil, do: existing_changeset = add_error(existing_changeset, :interview_status, "Feedback has already been entered")
+    if !is_nil(id) and is_nil(existing_changeset.errors[:interview_status_id]) do
+      interview = id |> retrieve_interview
+      if !is_nil(interview) and !is_nil(interview.interview_status_id), do: existing_changeset = add_error(existing_changeset, :interview_status, "Feedback has already been entered")
     end
     existing_changeset
   end
 
+  def add_signup_eligibity_for(interviews, panelist_login_name) do
+    candidate_ids_interviewed = get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
+    Enum.map(interviews, fn(interview) ->
+      signup_eligiblity = interview |> signup(candidate_ids_interviewed)
+      Map.put(interview, :signup, signup_eligiblity)
+    end)
+  end
+
   # TODO: Should this be added as a validation?
-  def signup(model, candidate_ids_interviewed) do
+  defp signup(model, candidate_ids_interviewed) do
     # TODO: Move the magic number (2) into the db
     has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model.id, 2)
   end
@@ -94,10 +99,11 @@ defmodule RecruitxBackend.Interview do
   end
 
   def update_status(id, status_id) do
-    interview = Interview |> Repo.get(id)
-    if !is_nil(interview) do
-      interview_changeset = Interview.changeset(interview, %{"interview_status_id": status_id})
-      ChangesetInserter.updateChangesets([interview_changeset])
-    end
+    interview = id |> retrieve_interview
+    if !is_nil(interview), do: [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetInserter.updateChangesets
+  end
+
+  defp retrieve_interview(id) do
+    __MODULE__ |> Repo.get(id)
   end
 end

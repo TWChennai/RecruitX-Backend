@@ -51,7 +51,7 @@ defmodule RecruitxBackend.CandidateController do
     candidate = Candidate
                 |> preload(:candidate_skills)
                 |> Repo.get(id)
-    if candidate != nil do
+    if !is_nil(candidate) do
       render(conn, "show.json", candidate: candidate)
     else
       render(conn, RecruitxBackend.ErrorView, "404.json")

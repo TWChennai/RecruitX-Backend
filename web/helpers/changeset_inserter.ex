@@ -44,7 +44,7 @@ defmodule RecruitxBackend.ChangesetInserter do
       end)
     else
       errors = for n <- changesets, do: List.first(getChangesetErrorsInReadableFormat(n))
-      errors_without_nil_values = Enum.filter(errors, fn(error) -> error != nil end)
+      errors_without_nil_values = Enum.filter(errors, fn(error) -> !is_nil(error) end)
       # TODO: Do not 'throw' return a tuple with an error code
       throw ({:changeset_error, errors_without_nil_values})
     end
