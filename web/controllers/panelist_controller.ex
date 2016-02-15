@@ -9,9 +9,9 @@ defmodule RecruitxBackend.PanelistController do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     try do
       {status, interview_panelist} = ChangesetInserter.insertChangesets([interview_panelist_changeset])
-      sendResponseBasedOnResult(conn, :create, status, interview_panelist)
+      conn |> sendResponseBasedOnResult(:create, status, interview_panelist)
     catch {status, error} ->
-      sendResponseBasedOnResult(conn, :create, status, error)
+      conn |> sendResponseBasedOnResult(:create, status, error)
     end
   end
 

@@ -4,6 +4,7 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
   describe "show" do
     it "should send 404 when file is not to be found" do
       allow File |> to(accept(:exists?, fn(_) -> false end))
+      allow File |> to(accept(:mkdir!, fn(_) -> true end))
 
       conn = action(:show, %{"id" => "file_name"})
 
@@ -12,6 +13,7 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
 
     it "should send file when file is found" do
       allow File |> to(accept(:exists?, fn(_) -> true end))
+      allow File |> to(accept(:mkdir!, fn(_) -> true end))
       allow Plug.Conn |> to(accept(:send_file, fn(conn, 200, "../uploaded_images/file_name.jpg", 0, :all) -> conn end))
       action(:show, %{"id" => "file_name.jpg"})
 

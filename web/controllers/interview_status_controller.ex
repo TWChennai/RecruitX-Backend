@@ -7,8 +7,8 @@ defmodule RecruitxBackend.InterviewStatusController do
   #plug :scrub_params, "interview_status" when action in [:create, :update]
 
   def index(conn, _params) do
-    interview_status = Repo.all(InterviewStatus)
-    render(conn, "index.json", interview_status: interview_status)
+    interview_status = InterviewStatus |> Repo.all
+    conn |> render("index.json", interview_status: interview_status)
   end
 
   #def create(conn, %{"interview_status" => interview_status_params}) do

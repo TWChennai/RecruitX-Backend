@@ -22,17 +22,15 @@ defmodule RecruitxBackend.InterviewController do
       !is_nil(panelist_name) ->
         get_interviews_for_panelist(panelist_name, conn)
       true ->
-        render(conn|> put_status(400), "missing_param_error.json", param: "panelist_login_name")
+        conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name")
     end
   end
 
   def show(conn, %{"id" => id}) do
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
-    if !is_nil(interview) do
-      interview_with_feedback_images = Repo.preload interview, :feedback_images
-      render(conn, "show.json", interview: interview_with_feedback_images)
-    else
-      render(conn, RecruitxBackend.ErrorView, "404.json")
+    case interview do
+      nil -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
+      _ -> conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
     end
   end
 
@@ -40,7 +38,7 @@ defmodule RecruitxBackend.InterviewController do
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter_new(%{candidate_id: id}, Interview)
                   |> Repo.all
-    render(conn, "index.json", interviews: interviews)
+    conn |> render("index.json", interviews: interviews)
   end
 
   defp get_interviews_for_panelist(panelist_name, conn) do
@@ -51,13 +49,13 @@ defmodule RecruitxBackend.InterviewController do
                   |> QueryFilter.filter_new(%{id: interview_id_for_panelist}, Interview)
                   |> Interview.default_order
                   |> Repo.all
-    render(conn, "index.json", interviews: interviews)
+    conn |> render("index.json", interviews: interviews)
   end
 
   defp get_interviews_for_signup(panelist_login_name, conn) do
     interviews = Interview.get_interviews_with_associated_data |> Interview.now_or_in_next_seven_days |> Repo.all
     interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name)
-    render(conn, "index.json", interviews_with_signup: interviews_with_signup_status)
+    conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
   # def create(conn, %{"interview" => interview_params}) do

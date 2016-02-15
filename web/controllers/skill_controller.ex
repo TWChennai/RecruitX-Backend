@@ -2,14 +2,13 @@ defmodule RecruitxBackend.SkillController do
   use RecruitxBackend.Web, :controller
 
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.Repo
 
   # TODO: Uncomment if/when implementing the create/update actions
   # plug :scrub_params, "skill" when action in [:create, :update]
 
   def index(conn, _params) do
-    skills = Repo.all(Skill)
-    render(conn, "index.json", skills: skills)
+    skills = Skill |> Repo.all
+    conn |> render("index.json", skills: skills)
   end
 
   # def create(conn, %{"skill" => skill_params}) do

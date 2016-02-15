@@ -18,32 +18,27 @@ defmodule RecruitxBackend.CandidateController do
                   |> preload(:candidate_skills)
                   |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
                   |> Repo.all
-    render(conn, "index.json", candidates: candidates)
+    conn |> render("index.json", candidates: candidates)
   end
 
   def create(conn, %{"candidate" => post_params}) do
     try do
-      skill_ids = readQueryParamOrRaiseError("skill_ids", post_params)
-      interview_rounds = readQueryParamOrRaiseError("interview_rounds", post_params)
+      skill_ids = "skill_ids" |> readQueryParamOrRaiseError(post_params)
+      interview_rounds = "interview_rounds" |> readQueryParamOrRaiseError(post_params)
       # TODO: Need to remove the try-rescue block
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          candidate_changesets = Candidate.changeset(%Candidate{}, post_params)
-          {_, candidate} = ChangesetInserter.insertChangesets([candidate_changesets])
-
-          candidate_skill_changesets = generateCandidateSkillChangesets(candidate, skill_ids)
-          ChangesetInserter.insertChangesets(candidate_skill_changesets)
-
-          candidate_interview_rounds_changeset = generateCandidateInterviewRoundChangesets(candidate, interview_rounds)
-          ChangesetInserter.insertChangesets(candidate_interview_rounds_changeset)
-          Repo.preload(candidate, :candidate_skills)
+          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetInserter.insertChangesets
+          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetInserter.insertChangesets
+          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetInserter.insertChangesets
+          candidate |> Repo.preload(:candidate_skills)
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)
         end
       end
-      sendResponseBasedOnResult(conn, :create, status, result_of_db_transaction)
+      conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
     catch {:missing_param_error, key} ->
-      sendResponseBasedOnResult(conn, :create, :error, [%JSONErrorReason{field_name: key, reason: "missing/empty required key"}])
+      conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: key, reason: "missing/empty required key"}])
     end
   end
 
@@ -51,10 +46,9 @@ defmodule RecruitxBackend.CandidateController do
     candidate = Candidate
                 |> preload(:candidate_skills)
                 |> Repo.get(id)
-    if !is_nil(candidate) do
-      render(conn, "show.json", candidate: candidate)
-    else
-      render(conn, RecruitxBackend.ErrorView, "404.json")
+    case candidate do
+      nil -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
+      _ -> conn |> render("show.json", candidate: candidate)
     end
   end
 
@@ -62,7 +56,7 @@ defmodule RecruitxBackend.CandidateController do
     read_query_params = post_params[key]
     # TODO: Do not 'throw' return a tuple with an error code
     if !read_query_params || Enum.empty?(read_query_params), do: throw {:missing_param_error, key}
-    Enum.uniq(read_query_params)
+    read_query_params |> Enum.uniq
   end
 
   def sendResponseBasedOnResult(conn, action, status, response) do

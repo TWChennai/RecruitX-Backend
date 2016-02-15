@@ -6,9 +6,7 @@ defmodule RecruitxBackend.ChangesetInserter do
     if Map.has_key?(changeset, :errors) do
       for n <- Keyword.keys(changeset.errors) do
         value = Keyword.get(changeset.errors, n)
-        if is_tuple(value) do
-          value = elem(value, 0)
-        end
+        if is_tuple(value), do: value = elem(value, 0)
         %JSONErrorReason{field_name: n, reason: value}
       end
     else

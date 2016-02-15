@@ -8,7 +8,7 @@ defmodule RecruitxBackend.InterviewTypeController do
 
   def index(conn, _params) do
     interview_types = InterviewType |> InterviewType.default_order |> Repo.all
-    render(conn, "index.json", interview_types: interview_types)
+    conn |> render("index.json", interview_types: interview_types)
   end
 
   # def create(conn, %{"interview_type" => interview_params}) do

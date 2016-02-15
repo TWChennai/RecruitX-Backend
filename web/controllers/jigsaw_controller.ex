@@ -21,6 +21,6 @@ defmodule RecruitxBackend.JigsawController do
             {:error, reason} -> reason
             end
     end
-    render(conn, "show.json", is_recruiter: is_recruiter)
+    conn |> render("show.json", is_recruiter: is_recruiter)
   end
 end

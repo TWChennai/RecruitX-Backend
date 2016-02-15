@@ -11,27 +11,20 @@ defmodule RecruitxBackend.FeedbackImageController do
   #plug :scrub_params, "feedback_image" when action in [:create, :update]
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
-    path = Endpoint.config(:path_to_store_images)
-    # TODO: Can't this check to create the path be done only once when the app starts up?
-    # Otherwise, the same check is happening for each request - which is a performance hit
-    if !(File.exists?(path) and File.dir?(path)), do: File.mkdir!(path)
     try do
       Interview.update_status(id, status_id)
-      ChangesetInserter.insertChangesets(store_image_and_generate_changesets(path, data, id))
-      sendResponseBasedOnResult(conn, :create, :ok, "Thanks for submitting feedback!")
+      ChangesetInserter.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
+      conn |> sendResponseBasedOnResult(:create, :ok, "Thanks for submitting feedback!")
     catch {status, error} ->
-      sendResponseBasedOnResult(conn, :create, status, error)
+      conn |> sendResponseBasedOnResult(:create, status, error)
     end
   end
 
   def show(conn, params) do
-    file_name = params["id"]
-    path = Endpoint.config(:path_to_store_images)
-    file_path = path <> "/" <> file_name
-    if File.exists?(file_path) do
-      send_file(conn, 200, file_path, 0, :all)
-    else
-      render(conn |> put_status(:not_found), RecruitxBackend.ErrorView, "404.json")
+    file_path = get_storage_path <> "/" <> params["id"]
+    case File.exists?(file_path) do
+      true -> conn |> send_file(200, file_path, 0, :all)
+      _ -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
     end
   end
 
@@ -56,5 +49,13 @@ defmodule RecruitxBackend.FeedbackImageController do
           |> put_status(:unprocessable_entity)
           |> json(%JSONError{errors: response})
     end
+  end
+
+  defp get_storage_path do
+    path = Endpoint.config(:path_to_store_images)
+    # TODO: Can't this check to create the path be done only once when the app starts up?
+    # Otherwise, the same check is happening for each request - which is a performance hit
+    if !File.exists?(path) || !File.dir?(path), do: File.mkdir!(path)
+    path
   end
 end

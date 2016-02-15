@@ -7,8 +7,8 @@ defmodule RecruitxBackend.RoleController do
   # plug :scrub_params, "role" when action in [:create, :update]
 
   def index(conn, _params) do
-    roles = Repo.all(Role)
-    render(conn, "index.json", roles: roles)
+    roles = Role |> Repo.all
+    conn |> render("index.json", roles: roles)
   end
 
   # def create(conn, %{"role" => role_params}) do
