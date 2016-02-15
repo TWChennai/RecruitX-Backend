@@ -41,6 +41,7 @@ defmodule RecruitxBackend.Mixfile do
      {:phoenix_ecto, "~> 2.0.1"},
      {:postgrex, "~> 0.11.0"},
      {:cowboy, "~> 1.0.4"},
+     {:exrm, "~> 0.19.9"},
      {:httpotion, "~> 2.2.0"},
      {:json, "~> 0.3.3"},
      {:corsica, "~> 0.4.0"},
