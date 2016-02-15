@@ -5,6 +5,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Role
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Candidate
 
   schema "candidates" do
     field :name, :string
@@ -31,5 +32,13 @@ defmodule RecruitxBackend.Candidate do
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)
+  end
+
+  def get_candidates_in_fifo_order do
+    from c in Candidate,
+    join: i in assoc(c, :interviews),
+    where: i.interview_type_id == 1,
+    order_by: i.start_time,
+    select: %{"id": c.id, "name": c.name, "experience": c.experience, "role_id": c.role_id}
   end
 end

@@ -14,11 +14,9 @@ defmodule RecruitxBackend.CandidateController do
   plug :scrub_params, "candidate" when action in [:create, :update]
 
   def index(conn, params) do
-    candidates = Candidate
-                  |> preload(:candidate_skills)
-                  |> QueryFilter.filter(%Candidate{}, params, [:name, :role_id])
-                  |> Repo.all
-    conn |> render("index.json", candidates: candidates)
+    candidates = Candidate.get_candidates_in_fifo_order
+                 |> Repo.all
+    render(conn, "index.json", candidates: candidates)
   end
 
   def create(conn, %{"candidate" => post_params}) do

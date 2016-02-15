@@ -15,7 +15,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     before do:  Repo.delete_all(Interview)
     before do:  Repo.delete_all(Candidate)
 
-    it "should return a list of candidates" do
+    xit "should return a list of candidates" do
       candidate_skill = create(:candidate_skill)
       # Can't take the complete candidate object since it has 'role' associated
       candidate = Repo.get!(Candidate, candidate_skill.candidate_id) |> Repo.preload(:candidate_skills)
