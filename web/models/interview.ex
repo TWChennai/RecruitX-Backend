@@ -118,7 +118,11 @@ defmodule RecruitxBackend.Interview do
   # TODO: Should this be added as a validation?
   defp signup(model, candidate_ids_interviewed) do
     # TODO: Move the magic number (2) into the db
-    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model.id, 2)
+    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model.id, 2) and is_not_completed(model)
+  end
+
+  def is_not_completed(model) do
+    is_nil(model.interview_status_id)
   end
 
   def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
