@@ -37,8 +37,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
     it "should respond with errors when trying to sign up for the same candidate's different interview" do
       candidate = create(:candidate)
-      interview1 = create(:interview, candidate_id: candidate.id, candidate: candidate)
-      interview2 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview1 = create(:interview, candidate_id: candidate.id)
+      interview2 = create(:interview, candidate_id: candidate.id)
       interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
       interview_panelist2 = %{interview_id: interview2.id, panelist_login_name: interview_panelist1.panelist_login_name}
 

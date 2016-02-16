@@ -1,9 +1,16 @@
 defmodule RecruitxBackend.InterviewControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
+  import Ecto.Query, only: [from: 2]
+
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.InterviewView
+
   describe "show" do
-    let :interview, do: build(:interview, id: 1)
-    before do: allow Repo |> to(accept(:get!, fn(Query, 1) -> interview end))
+    let :interview, do: create(:interview, id: 1)
+    let :quried_from_db, do: Repo.get(1)
+    before do: allow Repo |> to(accept(:get, fn(_, 1) -> interview end))
+    before do: allow InterviewView |> to(accept(:render, fn("show.json", quried_from_db) -> nil end))
 
     subject do: action(:show, %{"id" => 1})
 

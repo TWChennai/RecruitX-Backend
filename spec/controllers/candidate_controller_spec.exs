@@ -191,7 +191,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
       it "should send 201 when status is ok" do
         candidate_skill = create(:candidate_skill)
-        candidate = candidate_skill.candidate
+        candidate = Repo.get(Candidate, candidate_skill.candidate_id)
         response = CandidateController.sendResponseBasedOnResult(conn(), :create, :ok, candidate)
 
         response |> should(have_http_status(:created))

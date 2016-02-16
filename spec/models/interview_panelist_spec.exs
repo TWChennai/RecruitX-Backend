@@ -84,8 +84,8 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
     it "should be invalid when panelist has already done a previous interview for the candidate" do
       candidate = create(:candidate)
-      interview1 = create(:interview, candidate_id: candidate.id, candidate: candidate)
-      interview2 = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview1 = create(:interview, candidate_id: candidate.id)
+      interview2 = create(:interview, candidate_id: candidate.id)
 
       create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
       interview_panelist = fields_for(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")

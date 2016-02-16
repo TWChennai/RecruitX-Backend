@@ -28,7 +28,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     it "should return list of interviews that the panelist has taken" do
       candidate = create(:candidate)
       interview = create(:interview, candidate_id: candidate.id, candidate: candidate)
-      create(:candidate_skill, candidate_id: candidate.id, candidate: candidate)
+      create(:candidate_skill, candidate_id: candidate.id)
       create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
 
       response = get conn(), "/panelists/test/interviews"

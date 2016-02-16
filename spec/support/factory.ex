@@ -57,9 +57,7 @@ defmodule RecruitxBackend.Factory do
     interview_type = create(:interview_type)
     %Interview{
       start_time: getRandomDateTimeString,
-      candidate: candidate,
       candidate_id: candidate.id,
-      interview_type: interview_type,
       interview_type_id: interview_type.id,
     }
   end
@@ -69,7 +67,6 @@ defmodule RecruitxBackend.Factory do
     %Candidate{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
-      role: role,
       role_id: role.id
     }
   end
@@ -78,7 +75,6 @@ defmodule RecruitxBackend.Factory do
     candidate = create(:candidate)
     skill = create(:skill)
     %CandidateSkill{
-      candidate: candidate,
       candidate_id: candidate.id,
       skill_id: skill.id
     }
