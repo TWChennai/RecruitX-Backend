@@ -3,11 +3,11 @@ defmodule RecruitxBackend.Factory do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.FeedbackImage
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill

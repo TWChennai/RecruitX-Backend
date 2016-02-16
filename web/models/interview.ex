@@ -1,18 +1,17 @@
 defmodule RecruitxBackend.Interview do
   use RecruitxBackend.Web, :model
 
-  alias Timex.Date
-  alias RecruitxBackend.Candidate
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.FeedbackImage
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.ChangesetManipulator
-  alias RecruitxBackend.QueryFilter
   alias Ecto.Changeset
+  alias RecruitxBackend.Candidate
+  alias RecruitxBackend.ChangesetManipulator
+  alias RecruitxBackend.FeedbackImage
+  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.QueryFilter
+  alias RecruitxBackend.Repo
+  alias Timex.Date
 
   import RecruitxBackend.CustomValidators
   import Ecto.Query
@@ -41,6 +40,7 @@ defmodule RecruitxBackend.Interview do
     from i in query, order_by: [asc: i.start_time, asc: i.id]
   end
 
+  # TODO: Move into InterviewPanelist model
   def get_candidate_ids_interviewed_by(panelist_login_name) do
     from ip in InterviewPanelist,
       where: ip.panelist_login_name == ^panelist_login_name,
@@ -108,6 +108,7 @@ defmodule RecruitxBackend.Interview do
           |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1))
       {previous_interview, next_interview} ->
         error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
+        # TODO: Remove magic numbers - move it into a 'end_time' column at the db-level
         (next_interview.start_time |> Date.shift(hours: -1) |> Date.compare(new_time)) && (new_time |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1)))
     end
 
@@ -130,6 +131,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def is_signup_lesser_than(model_id, max_count) do
+    # TODO: Pass the model_id into the 'InterviewPanelist.get_interview_type_based_count_of_sign_ups' so that the filtration is done in the db
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
     result == [] or List.first(result).signup_count < max_count
@@ -144,18 +146,20 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp is_pass(status_id) do
+    # TODO: Do not Use QueryFilter here - why not plain ecto query?
     status = QueryFilter.filter_new((from i in InterviewStatus), %{name: ["Pass"]}, InterviewStatus) |> Repo.one
     !is_nil(status) and status.id == status_id
   end
 
   defp delete_successive_interviews_and_panelists(interview) do
-     interviews_to_remove = get_interview_ids_to_delete(interview.candidate_id, interview.start_time)
-     (from ip in InterviewPanelist, where: ip.interview_id in ^interviews_to_remove) |> Repo.delete_all
-     (from i in Interview, where: i.id in ^interviews_to_remove) |> Repo.delete_all
+    interviews_to_remove = get_interview_ids_to_delete(interview.candidate_id, interview.start_time)
+    # TODO: Research whether the InterviewPanelist can be cascade-deleted when the Interview is deleted
+    (from ip in InterviewPanelist, where: ip.interview_id in ^interviews_to_remove) |> Repo.delete_all
+    (from i in __MODULE__, where: i.id in ^interviews_to_remove) |> Repo.delete_all
   end
 
   defp get_interview_ids_to_delete(candidate, start_time) do
-    (from i in Interview,
+    (from i in __MODULE__,
       where: i.candidate_id == ^candidate,
       where: (i.start_time > ^start_time),
       select: i.id) |> Repo.all
@@ -165,13 +169,13 @@ defmodule RecruitxBackend.Interview do
     __MODULE__ |> Repo.get(id)
   end
 
+  # TODO: This doesn't handle the case where the Leadership and P3 have the same priority
   defp get_interview(candidate_id, priority) do
-    interviews = (from i in __MODULE__,
+    (from i in __MODULE__,
       join: it in assoc(i, :interview_type),
       preload: [:interview_type],
       where: i.candidate_id == ^candidate_id and
       it.priority == ^priority)
-      |> Repo.all
-    Enum.at(interviews, 0);
+      |> Repo.one
   end
 end

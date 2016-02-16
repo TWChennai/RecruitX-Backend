@@ -1,14 +1,13 @@
 defmodule RecruitxBackend.InterviewSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Interview
 
-  alias Timex.Date
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.Repo
+  alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.Repo
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:interview)
