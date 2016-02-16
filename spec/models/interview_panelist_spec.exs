@@ -73,6 +73,15 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       expect(changeset) |> to(have_errors([signup_count: "More than 2 signups are not allowed"]))
     end
 
+    it "should be invalid when feedback is already entered" do
+      interview = create(:interview, interview_status_id: create(:interview_status).id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, interview_panelist)
+
+      expect(changeset) |> to(have_errors([signup: "Interview is already over!"]))
+    end
+
     it "should be invalid when panelist has already done a previous interview for the candidate" do
       candidate = create(:candidate)
       interview1 = create(:interview, candidate_id: candidate.id, candidate: candidate)
