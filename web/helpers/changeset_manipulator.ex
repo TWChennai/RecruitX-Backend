@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.ChangesetInserter do
+defmodule RecruitxBackend.ChangesetManipulator do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Repo
 

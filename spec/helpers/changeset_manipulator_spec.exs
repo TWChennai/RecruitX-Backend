@@ -1,21 +1,21 @@
-defmodule RecruitxBackend.ChangesetInserterSpec do
-  use ESpec.Phoenix, model: RecruitxBackend.ChangesetInserter
+defmodule RecruitxBackend.ChangesetManipulatorSpec do
+  use ESpec.Phoenix, model: RecruitxBackend.ChangesetManipulator
 
-  alias RecruitxBackend.ChangesetInserter;
+  alias RecruitxBackend.ChangesetManipulator;
   alias RecruitxBackend.JSONErrorReason;
   alias RecruitxBackend.Role;
   alias RecruitxBackend.Candidate;
 
   context "getChangesetErrorsInReadableFormat" do
     it "when errors is in the form of string" do
-      [result] = ChangesetInserter.getChangesetErrorsInReadableFormat(%{errors: [test: "is invalid"]})
+      [result] = ChangesetManipulator.getChangesetErrorsInReadableFormat(%{errors: [test: "is invalid"]})
 
       expect(result.field_name) |> to(eql(:test))
       expect(result.reason) |> to(eql("is invalid"))
     end
 
     it "when there are multiple errors" do
-      [result1,result2] = ChangesetInserter.getChangesetErrorsInReadableFormat(%{errors: [error1: "is invalid", error2: "is also invalid"]})
+      [result1,result2] = ChangesetManipulator.getChangesetErrorsInReadableFormat(%{errors: [error1: "is invalid", error2: "is also invalid"]})
 
       expect(result1.field_name) |> to(eql(:error1))
       expect(result1.reason) |> to(eql("is invalid"))
@@ -24,14 +24,14 @@ defmodule RecruitxBackend.ChangesetInserterSpec do
     end
 
     it "when errors is in the form of tuple" do
-      [result] = ChangesetInserter.getChangesetErrorsInReadableFormat(%{errors: [test: {"value1", "value2"}]})
+      [result] = ChangesetManipulator.getChangesetErrorsInReadableFormat(%{errors: [test: {"value1", "value2"}]})
 
       expect(result.field_name) |> to(eql(:test))
       expect(result.reason) |> to(eql("value1"))
     end
 
     it "when there are no errors" do
-      result = ChangesetInserter.getChangesetErrorsInReadableFormat(%{})
+      result = ChangesetManipulator.getChangesetErrorsInReadableFormat(%{})
 
       expect(result) |> to(eql([]))
     end
@@ -41,7 +41,7 @@ defmodule RecruitxBackend.ChangesetInserterSpec do
     it "should insert a changeset into db" do
       role = fields_for(:role)
       changesets = [Role.changeset(%Role{}, role)]
-      {status, result} = ChangesetInserter.insertChangesets(changesets)
+      {status, result} = ChangesetManipulator.insertChangesets(changesets)
 
       expect(status) |> to(eql(:ok))
       expect(result.name) |> to(eql(role.name))
@@ -50,7 +50,7 @@ defmodule RecruitxBackend.ChangesetInserterSpec do
     it "should not insert a changeset into db when there are changeset errors" do
       expectedRoleErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
       changesets = [Role.changeset(%Role{}, %{name: nil})]
-      insert = fn -> ChangesetInserter.insertChangesets(changesets) end
+      insert = fn -> ChangesetManipulator.insertChangesets(changesets) end
       expected_error_to_be_thrown = {:changeset_error, [expectedRoleErrorReason]}
 
       expect insert |> to(throw_term expected_error_to_be_thrown)
@@ -60,7 +60,7 @@ defmodule RecruitxBackend.ChangesetInserterSpec do
       expectedRoleErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
       candidate = fields_for(:candidate)
       changesets = [Candidate.changeset(%Candidate{}, Map.merge(candidate, %{role_id: -1}))]
-      insert = fn -> ChangesetInserter.insertChangesets(changesets) end
+      insert = fn -> ChangesetManipulator.insertChangesets(changesets) end
       expected_error_to_be_thrown = {:error, [expectedRoleErrorReason]}
 
       expect insert |> to(throw_term expected_error_to_be_thrown)

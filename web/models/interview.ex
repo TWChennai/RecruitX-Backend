@@ -8,7 +8,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.ChangesetInserter
+  alias RecruitxBackend.ChangesetManipulator
 
   import RecruitxBackend.CustomValidators
   import Ecto.Query
@@ -100,7 +100,7 @@ defmodule RecruitxBackend.Interview do
 
   def update_status(id, status_id) do
     interview = id |> retrieve_interview
-    if !is_nil(interview), do: [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetInserter.updateChangesets
+    if !is_nil(interview), do: [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
   end
 
   defp retrieve_interview(id) do

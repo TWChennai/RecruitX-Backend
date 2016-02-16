@@ -5,7 +5,7 @@ defmodule RecruitxBackend.FeedbackImageController do
   alias RecruitxBackend.Endpoint
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
-  alias RecruitxBackend.ChangesetInserter
+  alias RecruitxBackend.ChangesetManipulator
   alias Ecto.UUID
 
   #plug :scrub_params, "feedback_image" when action in [:create, :update]
@@ -14,7 +14,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     {status, result_of_db_transaction} = Repo.transaction fn ->
       try do
         Interview.update_status(id, status_id)
-        ChangesetInserter.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
+        ChangesetManipulator.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
         "Thanks for submitting feedback!"
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)

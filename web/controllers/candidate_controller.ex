@@ -8,7 +8,7 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.ChangesetInserter
+  alias RecruitxBackend.ChangesetManipulator
 
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -28,9 +28,9 @@ defmodule RecruitxBackend.CandidateController do
       # TODO: Need to remove the try-rescue block
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetInserter.insertChangesets
-          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetInserter.insertChangesets
-          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetInserter.insertChangesets
+          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetManipulator.insertChangesets
+          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.insertChangesets
+          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.insertChangesets
           candidate |> Repo.preload(:candidate_skills)
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)
