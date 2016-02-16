@@ -5,9 +5,11 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
   alias RecruitxBackend.JSONErrorReason
+  alias Timex.Date
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -281,15 +283,6 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "update_status" do
-    it "should update status for interview given" do
-      interview = create(:interview)
-      interview_status = create(:interview_status)
-      Interview.update_status(interview.id, interview_status.id)
-
-      updated_interview = Interview |> Repo.get(interview.id)
-      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
-    end
-
     it "should not update interview when status is already entered" do
       interview = create(:interview)
       interview_status = create(:interview_status)
@@ -307,6 +300,66 @@ defmodule RecruitxBackend.InterviewSpec do
       expected_error = {:error, [%JSONErrorReason{field_name: :interview_status, reason: "does not exist"}]}
 
       expect update |> to(throw_term expected_error)
+    end
+
+    it "should update status and not delete other interviews,panelists for a candidate when status is not Pass" do
+      interview = create(:interview)
+      interview_status = create(:interview_status)
+      interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, candidate: interview.candidate, start_time: Date.now |> Date.shift(days: 7))
+      panelists_to_be_retained = create(:interview_panelist, interview_id: interview_to_be_retained.id)
+
+      Interview.update_status(interview.id, interview_status.id)
+
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+      expect(!is_nil(Interview |> Repo.get(interview_to_be_retained.id))) |> to(be_true)
+      expect(!is_nil(InterviewPanelist |> Repo.get(panelists_to_be_retained.id))) |> to(be_true)
+    end
+
+    it "should update status and delete future interviews,panelists when status is Pass" do
+      Repo.delete_all InterviewStatus
+
+      future_date = Date.now |> Date.shift(days: 7)
+      interview = create(:interview, start_time: Date.now)
+      future_interview = create(:interview, candidate_id: interview.candidate_id, candidate: interview.candidate, start_time: future_date)
+      future_panelist = create(:interview_panelist, interview_id: future_interview.id)
+      interview_status = create(:interview_status, name: "Pass")
+
+      Interview.update_status(interview.id, interview_status.id)
+
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+      expect(Interview |> Repo.get(future_interview.id)) |> to(be_nil)
+      expect(InterviewPanelist |> Repo.get(future_panelist.id)) |> to(be_nil)
+    end
+
+    it "should update status and not delete past interviews,panelists when status is Pass" do
+      Repo.delete_all InterviewStatus
+
+      past_date = Date.now |> Date.shift(days: -7)
+      interview = create(:interview, start_time: Date.now)
+      interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, candidate: interview.candidate, start_time: past_date)
+      panelists_to_be_retained = create(:interview_panelist, interview_id: interview_to_be_retained.id)
+      interview_status = create(:interview_status, name: "Pass")
+
+      Interview.update_status(interview.id, interview_status.id)
+
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+      expect(!is_nil(Interview |> Repo.get(interview_to_be_retained.id))) |> to(be_true)
+      expect(!is_nil(InterviewPanelist |> Repo.get(panelists_to_be_retained.id))) |> to(be_true)
+    end
+
+    it "should update status when status is Pass and there are no successive rounds" do
+      Repo.delete_all InterviewStatus
+
+      interview = create(:interview)
+      interview_status = create(:interview_status, name: "Pass")
+
+      Interview.update_status(interview.id, interview_status.id)
+
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
     end
   end
 

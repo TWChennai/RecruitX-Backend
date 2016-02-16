@@ -11,6 +11,8 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.QueryFilter
   alias Ecto.Changeset
+  alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.Interview
 
   import RecruitxBackend.CustomValidators
   import Ecto.Query
@@ -131,7 +133,28 @@ defmodule RecruitxBackend.Interview do
 
   def update_status(id, status_id) do
     interview = id |> retrieve_interview
-    if !is_nil(interview), do: [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
+    if !is_nil(interview) do
+     [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
+     if is_pass(status_id), do: delete_successive_interviews_and_panelists(interview)
+    end
+  end
+
+  defp is_pass(status_id) do
+    status = QueryFilter.filter_new((from i in InterviewStatus), %{name: ["Pass"]}, InterviewStatus) |> Repo.one
+    !is_nil(status) and status.id == status_id
+  end
+
+  defp delete_successive_interviews_and_panelists(interview) do
+     interviews_to_remove = get_interview_ids_to_delete(interview.candidate_id, interview.start_time)
+     (from ip in InterviewPanelist, where: ip.interview_id in ^interviews_to_remove) |> Repo.delete_all
+     (from i in Interview, where: i.id in ^interviews_to_remove) |> Repo.delete_all
+  end
+
+  defp get_interview_ids_to_delete(candidate, start_time) do
+    (from i in Interview,
+      where: i.candidate_id == ^candidate,
+      where: (i.start_time > ^start_time),
+      select: i.id) |> Repo.all
   end
 
   defp retrieve_interview(id) do
