@@ -63,9 +63,10 @@ defmodule RecruitxBackend.InterviewController do
     changeset = Interview.validate_with_other_rounds(changeset)
 
     case Repo.update(changeset) do
-      {:ok, _interview} ->
+      {:ok, interview} ->
         conn
-        |> render(RecruitxBackend.SuccessView, "success.json", message: "Updated successfully")
+        |> put_status(:ok)
+        |> render("success.json", interview: interview)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)

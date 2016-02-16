@@ -15,6 +15,15 @@ defmodule RecruitxBackend.InterviewView do
     render_one(interview, RecruitxBackend.InterviewView, "interview_with_panelists.json")
   end
 
+  def render("success.json", %{interview: interview}) do
+    %{
+      id: interview.id,
+      start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      candidate_id: interview.candidate_id,
+      interview_type_id: interview.interview_type_id
+    }
+  end
+
   def render("missing_param_error.json", %{param: param}) do
     %{
       field: param,
