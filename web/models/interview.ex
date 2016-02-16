@@ -9,7 +9,6 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Repo
   alias Timex.Date
 
@@ -146,8 +145,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp is_pass(status_id) do
-    # TODO: Do not Use QueryFilter here - why not plain ecto query?
-    status = QueryFilter.filter_new((from i in InterviewStatus), %{name: ["Pass"]}, InterviewStatus) |> Repo.one
+    status = (from i in InterviewStatus, where: i.name == "Pass") |> Repo.one
     !is_nil(status) and status.id == status_id
   end
 
