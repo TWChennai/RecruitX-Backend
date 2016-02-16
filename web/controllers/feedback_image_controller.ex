@@ -13,7 +13,7 @@ defmodule RecruitxBackend.FeedbackImageController do
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
       try do
-        Interview.update_status(id, status_id)
+        Interview.update_status(id, String.to_integer(status_id))
         ChangesetManipulator.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
         "Thanks for submitting feedback!"
       catch {_, result_of_db_transaction} ->

@@ -18,7 +18,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       interview = create(:interview)
       interview_status = create(:interview_status)
 
-      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => interview_status.id}
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(201))
       expect(conn.resp_body) |> to(be("\"Thanks for submitting feedback!\""))
@@ -31,7 +31,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       allow File |> to(accept(:exists?, fn(_) -> true end))
       interview = create(:interview, interview_status_id: create(:interview_status).id)
 
-      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => create(:interview_status).id}
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{create(:interview_status).id}"}
 
       conn |> should(have_http_status(:unprocessable_entity))
       expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "Feedback has already been entered"}
@@ -43,7 +43,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       interview = create(:interview)
       expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "does not exist"}
 
-      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => 0}
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "0"}
 
       conn |> should(have_http_status(:unprocessable_entity))
       expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expected_reason]})))
@@ -54,7 +54,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       interview_status = create(:interview_status)
       allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
 
-      conn = post conn(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => interview_status.id}
+      conn = post conn(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "does not exist"}
@@ -68,7 +68,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       interview = create(:interview)
       interview_status = create(:interview_status)
 
-      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => interview_status.id}
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "file_name", reason: "has invalid format"}
@@ -85,7 +85,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
       interview = create(:interview)
 
-      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => create(:interview_status).id}
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{create(:interview_status).id}"}
 
       expect File |> to(accepted :mkdir!)
       conn |> should(have_http_status(201))
