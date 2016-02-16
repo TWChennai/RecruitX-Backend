@@ -48,9 +48,9 @@ defmodule RecruitxBackend.InterviewPanelist do
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     if !is_nil(interview_id) and !is_nil(panelist_login_name) do
       interview = Interview |> Repo.get(interview_id)
-      candidate_ids_interviewed = (Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all)
       if !is_nil(interview) do
-        if !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed),do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
+        candidate_ids_interviewed = (Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all)
+        if !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed), do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
         if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
       end
     end

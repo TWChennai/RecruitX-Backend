@@ -85,10 +85,10 @@ defmodule RecruitxBackend.Interview do
     end)
   end
 
-  def validate_with_other_rounds(changeset) do
-    new_time = Changeset.get_field(changeset, :start_time)
-    candidate_id = Changeset.get_field(changeset, :candidate_id)
-    current_priority = (Changeset.get_field(changeset, :interview_type)).priority
+  def validate_with_other_rounds(changes) do
+    new_time = Changeset.get_field(changes, :start_time)
+    candidate_id = Changeset.get_field(changes, :candidate_id)
+    current_priority = (Changeset.get_field(changes, :interview_type)).priority
 
     previous_interview = get_interview(candidate_id, current_priority - 1)
     next_interview = get_interview(candidate_id, current_priority + 1);
@@ -111,8 +111,8 @@ defmodule RecruitxBackend.Interview do
         (next_interview.start_time |> Date.shift(hours: -1) |> Date.compare(new_time)) && (new_time |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1)))
     end
 
-    if result == failure, do: changeset = Changeset.add_error(changeset, :start_time,  error_message)
-    changeset
+    if result == failure, do: changes = Changeset.add_error(changes, :start_time, error_message)
+    changes
   end
 
   # TODO: Should this be added as a validation?
