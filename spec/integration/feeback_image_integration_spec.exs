@@ -7,6 +7,9 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.FeedbackImage
+
+  import Ecto.Query, only: [from: 2]
 
   describe "create" do
     it "should update status and feedback images" do
@@ -56,6 +59,24 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       conn |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "does not exist"}
       expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+    end
+
+    it "should not update status and feedback images when file name is invalid" do
+      allow Ecto.UUID |> to(accept(:load, fn(_) -> {:ok, "invalid/file/name"} end))
+      allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
+
+      interview = create(:interview)
+      interview_status = create(:interview_status)
+
+      conn = post conn(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => interview_status.id}
+
+      conn |> should(have_http_status(:unprocessable_entity))
+      expectedErrorReason = %JSONErrorReason{field_name: "file_name", reason: "has invalid format"}
+      expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(nil))
+      feedback_images = (from f in FeedbackImage, where: f.interview_id == ^interview.id) |> Repo.all
+      expect(feedback_images) |> to(be([]))
     end
 
     it "should create directory when file doesn't exist" do

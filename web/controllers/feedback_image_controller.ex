@@ -5,19 +5,22 @@ defmodule RecruitxBackend.FeedbackImageController do
   alias RecruitxBackend.Endpoint
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
-  alias Timex.Date
   alias RecruitxBackend.ChangesetInserter
+  alias Ecto.UUID
 
   #plug :scrub_params, "feedback_image" when action in [:create, :update]
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
-    try do
-      Interview.update_status(id, status_id)
-      ChangesetInserter.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
-      conn |> sendResponseBasedOnResult(:create, :ok, "Thanks for submitting feedback!")
-    catch {status, error} ->
-      conn |> sendResponseBasedOnResult(:create, status, error)
+    {status, result_of_db_transaction} = Repo.transaction fn ->
+      try do
+        Interview.update_status(id, status_id)
+        ChangesetInserter.insertChangesets(store_image_and_generate_changesets(get_storage_path, data, id))
+        "Thanks for submitting feedback!"
+      catch {_, result_of_db_transaction} ->
+        Repo.rollback(result_of_db_transaction)
+      end
     end
+    conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
   def show(conn, params) do
@@ -30,8 +33,8 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   defp store_image_and_generate_changesets(path, data, id) do
     Enum.reduce(Map.keys(data), [], fn(key, acc) ->
-      # TODO: Why do we need a random for the runtime code?
-      new_file_name = "interview_#{id}_#{:rand.uniform(Date.now(:secs))}.jpg"
+      {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
+      new_file_name = "interview_#{id}_#{random_file_name_suffix}.jpg"
       new_file_path = path <> "/" <> new_file_name
       File.cp!(Map.get(data, key).path, new_file_path)
       acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
