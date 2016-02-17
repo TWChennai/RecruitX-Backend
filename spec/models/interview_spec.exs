@@ -368,6 +368,8 @@ defmodule RecruitxBackend.InterviewSpec do
     let :code_pairing_interview_type, do: create(:interview_type, priority: 1, name: "CP")
     let :technical_one_interview_type, do: create(:interview_type, priority: 2, name: "T1")
     let :technical_two_interview_type, do: create(:interview_type, priority: 3, name: "T2")
+    let :leadership_interview_type, do: create(:interview_type, priority: 4, name: "LD")
+    let :p3_interview_type, do: create(:interview_type, priority: 4, name: "Pthree")
 
     it "should not allow interview with less priority to happen before interview with high priority" do
       code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
@@ -431,6 +433,38 @@ defmodule RecruitxBackend.InterviewSpec do
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
+    end
+
+    describe "comparison with interviews of same priority" do
+      before do
+        create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 1))
+      end
+
+      let :technical_two, do: create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 2))
+
+      it "should use the interview with lowest start time for comparison" do
+        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: now
+        |> Date.shift(hours: 3))
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: now
+        |> Date.shift(hours: 6))
+
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 4)})
+        changeset = Interview.validate_with_other_rounds(changeset)
+
+        expect changeset.errors[:start_time] |> to(be("should be after T1 and before Pthree atleast by 1 hour"))
+      end
+
+      it "should use the interview with lowest start time for comparison" do
+        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: now
+        |> Date.shift(hours: 6))
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: now
+        |> Date.shift(hours: 3))
+
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 4)})
+        changeset = Interview.validate_with_other_rounds(changeset)
+
+        expect changeset.errors[:start_time] |> to(be("should be after T1 and before LD atleast by 1 hour"))
+      end
     end
 
   end

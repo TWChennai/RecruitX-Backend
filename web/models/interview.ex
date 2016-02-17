@@ -10,6 +10,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.TimexHelper
   alias Timex.Date
 
   import RecruitxBackend.CustomValidators
@@ -93,25 +94,22 @@ defmodule RecruitxBackend.Interview do
     previous_interview = get_interview(candidate_id, current_priority - 1)
     next_interview = get_interview(candidate_id, current_priority + 1);
 
-    failure = -1
     error_message = ""
     result = case {previous_interview, next_interview} do
       {nil, nil} -> 1
       {nil, next_interview} ->
         error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
-        (next_interview.start_time |> Date.shift(hours: -1))
-          |> Date.compare(new_time)
+        TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
       {previous_interview, nil} ->
         error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
-        new_time
-          |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1))
+        TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
       {previous_interview, next_interview} ->
         error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
         # TODO: Remove magic numbers - move it into a 'end_time' column at the db-level
-        (next_interview.start_time |> Date.shift(hours: -1) |> Date.compare(new_time)) && (new_time |> Date.compare(previous_interview.start_time |> Date.shift(hours: 1)))
+        TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
     end
 
-    if result == failure, do: changes = Changeset.add_error(changes, :start_time, error_message)
+    if !result, do: changes = Changeset.add_error(changes, :start_time, error_message)
     changes
   end
 
@@ -173,7 +171,9 @@ defmodule RecruitxBackend.Interview do
       join: it in assoc(i, :interview_type),
       preload: [:interview_type],
       where: i.candidate_id == ^candidate_id and
-      it.priority == ^priority)
-      |> Repo.one
+      it.priority == ^priority,
+      order_by: i.start_time,
+      limit: 1)
+    |> Repo.one
   end
 end
