@@ -19,11 +19,13 @@ alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
+alias RecruitxBackend.PipelineStatus
 
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(Role)
 skills = Repo.all(Skill)
 interview_types = Repo.all(InterviewType)
+pipeline_statuses = Repo.all(PipelineStatus)
 
 candidates = Enum.map(%{"Dinesh" => "Hadoop",
           "Kausalya" => "Hbase",
@@ -33,7 +35,7 @@ candidates = Enum.map(%{"Dinesh" => "Hadoop",
           "Sivasubramanian" => "AngularJS",
           "Subha" => "NodeJS",
           "Vijay" => "Haskell"}, fn {name_value, other_skills} ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id})
+  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: Enum.random(pipeline_statuses).id})
 end)
 
 Enum.each(candidates, fn candidate ->

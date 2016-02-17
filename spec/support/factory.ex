@@ -11,6 +11,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.PipelineStatus  
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -19,6 +20,12 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:role) do
     %Role{
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"
+    }
+  end
+
+  def factory(:pipeline_status) do
+    %PipelineStatus{
       name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"
     }
   end
@@ -64,10 +71,12 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:candidate) do
     role = create(:role)
+    pipeline_status = create(:pipeline_status)
     %Candidate{
       name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
-      role_id: role.id
+      role_id: role.id,
+      pipeline_status_id: pipeline_status.id
     }
   end
 

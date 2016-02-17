@@ -6,7 +6,8 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterview do
       add :start_time, :datetime, null: false
       add :candidate_id, references(:candidates), null: false
       add :interview_type_id, references(:interview_types), null: false
-
+      add :interview_status_id, references(:interview_status)
+      
       timestamps
     end
 
