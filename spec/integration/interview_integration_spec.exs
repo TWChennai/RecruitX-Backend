@@ -27,7 +27,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
 
     it "should return list of interviews that the panelist has taken" do
       candidate = create(:candidate)
-      interview = create(:interview, candidate_id: candidate.id, candidate: candidate)
+      interview = create(:interview, candidate_id: candidate.id)
       create(:candidate_skill, candidate_id: candidate.id)
       create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
 
@@ -36,7 +36,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       expect(response.status) |> to(be(200))
       [result_interview] = response.assigns.interviews
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
-      expect(compare_fields(result_interview.candidate, interview.candidate, [:name, :experience, :role_id, :other_skills])) |> to(be_true)
+      expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
     end
   end
 end
