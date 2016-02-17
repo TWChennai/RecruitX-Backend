@@ -252,30 +252,26 @@ defmodule RecruitxBackend.InterviewSpec do
   describe "is_signup_lesser_than" do
     it "should return true when there are no signups" do
       interview = create(:interview)
-      allow Repo |> to(accept(:all, fn(_) -> [] end))
 
-      expect(Interview.is_signup_lesser_than(interview.id, 2)) |> to(be_true)
+      expect(Interview.is_signup_lesser_than_max_count(interview.id, [])) |> to(be_true)
     end
 
     it "should return true when signups are lesser than max" do
       interview = create(:interview)
-      allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id, "signup_count": 1, "interview_type": 1}] end))
-
-      expect(Interview.is_signup_lesser_than(interview.id, 2)) |> to(be_true)
+      signup_counts = [%{"interview_id": interview.id, "signup_count": 1, "interview_type": 1}]
+      expect(Interview.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_true)
     end
 
     it "should return false when signups are greater than max" do
       interview = create(:interview)
-      allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}] end))
-
-      expect(Interview.is_signup_lesser_than(interview.id, 2)) |> to(be_false)
+      signup_counts = [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}]
+      expect(Interview.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_false)
     end
 
     it "should return false when signups are equal to max" do
       interview = create(:interview)
-      allow Repo |> to(accept(:all, fn(_) -> [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}] end))
-
-      expect(Interview.is_signup_lesser_than(interview.id, 2)) |> to(be_false)
+      signup_counts = [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}]
+      expect(Interview.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_false)
     end
   end
 

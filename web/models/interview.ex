@@ -15,6 +15,9 @@ defmodule RecruitxBackend.Interview do
 
   import Ecto.Query
 
+  @max_count 2
+  # TODO: Move the magic number (2) into the db
+
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
     belongs_to :candidate, Candidate
@@ -88,8 +91,9 @@ defmodule RecruitxBackend.Interview do
 
   def add_signup_eligibity_for(interviews, panelist_login_name) do
     candidate_ids_interviewed = get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
+    signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     Enum.map(interviews, fn(interview) ->
-      signup_eligiblity = interview |> signup(candidate_ids_interviewed)
+      signup_eligiblity = interview |> signup(candidate_ids_interviewed, signup_counts)
       Map.put(interview, :signup, signup_eligiblity)
     end)
   end
@@ -130,9 +134,10 @@ defmodule RecruitxBackend.Interview do
   end
 
   # TODO: Should this be added as a validation?
-  defp signup(model, candidate_ids_interviewed) do
-    # TODO: Move the magic number (2) into the db
-    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) and is_signup_lesser_than(model.id, 2) and is_not_completed(model)
+  defp signup(model, candidate_ids_interviewed, signup_counts) do
+    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
+      and is_signup_lesser_than_max_count(model.id, signup_counts)
+      and is_not_completed(model)
   end
 
   def is_not_completed(model) do
@@ -143,11 +148,9 @@ defmodule RecruitxBackend.Interview do
     !Enum.member?(candidate_ids_interviewed, model.candidate_id)
   end
 
-  def is_signup_lesser_than(model_id, max_count) do
-    # TODO: Pass the model_id into the 'InterviewPanelist.get_interview_type_based_count_of_sign_ups' so that the filtration is done in the db
-    signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+  def is_signup_lesser_than_max_count(model_id, signup_counts) do
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
-    result == [] or List.first(result).signup_count < max_count
+    result == [] or List.first(result).signup_count < @max_count
   end
 
   def update_status(id, status_id) do

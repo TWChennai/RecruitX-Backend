@@ -4,6 +4,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
+  import Ecto.Query, only: [where: 2, from: 2]
+
   @max_count 2
 
   schema "interview_panelists" do
@@ -59,8 +61,9 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   defp validate_signup_count(existing_changeset) do
     id = get_field(existing_changeset, :interview_id)
-    if !is_nil(id) and !Interview.is_signup_lesser_than(id, @max_count) do
-      existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
+    if !is_nil(id) do
+      signup_counts = __MODULE__.get_interview_type_based_count_of_sign_ups |> where(interview_id: ^id) |> Repo.all
+      if !Interview.is_signup_lesser_than_max_count(id, signup_counts), do: existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
     end
     existing_changeset
   end
