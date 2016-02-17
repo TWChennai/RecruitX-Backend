@@ -28,7 +28,7 @@ defmodule RecruitxBackend.Candidate do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> add_default_pipeline_status()
+    |> add_default_pipeline_status
     |> validate_length(:name, min: 1)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
@@ -37,16 +37,18 @@ defmodule RecruitxBackend.Candidate do
   end
 
   defp add_default_pipeline_status(existing_changeset) do
-    in_progress = Repo.one(from ps in PipelineStatus, where: ps.name == "In Progress")
     incoming_id = existing_changeset |> get_field(:pipeline_status_id)
-    if is_nil(incoming_id), do: existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progress.id)
+    if is_nil(incoming_id) do
+      in_progess_id = Repo.one(from ps in PipelineStatus, where: ps.name == "In Progress", select: ps.id)
+      existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess_id)
+    end
     existing_changeset
   end
 
   def get_candidates_in_fifo_order do
     from c in Candidate,
     join: i in assoc(c, :interviews),
-    where: i.interview_type_id == 1,
+    where: i.interview_type_id == 1,    # TODO: Is this correct?
     order_by: i.start_time,
     select: c
   end
