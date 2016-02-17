@@ -39,7 +39,7 @@ defmodule RecruitxBackend.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.1.4"},
      {:phoenix_ecto, "~> 2.0.1"},
-     {:postgrex, "~> 0.11.0"},
+     {:postgrex, "~> 0.11.1"},
      {:cowboy, "~> 1.0.4"},
      {:exrm, "~> 0.19.9"},
      {:httpotion, "~> 2.2.0"},
@@ -48,7 +48,7 @@ defmodule RecruitxBackend.Mixfile do
      {:timex, "~> 1.0.1"},
      {:timex_ecto, "~> 0.8.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
-     {:credo, "~> 0.3.1", only: :test, app: false},
+     {:credo, "~> 0.3.2", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},
      {:espec_phoenix, "~> 0.2.0", only: :test, app: false},
      {:excoveralls, "~> 0.4.6", only: :test, app: false},
