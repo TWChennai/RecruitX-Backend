@@ -1,8 +1,8 @@
 defmodule RecruitxBackend.InterviewTypeSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewType
 
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
 
   let :valid_attrs, do: fields_for(:interview_type, priority: trunc(:rand.uniform * 10))
   let :invalid_attrs, do: %{}

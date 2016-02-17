@@ -1,15 +1,11 @@
 defmodule RecruitxBackend.QueryFilterSpec do
   use ESpec.Phoenix, model: RecruitxBackend.QueryFilter
 
-  alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.Interview
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Repo
 
-  before do: Repo.delete_all Interview
-  before do: Repo.delete_all CandidateSkill
-  before do: Repo.delete_all Candidate
+  before do: Repo.delete_all(Candidate)
 
   it "should filter fields when their values are passed as arrays" do
     c1 = create(:candidate)

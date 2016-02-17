@@ -60,7 +60,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     it "when candidate id not present in candidates table" do
       # TODO: Not sure why Ectoo.max(Repo, Candidate, :id) is failing - need to investigate
       current_candidate_count = Ectoo.count(Repo, Candidate)
-      candidate_id_not_present = current_candidate_count + 1
+      candidate_id_not_present = current_candidate_count + 100
       candidate_skill_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_candidate_id)
@@ -73,7 +73,7 @@ defmodule RecruitxBackend.CandidateSkillSpec do
     it "when skill id not present in skills table" do
       # TODO: Not sure why Ectoo.max(Repo, Skill, :id) is failing - need to investigate
       current_skill_count = Ectoo.count(Repo, Skill)
-      skill_id_not_present = current_skill_count + 1
+      skill_id_not_present = current_skill_count + 100
       candidate_skill_with_invalid_skill_id = Map.merge(valid_attrs, %{skill_id: skill_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_skill_id)

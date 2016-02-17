@@ -1,8 +1,11 @@
 defmodule RecruitxBackend.InterviewControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
-  alias RecruitxBackend.Repo
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewView
+  alias RecruitxBackend.Repo
+
+  before do: Repo.delete_all(Interview)
 
   describe "show" do
     let :interview, do: create(:interview, id: 1)

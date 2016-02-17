@@ -7,12 +7,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   import Ecto.Query, only: [from: 2]
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Interview
 
   describe "get /candidates" do
-    before do:  Repo.delete_all(CandidateSkill)
-    before do:  Repo.delete_all(Interview)
     before do:  Repo.delete_all(Candidate)
 
     xit "should return a list of candidates" do

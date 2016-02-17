@@ -1,11 +1,14 @@
 defmodule RecruitxBackend.InterviewPanelistSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewPanelist
 
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
 
   let :valid_attrs, do: fields_for(:interview_panelist)
   let :invalid_attrs, do: %{}
+
+  before do: Repo.delete_all(Interview)
 
   context "valid changeset" do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)

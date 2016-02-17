@@ -1,19 +1,13 @@
 defmodule RecruitxBackend.InterviewIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Repo
 
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
   describe "index" do
-    before do: Repo.delete_all(Interview)
-    before do: Repo.delete_all(InterviewPanelist)
-    before do: Repo.delete_all(CandidateSkill)
     before do: Repo.delete_all(Candidate)
 
     it "should return empty when panelist has taken no interviews" do
