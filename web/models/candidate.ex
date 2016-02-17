@@ -48,6 +48,6 @@ defmodule RecruitxBackend.Candidate do
     join: i in assoc(c, :interviews),
     where: i.interview_type_id == 1,
     order_by: i.start_time,
-    select: %{"id": c.id, "name": c.name, "experience": c.experience, "role_id": c.role_id}
+    select: c
   end
 end
