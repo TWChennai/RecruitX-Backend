@@ -3,7 +3,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
   alias RecruitxBackend.Candidate
 
-  let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id)
+  let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
@@ -23,6 +23,27 @@ defmodule RecruitxBackend.CandidateSpec do
       changeset = Candidate.changeset(%Candidate{}, candidate_with_no_experience)
 
       expect(changeset) |> to(be_valid)
+    end
+
+    it "should be valid when pipeline_status_id is not given and is replaced by default value" do
+      candidate_with_no_pipeline_status = Map.delete(valid_attrs, :pipeline_status_id)
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_no_pipeline_status)
+
+      expect(changeset) |> to(be_valid)
+    end
+
+    it "should be valid when pipeline_status_id is nil and is replaced by default value" do
+      candidate_with_no_pipeline_status = Map.merge(valid_attrs, %{pipeline_status_id: nil})
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_no_pipeline_status)
+
+      expect(changeset) |> to(be_valid)
+    end
+
+    it "should be valid with the given pipeline_status_id" do
+      ps = create(:pipeline_status)
+      changeset = Candidate.changeset(%Candidate{}, Map.merge(valid_attrs, %{pipeline_status_id: ps.id}))
+
+      expect(changeset.changes.pipeline_status_id) |> to(be(ps.id))
     end
   end
 

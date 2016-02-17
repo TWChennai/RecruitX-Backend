@@ -6,6 +6,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Role
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Repo
 
   schema "candidates" do
     field :name, :string
@@ -21,17 +22,25 @@ defmodule RecruitxBackend.Candidate do
     has_many :skills, through: [:candidate_skills, :skill]
   end
 
-  @required_fields ~w(name experience role_id pipeline_status_id)
-  @optional_fields ~w(other_skills)
+  @required_fields ~w(name experience role_id)
+  @optional_fields ~w(other_skills pipeline_status_id)
 
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> add_default_pipeline_status()
     |> validate_length(:name, min: 1)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)
+  end
+
+  defp add_default_pipeline_status(existing_changeset) do
+    in_progress = Repo.one(from ps in PipelineStatus, where: ps.name == "In Progress")
+    incoming_id = existing_changeset |> get_field(:pipeline_status_id)
+    if is_nil(incoming_id), do: existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progress.id)
+    existing_changeset
   end
 
   def get_candidates_in_fifo_order do
