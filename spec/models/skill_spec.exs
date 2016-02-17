@@ -1,9 +1,6 @@
 defmodule RecruitxBackend.SkillSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Skill
 
-  alias RecruitxBackend.Candidate
-  alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
 
   let :valid_attrs, do: fields_for(:skill)
