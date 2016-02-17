@@ -8,6 +8,7 @@ defmodule RecruitxBackend.JigsawController do
   @jigsaw_url System.get_env("JIGSAW_URL")
   @token System.get_env("JIGSAW_TOKEN")
 
+  @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   def show(conn, %{"id" => id}) do
       case id do
         "mahalakshme1994" -> is_recruiter = false
