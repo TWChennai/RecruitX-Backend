@@ -11,9 +11,7 @@ defmodule RecruitxBackend.JigsawController do
   def show(conn, %{"id" => id}) do
       case id do
         "mahalakshme1994" -> is_recruiter = false
-         conn |> render("show.json", is_recruiter: is_recruiter)
-         "shridhar.u.p" -> is_recruiter = true
-         conn |> render("show.json", is_recruiter: is_recruiter)
+        "shridhar.u.p" -> is_recruiter = true
          _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         is_recruiter = case response.body do
           "" -> @invalid_user
@@ -28,7 +26,7 @@ defmodule RecruitxBackend.JigsawController do
            {:error, reason} -> reason
         end
     end
-    conn |> render("show.json", is_recruiter: is_recruiter)
   end
+  conn |> render("show.json", is_recruiter: is_recruiter)
 end
 end
