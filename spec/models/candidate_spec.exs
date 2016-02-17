@@ -125,14 +125,14 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "on delete" do
-    it "should raise an exception when it has foreign key reference in other tables" do
+    it "should not raise an exception when it has foreign key reference in other tables" do
       # TODO: Fix factory usage (Ecto 2 will fix it)
       candidate = create(:candidate)
       create(:interview, candidate_id: candidate.id)
 
       delete = fn -> Repo.delete!(candidate) end
 
-      expect(delete).to raise_exception(Ecto.ConstraintError)
+      expect(delete).to_not raise_exception(Ecto.ConstraintError)
     end
 
     it "should not raise an exception when it has no foreign key references in other tables" do

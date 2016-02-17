@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewPanelist do
   def change do
     create table(:interview_panelists) do
       add :panelist_login_name, :string, null: false
-      add :interview_id, references(:interviews), null: false
+      add :interview_id, references(:interviews, on_delete: :delete_all), null: false
 
       timestamps
     end

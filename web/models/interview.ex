@@ -164,17 +164,9 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp delete_successive_interviews_and_panelists(interview) do
-    interviews_to_remove = get_interview_ids_to_delete(interview.candidate_id, interview.start_time)
-    # TODO: Research whether the InterviewPanelist can be cascade-deleted when the Interview is deleted
-    (from ip in InterviewPanelist, where: ip.interview_id in ^interviews_to_remove) |> Repo.delete_all
-    (from i in __MODULE__, where: i.id in ^interviews_to_remove) |> Repo.delete_all
-  end
-
-  defp get_interview_ids_to_delete(candidate, start_time) do
     (from i in __MODULE__,
-      where: i.candidate_id == ^candidate,
-      where: (i.start_time > ^start_time),
-      select: i.id) |> Repo.all
+      where: i.candidate_id == ^interview.candidate_id,
+      where: (i.start_time > ^interview.start_time)) |> Repo.delete_all
   end
 
   defp retrieve_interview(id) do

@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateFeedbackImage do
   def change do
     create table(:feedback_images) do
       add :file_name, :string, null: false
-      add :interview_id, references(:interviews), null: false
+      add :interview_id, references(:interviews, on_delete: :delete_all), null: false
 
       timestamps
     end
