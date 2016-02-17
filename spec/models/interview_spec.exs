@@ -25,6 +25,14 @@ defmodule RecruitxBackend.InterviewSpec do
 
       expect(result) |> to(be_valid)
     end
+
+    it "when interview date time is in the future" do
+      future_interview = Map.merge(valid_attrs, %{start_time: (Timex.Date.now |> Timex.Date.shift(hours: 2))})
+
+      result = Interview.changeset(%Interview{}, future_interview)
+
+      expect(result) |> to(be_valid)
+    end
   end
 
   context "invalid changeset" do
@@ -82,17 +90,25 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is invalid" do
-      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{start_time: "invalid"})
+      interview_with_invalid_start_time = Map.merge(valid_attrs, %{start_time: "invalid"})
 
-      result = Interview.changeset(%Interview{}, interview_with_candidate_id_nil)
+      result = Interview.changeset(%Interview{}, interview_with_invalid_start_time)
 
       expect(result) |> to(have_errors(start_time: "is invalid"))
     end
 
-    it "when interview id and date time are  invalid" do
-      interview_with_candidate_id_nil = Map.merge(valid_attrs, %{interview_type_id: 1.2, start_time: "invalid"})
+    it "when interview date time is in the past" do
+      past_interview = Map.merge(valid_attrs, %{start_time: (Timex.Date.now |> Timex.Date.shift(hours: -2))})
 
-      result = Interview.changeset(%Interview{}, interview_with_candidate_id_nil)
+      result = Interview.changeset(%Interview{}, past_interview)
+
+      expect(result) |> to(have_errors(start_time: "should be in the future"))
+    end
+
+    it "when interview id and date time are invalid" do
+      invalid_interview = Map.merge(valid_attrs, %{interview_type_id: 1.2, start_time: "invalid"})
+
+      result = Interview.changeset(%Interview{}, invalid_interview)
 
       expect(result) |> to(have_errors([interview_type_id: "is invalid", start_time: "is invalid"]))
     end
@@ -363,7 +379,7 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "validation for updating the interview schedule" do
-    let :now, do: Date.now()
+    let :tomorrow, do: Date.now() |> Date.shift(days: 1)
     let :candidate, do: create(:candidate)
     let :code_pairing_interview_type, do: create(:interview_type, priority: 1, name: "CP")
     let :technical_one_interview_type, do: create(:interview_type, priority: 2, name: "T1")
@@ -372,64 +388,64 @@ defmodule RecruitxBackend.InterviewSpec do
     let :p3_interview_type, do: create(:interview_type, priority: 4, name: "Pthree")
 
     it "should not allow interview with less priority to happen before interview with high priority" do
-      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
-      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 2))
+      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
+      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 1.01)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 1.01)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be before T1 atleast by 1 hour"))
     end
 
     it "should not allow interview with high priority to happen after interview with low priority" do
-      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
-      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now
+      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
+      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
       |> Date.shift(hours: 2))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: -1.01)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -1.01)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be after CP atleast by 1 hour"))
     end
 
     it "should not allow interview to be scheduled after interview with high priority and before interview with low priority" do
-      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
-      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 1))
-      create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: now
+      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
+      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 1))
+      create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
       |> Date.shift(hours: 1.5))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 0.75)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 0.75)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be after CP and before T2 atleast by 1 hour"))
     end
 
     it "should allow interview with high priority to happen after interview with low priority" do
-      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
-      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now
+      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
+      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
       |> Date.shift(hours: 2))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(days: 2)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(days: 2)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
     end
 
     it "should allow interview with low priority to happen before interview with high priority" do
-      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
-      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now
+      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
+      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
       |> Date.shift(hours: 4))
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: -2)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -2)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
     end
 
     it "should allow interview with lowest priority to be modified without any constraint" do
-      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: now)
+      code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: -2)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -2)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
@@ -437,30 +453,30 @@ defmodule RecruitxBackend.InterviewSpec do
 
     describe "comparison with interviews of same priority" do
       before do
-        create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 1))
+        create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 1))
       end
 
-      let :technical_two, do: create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: now |> Date.shift(hours: 2))
+      let :technical_two, do: create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
 
       it "should use the interview with lowest start time for comparison" do
-        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: now
+        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
         |> Date.shift(hours: 3))
-        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: now
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
         |> Date.shift(hours: 6))
 
-        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 4)})
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
         changeset = Interview.validate_with_other_rounds(changeset)
 
         expect changeset.errors[:start_time] |> to(be("should be after T1 and before Pthree atleast by 1 hour"))
       end
 
       it "should use the interview with lowest start time for comparison" do
-        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: now
+        create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
         |> Date.shift(hours: 6))
-        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: now
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
         |> Date.shift(hours: 3))
 
-        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => now |> Date.shift(hours: 4)})
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
         changeset = Interview.validate_with_other_rounds(changeset)
 
         expect changeset.errors[:start_time] |> to(be("should be after T1 and before LD atleast by 1 hour"))

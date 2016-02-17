@@ -13,7 +13,6 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
 
-  import RecruitxBackend.CustomValidators
   import Ecto.Query
 
   schema "interviews" do
@@ -60,13 +59,22 @@ defmodule RecruitxBackend.Interview do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    # TODO: Shouldn't the start_time only be in the future if the record is being created for the first time?
-    |> validate_date_time(:start_time)
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> validate_single_update_of_status()
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
+    |> is_in_future(:start_time)
+  end
+
+  def is_in_future(changes, field) do
+    if changes.valid? do
+      new_time = Changeset.get_field(changes, field)
+      # TODO: Date.now might introduce time difference because network call
+      valid = TimexHelper.compare(new_time, Date.now)
+      if !valid, do: changes = Changeset.add_error(changes, field, "should be in the future")
+    end
+    changes
   end
 
   defp validate_single_update_of_status(existing_changeset) do
@@ -86,31 +94,39 @@ defmodule RecruitxBackend.Interview do
     end)
   end
 
-  def validate_with_other_rounds(changes) do
-    new_time = Changeset.get_field(changes, :start_time)
-    candidate_id = Changeset.get_field(changes, :candidate_id)
-    current_priority = (Changeset.get_field(changes, :interview_type)).priority
+  def validate_with_other_rounds(changes, interview_type \\ :empty) do
+    if changes.valid? do
+      new_time = Changeset.get_field(changes, :start_time)
+      candidate_id = Changeset.get_field(changes, :candidate_id)
+      current_priority = get_current_priority(changes, interview_type)
+      previous_interview = get_interview(candidate_id, current_priority - 1)
+      next_interview = get_interview(candidate_id, current_priority + 1);
 
-    previous_interview = get_interview(candidate_id, current_priority - 1)
-    next_interview = get_interview(candidate_id, current_priority + 1);
+      error_message = ""
+      result = case {previous_interview, next_interview} do
+        {nil, nil} -> 1
+        {nil, next_interview} ->
+          error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
+          TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
+        {previous_interview, nil} ->
+          error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
+          TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
+        {previous_interview, next_interview} ->
+          error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
+          # TODO: Remove magic numbers - move it into a 'end_time' column at the db-level
+          TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
+      end
 
-    error_message = ""
-    result = case {previous_interview, next_interview} do
-      {nil, nil} -> 1
-      {nil, next_interview} ->
-        error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
-        TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
-      {previous_interview, nil} ->
-        error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
-        TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
-      {previous_interview, next_interview} ->
-        error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
-        # TODO: Remove magic numbers - move it into a 'end_time' column at the db-level
-        TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
+      if !result, do: changes = Changeset.add_error(changes, :start_time, error_message)
     end
-
-    if !result, do: changes = Changeset.add_error(changes, :start_time, error_message)
     changes
+  end
+
+  defp get_current_priority(changes, interview_type) do
+    case interview_type do
+      :empty -> (Changeset.get_field(changes, :interview_type)).priority
+      _ -> interview_type.priority
+    end
   end
 
   # TODO: Should this be added as a validation?

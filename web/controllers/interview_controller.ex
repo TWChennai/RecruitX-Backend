@@ -2,11 +2,13 @@ defmodule RecruitxBackend.InterviewController do
   use RecruitxBackend.Web, :controller
 
   import Ecto.Query
+
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.QueryFilter
 
-  plug :scrub_params, "interview" when action in [:update]
+  plug :scrub_params, "interview" when action in [:update, :create]
 
   #TODO:To use guard classes
   def index(conn, params) do
@@ -74,28 +76,24 @@ defmodule RecruitxBackend.InterviewController do
     end
   end
 
-  # def create(conn, %{"interview" => interview_params}) do
-  #   changeset = Interview.changeset(%Interview{}, interview_params)
-  #
-  #   # case Repo.insert(changeset) do
-  #   #   {:ok, interview} ->
-  #   #     conn
-  #   #     |> put_status(:created)
-  #   #     |> put_resp_header("location", interview_path(conn, :show, interview))
-  #   #     # |> render("show.json", interview: interview)
-  #   #   {:error, changeset} ->
-  #   #     conn
-  #   #     |> put_status(:unprocessable_entity)
-  #   #     # |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
-  #   # end
-  #   if changeset.valid? do
-  #     Repo.insert(changeset)
-  #     send_resp(conn, 200, "")
-  #   else
-  #     send_resp(conn, 400, "")
-  #   end
-  # end
-  #
+  def create(conn, %{"interview" => interview_params}) do
+    interview_type = InterviewType |> Repo.get(interview_params["interview_type_id"])
+    changeset = Interview.changeset(%Interview{}, interview_params)
+    changeset = Interview.validate_with_other_rounds(changeset, interview_type)
+
+    case Repo.insert(changeset) do
+      {:ok, interview} ->
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", interview_path(conn, :show, interview))
+        |> render("success.json", interview: interview)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
   # def delete(conn, %{"id" => id}) do
   #   interview = Repo.get!(Interview, id)
   #
