@@ -2,14 +2,18 @@ defmodule RecruitxBackend.CandidateView do
   use RecruitxBackend.Web, :view
 
   def render("index.json", %{candidates: candidates}) do
-   render_many(candidates, RecruitxBackend.CandidateView, "candidates.json")
+   render_many(candidates, RecruitxBackend.CandidateView, "candidate.json")
   end
 
   def render("show.json", %{candidate: candidate}) do
+    render_one(candidate, RecruitxBackend.CandidateView, "candidate_with_skills.json")
+  end
+
+  def render("update.json", %{candidate: candidate}) do
     render_one(candidate, RecruitxBackend.CandidateView, "candidate.json")
   end
 
-  def render("candidate.json", %{candidate: candidate}) do
+  def render("candidate_with_skills.json", %{candidate: candidate}) do
     %{
       id: candidate.id,
       name: candidate.name,
@@ -20,12 +24,13 @@ defmodule RecruitxBackend.CandidateView do
     }
   end
 
-  def render("candidates.json", %{candidate: candidate}) do
+  def render("candidate.json", %{candidate: candidate}) do
     %{
       id: candidate.id,
       name: candidate.name,
       role_id: candidate.role_id,
-      experience: candidate.experience
+      experience: candidate.experience,
+      pipeline_status_id: candidate.pipeline_status_id
      }
   end
 end

@@ -27,6 +27,34 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
   end
 
+  describe "update /candidates/:id" do
+    it "should update and return the candidate" do
+      candidate = create(:candidate)
+
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{name: "test"}}
+
+      updated_candidate = Map.merge(candidate, %{name: "test"})
+      response |> should(have_http_status(200))
+      expect(response.assigns.candidate) |> to(be(updated_candidate))
+    end
+
+    it "should not update and return errors when invalid change" do
+      candidate = create(:candidate)
+
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{name: "test1"}}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      expect(response.assigns.changeset.errors) |> to(be([name: "has invalid format"]))
+      expect(Candidate |> Repo.get(candidate.id)) |> to(be(candidate))
+    end
+
+    it "should return 404 when candidate is not found" do
+      response = put conn(), "/candidates/0", %{"candidate" => %{name: "test"}}
+
+      response |> should(have_http_status(:not_found))
+    end
+  end
+
   describe "POST /candidates" do
     context "with valid params" do
       it "should create a new candidate and insert corresponding skill, interview round in the db" do

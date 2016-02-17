@@ -7,13 +7,12 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
-  alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.ChangesetManipulator
 
   # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
 
-  def index(conn, params) do
+  def index(conn, _) do
     candidates = Candidate.get_candidates_in_fifo_order
                  |> Repo.all
     render(conn, "index.json", candidates: candidates)
@@ -83,19 +82,25 @@ defmodule RecruitxBackend.CandidateController do
         %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], start_time: single_round["start_time"]})
   end
 
-  # def update(conn, %{"id" => id, "candidate" => candidate_params}) do
-  #   candidate = Repo.get!(Candidate, id)
-  #   changeset = Candidate.changeset(candidate, candidate_params)
-  #
-  #   case Repo.update(changeset) do
-  #     {:ok, candidate} ->
-  #       render(conn, "show.json", candidate: candidate)
-  #     {:error, changeset} ->
-  #       conn
-  #       |> put_status(:unprocessable_entity)
-  #       |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
-  #   end
-  # end
+  def update(conn, %{"id" => id, "candidate" => candidate_params}) do
+    candidate = Candidate |> Repo.get(id)
+    case candidate do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> render(RecruitxBackend.ErrorView, "404.json")
+      _ ->
+        changeset = Candidate.changeset(candidate, candidate_params)
+        case Repo.update(changeset) do
+          {:ok, candidate} ->
+            conn |> render("update.json", candidate: candidate)
+          {:error, changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+        end
+    end
+  end
   #
   # def delete(conn, %{"id" => id}) do
   #   candidate = Repo.get!(Candidate, id)
