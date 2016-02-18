@@ -11,7 +11,7 @@ defmodule RecruitxBackend.JigsawController do
   @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   def show(conn, %{"id" => id}) do
       case id do
-        "mahalakshme1994" -> is_recruiter = false
+        "panelist.p" -> is_recruiter = false
         "shridhar.u.p" -> is_recruiter = true
          _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         is_recruiter = case response.body do
