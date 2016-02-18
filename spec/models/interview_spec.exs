@@ -119,7 +119,6 @@ defmodule RecruitxBackend.InterviewSpec do
       # TODO: Not sure why Ectoo.max(Repo, Candidate, :id) is failing - need to investigate
       current_candidate_count = Ectoo.count(Repo, Candidate)
       candidate_id_not_present = current_candidate_count + 1
-      # TODO: Use factory
       interview_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
 
       changeset = Interview.changeset(%Interview{}, interview_with_invalid_candidate_id)
@@ -131,7 +130,6 @@ defmodule RecruitxBackend.InterviewSpec do
     it "when interview id not present in interview_type table" do
       # TODO: Not sure why Ectoo.max(Repo, InterviewType, :id) is failing - need to investigate
       current_interview_type_count = Ectoo.count(Repo, InterviewType)
-      # TODO: Use factory
       interview_type_id_not_present = current_interview_type_count + 1
       interview_with_invalid_interview_id = Map.merge(valid_attrs, %{interview_type_id: interview_type_id_not_present})
 
@@ -153,7 +151,6 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "unique_index constraint will fail" do
     it "when same interview is scheduled more than once for a candidate" do
-      # TODO: Use factory
       changeset = Interview.changeset(%Interview{}, valid_attrs)
       Repo.insert(changeset)
 

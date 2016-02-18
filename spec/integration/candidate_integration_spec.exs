@@ -85,18 +85,17 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       end
     end
 
-     context "with no POST params" do
-       xit "should return 400(Bad Request)" do
+    context "with no POST params" do
+      xit "should return 400(Bad Request)" do
         orig_candidate_count = get_candidate_count
 
         response = post conn(), "/candidates"
         expect(response.status) |> to(be(400))
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count))
-       end
-     end
+      end
+    end
 
-    # TODO: Just an example - still incomplete.
     defp getCandidateWithName(name) do
       query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:candidate_skills, :interviews]
       Repo.one(query)

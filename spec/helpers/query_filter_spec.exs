@@ -14,7 +14,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{role_id: [c1.role_id]}
 
-    [result1] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+    [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
     expect(result1.role_id) |> to(eql(c1.role_id))
   end
@@ -25,7 +25,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{role_id: c1.role_id}
 
-    [result1] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+    [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
     expect(result1.role_id) |> to(eql(c1.role_id))
   end
@@ -37,7 +37,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{role_id: [c1.role_id], name: [c1.name, c2.name]}
 
-    [result1] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+    [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
     expect(result1.name) |> to(eql(c1.name))
   end
@@ -49,7 +49,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{name: [c1.name]}
 
-    [result1] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+    [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
     expect(result1.name) |> to(eql(c1.name))
   end
@@ -61,7 +61,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{name: ["#{c1.name}%"]}
 
-    [result1, result2] = QueryFilter.filter_new(query, filters, model) |> Repo.all
+    [result1, result2] = QueryFilter.filter(query, filters, model) |> Repo.all
 
     expect(result1.name) |> to(eql(c1.name))
     expect(result2.name) |> to(eql(c2.name))
@@ -73,7 +73,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
     model = Candidate
     filters = %{dummy: ['a']}
 
-    result_query = QueryFilter.filter_new(query, filters, model)
+    result_query = QueryFilter.filter(query, filters, model)
 
     expect(result_query) |> to(eql(query))
   end

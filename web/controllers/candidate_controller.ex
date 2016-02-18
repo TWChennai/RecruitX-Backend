@@ -9,7 +9,7 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.ChangesetManipulator
 
-  # TODO: Need to fix the spec to pass context "invalid params" and check scrub_params is needed
+  # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
 
   def index(conn, _) do
@@ -22,7 +22,7 @@ defmodule RecruitxBackend.CandidateController do
     try do
       skill_ids = "skill_ids" |> readQueryParamOrRaiseError(post_params)
       interview_rounds = "interview_rounds" |> readQueryParamOrRaiseError(post_params)
-      # TODO: Need to remove the try-rescue block
+      # TODO: Need to remove the try-catch block
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
           {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetManipulator.insertChangesets

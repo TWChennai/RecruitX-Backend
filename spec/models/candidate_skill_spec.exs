@@ -65,7 +65,6 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_candidate_id)
 
-      # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([candidate: "does not exist"]))
     end
@@ -78,7 +77,6 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_skill_id)
 
-      # TODO: Use factory
       {:error, error_changeset} = Repo.insert(changeset)
       expect(error_changeset) |> to(have_errors([skill: "does not exist"]))
     end
@@ -86,7 +84,6 @@ defmodule RecruitxBackend.CandidateSkillSpec do
 
   context "unique_index constraint will fail" do
     it "when same skil is added more than once for a candidate" do
-      # TODO: Use factory
       changeset = CandidateSkill.changeset(%CandidateSkill{}, valid_attrs)
       Repo.insert(changeset)
 
