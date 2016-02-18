@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateCandidate do
   import Ecto.Query, only: [from: 2, where: 2]
 
   def change do
-    in_progess_id = Repo.one(from ps in PipelineStatus, where: ps.name == "In Progress", select: ps.id)
+    in_progess_id = PipelineStatus.retrieve_by_name("In Progress").id
     create table(:candidates) do
       add :name, :string
       add :experience, :decimal, null: false, precision: 4, scale: 2

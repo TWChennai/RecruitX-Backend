@@ -7,6 +7,10 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   import Ecto.Query, only: [from: 2]
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.PipelineStatus
+  alias Timex.Date
 
   describe "get /candidates" do
     before do:  Repo.delete_all(Candidate)
@@ -48,6 +52,54 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       response = put conn(), "/candidates/0", %{"candidate" => %{name: "test"}}
 
       response |> should(have_http_status(:not_found))
+    end
+
+    it "should update the candidate and delete the successive interviews and panelists if the update is for closing the pipeline" do
+      candidate = create(:candidate)
+      interview = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: 1)})
+      interview_panelist = create(:interview_panelist, interview_id: interview.id)
+      closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
+
+      updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
+      response |> should(have_http_status(200))
+      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      expect(Interview |> Repo.get(interview.id)) |> to(be_nil)
+      expect(InterviewPanelist |> Repo.get(interview_panelist.id)) |> to(be_nil)
+    end
+
+    it "should update the candidate and not delete previous interviews and panelists if the update is for closing the pipeline" do
+      candidate = create(:candidate)
+      interview = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1)})
+      interview_panelist = create(:interview_panelist, interview_id: interview.id)
+      closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
+
+      updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
+      response |> should(have_http_status(200))
+      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      expect(Interview |> Repo.get(interview.id)) |> to(be(interview))
+      expect(InterviewPanelist |> Repo.get(interview_panelist.id)) |> to(be(interview_panelist))
+    end
+
+    it "should update the candidate and not delete the successive and past interviews and panelists if the update is for not closing the pipeline" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: 1)})
+      interview2 = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1)})
+      interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
+      interview_panelist2 = create(:interview_panelist, interview_id: interview2.id)
+      pipeline_status = create(:pipeline_status)
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => pipeline_status.id}}
+
+      updated_candidate = Map.merge(candidate, %{pipeline_status_id: pipeline_status.id})
+      response |> should(have_http_status(200))
+      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      expect(Interview |> Repo.get(interview1.id)) |> to(be(interview1))
+      expect(Interview |> Repo.get(interview2.id)) |> to(be(interview2))
+      expect(InterviewPanelist |> Repo.get(interview_panelist1.id)) |> to(be(interview_panelist1))
+      expect(InterviewPanelist |> Repo.get(interview_panelist2.id)) |> to(be(interview_panelist2))
     end
   end
 

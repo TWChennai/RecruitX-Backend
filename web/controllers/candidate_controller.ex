@@ -5,9 +5,11 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.ChangesetManipulator
+  alias Timex.Date
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -93,6 +95,11 @@ defmodule RecruitxBackend.CandidateController do
         changeset = Candidate.changeset(candidate, candidate_params)
         case Repo.update(changeset) do
           {:ok, candidate} ->
+            pipeline_status_id = candidate_params["pipeline_status_id"]
+            if !is_nil(pipeline_status_id) do
+              closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+              if pipeline_status_id == closed_pipeline_status_id, do: Interview.delete_successive_interviews_and_panelists(id, Date.now)
+            end
             conn |> render("update.json", candidate: candidate)
           {:error, changeset} ->
             conn

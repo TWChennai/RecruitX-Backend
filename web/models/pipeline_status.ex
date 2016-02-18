@@ -2,6 +2,9 @@ defmodule RecruitxBackend.PipelineStatus do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Repo
+
+  import Ecto.Query, only: [from: 2, where: 2]
 
   schema "pipeline_statuses" do
     field :name, :string
@@ -20,5 +23,9 @@ defmodule RecruitxBackend.PipelineStatus do
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
     |> unique_constraint(:name, name: :pipeline_statuses_name_index)
+  end
+
+  def retrieve_by_name(name) do
+    (from ps in __MODULE__, where: ps.name == ^name) |> Repo.one
   end
 end
