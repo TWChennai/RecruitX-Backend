@@ -20,6 +20,7 @@ defmodule RecruitxBackend.CandidateView do
       role_id: candidate.role_id,
       other_skills: candidate.other_skills,
       experience: candidate.experience,
+      pipeline_status_id: candidate.pipeline_status_id,
       skills: render_many(candidate.candidate_skills, RecruitxBackend.CandidateSkillView, "candidate_skill_id.json")
     }
   end
