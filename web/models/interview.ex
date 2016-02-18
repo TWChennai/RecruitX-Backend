@@ -70,14 +70,14 @@ defmodule RecruitxBackend.Interview do
     |> is_in_future(:start_time)
   end
 
-  def is_in_future(changes, field) do
-    if changes.valid? do
-      new_time = Changeset.get_field(changes, field)
+  def is_in_future(existing_changeset, field) do
+    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
+      new_time = Changeset.get_field(existing_changeset, field)
       # TODO: Date.now might introduce time difference because network call
       valid = TimexHelper.compare(new_time, Date.now)
-      if !valid, do: changes = Changeset.add_error(changes, field, "should be in the future")
+      if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be in the future")
     end
-    changes
+    existing_changeset
   end
 
   defp validate_single_update_of_status(existing_changeset) do
@@ -98,11 +98,11 @@ defmodule RecruitxBackend.Interview do
     end)
   end
 
-  def validate_with_other_rounds(changes, interview_type \\ :empty) do
-    if changes.valid? do
-      new_time = Changeset.get_field(changes, :start_time)
-      candidate_id = Changeset.get_field(changes, :candidate_id)
-      current_priority = get_current_priority(changes, interview_type)
+  def validate_with_other_rounds(existing_changeset, interview_type \\ :empty) do
+    if existing_changeset.valid? do
+      new_time = Changeset.get_field(existing_changeset, :start_time)
+      candidate_id = Changeset.get_field(existing_changeset, :candidate_id)
+      current_priority = get_current_priority(existing_changeset, interview_type)
       previous_interview = get_interview(candidate_id, current_priority - 1)
       next_interview = get_interview(candidate_id, current_priority + 1);
 
@@ -121,9 +121,9 @@ defmodule RecruitxBackend.Interview do
           TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
       end
 
-      if !result, do: changes = Changeset.add_error(changes, :start_time, error_message)
+      if !result, do: existing_changeset = Changeset.add_error(existing_changeset, :start_time, error_message)
     end
-    changes
+    existing_changeset
   end
 
   defp get_current_priority(changes, interview_type) do
