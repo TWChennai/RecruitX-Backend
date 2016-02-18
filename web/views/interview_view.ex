@@ -49,7 +49,8 @@ defmodule RecruitxBackend.InterviewView do
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
       candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate_with_skills.json"),
-      status_id: interview.interview_status_id
+      status_id: interview.interview_status_id,
+      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json")
     }
   end
 
