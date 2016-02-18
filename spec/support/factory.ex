@@ -11,7 +11,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.PipelineStatus  
+  alias RecruitxBackend.PipelineStatus
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -47,7 +47,7 @@ defmodule RecruitxBackend.Factory do
     create(:interview_type, id: current_interview_count + 1)
     create(:interview_type, id: current_interview_count + 2)
     interview_rounds = for n <- 1..:rand.uniform(2) do
-      %{"interview_type_id" => current_interview_count + n, "start_time" => getRandomDateTimeString}
+      %{"interview_type_id" => current_interview_count + n, "start_time" => getRandomDateTime}
     end
     %{interview_rounds: interview_rounds}
   end
@@ -63,7 +63,7 @@ defmodule RecruitxBackend.Factory do
     candidate = create(:candidate)
     interview_type = create(:interview_type)
     %Interview{
-      start_time: getRandomDateTimeString,
+      start_time: getRandomDateTime,
       candidate_id: candidate.id,
       interview_type_id: interview_type.id,
     }
@@ -109,8 +109,12 @@ defmodule RecruitxBackend.Factory do
     }
   end
 
-  def getRandomDateTimeString do
-    {_, value} = DateTime.cast(DateFormat.format!(Date.now, "%Y-%m-%d %H:%M:%S", :strftime))
+  defp getRandomDateTime do
+    {_, value} = DateTime.cast(getRandomDateTimeString)
     value
+  end
+
+  defp getRandomDateTimeString do
+    DateFormat.format!(Date.now, "%Y-%m-%d %H:%M:%S", :strftime)
   end
 end
