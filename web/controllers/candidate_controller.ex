@@ -14,9 +14,9 @@ defmodule RecruitxBackend.CandidateController do
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
 
-  def index(conn, _) do
+  def index(conn, _params) do
     candidates = Candidate.get_candidates_in_fifo_order
-                 |> Repo.all
+                 |> Repo.paginate(_params)
     render(conn, "index.json", candidates: candidates)
   end
 

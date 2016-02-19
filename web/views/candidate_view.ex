@@ -2,7 +2,10 @@ defmodule RecruitxBackend.CandidateView do
   use RecruitxBackend.Web, :view
 
   def render("index.json", %{candidates: candidates}) do
-   render_many(candidates, RecruitxBackend.CandidateView, "candidate.json")
+    %{
+      total_pages: candidates.total_pages,
+      candidates: render_many(candidates.entries, RecruitxBackend.CandidateView, "candidate.json")
+    }
   end
 
   def render("show.json", %{candidate: candidate}) do
