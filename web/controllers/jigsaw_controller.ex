@@ -10,26 +10,27 @@ defmodule RecruitxBackend.JigsawController do
 
   @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   def show(conn, %{"id" => id}) do
-      case id do
-        "ppanelist" -> is_recruiter = false
-        "ppanelistp" -> is_recruiter = false
-        "rrecruitx" -> is_recruiter = true
-        "rrecruitxr" -> is_recruiter = true
-         _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
-        is_recruiter = case response.body do
+    is_recruiter = case id do
+      "ppanelist" -> false
+      "ppanelistp" -> false
+      "rrecruitx" -> true
+      "rrecruitxr" -> true
+      _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
+        case response.body do
           "" -> @invalid_user
           _  -> case response.body |> Parser.parse do
-            {:ok, body} ->  key_value_response = for {key, val} <- body, into: %{}, do: {String.to_atom(key), val}
-                        department = key_value_response.department
-                        department_key_value_pair = for {key, val} <- department, into: %{}, do: {String.to_atom(key), val}
-                            case department_key_value_pair.name do
-                              @recruitment_department -> true
-                              _ -> false
-                            end
-           {:error, reason} -> reason
-        end
+                  {:ok, body} -> key_value_response = for {key, val} <- body, into: %{}, do: {String.to_atom(key), val}
+                  department = key_value_response.department
+                  department_key_value_pair = for {key, val} <- department, into: %{}, do: {String.to_atom(key), val}
+                  case department_key_value_pair.name do
+                    @recruitment_department -> true
+                    _ -> false
+                  end
+                  {:error, reason} -> reason
+                end
+      end
     end
+
+    conn |> render("show.json", is_recruiter: is_recruiter)
   end
-  conn |> render("show.json", is_recruiter: is_recruiter)
-end
 end
