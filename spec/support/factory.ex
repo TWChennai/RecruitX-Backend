@@ -69,7 +69,8 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:candidate) do
     %Candidate{
-      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}"),   # TODO: Find a way to specify from a list of known langugages
+      first_name: sanitize_name(Faker.Name.first_name),   # TODO: Find a way to specify from a list of known langugages
+      last_name: sanitize_name(Faker.Name.last_name),   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
       role_id: create(:role).id,
       pipeline_status_id: create(:pipeline_status).id

@@ -6,10 +6,10 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Role
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Repo
 
   schema "candidates" do
-    field :name, :string
+    field :first_name, :string
+    field :last_name, :string
     field :experience, :decimal
     field :other_skills, :string
 
@@ -22,15 +22,17 @@ defmodule RecruitxBackend.Candidate do
     has_many :skills, through: [:candidate_skills, :skill]
   end
 
-  @required_fields ~w(name experience role_id)
+  @required_fields ~w(first_name last_name experience role_id)
   @optional_fields ~w(other_skills pipeline_status_id)
 
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> add_default_pipeline_status
-    |> validate_length(:name, min: 1)
-    |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_length(:first_name, min: 1)
+    |> validate_format(:first_name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_length(:last_name, min: 1)
+    |> validate_format(:last_name, ~r/^[a-z]+[\sa-z]*$/i)
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)

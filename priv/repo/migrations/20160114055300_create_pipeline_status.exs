@@ -10,8 +10,11 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
 
       timestamps
     end
+
     execute "CREATE UNIQUE INDEX pipeline_statuses_name_index ON pipeline_statuses (UPPER(name));"
+
     flush
+
     Enum.map(["In Progress",
               "Closed"], fn pipeline_status_value ->
       Repo.insert!(%PipelineStatus{name: pipeline_status_value})

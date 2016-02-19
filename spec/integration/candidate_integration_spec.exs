@@ -31,9 +31,9 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     it "should update and return the candidate" do
       candidate = create(:candidate)
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{name: "test"}}
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test"}}
 
-      updated_candidate = Map.merge(candidate, %{name: "test"})
+      updated_candidate = Map.merge(candidate, %{first_name: "test"})
       response |> should(have_http_status(200))
       expect(response.assigns.candidate) |> to(be(updated_candidate))
     end
@@ -41,15 +41,15 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     it "should not update and return errors when invalid change" do
       candidate = create(:candidate)
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{name: "test1"}}
+      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test1"}}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expect(response.assigns.changeset.errors) |> to(be([name: "has invalid format"]))
+      expect(response.assigns.changeset.errors) |> to(be([first_name: "has invalid format"]))
       expect(Candidate |> Repo.get(candidate.id)) |> to(be(candidate))
     end
 
     it "should return 404 when candidate is not found" do
-      response = put conn(), "/candidates/0", %{"candidate" => %{name: "test"}}
+      response = put conn(), "/candidates/0", %{"candidate" => %{first_name: "test"}}
 
       response |> should(have_http_status(:not_found))
     end
@@ -115,7 +115,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         response = post conn(), "/candidates", %{"candidate" => post_parameters}
 
         expect(response.status) |> to(be(201))
-        inserted_candidate = getCandidateWithName(candidate_params.name)
+        inserted_candidate = Repo.one(from c in Candidate, where: ilike(c.first_name, ^"%#{candidate_params.first_name}%"), preload: [:candidate_skills, :interviews])
         List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/candidates/#{inserted_candidate.id}"}))
 
         new_candidate_count = get_candidate_count
@@ -146,11 +146,6 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count))
       end
-    end
-
-    defp getCandidateWithName(name) do
-      query = from c in Candidate, where: ilike(c.name, ^"%#{name}%"), preload: [:candidate_skills, :interviews]
-      Repo.one(query)
     end
 
     defp get_candidate_count do

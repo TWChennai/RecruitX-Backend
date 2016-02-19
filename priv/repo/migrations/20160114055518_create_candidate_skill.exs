@@ -8,6 +8,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateCandidateSkill do
 
       timestamps
     end
+
     create unique_index(:candidate_skills, [:candidate_id, :skill_id], name: :candidate_skill_id_index)
     create index(:candidate_skills, [:candidate_id])
     create index(:candidate_skills, [:skill_id])

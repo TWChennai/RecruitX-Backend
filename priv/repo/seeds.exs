@@ -27,15 +27,16 @@ skills = Repo.all(Skill)
 interview_types = Repo.all(InterviewType)
 pipeline_statuses = Repo.all(PipelineStatus)
 
-candidates = Enum.map(%{"Dinesh" => "Hadoop",
-          "Kausalya" => "Hbase",
-          "Maha" => "IOT",
-          "Navaneetha" => "Hadoop, IOT",
-          "Pranjal" => "Elixir",
-          "Sivasubramanian" => "AngularJS",
-          "Subha" => "NodeJS",
-          "Vijay" => "Haskell"}, fn {name_value, other_skills} ->
-  Repo.insert!(%Candidate{name: name_value, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: Enum.random(pipeline_statuses).id})
+candidates = Enum.map(%{"Dinesh B" => "Hadoop",
+          "Kausalya M" => "Hbase",
+          "Maha S" => "IOT",
+          "Navaneetha K" => "Hadoop, IOT",
+          "Pranjal D" => "Elixir",
+          "Sivasubramanian V" => "AngularJS",
+          "Subha M" => "NodeJS",
+          "Vijay A" => "Haskell"}, fn {name_value, other_skills} ->
+  [first_name, last_name] = String.split(name_value, " ")
+  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: Enum.random(pipeline_statuses).id})
 end)
 
 Enum.each(candidates, fn candidate ->

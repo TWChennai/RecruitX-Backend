@@ -16,7 +16,8 @@ defmodule RecruitxBackend.CandidateView do
   def render("candidate_with_skills.json", %{candidate: candidate}) do
     %{
       id: candidate.id,
-      name: candidate.name,
+      first_name: candidate.first_name,
+      last_name: candidate.last_name,
       role_id: candidate.role_id,
       other_skills: candidate.other_skills,
       experience: Decimal.reduce(candidate.experience),
@@ -28,7 +29,8 @@ defmodule RecruitxBackend.CandidateView do
   def render("candidate.json", %{candidate: candidate}) do
     %{
       id: candidate.id,
-      name: candidate.name,
+      first_name: candidate.first_name,
+      last_name: candidate.last_name,
       role_id: candidate.role_id,
       experience: Decimal.reduce(candidate.experience),
       pipeline_status_id: candidate.pipeline_status_id

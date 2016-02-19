@@ -109,11 +109,19 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     end
 
     context "invalid changeset on validation before insertion to database" do
-      it "when name is of invalid format" do
-        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"name" => "1test"})})
+      it "when first_name is of invalid format" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"first_name" => "1test"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedNameErrorReason = %JSONErrorReason{field_name: "name", reason: "has invalid format"}
+        expectedNameErrorReason = %JSONErrorReason{field_name: "first_name", reason: "has invalid format"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
+      end
+
+      it "when last_name is of invalid format" do
+        response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"last_name" => "1test"})})
+
+        response |> should(have_http_status(:unprocessable_entity))
+        expectedNameErrorReason = %JSONErrorReason{field_name: "last_name", reason: "has invalid format"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
 

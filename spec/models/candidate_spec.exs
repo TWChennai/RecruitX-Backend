@@ -51,41 +51,76 @@ defmodule RecruitxBackend.CandidateSpec do
     subject do: Candidate.changeset(%Candidate{}, invalid_attrs)
 
     it do: should_not be_valid
-    it do: should have_errors(name: "can't be blank", role_id: "can't be blank", experience: "can't be blank")
+    it do: should have_errors(first_name: "can't be blank", last_name: "can't be blank", role_id: "can't be blank", experience: "can't be blank")
 
-    it "should be invalid when name is an empty string" do
-      candidate_with_empty_name = Map.merge(valid_attrs, %{name: ""})
+    it "should be invalid when first_name is an empty string" do
+      candidate_with_empty_name = Map.merge(valid_attrs, %{first_name: ""})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_name)
 
-      expect(changeset) |> to(have_errors(name: {"should be at least %{count} character(s)", [count: 1]}))
+      expect(changeset) |> to(have_errors(first_name: {"should be at least %{count} character(s)", [count: 1]}))
     end
 
-    it "should be invalid when name is nil" do
-      candidate_with_nil_name = Map.merge(valid_attrs, %{name: nil})
+    it "should be invalid when first_name is nil" do
+      candidate_with_nil_name = Map.merge(valid_attrs, %{first_name: nil})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_nil_name)
 
-      expect(changeset) |> to(have_errors([name: "can't be blank"]))
+      expect(changeset) |> to(have_errors([first_name: "can't be blank"]))
     end
 
-    it "should be invalid when name is a blank string" do
-      candidte_with_blank_name = Map.merge(valid_attrs, %{name: "  "})
+    it "should be invalid when first_name is a blank string" do
+      candidte_with_blank_name = Map.merge(valid_attrs, %{first_name: "  "})
       changeset = Candidate.changeset(%Candidate{}, candidte_with_blank_name)
 
-      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+      expect(changeset) |> to(have_errors([first_name: "has invalid format"]))
     end
 
-    it "should be invalid when name is only numbers" do
-      candidate_with_numbers_name = Map.merge(valid_attrs, %{name: "678"})
+    it "should be invalid when first_name is only numbers" do
+      candidate_with_numbers_name = Map.merge(valid_attrs, %{first_name: "678"})
       changeset = Candidate.changeset(%Candidate{}, candidate_with_numbers_name)
 
-      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+      expect(changeset) |> to(have_errors([first_name: "has invalid format"]))
     end
 
-    it "should be invalid when name starts with space" do
-      candidate_starting_with_space_name = Map.merge(valid_attrs, %{name: " space"})
+    it "should be invalid when first_name starts with space" do
+      candidate_starting_with_space_name = Map.merge(valid_attrs, %{first_name: " space"})
       changeset = Candidate.changeset(%Candidate{}, candidate_starting_with_space_name)
 
-      expect(changeset) |> to(have_errors([name: "has invalid format"]))
+      expect(changeset) |> to(have_errors([first_name: "has invalid format"]))
+    end
+
+    it "should be invalid when last_name is an empty string" do
+      candidate_with_empty_name = Map.merge(valid_attrs, %{last_name: ""})
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_empty_name)
+
+      expect(changeset) |> to(have_errors(last_name: {"should be at least %{count} character(s)", [count: 1]}))
+    end
+
+    it "should be invalid when last_name is nil" do
+      candidate_with_nil_name = Map.merge(valid_attrs, %{last_name: nil})
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_nil_name)
+
+      expect(changeset) |> to(have_errors([last_name: "can't be blank"]))
+    end
+
+    it "should be invalid when last_name is a blank string" do
+      candidte_with_blank_name = Map.merge(valid_attrs, %{last_name: "  "})
+      changeset = Candidate.changeset(%Candidate{}, candidte_with_blank_name)
+
+      expect(changeset) |> to(have_errors([last_name: "has invalid format"]))
+    end
+
+    it "should be invalid when last_name is only numbers" do
+      candidate_with_numbers_name = Map.merge(valid_attrs, %{last_name: "678"})
+      changeset = Candidate.changeset(%Candidate{}, candidate_with_numbers_name)
+
+      expect(changeset) |> to(have_errors([last_name: "has invalid format"]))
+    end
+
+    it "should be invalid when last_name starts with space" do
+      candidate_starting_with_space_name = Map.merge(valid_attrs, %{last_name: " space"})
+      changeset = Candidate.changeset(%Candidate{}, candidate_starting_with_space_name)
+
+      expect(changeset) |> to(have_errors([last_name: "has invalid format"]))
     end
 
     it "should be invalid when experience is nil" do

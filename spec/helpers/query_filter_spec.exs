@@ -35,11 +35,11 @@ defmodule RecruitxBackend.QueryFilterSpec do
     c2 = create(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
-    filters = %{role_id: [c1.role_id], name: [c1.name, c2.name]}
+    filters = %{role_id: [c1.role_id], first_name: [c1.first_name, c2.first_name]}
 
     [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
-    expect(result1.name) |> to(eql(c1.name))
+    expect(result1.first_name) |> to(eql(c1.first_name))
   end
 
   it "should filter fields when their values are strings" do
@@ -47,24 +47,24 @@ defmodule RecruitxBackend.QueryFilterSpec do
     create(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
-    filters = %{name: [c1.name]}
+    filters = %{first_name: [c1.first_name]}
 
     [result1] = QueryFilter.filter(query, filters, model) |> Repo.all
 
-    expect(result1.name) |> to(eql(c1.name))
+    expect(result1.first_name) |> to(eql(c1.first_name))
   end
 
   it "should filter fields with like matches when their values are strings" do
     c1 = create(:candidate)
-    c2 = create(:candidate, name: "#{c1.name}extension")
+    c2 = create(:candidate, first_name: "#{c1.first_name}extension")
     query = Ecto.Query.from c in Candidate
     model = Candidate
-    filters = %{name: ["#{c1.name}%"]}
+    filters = %{first_name: ["#{c1.first_name}%"]}
 
     [result1, result2] = QueryFilter.filter(query, filters, model) |> Repo.all
 
-    expect(result1.name) |> to(eql(c1.name))
-    expect(result2.name) |> to(eql(c2.name))
+    expect(result1.first_name) |> to(eql(c1.first_name))
+    expect(result2.first_name) |> to(eql(c2.first_name))
   end
 
   it "should not modify query when invalid fields are passed" do
