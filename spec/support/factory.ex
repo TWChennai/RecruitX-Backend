@@ -8,10 +8,10 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.PipelineStatus
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -20,19 +20,19 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:role) do
     %Role{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:pipeline_status) do
     %PipelineStatus{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:skill) do
     %Skill{
-      name: Faker.Name.first_name   # TODO: Find a way to specify from a list of known langugages
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
@@ -54,51 +54,45 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:interview_type) do
     %InterviewType{
-      name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
       priority: :rand.uniform(4)
     }
   end
 
   def factory(:interview) do
-    candidate = create(:candidate)
-    interview_type = create(:interview_type)
     %Interview{
+      candidate_id: create(:candidate).id,
+      interview_type_id: create(:interview_type).id,
       start_time: getRandomDateTime,
-      candidate_id: candidate.id,
-      interview_type_id: interview_type.id,
     }
   end
 
   def factory(:candidate) do
-    role = create(:role)
-    pipeline_status = create(:pipeline_status)
     %Candidate{
-      name: Faker.Name.first_name,   # TODO: Find a way to specify from a list of known langugages
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
-      role_id: role.id,
-      pipeline_status_id: pipeline_status.id
+      role_id: create(:role).id,
+      pipeline_status_id: create(:pipeline_status).id
     }
   end
 
   def factory(:candidate_skill) do
-    candidate = create(:candidate)
-    skill = create(:skill)
     %CandidateSkill{
-      candidate_id: candidate.id,
-      skill_id: skill.id
+      candidate_id: create(:candidate).id,
+      skill_id: create(:skill).id
     }
   end
 
   def factory(:interview_panelist) do
     %InterviewPanelist{
-      panelist_login_name: Faker.Name.first_name,
+      panelist_login_name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
       interview_id: create(:interview).id
     }
   end
 
   def factory(:interview_status) do
     %InterviewStatus{
-      name: "#{Faker.Name.first_name}"
+      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
