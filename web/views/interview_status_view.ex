@@ -6,7 +6,9 @@ defmodule RecruitxBackend.InterviewStatusView do
   end
 
   def render("interview_status.json", %{interview_status: interview_status}) do
-    %{id: interview_status.id,
-      name: interview_status.name}
+    %{
+      id: interview_status.id,
+      name: interview_status.name
+    }
   end
 end

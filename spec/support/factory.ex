@@ -20,19 +20,19 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:role) do
     %Role{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:pipeline_status) do
     %PipelineStatus{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:skill) do
     %Skill{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
@@ -54,7 +54,7 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:interview_type) do
     %InterviewType{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}"),   # TODO: Find a way to specify from a list of known langugages
       priority: :rand.uniform(4)
     }
   end
@@ -69,7 +69,7 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:candidate) do
     %Candidate{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}"),   # TODO: Find a way to specify from a list of known langugages
       experience: Decimal.new(Float.round(:rand.uniform * 10, 2)),
       role_id: create(:role).id,
       pipeline_status_id: create(:pipeline_status).id
@@ -85,20 +85,20 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:interview_panelist) do
     %InterviewPanelist{
-      panelist_login_name: "#{Faker.Name.first_name} #{Faker.Name.last_name}",   # TODO: Find a way to specify from a list of known langugages
+      panelist_login_name: sanitize_name(Faker.Name.first_name),   # TODO: Find a way to specify from a list of known langugages
       interview_id: create(:interview).id
     }
   end
 
   def factory(:interview_status) do
     %InterviewStatus{
-      name: "#{Faker.Name.first_name} #{Faker.Name.last_name}"   # TODO: Find a way to specify from a list of known langugages
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
     }
   end
 
   def factory(:feedback_image) do
     %FeedbackImage{
-      file_name: "#{Faker.Name.first_name}",
+      file_name: sanitize_name(Faker.Name.first_name),
       interview_id: create(:interview).id
     }
   end
@@ -110,5 +110,9 @@ defmodule RecruitxBackend.Factory do
 
   defp getRandomDateTimeString do
     DateFormat.format!(Date.now, "%Y-%m-%d %H:%M:%S", :strftime)
+  end
+
+  defp sanitize_name(name) do
+    name |> String.replace("'", "")
   end
 end

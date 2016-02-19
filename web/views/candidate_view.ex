@@ -19,7 +19,7 @@ defmodule RecruitxBackend.CandidateView do
       name: candidate.name,
       role_id: candidate.role_id,
       other_skills: candidate.other_skills,
-      experience: candidate.experience,
+      experience: Decimal.reduce(candidate.experience),
       pipeline_status_id: candidate.pipeline_status_id,
       skills: render_many(candidate.candidate_skills, RecruitxBackend.CandidateSkillView, "candidate_skill_id.json")
     }
@@ -30,8 +30,8 @@ defmodule RecruitxBackend.CandidateView do
       id: candidate.id,
       name: candidate.name,
       role_id: candidate.role_id,
-      experience: candidate.experience,
+      experience: Decimal.reduce(candidate.experience),
       pipeline_status_id: candidate.pipeline_status_id
-     }
+    }
   end
 end
