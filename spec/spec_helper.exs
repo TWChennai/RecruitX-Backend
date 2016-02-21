@@ -9,6 +9,8 @@ ESpec.configure fn(config) ->
     :random.seed(a, b, c)
     # Get a new random number using: `:rand.uniform`
 
+    Decimal.set_context(%Decimal.Context{Decimal.get_context | precision: 2, rounding: :half_up})
+
     Faker.start
     #restart transactions
     Ecto.Adapters.SQL.restart_test_transaction(RecruitxBackend.Repo, [])
