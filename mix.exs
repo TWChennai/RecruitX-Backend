@@ -46,16 +46,16 @@ defmodule RecruitxBackend.Mixfile do
      {:json, "~> 0.3.3"},
      {:corsica, "~> 0.4.0"},
      {:timex, "~> 1.0.1"},
-     {:timex_ecto, "~> 0.8.0"},
+     {:timex_ecto, "~> 0.9.0"},
+     {:scrivener, "~> 1.1"},
+     {:gettext, "~> 0.10.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
-     {:credo, "~> 0.3.2", only: :test, app: false},
+     {:credo, "~> 0.3.3", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},
      {:espec_phoenix, "~> 0.2.0", only: :test, app: false},
-     {:excoveralls, "~> 0.4.6", only: :test, app: false},
+     {:excoveralls, "~> 0.5.1", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
      {:faker, "~> 0.6.0", only: :test, app: false},
-     {:scrivener, "~> 1.0"},
-     {:gettext, "~> 0.9"}
    ]
   end
 
