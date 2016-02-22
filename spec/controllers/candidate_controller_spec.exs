@@ -3,11 +3,11 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   import RecruitxBackend.Factory
 
+  alias Ecto.DateTime
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateController
-  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
-  alias Ecto.DateTime
+  alias RecruitxBackend.JSONErrorReason
 
   before do: Repo.delete_all(Candidate)
 
@@ -17,7 +17,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{other_skills: "other skills"}))
 
   describe "index" do
-
     subject do: action :index
 
     it do: should be_successful
@@ -27,18 +26,28 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       # TODO: Need to find another way to ensure that the returned structure is correct as opposed to full equality
       interviewOne = create(:interview, interview_type_id: 1)
       interviewTwo = create(:interview, interview_type_id: 1)
-      candidateOne = RecruitxBackend.Repo.get(Candidate, interviewOne.candidate_id)
-      candidateTwo = RecruitxBackend.Repo.get(Candidate, interviewTwo.candidate_id)
+      candidateOne = Repo.get(Candidate, interviewOne.candidate_id)
+      candidateTwo = Repo.get(Candidate, interviewTwo.candidate_id)
+
       response = action(:index)
+
       expect(response.assigns.candidates.total_pages) |> to(eq(1))
       expect(response.assigns.candidates.entries) |> to(eq([candidateOne, candidateTwo]))
     end
 
     it "should return the page number as 2 if candidates are more than 10 and less than 20" do
-      for _ <- 1..11 do
-         create(:interview, interview_type_id: 1)
-      end
+      create_list(11, :interview, interview_type_id: 1)
+
       response = action(:index)
+
+      expect(response.assigns.candidates.total_pages) |> to(eq(2))
+    end
+
+    it "should return the page number as 2 if candidates is equal to 20" do
+      create_list(20, :interview, interview_type_id: 1)
+
+      response = action(:index)
+
       expect(response.assigns.candidates.total_pages) |> to(eq(2))
     end
   end
