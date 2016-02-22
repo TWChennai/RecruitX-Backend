@@ -73,8 +73,8 @@ defmodule RecruitxBackend.Interview do
   def is_in_future(existing_changeset, field) do
     if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
       new_time = Changeset.get_field(existing_changeset, field)
-      # TODO: Date.now might introduce time difference because network call
-      valid = TimexHelper.compare(new_time, Date.now)
+      current_time = (Date.now |> Date.shift(mins: -5))
+      valid = TimexHelper.compare(new_time, current_time)
       if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be in the future")
     end
     existing_changeset
