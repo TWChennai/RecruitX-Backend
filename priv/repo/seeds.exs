@@ -24,7 +24,6 @@ alias RecruitxBackend.PipelineStatus
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(Role)
 skills = Repo.all(Skill)
-interview_types = Repo.all(InterviewType)
 pipeline_statuses = Repo.all(PipelineStatus)
 
 candidates = Enum.map(%{"Dinesh B" => "Hadoop",
@@ -33,6 +32,8 @@ candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Navaneetha K" => "Hadoop, IOT",
           "Pranjal D" => "Elixir",
           "Sivasubramanian V" => "AngularJS",
+          "Arunvel Sriram" => "AngularJS",
+          "Siva V" => "Go",
           "Subha M" => "NodeJS",
           "Vijay A" => "Haskell"}, fn {name_value, other_skills} ->
   [first_name, last_name] = String.split(name_value, " ")
@@ -52,19 +53,14 @@ end)
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
 Enum.each(candidates, fn candidate ->
   now = Timex.Date.now
-  for _ <- 1..:rand.uniform(5) do
-    multiplier = if :rand.uniform(2) == 2, do: 1, else: -1
-    try do
-      interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: Enum.random(interview_types).id, start_time: now |> Timex.Date.shift(days: (multiplier * :rand.uniform(10)))})
-      for _ <- 1..:rand.uniform(2) do
+  for interview_round_number <- 1..:rand.uniform(5) do
+    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_round_number, start_time: now |> Timex.Date.shift(hours: interview_round_number)})
+    for _ <- 1..:rand.uniform(2) do
         try do
           Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
         rescue
           ConstraintError -> {} # ignore the unique constraint violation errors
         end
-      end
-    rescue
-      ConstraintError -> {} # ignore the unique constraint violation errors
     end
   end
 end)
