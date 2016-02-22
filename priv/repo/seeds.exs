@@ -15,7 +15,6 @@ alias RecruitxBackend.Candidate
 alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.Interview
 alias RecruitxBackend.InterviewPanelist
-alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill

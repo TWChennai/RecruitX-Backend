@@ -9,26 +9,37 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   alias RecruitxBackend.JSONError
   alias Ecto.DateTime
 
+  before do: Repo.delete_all(Candidate)
+
   let :role, do: create(:role)
   let :interview_rounds, do: convertKeysFromAtomsToStrings(build(:interview_rounds))
   let :valid_attrs, do: Map.merge(fields_for(:candidate, role_id: role.id), Map.merge(interview_rounds, build(:skill_ids)))
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{other_skills: "other skills"}))
 
   describe "index" do
-    let :candidates do
-      Enum.map(create_list(3, :candidate_skill), fn(cs) -> cs.candidate |> Repo.preload(:candidate_skills) end)
-    end
 
     subject do: action :index
 
     it do: should be_successful
     it do: should have_http_status(:ok)
 
-    xit "should return the array of candidates as a JSON response" do
+    it "should return the array of candidates as a JSON response" do
       # TODO: Need to find another way to ensure that the returned structure is correct as opposed to full equality
+      interviewOne = create(:interview, interview_type_id: 1)
+      interviewTwo = create(:interview, interview_type_id: 1)
+      candidateOne = RecruitxBackend.Repo.get(Candidate, interviewOne.candidate_id)
+      candidateTwo = RecruitxBackend.Repo.get(Candidate, interviewTwo.candidate_id)
       response = action(:index)
+      expect(response.assigns.candidates.total_pages) |> to(eq(1))
+      expect(response.assigns.candidates.entries) |> to(eq([candidateOne, candidateTwo]))
+    end
 
-      expect(response.resp_body) |> to(eq(Poison.encode!(candidates, keys: :atoms!)))
+    it "should return the page number as 2 if candidates are more than 10 and less than 20" do
+      for _ <- 1..11 do
+         create(:interview, interview_type_id: 1)
+      end
+      response = action(:index)
+      expect(response.assigns.candidates.total_pages) |> to(eq(2))
     end
   end
 
