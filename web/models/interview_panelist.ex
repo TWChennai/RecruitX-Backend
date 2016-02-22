@@ -41,7 +41,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> validate_signup_count()
     |> validate_panelist_has_not_interviewed_candidate()
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
-    |> assoc_constraint(:interview)
+    |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself

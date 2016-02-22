@@ -126,7 +126,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_invalid_interview_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([interview: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([interview: "Interview does not exist"]))
     end
   end
 
