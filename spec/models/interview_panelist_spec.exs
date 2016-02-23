@@ -4,6 +4,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
+  alias Timex.Date
 
   let :valid_attrs, do: fields_for(:interview_panelist)
   let :invalid_attrs, do: %{}
@@ -14,6 +15,26 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)
 
     it do: should be_valid
+
+    it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 3))
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, %{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id})
+
+      expect(changeset) |> to(be_valid)
+    end
+
+    it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, %{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id})
+
+      expect(changeset) |> to(be_valid)
+    end
   end
 
   context "invalid changeset" do
@@ -97,6 +118,16 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
       expect(changeset) |> to(have_errors([signup: "You have already signed up an interview for this candidate"]))
     end
+
+    it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 1))
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, %{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id})
+
+      expect(changeset) |> to(have_errors([signup: "You are already signed up for another interview within 2 hours"]))
+    end
   end
 
   context "unique_index constraint" do
@@ -111,9 +142,12 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     it "should allow same panelist to be added more than once for a different interview" do
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)
       Repo.insert(changeset)
-      new_interview = create(:interview)
+      signed_up_interview = Interview |> Repo.get(valid_attrs.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, Map.merge(valid_attrs, %{interview_id: new_interview.id}))
+
       {status, _} = Repo.insert(changeset)
+
       expect(status) |> to(eql(:ok))
     end
   end

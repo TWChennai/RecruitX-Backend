@@ -18,6 +18,7 @@ defmodule RecruitxBackend.Interview do
   @max_count 2
   # TODO: Move the magic number (2) into the db
   @duration_of_interview 1
+  @time_buffer_between_sign_ups 2
 
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
@@ -51,6 +52,13 @@ defmodule RecruitxBackend.Interview do
       join: i in assoc(ip, :interview),
       group_by: i.candidate_id,
       select: i.candidate_id
+  end
+
+  def get_start_time_for_my_interviews(panelist_login_name) do
+    from ip in InterviewPanelist,
+      where: ip.panelist_login_name == ^panelist_login_name,
+      join: i in assoc(ip, :interview),
+      select: i.start_time
   end
 
   def get_interviews_with_associated_data do
@@ -104,9 +112,10 @@ defmodule RecruitxBackend.Interview do
 
   def add_signup_eligibity_for(interviews, panelist_login_name) do
     candidate_ids_interviewed = get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all
+    my_previous_sign_up_start_times = get_start_time_for_my_interviews(panelist_login_name) |> Repo.all
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     Enum.map(interviews, fn(interview) ->
-      signup_eligiblity = interview |> signup(candidate_ids_interviewed, signup_counts)
+      signup_eligiblity = interview |> signup(candidate_ids_interviewed, signup_counts, my_previous_sign_up_start_times)
       Map.put(interview, :signup, signup_eligiblity)
     end)
   end
@@ -146,11 +155,31 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
+  require Logger
+
   # TODO: Should this be added as a validation?
-  defp signup(model, candidate_ids_interviewed, signup_counts) do
-    has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
-      and is_signup_lesser_than_max_count(model.id, signup_counts)
-      and is_not_completed(model)
+  defp signup(model, candidate_ids_interviewed, signup_counts, my_sign_up_start_times) do
+      has_panelist_not_interviewed_candidate_value = has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
+      is_signup_lesser_than_max_count_value = is_signup_lesser_than_max_count(model.id, signup_counts)
+      is_not_completed_value = is_not_completed(model)
+      is_within_time_buffer_of_my_previous_sign_ups_value = is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times)
+
+      Logger.info('candidate_id:#{model.candidate_id}')
+      Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
+      Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
+      Logger.info('is_not_complete:#{is_not_completed_value}')
+      Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
+
+    has_panelist_not_interviewed_candidate_value
+      and is_signup_lesser_than_max_count_value
+      and is_not_completed_value
+      and is_within_time_buffer_of_my_previous_sign_ups_value
+  end
+
+  def is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times) do
+    Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
+      abs(Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
+    end)
   end
 
   def is_not_completed(model) do

@@ -235,6 +235,21 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "query" do
+    context "get_start_time_for_my_interviews" do
+      it "should return [] when panelist has not signed up for any interview" do
+        start_times = (Interview.get_start_time_for_my_interviews("dummy")) |> Repo.all
+        expect(start_times) |> to(be([]))
+      end
+
+      it "should return start_times for signed up interviews only" do
+        interview_panelist = create(:interview_panelist)
+        create(:interview_panelist)
+        start_times = (Interview.get_start_time_for_my_interviews(interview_panelist.panelist_login_name)) |> Repo.all
+        signed_up_interview = Interview |> Repo.get(interview_panelist.interview_id)
+        expect(start_times) |> to(be([signed_up_interview.start_time]))
+      end
+    end
+
     context "get_candidate_ids_interviewed_by" do
       before do:  Repo.delete_all(InterviewPanelist)
 
@@ -311,6 +326,50 @@ defmodule RecruitxBackend.InterviewSpec do
       candidates_interviewed = [interview.candidate_id]
 
       expect(Interview.has_panelist_not_interviewed_candidate(interview, candidates_interviewed)) |> to(be_false)
+    end
+  end
+
+  describe "is_within_time_buffer_of_my_previous_sign_ups" do
+    it "should return false if current interview is within 2 hours of signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 1)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return false if current interview is within 2 hours of signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -1)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return true if there are no signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = []
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return true if current interview is exactly 2 hours earlier to signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 2)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return true if interview is exactly 2 hours later to signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -2)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return true if current interview is more than 2 hours earlier to signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 3)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    end
+
+    it "should return true if interview is more than 2 hours later to signed up interviews" do
+      interview = create(:interview)
+      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -3)]
+      Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
     end
   end
 

@@ -39,21 +39,27 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, ~r/^[a-z]+[\sa-z]*$/i)
     |> validate_signup_count()
-    |> validate_panelist_has_not_interviewed_candidate()
+    |> validate_sign_up_for_interview
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
-  defp validate_panelist_has_not_interviewed_candidate(existing_changeset) do
+  defp validate_sign_up_for_interview(existing_changeset) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     if !is_nil(interview_id) and !is_nil(panelist_login_name) do
       interview = Interview |> Repo.get(interview_id)
       if !is_nil(interview) do
         candidate_ids_interviewed = (Interview.get_candidate_ids_interviewed_by(panelist_login_name) |> Repo.all)
-        if !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed), do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
+        my_sign_up_start_times = (Interview.get_start_time_for_my_interviews(panelist_login_name)) |> Repo.all
+        has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
+
+        if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
         if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
+        if has_panelist_not_interviewed_candidate and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times) do
+          existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within 2 hours")
+        end
       end
     end
     existing_changeset
