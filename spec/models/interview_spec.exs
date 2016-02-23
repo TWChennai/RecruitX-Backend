@@ -27,12 +27,36 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is in the future" do
-      future_interview = Map.merge(valid_attrs, %{start_time: (Timex.Date.now |> Timex.Date.shift(hours: 2))})
+      future_interview = Map.merge(valid_attrs, %{start_time: (Date.now |> Date.shift(hours: 2))})
 
       result = Interview.changeset(%Interview{}, future_interview)
 
       expect(result) |> to(be_valid)
     end
+
+    it "when end_time is not given and is replaced by default value" do
+      result = Interview.changeset(%Interview{}, Map.delete(valid_attrs, :end_time))
+
+      expect(result) |> to(be_valid)
+      expect(result.changes.end_time) |> to(be(result.changes.start_time |> Date.shift(hours: 1)))
+    end
+
+    it "when end_time is given and is replaced by default value" do
+      result = Interview.changeset(%Interview{}, valid_attrs)
+
+      expect(result) |> to(be_valid)
+      expect(result.changes.end_time) |> to(be(valid_attrs.start_time |> Date.shift(hours: 1)))
+    end
+
+    it "when start_time is updated  and end_time is re-calculated" do
+      new_start_time = Date.now |> Date.shift(hours: 2)
+      attrs_new_start_time = Map.merge(valid_attrs, %{start_time: new_start_time})
+      result = Interview.changeset(%Interview{}, attrs_new_start_time)
+
+      expect(result) |> to(be_valid)
+      expect(result.changes.end_time) |> to(be(new_start_time |> Date.shift(hours: 1)))
+    end
+
   end
 
   context "invalid changeset" do
@@ -98,7 +122,7 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is in the past" do
-      past_interview = Map.merge(valid_attrs, %{start_time: (Timex.Date.now |> Timex.Date.shift(hours: -2))})
+      past_interview = Map.merge(valid_attrs, %{start_time: (Date.now |> Date.shift(hours: -2))})
 
       result = Interview.changeset(%Interview{}, past_interview)
 
@@ -182,11 +206,11 @@ defmodule RecruitxBackend.InterviewSpec do
     before do: Repo.delete_all(Interview)
 
     it "should sort by ascending order of start time" do
-      now = Timex.Date.now
-      interview_with_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1))
-      interview_with_start_date2 = create(:interview, start_time: now |> Timex.Date.shift(days: 3))
-      interview_with_start_date3 = create(:interview, start_time: now |> Timex.Date.shift(days: -2))
-      interview_with_start_date4 = create(:interview, start_time: now |> Timex.Date.shift(days: -5))
+      now = Date.now
+      interview_with_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1))
+      interview_with_start_date2 = create(:interview, start_time: now |> Date.shift(days: 3))
+      interview_with_start_date3 = create(:interview, start_time: now |> Date.shift(days: -2))
+      interview_with_start_date4 = create(:interview, start_time: now |> Date.shift(days: -5))
 
       [interview1, interview2, interview3, interview4] = Interview |> Interview.default_order |> Repo.all
 
@@ -197,10 +221,10 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should tie-break on id for the same start time" do
-      now = Timex.Date.now
-      interview_with_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1), id: 1)
-      interview_with_same_start_date1 = create(:interview, start_time: now |> Timex.Date.shift(days: 1), id: interview_with_start_date1.id + 1)
-      interview_with_start_date2 = create(:interview, start_time: now |> Timex.Date.shift(days: 2))
+      now = Date.now
+      interview_with_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1), id: 1)
+      interview_with_same_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1), id: interview_with_start_date1.id + 1)
+      interview_with_start_date2 = create(:interview, start_time: now |> Date.shift(days: 2))
 
       [interview1, interview2, interview3] = Interview |> Interview.default_order |> Repo.all
 

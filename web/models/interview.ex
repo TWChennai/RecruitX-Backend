@@ -17,9 +17,11 @@ defmodule RecruitxBackend.Interview do
 
   @max_count 2
   # TODO: Move the magic number (2) into the db
+  @duration_of_interview 1
 
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
+    field :end_time, Timex.Ecto.DateTime
     belongs_to :candidate, Candidate
     belongs_to :interview_type, InterviewType
     belongs_to :interview_status, InterviewStatus
@@ -68,6 +70,17 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
     |> is_in_future(:start_time)
+    |> calculate_end_time
+  end
+
+  #TODO: When end_time is sent from UI, validations on end time to be done
+  defp calculate_end_time(existing_changeset) do
+    incoming_start_time = existing_changeset |> get_field(:start_time)
+    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
+      min_valid_end_time = incoming_start_time |> Date.shift(hours: @duration_of_interview)
+      existing_changeset = existing_changeset |> put_change(:end_time, min_valid_end_time)
+    end
+    existing_changeset
   end
 
   def is_in_future(existing_changeset, field) do

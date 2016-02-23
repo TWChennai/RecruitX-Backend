@@ -60,10 +60,12 @@ defmodule RecruitxBackend.Factory do
   end
 
   def factory(:interview) do
+    random_time = getRandomDateTime
     %Interview{
       candidate_id: create(:candidate).id,
       interview_type_id: create(:interview_type).id,
-      start_time: getRandomDateTime,
+      start_time: random_time,
+      end_time: random_time |> Date.shift(hours: 2)
     }
   end
 
