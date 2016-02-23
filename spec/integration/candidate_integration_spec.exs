@@ -38,7 +38,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
       updated_candidate = Map.merge(candidate, %{first_name: "test"})
       response |> should(have_http_status(200))
-      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      expect(response.assigns.candidate.first_name) |> to(be(updated_candidate.first_name))
     end
 
     it "should not update and return errors when invalid change" do
