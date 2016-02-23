@@ -15,15 +15,18 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   describe "get /candidates" do
     before do:  Repo.delete_all(Candidate)
 
-    xit "should return a list of candidates" do
-      candidate_skill = create(:candidate_skill)
-      # Can't take the complete candidate object since it has 'role' associated
-      candidate = Repo.get!(Candidate, candidate_skill.candidate_id) |> Repo.preload(:candidate_skills)
+    it "should return a list of candidates" do
+      candidate1 = create(:candidate)
+      candidate2 = create(:candidate)
+
+      create(:interview, candidate_id: candidate1.id, interview_type_id: 1, start_time: Date.now)
+      create(:interview, candidate_id: candidate2.id, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
 
       response = get conn(), "/candidates"
 
       expect(response.status) |> to(be(200))
-      expect(response.assigns.candidates) |> to(be([candidate]))
+      expect(response.assigns.candidates.total_pages) |> to(eq(1))
+      expect(response.assigns.candidates.entries) |> to(eq([candidate1, candidate2]))
     end
   end
 

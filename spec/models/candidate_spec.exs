@@ -2,6 +2,8 @@ defmodule RecruitxBackend.CandidateSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Candidate
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Repo
+  alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
@@ -177,4 +179,18 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(delete).to_not raise_exception(Ecto.ConstraintError)
     end
   end
-end
+
+  context "methods" do
+      it "should return candidates in FIFO order" do
+        Repo.delete_all(Candidate)
+        candidate1 = create(:candidate)
+        candidate2 = create(:candidate)
+
+        create(:interview, candidate_id: candidate1.id, interview_type_id: 1, start_time: Date.now)
+        create(:interview, candidate_id: candidate2.id, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+
+        result = Candidate.get_candidates_in_fifo_order |> Repo.all
+        expect(result) |> to(be([candidate1, candidate2]))
+      end
+    end
+  end

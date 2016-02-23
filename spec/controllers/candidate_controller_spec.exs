@@ -21,20 +21,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
     it do: should be_successful
     it do: should have_http_status(:ok)
-
-    it "should return the array of candidates as a JSON response" do
-      # TODO: Need to find another way to ensure that the returned structure is correct as opposed to full equality
-      interviewOne = create(:interview, interview_type_id: 1)
-      interviewTwo = create(:interview, interview_type_id: 1)
-      candidateOne = Repo.get(Candidate, interviewOne.candidate_id)
-      candidateTwo = Repo.get(Candidate, interviewTwo.candidate_id)
-
-      response = action(:index)
-
-      expect(response.assigns.candidates.total_pages) |> to(eq(1))
-      expect(response.assigns.candidates.entries) |> to(eq([candidateOne, candidateTwo]))
-    end
-
+    
     it "should return the page number as 2 if candidates are more than 10 and less than 20" do
       create_list(11, :interview, interview_type_id: 1)
 
