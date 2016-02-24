@@ -14,7 +14,16 @@ defmodule RecruitxBackend.Mixfile do
      start_permanent: Mix.env == :prod,
      aliases: aliases,
      deps: deps,
-     preferred_cli_env: [espec: :test, spec: :test, coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, commit: :test, credo: :test],
+     preferred_cli_env: [
+                          espec: :test,
+                          spec: :test,
+                          coveralls: :test,
+                          "coveralls.detail": :test,
+                          "coveralls.html": :test,
+                          "coveralls.post": :test,
+                          commit: :test,
+                          credo: :test
+                        ],
      test_coverage: [tool: ExCoveralls, test_task: "espec"]
    ]
   end
@@ -71,7 +80,7 @@ defmodule RecruitxBackend.Mixfile do
       "ecto.seed": "run priv/repo/seeds.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      commit: ["deps.get --only #{Mix.env}", "espec --cover", "credo -i todo,duplicatedcode --strict"]
+      commit: ["deps.get --only #{Mix.env}", "coveralls.html", "credo -i todo,duplicatedcode --strict"]
     ]
   end
 end
