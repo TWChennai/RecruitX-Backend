@@ -141,11 +141,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
     context "with no POST params" do
-      xit "should return 400(Bad Request)" do
+      it "should return 400(Bad Request)" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates"
-        expect(response.status) |> to(be(400))
+        response = post conn(), "/candidates", %{"candidate" => %{}}
+        expect(response.status) |> to(be(422))
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count))
       end

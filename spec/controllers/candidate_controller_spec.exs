@@ -17,11 +17,15 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{other_skills: "other skills"}))
 
   describe "index" do
+    let :candidates do
+      Enum.map(create_list(3, :candidate), fn(c) -> c |> Repo.preload(:candidate_skills) end)
+    end
+
     subject do: action :index
 
     it do: should be_successful
     it do: should have_http_status(:ok)
-    
+
     it "should return the page number as 2 if candidates are more than 10 and less than 20" do
       create_list(11, :interview, interview_type_id: 1)
 
@@ -39,19 +43,21 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     end
   end
 
-  xdescribe "show" do
-    let :candidate, do: build(:candidate, id: 1)
+  describe "show" do
+    let :candidate do
+      build(:candidate, id: 1) |> Repo.preload(:candidate_skills)
+    end
 
-    before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> candidate end))
+    before do: allow Repo |> to(accept(:get, fn(_, 1) -> candidate end))
 
-    subject do: action(:show, %{"id" => 1})
+    subject do: action(:show, %{"id" => candidate.id})
 
     it do: is_expected |> to(be_successful)
 
     context "not found" do
       before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> nil end))
 
-      it "raises exception" do
+      xit "raises exception" do
         expect(fn -> action(:show, %{"id" => 1}) end) |> to(raise_exception)
       end
     end
