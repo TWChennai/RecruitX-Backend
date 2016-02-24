@@ -64,6 +64,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   end
 
   defp getInterviewPanelistWithName(name) do
-    Repo.one(InterviewPanelist |> QueryFilter.filter(%{panelist_login_name: name}, InterviewPanelist))
+    InterviewPanelist |> QueryFilter.filter(%{panelist_login_name: name}, InterviewPanelist) |> Repo.one
   end
 end
