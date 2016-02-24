@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
@@ -37,7 +38,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> validate_format(:panelist_login_name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_format(:panelist_login_name, AppConstants.name_format)
     |> validate_signup_count()
     |> validate_sign_up_for_interview
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")

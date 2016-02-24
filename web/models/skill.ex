@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.Skill do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.AppConstants
   alias RecruitxBackend.CandidateSkill
 
   schema "skills" do
@@ -18,7 +19,7 @@ defmodule RecruitxBackend.Skill do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_length(:name, min: 1, max: 255)
-    |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :skills_name_index)
   end
 end

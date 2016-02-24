@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.PipelineStatus do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
 
@@ -21,7 +22,7 @@ defmodule RecruitxBackend.PipelineStatus do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_length(:name, min: 1, max: 255)
-    |> validate_format(:name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :pipeline_statuses_name_index)
   end
 

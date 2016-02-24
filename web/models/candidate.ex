@@ -1,11 +1,12 @@
 defmodule RecruitxBackend.Candidate do
   use RecruitxBackend.Web, :model
 
-  alias RecruitxBackend.Interview
-  alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Role
-  alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Role
 
   schema "candidates" do
     field :first_name, :string
@@ -30,9 +31,9 @@ defmodule RecruitxBackend.Candidate do
     |> cast(params, @required_fields, @optional_fields)
     |> add_default_pipeline_status
     |> validate_length(:first_name, min: 1)
-    |> validate_format(:first_name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_format(:first_name, AppConstants.name_format)
     |> validate_length(:last_name, min: 1)
-    |> validate_format(:last_name, ~r/^[a-z]+[\sa-z]*$/i)
+    |> validate_format(:last_name, AppConstants.name_format)
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)
