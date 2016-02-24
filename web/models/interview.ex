@@ -15,6 +15,8 @@ defmodule RecruitxBackend.Interview do
 
   import Ecto.Query
 
+  require Logger
+
   @max_count 2
   # TODO: Move the magic number (2) into the db
   @duration_of_interview 1
@@ -100,7 +102,15 @@ defmodule RecruitxBackend.Interview do
     {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     Enum.map(interviews, fn(interview) ->
-      signup_eligiblity = interview |> signup(candidate_ids_interviewed, signup_counts, my_previous_sign_up_start_times)
+      Logger.info("candidate_id:#{interview.candidate_id}")
+      changeset_if_signup = InterviewPanelist.changeset(%InterviewPanelist{},
+        %{panelist_login_name: panelist_login_name,
+          interview_id: interview.id,
+          candidate_ids_interviewed: candidate_ids_interviewed,
+          my_previous_sign_up_start_times: my_previous_sign_up_start_times,
+          signup_counts: signup_counts,
+          interview: interview})
+      signup_eligiblity = changeset_if_signup.valid?
       Map.put(interview, :signup, signup_eligiblity)
     end)
   end
@@ -140,44 +150,31 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-  require Logger
-
-  # TODO: Should this be added as a validation?
-  defp signup(model, candidate_ids_interviewed, signup_counts, my_sign_up_start_times) do
-    has_panelist_not_interviewed_candidate_value = has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
-    is_signup_lesser_than_max_count_value = is_signup_lesser_than_max_count(model.id, signup_counts)
-    is_not_completed_value = is_not_completed(model)
-    is_within_time_buffer_of_my_previous_sign_ups_value = is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times)
-
-    Logger.info('candidate_id:#{model.candidate_id}')
-    Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
-    Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
-    Logger.info('is_not_complete:#{is_not_completed_value}')
-    Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
-
-    has_panelist_not_interviewed_candidate_value
-      and is_signup_lesser_than_max_count_value
-      and is_not_completed_value
-      and is_within_time_buffer_of_my_previous_sign_ups_value
-  end
-
   def is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times) do
-    Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
+    is_within_time_buffer_of_my_previous_sign_ups_value = Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
       abs(Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
     end)
-  end
-
-  def is_not_completed(model) do
-    is_nil(model.interview_status_id)
+    Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
+    is_within_time_buffer_of_my_previous_sign_ups_value
   end
 
   def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
-    !Enum.member?(candidate_ids_interviewed, model.candidate_id)
+    has_panelist_not_interviewed_candidate_value = !Enum.member?(candidate_ids_interviewed, model.candidate_id)
+    Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
+    has_panelist_not_interviewed_candidate_value
+  end
+
+  def is_not_completed(model) do
+    is_not_completed_value = is_nil(model.interview_status_id)
+    Logger.info('is_not_complete:#{is_not_completed_value}')
+    is_not_completed_value
   end
 
   def is_signup_lesser_than_max_count(model_id, signup_counts) do
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
-    result == [] or List.first(result).signup_count < @max_count
+    is_signup_lesser_than_max_count_value = result == [] or List.first(result).signup_count < @max_count
+    Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
+    is_signup_lesser_than_max_count_value
   end
 
   def update_status(id, status_id) do
