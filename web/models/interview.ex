@@ -134,6 +134,10 @@ defmodule RecruitxBackend.Interview do
         _ -> get_interview(candidate_id, current_priority, interview_id)
       end
 
+      # TODO: This can be made a lot simpler by just using
+      # (1) (one array for interviews for all interview_types <= current priority - self) and from this find the latest one
+      # (2) (one array for interviews for all interview_types >= current priority - self) and from this find the earliest one
+      # (3) check for overlap between results of (1) and (2) in case of non-nil value
       error_message = ""
       result = case {previous_interview, next_interview, interview_with_same_priority} do
         {nil, nil, nil} -> 1
