@@ -235,43 +235,28 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "query" do
-    context "get_start_time_for_my_interviews" do
-      it "should return [] when panelist has not signed up for any interview" do
-        start_times = (Interview.get_start_time_for_my_interviews("dummy")) |> Repo.all
-        expect(start_times) |> to(be([]))
-      end
-
-      it "should return start_times for signed up interviews only" do
-        interview_panelist = create(:interview_panelist)
-        create(:interview_panelist)
-        start_times = (Interview.get_start_time_for_my_interviews(interview_panelist.panelist_login_name)) |> Repo.all
-        signed_up_interview = Interview |> Repo.get(interview_panelist.interview_id)
-        expect(start_times) |> to(be([signed_up_interview.start_time]))
-      end
-    end
-
-    context "get_candidate_ids_interviewed_by" do
+    context "get_interviews_for" do
       before do:  Repo.delete_all(InterviewPanelist)
 
-      it "should return no candidate_ids when none were interviewed by panelist" do
-        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("dummy")
+      it "should return [] when none were interviewed by panelist" do
+        result = Repo.all Interview.get_interviews_for("dummy")
 
-        expect(candidate_ids) |> to(be([]))
+        expect(result) |> to(be([]))
       end
 
-      it "should return candidate_ids who were interviewed by panelist" do
+      it "should return candidate_ids, start_times interviewed by panelist" do
         interview1 = create(:interview)
         interview2 = create(:interview)
         create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
         create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
 
-        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("test")
+        [result1, result2] = Repo.all Interview.get_interviews_for("test")
 
-        expect(Enum.sort(candidate_ids)) |> to(be([interview1.candidate_id, interview2.candidate_id]))
-
+        expect(result1) |> to(be({interview1.candidate_id, interview1.start_time}))
+        expect(result2) |> to(be({interview2.candidate_id, interview2.start_time}))
       end
 
-      it "should not return candidate_ids who were not interviewed by panelist" do
+      it "should not return interviews who were not interviewed by panelist" do
         candidateInterviewed = create(:candidate)
         candidateNotInterviewed = create(:candidate)
 
@@ -281,9 +266,9 @@ defmodule RecruitxBackend.InterviewSpec do
         create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
         create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "dummy")
 
-        candidate_ids = Repo.all Interview.get_candidate_ids_interviewed_by("test")
+        [result1] = Repo.all Interview.get_interviews_for("test")
 
-        expect(candidate_ids) |> to(be([interview1.candidate_id]))
+        expect(result1) |> to(be({interview1.candidate_id, interview1.start_time}))
       end
     end
   end
