@@ -26,7 +26,7 @@ defmodule RecruitxBackend.Mixfile do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
-                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion]]
+                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext]]
   end
 
   # Specifies which paths to compile per environment.
@@ -56,7 +56,7 @@ defmodule RecruitxBackend.Mixfile do
      {:excoveralls, "~> 0.5.1", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
      {:faker, "~> 0.6.0", only: :test, app: false},
-   ]
+    ]
   end
 
   # Aliases are shortcut or tasks specific to the current project.
