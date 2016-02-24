@@ -49,6 +49,10 @@ defmodule RecruitxBackend.Interview do
     from i in query, order_by: [asc: i.start_time, asc: i.id]
   end
 
+  def descending_order(query) do
+    from i in query, order_by: [desc: i.start_time, asc: i.id]
+  end
+
   def get_interviews_with_associated_data do
     (from i in __MODULE__,
       join: c in assoc(i, :candidate),

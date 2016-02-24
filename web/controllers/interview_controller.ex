@@ -48,7 +48,7 @@ defmodule RecruitxBackend.InterviewController do
                                   |> Repo.all
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{id: interview_id_for_panelist}, Interview)
-                  |> Interview.default_order
+                  |> Interview.descending_order
                   |> Repo.all
     conn |> render("index.json", interviews: interviews)
   end
