@@ -504,7 +504,7 @@ defmodule RecruitxBackend.InterviewSpec do
       expect changeset.errors[:start_time] |> to(be(nil))
     end
 
-    describe "comparison with interviews of same priority" do
+    describe "comparison with interviews of same priority based on start_time" do
       before do
         create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 1))
       end
@@ -535,6 +535,36 @@ defmodule RecruitxBackend.InterviewSpec do
         expect changeset.errors[:start_time] |> to(be("should be after T1 and before LD atleast by 1 hour"))
       end
     end
+
+    describe "comparison with interviews of same priority" do
+      before do
+        create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
+      end
+
+      it "should return nil when there is no clash with same priority round" do
+      p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+      |> Date.shift(hours: 6))
+      create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+      |> Date.shift(hours: 3))
+
+      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
+      changeset = Interview.validate_with_other_rounds(changeset)
+
+      expect changeset.errors[:start_time] |> to(be(nil))
+    end
+
+      it "should return error message when there is clash with same priority round" do
+      p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+      |> Date.shift(hours: 6))
+      create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+      |> Date.shift(hours: 3))
+
+      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 2)})
+      changeset = Interview.validate_with_other_rounds(changeset)
+
+      expect changeset.errors[:start_time] |> to(be("should be after T2 and before/after LD atleast by 1 hour"))
+    end
+  end
 
   end
 end

@@ -119,27 +119,47 @@ defmodule RecruitxBackend.Interview do
     end)
   end
 
+  @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def validate_with_other_rounds(existing_changeset, interview_type \\ :empty) do
     if existing_changeset.valid? do
       new_time = Changeset.get_field(existing_changeset, :start_time)
       candidate_id = Changeset.get_field(existing_changeset, :candidate_id)
+      interview_id = Changeset.get_field(existing_changeset, :id)
       current_priority = get_current_priority(existing_changeset, interview_type)
       previous_interview = get_interview(candidate_id, current_priority - 1)
-      next_interview = get_interview(candidate_id, current_priority + 1);
+      next_interview = get_interview(candidate_id, current_priority + 1)
+      interview_with_same_priority = case interview_id do
+        nil -> get_interview(candidate_id, current_priority)
+        _ -> get_interview(candidate_id, current_priority, interview_id)
+      end
 
       error_message = ""
-      result = case {previous_interview, next_interview} do
-        {nil, nil} -> 1
-        {nil, next_interview} ->
+      result = case {previous_interview, next_interview, interview_with_same_priority} do
+        {nil, nil, nil} -> 1
+        {nil, next_interview, nil} ->
           error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
           TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
-        {previous_interview, nil} ->
+        {previous_interview, nil, nil} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
           TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
-        {previous_interview, next_interview} ->
+        {previous_interview, next_interview, nil} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
           # TODO: Remove magic numbers - move it into a 'end_time' column at the db-level
           TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
+        {nil, nil, interview_with_same_priority} ->
+          error_message = error_message <> "before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
+          (TimexHelper.compare((interview_with_same_priority.start_time |> Date.shift(hours: -1)), new_time) || TimexHelper.compare(new_time, (interview_with_same_priority.start_time |> Date.shift(hours: 1))))
+        {nil, next_interview, interview_with_same_priority} ->
+          error_message = error_message <> "should be before #{next_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
+          (TimexHelper.compare((interview_with_same_priority.start_time |> Date.shift(hours: -1)), new_time) || TimexHelper.compare(new_time, (interview_with_same_priority.start_time |> Date.shift(hours: 1)))) &&
+          TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
+        {previous_interview, nil, interview_with_same_priority} ->
+          error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
+          (TimexHelper.compare((interview_with_same_priority.start_time |> Date.shift(hours: -1)), new_time) || TimexHelper.compare(new_time, (interview_with_same_priority.start_time |> Date.shift(hours: 1)))) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1)))
+        {previous_interview, next_interview, interview_with_same_priority} ->
+          error_message = error_message <> "should be after #{previous_interview.interview_type.name}, before #{next_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
+          (TimexHelper.compare((interview_with_same_priority.start_time |> Date.shift(hours: -1)), new_time) || TimexHelper.compare(new_time, (interview_with_same_priority.start_time |> Date.shift(hours: 1)))) && TimexHelper.compare(new_time, (previous_interview.start_time |> Date.shift(hours: 1))) &&
+          TimexHelper.compare((next_interview.start_time |> Date.shift(hours: -1)), new_time)
       end
 
       if !result, do: existing_changeset = Changeset.add_error(existing_changeset, :start_time, error_message)
@@ -205,13 +225,24 @@ defmodule RecruitxBackend.Interview do
     __MODULE__ |> Repo.get(id)
   end
 
-  # TODO: This doesn't handle the case where the Leadership and P3 have the same priority
   defp get_interview(candidate_id, priority) do
     (from i in __MODULE__,
       join: it in assoc(i, :interview_type),
       preload: [:interview_type],
       where: i.candidate_id == ^candidate_id and
       it.priority == ^priority,
+      order_by: i.start_time,
+      limit: 1)
+    |> Repo.one
+  end
+
+  defp get_interview(candidate_id, priority, interview_id) do
+    (from i in __MODULE__,
+      join: it in assoc(i, :interview_type),
+      preload: [:interview_type],
+      where: i.candidate_id == ^candidate_id and
+      it.priority == ^priority and
+      i.id != ^interview_id,
       order_by: i.start_time,
       limit: 1)
     |> Repo.one
