@@ -17,6 +17,13 @@ defmodule RecruitxBackend.InterviewPanelist do
     timestamps
   end
 
+  def get_interviews_for(panelist_login_name) do
+    from ip in __MODULE__,
+      where: ip.panelist_login_name == ^panelist_login_name,
+      join: i in assoc(ip, :interview),
+      select: {i.candidate_id, i.start_time}
+  end
+
   def get_interview_type_based_count_of_sign_ups do
     from ip in __MODULE__,
       join: i in assoc(ip, :interview),
@@ -52,7 +59,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     if !is_nil(interview_id) and !is_nil(panelist_login_name) do
       interview = Interview |> Repo.get(interview_id)
       if !is_nil(interview) do
-        {candidate_ids_interviewed, my_sign_up_start_times} = Interview.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
+        {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
         has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
 
         if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
@@ -72,5 +79,11 @@ defmodule RecruitxBackend.InterviewPanelist do
       if !Interview.is_signup_lesser_than_max_count(id, signup_counts), do: existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
     end
     existing_changeset
+  end
+
+  def get_candidate_ids_and_start_times_interviewed_by(panelist_login_name) do
+    query_result = get_interviews_for(panelist_login_name) |> Repo.all
+    map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
+    {Map.keys(map_result), Map.values(map_result)}
   end
 end

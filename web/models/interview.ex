@@ -47,14 +47,6 @@ defmodule RecruitxBackend.Interview do
     from i in query, order_by: [asc: i.start_time, asc: i.id]
   end
 
-  # TODO: Move into InterviewPanelist model
-  def get_interviews_for(panelist_login_name) do
-    from ip in InterviewPanelist,
-      where: ip.panelist_login_name == ^panelist_login_name,
-      join: i in assoc(ip, :interview),
-      select: {i.candidate_id, i.start_time}
-  end
-
   def get_interviews_with_associated_data do
     (from i in __MODULE__,
       join: c in assoc(i, :candidate),
@@ -104,14 +96,8 @@ defmodule RecruitxBackend.Interview do
     existing_changeset
   end
 
-  def get_candidate_ids_and_start_times_interviewed_by(panelist_login_name) do
-    query_result = get_interviews_for(panelist_login_name) |> Repo.all
-    map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
-    {Map.keys(map_result), Map.values(map_result)}
-  end
-
   def add_signup_eligibity_for(interviews, panelist_login_name) do
-    {candidate_ids_interviewed, my_previous_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
+    {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     Enum.map(interviews, fn(interview) ->
       signup_eligiblity = interview |> signup(candidate_ids_interviewed, signup_counts, my_previous_sign_up_start_times)
