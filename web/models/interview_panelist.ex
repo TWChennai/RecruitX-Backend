@@ -59,7 +59,7 @@ defmodule RecruitxBackend.InterviewPanelist do
         if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
         if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
         if has_panelist_not_interviewed_candidate and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times) do
-          existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within 2 hours")
+          existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
         end
       end
     end

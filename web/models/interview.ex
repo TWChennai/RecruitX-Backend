@@ -36,6 +36,8 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w(interview_status_id)
 
+  def time_buffer_between_sign_ups, do: @time_buffer_between_sign_ups
+
   def now_or_in_next_seven_days(query) do
     start_of_today = Date.set(Date.now, time: {0, 0, 0})
     from i in query, where: i.start_time >= ^start_of_today and i.start_time <= ^(start_of_today |> Date.shift(days: 7))
@@ -159,16 +161,16 @@ defmodule RecruitxBackend.Interview do
 
   # TODO: Should this be added as a validation?
   defp signup(model, candidate_ids_interviewed, signup_counts, my_sign_up_start_times) do
-      has_panelist_not_interviewed_candidate_value = has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
-      is_signup_lesser_than_max_count_value = is_signup_lesser_than_max_count(model.id, signup_counts)
-      is_not_completed_value = is_not_completed(model)
-      is_within_time_buffer_of_my_previous_sign_ups_value = is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times)
+    has_panelist_not_interviewed_candidate_value = has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed)
+    is_signup_lesser_than_max_count_value = is_signup_lesser_than_max_count(model.id, signup_counts)
+    is_not_completed_value = is_not_completed(model)
+    is_within_time_buffer_of_my_previous_sign_ups_value = is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times)
 
-      Logger.info('candidate_id:#{model.candidate_id}')
-      Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
-      Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
-      Logger.info('is_not_complete:#{is_not_completed_value}')
-      Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
+    Logger.info('candidate_id:#{model.candidate_id}')
+    Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
+    Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
+    Logger.info('is_not_complete:#{is_not_completed_value}')
+    Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
 
     has_panelist_not_interviewed_candidate_value
       and is_signup_lesser_than_max_count_value
@@ -204,6 +206,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp is_pass(status_id) do
+    # TODO: Use a constant defined in InterviewStatus instead of hardcoding a magic string
     status = (from i in InterviewStatus, where: i.name == "Pass") |> Repo.one
     !is_nil(status) and status.id == status_id
   end
