@@ -1,3 +1,4 @@
+# TODO: Should this be moved into the lib folder so that its loaded only once?
 defmodule RecruitxBackend.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
