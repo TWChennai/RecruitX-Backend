@@ -3,9 +3,11 @@ defmodule RecruitxBackend.InterviewController do
 
   import Ecto.Query
 
+  alias RecruitxBackend.ChangesetView
+  alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.QueryFilter
 
   plug :scrub_params, "interview" when action in [:update, :create]
@@ -30,7 +32,7 @@ defmodule RecruitxBackend.InterviewController do
   def show(conn, %{"id" => id}) do
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
     case interview do
-      nil -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
+      nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
       _ -> conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
     end
   end
@@ -75,7 +77,7 @@ defmodule RecruitxBackend.InterviewController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 
@@ -93,7 +95,7 @@ defmodule RecruitxBackend.InterviewController do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+        |> render(ChangesetView, "error.json", changeset: changeset)
     end
   end
 

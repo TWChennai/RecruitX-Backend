@@ -1,14 +1,13 @@
 defmodule RecruitxBackend.FeedbackImageController do
   use RecruitxBackend.Web, :controller
 
-  alias RecruitxBackend.FeedbackImage
+  alias Ecto.UUID
+  alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.Endpoint
+  alias RecruitxBackend.ErrorView
+  alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
-  alias RecruitxBackend.ChangesetManipulator
-  alias Ecto.UUID
-
-  #plug :scrub_params, "feedback_image" when action in [:create, :update]
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
@@ -27,7 +26,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     file_path = get_storage_path <> "/" <> params["id"]
     case File.exists?(file_path) do
       true -> conn |> send_file(200, file_path, 0, :all)
-      _ -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
+      _ -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
     end
   end
 

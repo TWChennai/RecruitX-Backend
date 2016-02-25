@@ -4,11 +4,13 @@ defmodule RecruitxBackend.CandidateController do
   import Ecto.Query
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.Interview
-  alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.JSONErrorReason
-  alias RecruitxBackend.JSONError
   alias RecruitxBackend.ChangesetManipulator
+  alias RecruitxBackend.ChangesetView
+  alias RecruitxBackend.ErrorView
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.JSONError
+  alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.PipelineStatus
   alias Timex.Date
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
@@ -46,7 +48,7 @@ defmodule RecruitxBackend.CandidateController do
                 |> preload(:candidate_skills)
                 |> Repo.get(id)
     case candidate do
-      nil -> conn |> put_status(:not_found) |> render(RecruitxBackend.ErrorView, "404.json")
+      nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
       _ -> conn |> render("show.json", candidate: candidate)
     end
   end
@@ -90,7 +92,7 @@ defmodule RecruitxBackend.CandidateController do
       nil ->
         conn
         |> put_status(:not_found)
-        |> render(RecruitxBackend.ErrorView, "404.json")
+        |> render(ErrorView, "404.json")
       _ ->
         changeset = Candidate.changeset(candidate, candidate_params)
         case Repo.update(changeset) do
@@ -104,7 +106,7 @@ defmodule RecruitxBackend.CandidateController do
           {:error, changeset} ->
             conn
             |> put_status(:unprocessable_entity)
-            |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+            |> render(ChangesetView, "error.json", changeset: changeset)
         end
     end
   end

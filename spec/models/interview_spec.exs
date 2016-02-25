@@ -57,7 +57,6 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(result) |> to(be_valid)
       expect(result.changes.end_time) |> to(be(new_start_time |> Date.shift(hours: 1)))
     end
-
   end
 
   context "invalid changeset" do
@@ -392,7 +391,6 @@ defmodule RecruitxBackend.InterviewSpec do
       interview = create(:interview, start_time: Date.now)
       future_interview = create(:interview, candidate_id: interview.candidate_id, start_time: future_date)
       future_panelist = create(:interview_panelist, interview_id: future_interview.id)
-      pass_id = RecruitxBackend.PipelineStatus.retrieve_by_name("Pass").id
       interview_status = create(:interview_status, name: PipelineStatus.pass)
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 

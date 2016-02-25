@@ -1,18 +1,22 @@
 defmodule RecruitxBackend.InterviewView do
   use RecruitxBackend.Web, :view
 
+  alias RecruitxBackend.CandidateView
+  alias RecruitxBackend.FeedbackImageView
+  alias RecruitxBackend.InterviewPanelistView
+  alias RecruitxBackend.InterviewView
   alias Timex.DateFormat
 
   def render("index.json", %{interviews_with_signup: interviews}) do
-    render_many(interviews, RecruitxBackend.InterviewView, "interview_with_signup.json")
+    render_many(interviews, InterviewView, "interview_with_signup.json")
   end
 
   def render("index.json", %{interviews: interviews}) do
-    render_many(interviews, RecruitxBackend.InterviewView, "interview.json")
+    render_many(interviews, InterviewView, "interview.json")
   end
 
   def render("show.json", %{interview: interview}) do
-    render_one(interview, RecruitxBackend.InterviewView, "interview_with_panelists.json")
+    render_one(interview, InterviewView, "interview_with_panelists.json")
   end
 
   def render("success.json", %{interview: interview}) do
@@ -36,10 +40,10 @@ defmodule RecruitxBackend.InterviewView do
       id: interview.id,
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
-      candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate_with_skills.json"),
+      candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills.json"),
       status_id: interview.interview_status_id,
       signup: interview.signup,
-      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json")
+      panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
     }
   end
 
@@ -48,9 +52,9 @@ defmodule RecruitxBackend.InterviewView do
       id: interview.id,
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
-      candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate_with_skills.json"),
+      candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills.json"),
       status_id: interview.interview_status_id,
-      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json")
+      panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
     }
   end
 
@@ -59,10 +63,10 @@ defmodule RecruitxBackend.InterviewView do
       id: interview.id,
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
       interview_type_id: interview.interview_type_id,
-      candidate: render_one(interview.candidate, RecruitxBackend.CandidateView, "candidate_with_skills.json"),
+      candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills.json"),
       status_id: interview.interview_status_id,
-      panelists: render_many(interview.interview_panelist, RecruitxBackend.InterviewPanelistView, "interview_panelist.json"),
-      feedback_images: render_many(interview.feedback_images, RecruitxBackend.FeedbackImageView, "feedback_image.json")
+      panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json"),
+      feedback_images: render_many(interview.feedback_images, FeedbackImageView, "feedback_image.json")
     }
   end
 end

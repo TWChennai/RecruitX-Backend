@@ -1,8 +1,10 @@
 defmodule RecruitxBackend.InterviewTypeView do
   use RecruitxBackend.Web, :view
 
+  alias RecruitxBackend.InterviewTypeView
+
   def render("index.json", %{interview_types: interview_types}) do
-    render_many(interview_types, RecruitxBackend.InterviewTypeView, "interview_type.json")
+    render_many(interview_types, InterviewTypeView, "interview_type.json")
   end
 
   def render("interview_type.json", %{interview_type: interview_type}) do
