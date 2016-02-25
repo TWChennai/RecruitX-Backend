@@ -72,7 +72,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       candidate = create(:candidate)
       interview = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: 1)})
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
-      closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+      closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
       response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
@@ -87,7 +87,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       candidate = create(:candidate)
       interview = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1)})
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
-      closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+      closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
       response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 

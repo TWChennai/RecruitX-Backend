@@ -97,7 +97,7 @@ defmodule RecruitxBackend.CandidateController do
           {:ok, candidate} ->
             pipeline_status_id = candidate_params["pipeline_status_id"]
             if !is_nil(pipeline_status_id) do
-              closed_pipeline_status_id = PipelineStatus.retrieve_by_name("Closed").id
+              closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
               if pipeline_status_id == closed_pipeline_status_id, do: Interview.delete_successive_interviews_and_panelists(id, Date.now)
             end
             conn |> render("update.json", candidate: candidate)

@@ -4,8 +4,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateCandidate do
   alias RecruitxBackend.PipelineStatus
 
   def change do
-    # TODO: Magic string!
-    in_progess_id = PipelineStatus.retrieve_by_name("In Progress").id
+    in_progess_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
     create table(:candidates) do
       add :first_name, :string
       add :last_name, :string

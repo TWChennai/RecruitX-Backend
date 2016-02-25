@@ -15,9 +15,8 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
 
     flush
 
-    # TODO: Magic string!
-    Enum.map(["In Progress",
-              "Closed"], fn pipeline_status_value ->
+    Enum.map([PipelineStatus.in_progress,
+              PipelineStatus.closed], fn pipeline_status_value ->
       Repo.insert!(%PipelineStatus{name: pipeline_status_value})
     end)
   end

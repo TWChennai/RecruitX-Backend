@@ -7,6 +7,10 @@ defmodule RecruitxBackend.PipelineStatus do
 
   import Ecto.Query, only: [from: 2, where: 2]
 
+  def pass, do: "Pass"
+  def in_progress, do: "In Progress"
+  def closed, do: "Closed"
+
   schema "pipeline_statuses" do
     field :name, :string
 

@@ -3,6 +3,7 @@ defmodule RecruitxBackend.Interview do
 
   alias Ecto.Changeset
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.InterviewPanelist
@@ -217,9 +218,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp is_pass(status_id) do
-    # TODO: Use a constant defined in InterviewStatus instead of hardcoding a magic string
-    # TODO: Magic string!
-    status = (from i in InterviewStatus, where: i.name == "Pass") |> Repo.one
+    status = (from i in InterviewStatus, where: i.name == ^PipelineStatus.pass) |> Repo.one
     !is_nil(status) and status.id == status_id
   end
 

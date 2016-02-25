@@ -24,6 +24,7 @@ alias Timex.Date
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(Role)
 skills = Repo.all(Skill)
+in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
 
 candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Kausalya M" => "Hbase",
@@ -36,8 +37,7 @@ candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Subha M" => "NodeJS",
           "Vijay A" => "Haskell"}, fn {name_value, other_skills} ->
   [first_name, last_name] = String.split(name_value, " ")
-  # TODO: Magic string!
-  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: PipelineStatus.retrieve_by_name("In Progress").id})
+  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: in_progress_id})
 end)
 
 Enum.each(candidates, fn candidate ->

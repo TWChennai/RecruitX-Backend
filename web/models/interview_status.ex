@@ -4,6 +4,10 @@ defmodule RecruitxBackend.InterviewStatus do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
 
+  def pass, do: "Pass"
+  def pursue, do: "Pursue"
+  def strong_pursue, do: "Strong Pursue"
+
   schema "interview_status" do
     field :name, :string
 
