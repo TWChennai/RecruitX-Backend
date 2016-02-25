@@ -180,17 +180,30 @@ defmodule RecruitxBackend.CandidateSpec do
     end
   end
 
-  context "methods" do
-      it "should return candidates in FIFO order" do
-        Repo.delete_all(Candidate)
-        candidate1 = create(:candidate)
-        candidate2 = create(:candidate)
+  context "query" do
+    it "should return candidates in FIFO order" do
+      Repo.delete_all(Candidate)
 
-        create(:interview, candidate_id: candidate1.id, interview_type_id: 1, start_time: Date.now)
-        create(:interview, candidate_id: candidate2.id, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
+      interview2 = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      candidate_id1 = interview1.candidate_id
+      candidate_id2 = interview2.candidate_id
 
-        result = Candidate.get_candidates_in_fifo_order |> Repo.all
-        expect(result) |> to(be([candidate1, candidate2]))
-      end
+      [result1, result2] = Candidate.get_candidates_in_fifo_order |> Repo.all
+
+      expect([result1.id, result2.id]) |> to(be([candidate_id1, candidate_id2]))
+    end
+
+    it "should return candidates without interviews last in FIFO order" do
+      Repo.delete_all(Candidate)
+      candidate_without_interview = create(:candidate)
+
+      interview = create(:interview, interview_type_id: 1, start_time: Date.now)
+      candidate_with_interview_id = interview.candidate_id
+
+      [result1, result2] = Candidate.get_candidates_in_fifo_order |> Repo.all
+
+      expect([result1.id, result2.id]) |> to(be([candidate_with_interview_id, candidate_without_interview.id]))
     end
   end
+end

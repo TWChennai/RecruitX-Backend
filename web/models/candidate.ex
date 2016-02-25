@@ -50,9 +50,9 @@ defmodule RecruitxBackend.Candidate do
 
   def get_candidates_in_fifo_order do
     from c in Candidate,
-    join: i in assoc(c, :interviews),
-    where: i.interview_type_id == 1,    # TODO: Is this correct?
-    order_by: i.start_time,
-    select: c
+      left_join: i in assoc(c, :interviews),
+      where: i.interview_type_id == 1 or is_nil(i.interview_type_id), #TODO: Is this correct?
+      order_by: i.start_time,
+      select: c
   end
 end

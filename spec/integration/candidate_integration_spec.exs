@@ -16,11 +16,22 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     before do:  Repo.delete_all(Candidate)
 
     it "should return a list of candidates" do
-      candidate1 = create(:candidate)
-      candidate2 = create(:candidate)
+      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
+      interview2 = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      candidate1 = Candidate |> Repo.get(interview1.candidate_id)
+      candidate2 = Candidate |> Repo.get(interview2.candidate_id)
 
-      create(:interview, candidate_id: candidate1.id, interview_type_id: 1, start_time: Date.now)
-      create(:interview, candidate_id: candidate2.id, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      response = get conn(), "/candidates"
+
+      expect(response.status) |> to(be(200))
+      expect(response.assigns.candidates.total_pages) |> to(eq(1))
+      expect(response.assigns.candidates.entries) |> to(eq([candidate1, candidate2]))
+    end
+
+    it "should return a candidates with and without interviews " do
+      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
+      candidate1 = Candidate |> Repo.get(interview1.candidate_id)
+      candidate2 = create(:candidate)
 
       response = get conn(), "/candidates"
 
