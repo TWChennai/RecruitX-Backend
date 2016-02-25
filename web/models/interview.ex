@@ -208,7 +208,10 @@ defmodule RecruitxBackend.Interview do
     interview = id |> retrieve_interview
     if !is_nil(interview) do
      [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
-     if is_pass(status_id), do: delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
+     if is_pass(status_id) do
+       delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
+       Candidate.updateCandidateStatusAsPass(interview.candidate_id)
+     end
     end
   end
 

@@ -206,4 +206,18 @@ defmodule RecruitxBackend.CandidateSpec do
       expect([result1.id, result2.id]) |> to(be([candidate_with_interview_id, candidate_without_interview.id]))
     end
   end
+
+  context "updateCandidateStatusAsPass" do
+    it "should update candidate status as Pass" do
+      interview = create(:interview, interview_type_id: 1, start_time: Date.now)
+      candidate_id = interview.candidate_id
+      pass_id = RecruitxBackend.PipelineStatus.retrieve_by_name("Pass").id
+
+      Candidate.updateCandidateStatusAsPass(candidate_id)
+
+      updated_candidate = Candidate |> Repo.get(candidate_id)
+
+      expect(updated_candidate.pipeline_status_id) |> to(be(pass_id))
+    end
+  end
 end

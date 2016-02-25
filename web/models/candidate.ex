@@ -7,6 +7,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Role
+  alias RecruitxBackend.Repo
 
   schema "candidates" do
     field :first_name, :string
@@ -46,6 +47,16 @@ defmodule RecruitxBackend.Candidate do
       existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess_id)
     end
     existing_changeset
+  end
+
+  def updateCandidateStatusAsPass(id) do
+    candidate = Candidate |> Repo.get(id)
+    pass_pipeline_status_id = PipelineStatus.retrieve_by_name("Pass").id
+    candidate_params = %{
+      "pipeline_status_id": pass_pipeline_status_id
+    }
+    change = Candidate.changeset(candidate, candidate_params)
+    Repo.update(change)
   end
 
   def get_candidates_in_fifo_order do
