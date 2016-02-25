@@ -15,12 +15,7 @@ config :recruitx_backend, RecruitxBackend.Endpoint,
   http: [port: 4001],
   url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/manifest.json",
-  path_to_store_images: "../uploaded_images",
-  https: [port: 443,
-    otp_app: :recruitx_backend,
-    keyfile: System.get_env("RECRUITX_SSL_KEY_PATH"),
-    certfile: System.get_env("RECRUITX_SSL_CERT_PATH")
-  ]
+  path_to_store_images: "../uploaded_images"
 
 # Do not print debug messages in production
 config :logger, level: :info
