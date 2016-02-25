@@ -391,7 +391,9 @@ defmodule RecruitxBackend.InterviewSpec do
       interview = create(:interview, start_time: Date.now)
       future_interview = create(:interview, candidate_id: interview.candidate_id, start_time: future_date)
       future_panelist = create(:interview_panelist, interview_id: future_interview.id)
+      # TODO: Magic string!
       interview_status = create(:interview_status, name: "Pass")
+      # TODO: Magic string!
       pass_id = RecruitxBackend.PipelineStatus.retrieve_by_name("Pass").id
 
       Interview.update_status(interview.id, interview_status.id)
@@ -411,7 +413,9 @@ defmodule RecruitxBackend.InterviewSpec do
       interview = create(:interview, start_time: Date.now)
       interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, start_time: past_date)
       panelists_to_be_retained = create(:interview_panelist, interview_id: interview_to_be_retained.id)
+      # TODO: Magic string!
       interview_status = create(:interview_status, name: "Pass")
+      # TODO: Magic string!
       pass_id = RecruitxBackend.PipelineStatus.retrieve_by_name("Pass").id
 
       Interview.update_status(interview.id, interview_status.id)

@@ -207,16 +207,18 @@ defmodule RecruitxBackend.Interview do
   def update_status(id, status_id) do
     interview = id |> retrieve_interview
     if !is_nil(interview) do
-     [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
-     if is_pass(status_id) do
-       delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
-       Candidate.updateCandidateStatusAsPass(interview.candidate_id)
-     end
+      [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.updateChangesets
+      if is_pass(status_id) do
+        # TODO: Wrap this within a transaction
+        delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
+        Candidate.updateCandidateStatusAsPass(interview.candidate_id)
+      end
     end
   end
 
   defp is_pass(status_id) do
     # TODO: Use a constant defined in InterviewStatus instead of hardcoding a magic string
+    # TODO: Magic string!
     status = (from i in InterviewStatus, where: i.name == "Pass") |> Repo.one
     !is_nil(status) and status.id == status_id
   end

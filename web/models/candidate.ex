@@ -43,6 +43,7 @@ defmodule RecruitxBackend.Candidate do
   defp add_default_pipeline_status(existing_changeset) do
     incoming_id = existing_changeset |> get_field(:pipeline_status_id)
     if is_nil(incoming_id) do
+      # TODO: Magic string!
       in_progess_id = PipelineStatus.retrieve_by_name("In Progress").id
       existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess_id)
     end
@@ -51,6 +52,7 @@ defmodule RecruitxBackend.Candidate do
 
   def updateCandidateStatusAsPass(id) do
     candidate = Candidate |> Repo.get(id)
+    # TODO: Magic string!
     pass_pipeline_status_id = PipelineStatus.retrieve_by_name("Pass").id
     candidate_params = %{
       "pipeline_status_id": pass_pipeline_status_id

@@ -211,6 +211,7 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should update candidate status as Pass" do
       interview = create(:interview, interview_type_id: 1, start_time: Date.now)
       candidate_id = interview.candidate_id
+      # TODO: Magic string!
       pass_id = RecruitxBackend.PipelineStatus.retrieve_by_name("Pass").id
 
       Candidate.updateCandidateStatusAsPass(candidate_id)
