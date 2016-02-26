@@ -3,6 +3,9 @@ defmodule RecruitxBackend.InterviewStatus do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Repo
+
+  import Ecto.Query, only: [from: 2, where: 2]
 
   def pass, do: "Pass"
   def pursue, do: "Pursue"
@@ -25,5 +28,9 @@ defmodule RecruitxBackend.InterviewStatus do
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :interview_status_name_index)
+  end
+
+  def retrieve_by_name(name) do
+    (from is in __MODULE__, where: is.name == ^name) |> Repo.one
   end
 end

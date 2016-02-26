@@ -52,6 +52,10 @@ defmodule RecruitxBackend.InterviewController do
                   |> QueryFilter.filter(%{id: interview_id_for_panelist}, Interview)
                   |> Interview.descending_order
                   |> Repo.all
+    last_interviews_data = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
+    interviews = Enum.map(interviews, fn(interview) ->
+      Map.put(interview, :last_interview_status, Interview.get_last_interview_status_for(interview.candidate, last_interviews_data))
+    end)
     conn |> render("index.json", interviews: interviews)
   end
 

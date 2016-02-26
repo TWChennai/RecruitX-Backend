@@ -7,6 +7,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Repo
   alias Timex.Date
@@ -562,15 +563,83 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
       it "should return error message when there is clash with same priority round" do
-      p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 6), end_time: tomorrow |> Date.shift(hours: 7))
-      create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 3), end_time: tomorrow |> Date.shift(hours: 4))
+        p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 6), end_time: tomorrow |> Date.shift(hours: 7))
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 3), end_time: tomorrow |> Date.shift(hours: 4))
 
-      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 2.1)})
-      changeset = Interview.validate_with_other_rounds(changeset)
+        changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 2.1)})
+        changeset = Interview.validate_with_other_rounds(changeset)
 
-      expect changeset.errors[:start_time] |> to(be("should be after T2 and before/after LD atleast by 1 hour"))
+        expect changeset.errors[:start_time] |> to(be("should be after T2 and before/after LD atleast by 1 hour"))
+      end
     end
   end
 
+  context "get_candidates_with_all_rounds_completed" do
+    it "should return all candidates who have completed no of rounds with start_time of last interview" do
+      Repo.delete_all Candidate
+      Repo.delete_all InterviewType
+      interview1 = create(:interview, start_time: Date.now)
+      interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: Date.now |> Date.shift(hours: 1))
+
+      [[candidate_id, last_interview_start_time]] = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
+
+      expect(candidate_id) |> to(be(interview2.candidate_id))
+      expect(Date.from(last_interview_start_time)) |> to(be(interview2.start_time))
+    end
+
+    it "should return [] when candidate has not done all rounds" do
+      Repo.delete_all Candidate
+      Repo.delete_all InterviewType
+
+      create(:interview, start_time: Date.now)
+      create(:interview_type)
+
+      result = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
+      expect(result) |> to(be([]))
+    end
+  end
+
+  context "get_last_interview_status_for" do
+    it "should add status of last interview if pipeline is closed and candidate has finished all rounds" do
+      Repo.delete_all Candidate
+      Repo.delete_all InterviewType
+
+      interview_type1 = create(:interview_type)
+      interview_type2 = create(:interview_type)
+      candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name("Closed").id)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data2 = fields_for(:interview,
+        candidate_id: candidate.id,
+        interview_type_id: interview_type2.id,
+        interview_status_id: create(:interview_status).id,
+        start_time: Date.now |> Date.shift(hours: 1))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data1))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data2))
+
+      [last_status] = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
+
+      expect(last_status) |> to(be(interview_data2.interview_status_id))
+    end
+
+    it "should  not add status of last interview if pipeline is open and candidate has finished all rounds" do
+      Repo.delete_all Candidate
+      Repo.delete_all InterviewType
+
+      interview_type1 = create(:interview_type)
+      interview_type2 = create(:interview_type)
+      candidate = create(:candidate)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data2 = fields_for(:interview,
+        candidate_id: candidate.id,
+        interview_type_id: interview_type2.id,
+        interview_status_id: create(:interview_status).id,
+        start_time: Date.now |> Date.shift(hours: 1))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data1))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data2))
+
+      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
+
+      expect(last_status) |> to(be(nil))
+    end
   end
 end
