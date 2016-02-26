@@ -69,7 +69,7 @@ defmodule RecruitxBackend.Candidate do
 
   def is_pipeline_closed(candidate) do
     #TODO: Magic string!
-    in_progress_id = PipelineStatus.retrieve_by_name("Closed").id
+    in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
     candidate.pipeline_status_id == in_progress_id
   end
 end

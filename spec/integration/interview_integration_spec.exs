@@ -44,9 +44,9 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       interview = Interview |> Repo.get(interview_panelist.interview_id)
       candidate = Candidate |> Repo.get(interview.candidate_id)
       create(:candidate_skill, candidate_id: candidate.id)
-      #TODO: Magic string
-      Interview.update_status(interview.id, InterviewStatus.retrieve_by_name("Pass").id)
-      candidate_changeset = Candidate.changeset(candidate, %{pipeline_status_id: PipelineStatus.retrieve_by_name("Closed").id})
+      pass_id = InterviewStatus.retrieve_by_name(InterviewStatus.pass).id
+      Interview.update_status(interview.id, pass_id)
+      candidate_changeset = Candidate.changeset(candidate, %{pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id})
       Repo.update(candidate_changeset)
       response = get conn(), "/panelists/test/interviews"
 
@@ -54,7 +54,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       [result_interview] = response.assigns.interviews
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
-      expect(result_interview.last_interview_status) |> to(be([InterviewStatus.retrieve_by_name("Pass").id]))
+      expect(result_interview.last_interview_status) |> to(be([pass_id]))
     end
   end
 end
