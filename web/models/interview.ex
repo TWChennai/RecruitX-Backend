@@ -272,7 +272,7 @@ defmodule RecruitxBackend.Interview do
           where: i.start_time == ^last_interview_start_time,
           where: i.candidate_id == ^candidate_id ,
           select: i.interview_status_id)
-          |> Repo.all
+          |> Repo.one
         [] -> nil
       end
     end

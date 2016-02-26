@@ -54,7 +54,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       [result_interview] = response.assigns.interviews
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
-      expect(result_interview.last_interview_status) |> to(be([pass_id]))
+      expect(result_interview.last_interview_status) |> to(be(pass_id))
     end
   end
 end

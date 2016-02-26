@@ -616,7 +616,7 @@ defmodule RecruitxBackend.InterviewSpec do
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
 
-      [last_status] = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
+      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
 
       expect(last_status) |> to(be(interview_data2.interview_status_id))
     end
