@@ -15,12 +15,14 @@ alias RecruitxBackend.Candidate
 alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.Interview
 alias RecruitxBackend.InterviewPanelist
+alias RecruitxBackend.InterviewType
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 alias RecruitxBackend.PipelineStatus
 alias Timex.Date
 
+import Ecto.Query, only: [from: 2, where: 2]
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(Role)
 skills = Repo.all(Skill)
@@ -53,9 +55,10 @@ end)
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
 Enum.each(candidates, fn candidate ->
   now = Date.now
-  for interview_round_number <- 1..:rand.uniform(5) do
+  for interview_round_number <- 1..:rand.uniform(4) do
     random_start_time = now |> Date.shift(hours: interview_round_number)
-    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_round_number, start_time: random_start_time, end_time: random_start_time |> Date.shift(hours: 2)})
+    interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
+    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> Date.shift(hours: 2)})
     for _ <- 1..:rand.uniform(2) do
         try do
           Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
