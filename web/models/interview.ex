@@ -62,6 +62,19 @@ defmodule RecruitxBackend.Interview do
       select: i)
   end
 
+  def get_last_completed_rounds_start_time_for(candidate_id) do
+    interview_with_feedback_and_maximum_start_time =
+                              (from i in __MODULE__,
+                              where: i.candidate_id == ^candidate_id,
+                              order_by: [desc: i.start_time])
+                              |> Repo.all
+                              |> Enum.find(fn(interview) -> !is_nil(interview.interview_status_id) end)
+    case interview_with_feedback_and_maximum_start_time do
+      nil -> Date.set(Date.epoch, date: {0, 0, 1})
+      _ -> interview_with_feedback_and_maximum_start_time.start_time
+    end
+  end
+
   def get_candidates_with_all_rounds_completed do
     total_no_of_interview_types = Enum.count(InterviewType |> Repo.all)
     (from i in __MODULE__,

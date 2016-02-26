@@ -441,6 +441,52 @@ defmodule RecruitxBackend.InterviewSpec do
     end
   end
 
+  describe "get_last_completed_rounds_start_time_for_candidate" do
+    it "should return the minimum possible date if no interviews are there for a candidate" do
+      candidate = create(:candidate)
+      expected_value = Date.set(Date.epoch, date: {0, 0, 1})
+
+      actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
+
+      expect(actual_value) |> to(be(expected_value))
+    end
+
+    it "should return the minimum possible date if all interviews are with status_id as nil for a candidate" do
+      interview1 = create(:interview)
+      create(:interview, candidate_id: interview1.candidate_id)
+      candidate = Candidate |> Repo.get(interview1.candidate_id)
+      expected_value = Date.set(Date.epoch, date: {0, 0, 1})
+
+      actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
+
+      expect(actual_value) |> to(be(expected_value))
+    end
+
+    it "should return the start date of a interview if candidate have one interview with status_id as not nil" do
+      interview_status = create(:interview_status)
+      interview = create(:interview, interview_status_id: interview_status.id)
+      candidate = Candidate |> Repo.get(interview.candidate_id)
+      expected_value = interview.start_time
+
+      actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
+
+      expect(actual_value) |> to(be(expected_value))
+    end
+
+    it "should return the maximum start date of a interview with if candidate have more than one interview with status_id as not nil" do
+      now = Date.now
+      interview_status = create(:interview_status)
+      interview1 = create(:interview, interview_status_id: interview_status.id, start_time: now)
+      interview2 = create(:interview, interview_status_id: interview_status.id, start_time: now |> Date.shift(hours: 1), candidate_id: interview1.candidate_id)
+      candidate = Candidate |> Repo.get(interview2.candidate_id)
+      expected_value = interview2.start_time
+
+      actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
+
+      expect(actual_value) |> to(be(expected_value))
+    end
+  end
+
   describe "validation for updating the interview schedule" do
     let :tomorrow, do: Date.now() |> Date.shift(days: 1)
     let :candidate, do: create(:candidate)

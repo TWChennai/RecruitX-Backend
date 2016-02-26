@@ -65,7 +65,8 @@ defmodule RecruitxBackend.Factory do
       candidate_id: create(:candidate).id,
       interview_type_id: create(:interview_type).id,
       start_time: random_time,
-      end_time: random_time |> Date.shift(hours: 2)
+      end_time: random_time |> Date.shift(hours: 2),
+      interview_status_id: nil
     }
   end
 
