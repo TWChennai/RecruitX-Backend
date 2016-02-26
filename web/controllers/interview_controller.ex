@@ -41,7 +41,7 @@ defmodule RecruitxBackend.InterviewController do
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{candidate_id: id}, Interview)
                   |> Repo.all
-    conn |> render("index.json", interviews: interviews)
+    conn |> render("index.json", interviews_for_candidate: interviews)
   end
 
   defp get_interviews_for_panelist(panelist_name, conn) do
