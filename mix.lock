@@ -25,7 +25,7 @@
   "getopt": {:hex, :getopt, "0.8.2"},
   "gettext": {:hex, :gettext, "0.10.0"},
   "hackney": {:hex, :hackney, "1.4.8"},
-  "httpotion": {:hex, :httpotion, "2.2.0"},
+  "httpotion": {:hex, :httpotion, "2.2.1"},
   "ibrowse": {:hex, :ibrowse, "4.2.2"},
   "idna": {:hex, :idna, "1.0.3"},
   "json": {:hex, :json, "0.3.3"},
