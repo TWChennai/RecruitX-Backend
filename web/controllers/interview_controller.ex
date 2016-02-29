@@ -12,11 +12,11 @@ defmodule RecruitxBackend.InterviewController do
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
-  def index(conn, %{"panelist_login_name" => panelist_login_name})do
+  def index(conn, %{"panelist_login_name" => panelist_login_name}) do
     get_interviews_for_signup(panelist_login_name, conn)
   end
 
-  def index(conn, %{"candidate_id" => candidate_id})do
+  def index(conn, %{"candidate_id" => candidate_id}) do
     get_interviews_for_candidate(candidate_id, conn)
   end
 

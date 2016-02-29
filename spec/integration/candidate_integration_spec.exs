@@ -21,7 +21,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       candidate1 = Candidate |> Repo.get(interview1.candidate_id)
       candidate2 = Candidate |> Repo.get(interview2.candidate_id)
 
-      response = get conn(), "/candidates"
+      response = get conn_with_dummy_authorization(), "/candidates"
 
       expect(response.status) |> to(be(200))
       expect(response.assigns.candidates.total_pages) |> to(eq(1))
@@ -33,7 +33,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       candidate1 = Candidate |> Repo.get(interview1.candidate_id)
       candidate2 = create(:candidate)
 
-      response = get conn(), "/candidates"
+      response = get conn_with_dummy_authorization(), "/candidates"
 
       expect(response.status) |> to(be(200))
       expect(response.assigns.candidates.total_pages) |> to(eq(1))
@@ -45,7 +45,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     it "should update and return the candidate" do
       candidate = create(:candidate)
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test"}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test"}}
 
       updated_candidate = Map.merge(candidate, %{first_name: "test"})
       response |> should(have_http_status(200))
@@ -55,7 +55,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     it "should not update and return errors when invalid change" do
       candidate = create(:candidate)
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test1"}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{first_name: "test1"}}
 
       response |> should(have_http_status(:unprocessable_entity))
       expect(response.assigns.changeset.errors) |> to(be([first_name: "has invalid format"]))
@@ -63,7 +63,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
     it "should return 404 when candidate is not found" do
-      response = put conn(), "/candidates/0", %{"candidate" => %{first_name: "test"}}
+      response = put conn_with_dummy_authorization(), "/candidates/0", %{"candidate" => %{first_name: "test"}}
 
       response |> should(have_http_status(:not_found))
     end
@@ -74,7 +74,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
       updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
@@ -89,7 +89,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
       updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
@@ -103,7 +103,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
       updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
@@ -119,7 +119,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
       interview_panelist2 = create(:interview_panelist, interview_id: interview2.id)
       pipeline_status = create(:pipeline_status)
-      response = put conn(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => pipeline_status.id}}
+      response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => pipeline_status.id}}
 
       updated_candidate = Map.merge(candidate, %{pipeline_status_id: pipeline_status.id})
       response |> should(have_http_status(200))
@@ -140,7 +140,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         interview_round_params = build(:interview_rounds)
         post_parameters = Map.merge(candidate_params, Map.merge(post_skill_params, interview_round_params))
 
-        response = post conn(), "/candidates", %{"candidate" => post_parameters}
+        response = post conn_with_dummy_authorization(), "/candidates", %{"candidate" => post_parameters}
 
         expect(response.status) |> to(be(201))
         inserted_candidate = Repo.one(from c in Candidate, where: ilike(c.first_name, ^"%#{candidate_params.first_name}%"), preload: [:candidate_skills, :interviews])
@@ -157,7 +157,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       it "should not create a new candidate in the db" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" => Map.merge(build(:skill_ids), build(:interview_rounds))}
+        response = post conn_with_dummy_authorization(), "/candidates", %{"candidate" => Map.merge(build(:skill_ids), build(:interview_rounds))}
 
         expect(response.status) |> to(be(422))
         new_candidate_count = get_candidate_count
@@ -169,7 +169,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       it "should return 400(Bad Request)" do
         orig_candidate_count = get_candidate_count
 
-        response = post conn(), "/candidates", %{"candidate" => %{}}
+        response = post conn_with_dummy_authorization(), "/candidates", %{"candidate" => %{}}
         expect(response.status) |> to(be(422))
         new_candidate_count = get_candidate_count
         expect(new_candidate_count) |> to(be(orig_candidate_count))

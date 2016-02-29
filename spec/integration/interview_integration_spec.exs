@@ -17,7 +17,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     it "should return empty when panelist has taken no interviews" do
       create(:interview)
 
-      response = get conn(), "/panelists/recruitx/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/recruitx/interviews"
 
       expect(response.status) |> to(be(200))
       expect(response.assigns.interviews) |> to(be([]))
@@ -29,7 +29,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       create(:candidate_skill, candidate_id: candidate.id)
       create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
 
-      response = get conn(), "/panelists/test/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/test/interviews"
 
       expect(response.status) |> to(be(200))
       [result_interview] = response.assigns.interviews
@@ -48,7 +48,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       Interview.update_status(interview.id, pass_id)
       candidate_changeset = Candidate.changeset(candidate, %{pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id})
       Repo.update(candidate_changeset)
-      response = get conn(), "/panelists/test/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/test/interviews"
 
       expect(response.status) |> to(be(200))
       [result_interview] = response.assigns.interviews
