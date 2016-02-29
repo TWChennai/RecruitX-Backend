@@ -11,7 +11,6 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.PipelineStatus
-  alias Timex.Date
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]

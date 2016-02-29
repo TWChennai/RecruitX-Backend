@@ -1,7 +1,6 @@
 defmodule RecruitxBackend.TestHelpers do
-
   def conn_with_dummy_authorization() do
-    Plug.Conn.put_req_header(Phoenix.ConnTest.conn(),"authorization", System.get_env("API_KEY"))
+    Plug.Conn.put_req_header(Phoenix.ConnTest.conn(), "authorization", System.get_env("API_KEY"))
   end
 
   def convertKeysFromAtomsToStrings(input) do

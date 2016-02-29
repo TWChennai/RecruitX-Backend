@@ -43,7 +43,7 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json", interviews: interviews)
   end
 
-  def index(conn, params) do
+  def index(conn, _) do
     conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name")
   end
 
