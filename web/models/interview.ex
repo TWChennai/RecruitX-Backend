@@ -65,11 +65,11 @@ defmodule RecruitxBackend.Interview do
   def get_last_completed_rounds_start_time_for(candidate_id) do
     interview_with_feedback_and_maximum_start_time =
                               (from i in __MODULE__,
-                              where: i.candidate_id == ^candidate_id,
-                              order_by: [desc: i.start_time])
-                              |> Repo.all
-                              # TODO: Why not push the not-null check into the db call?
-                              |> Enum.find(fn(interview) -> !is_nil(interview.interview_status_id) end)
+                              where: i.candidate_id == ^candidate_id and
+                              not(is_nil(i.interview_status_id)),
+                              order_by: [desc: i.start_time],
+                              limit: 1)
+                              |> Repo.one
     case interview_with_feedback_and_maximum_start_time do
       nil -> Date.set(Date.epoch, date: {0, 0, 1})
       _ -> interview_with_feedback_and_maximum_start_time.start_time
