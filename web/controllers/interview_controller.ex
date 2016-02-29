@@ -12,21 +12,20 @@ defmodule RecruitxBackend.InterviewController do
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
-  #TODO: To use guard classes and pattern-matched overloaded methods
+  def index(conn, %{"panelist_login_name" => panelist_login_name})do
+    get_interviews_for_signup(panelist_login_name, conn)
+  end
+
+  def index(conn, %{"candidate_id" => candidate_id})do
+    get_interviews_for_candidate(candidate_id, conn)
+  end
+
+  def index(conn, %{"panelist_name" => panelist_name}) do
+    get_interviews_for_panelist(panelist_name, conn)
+  end
+
   def index(conn, params) do
-    panelist_login_name = params["panelist_login_name"]
-    candidate_id = params["candidate_id"]
-    panelist_name = params["panelist_name"]
-    cond do
-      !is_nil(panelist_login_name) ->
-        get_interviews_for_signup(panelist_login_name, conn)
-      !is_nil(candidate_id) ->
-        get_interviews_for_candidate(candidate_id, conn)
-      !is_nil(panelist_name) ->
-        get_interviews_for_panelist(panelist_name, conn)
-      true ->
-        conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name")
-    end
+    conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name")
   end
 
   def show(conn, %{"id" => id}) do
