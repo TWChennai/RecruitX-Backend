@@ -13,37 +13,22 @@ defmodule RecruitxBackend.InterviewController do
   plug :scrub_params, "interview" when action in [:update, :create]
 
   def index(conn, %{"panelist_login_name" => panelist_login_name}) do
-    get_interviews_for_signup(panelist_login_name, conn)
+    interviews = Interview.get_interviews_with_associated_data
+                  |> Interview.now_or_in_next_seven_days
+                  |> Interview.default_order
+                  |> Repo.all
+    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name)
+    conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
   def index(conn, %{"candidate_id" => candidate_id}) do
-    get_interviews_for_candidate(candidate_id, conn)
-  end
-
-  def index(conn, %{"panelist_name" => panelist_name}) do
-    get_interviews_for_panelist(panelist_name, conn)
-  end
-
-  def index(conn, params) do
-    conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name")
-  end
-
-  def show(conn, %{"id" => id}) do
-    interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
-    case interview do
-      nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
-      _ -> conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
-    end
-  end
-
-  defp get_interviews_for_candidate(id, conn) do
     interviews = Interview.get_interviews_with_associated_data
-                  |> QueryFilter.filter(%{candidate_id: id}, Interview)
+                  |> QueryFilter.filter(%{candidate_id: candidate_id}, Interview)
                   |> Repo.all
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
 
-  defp get_interviews_for_panelist(panelist_name, conn) do
+  def index(conn, %{"panelist_name" => panelist_name}) do
     interview_id_for_panelist = (from ip in InterviewPanelist, select: ip.interview_id)
                                   |> QueryFilter.filter(%{panelist_login_name: panelist_name}, InterviewPanelist)
                                   |> Repo.all
@@ -58,13 +43,16 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json", interviews: interviews)
   end
 
-  defp get_interviews_for_signup(panelist_login_name, conn) do
-    interviews = Interview.get_interviews_with_associated_data
-                  |> Interview.now_or_in_next_seven_days
-                  |> Interview.default_order
-                  |> Repo.all
-    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name)
-    conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
+  def index(conn, params) do
+    conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name")
+  end
+
+  def show(conn, %{"id" => id}) do
+    interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
+    case interview do
+      nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
+      _ -> conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
+    end
   end
 
   def update(conn, %{"id" => id, "interview" => interview_params}) do
