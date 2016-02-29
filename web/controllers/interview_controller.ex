@@ -24,6 +24,7 @@ defmodule RecruitxBackend.InterviewController do
   def index(conn, %{"candidate_id" => candidate_id}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{candidate_id: candidate_id}, Interview)
+                  # TODO: Shouldn't this be ordered?
                   |> Repo.all
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
@@ -36,7 +37,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> QueryFilter.filter(%{id: interview_id_for_panelist}, Interview)
                   |> Interview.descending_order
                   |> Repo.all
-    last_interviews_data = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
+    last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
     interviews = Enum.map(interviews, fn(interview) ->
       Map.put(interview, :last_interview_status, Interview.get_last_interview_status_for(interview.candidate, last_interviews_data))
     end)
@@ -58,6 +59,7 @@ defmodule RecruitxBackend.InterviewController do
   def update(conn, %{"id" => id, "interview" => interview_params}) do
     interview = Interview |> preload(:interview_type) |> Repo.get(id)
     changeset = Interview.changeset(interview, interview_params)
+    # TODO: Can't this validation be moved into the changeset method itself? The second param can be obtained from the changeset itself
     changeset = Interview.validate_with_other_rounds(changeset)
 
     case Repo.update(changeset) do
@@ -75,6 +77,7 @@ defmodule RecruitxBackend.InterviewController do
   def create(conn, %{"interview" => interview_params}) do
     interview_type = InterviewType |> Repo.get(interview_params["interview_type_id"])
     changeset = Interview.changeset(%Interview{}, interview_params)
+    # TODO: Can't this validation be moved into the changeset method itself? The second param can be obtained from the changeset itself
     changeset = Interview.validate_with_other_rounds(changeset, interview_type)
 
     case Repo.insert(changeset) do
