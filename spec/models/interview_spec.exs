@@ -627,18 +627,18 @@ defmodule RecruitxBackend.InterviewSpec do
       interview1 = create(:interview, start_time: Date.now)
       interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: Date.now |> Date.shift(hours: 1))
 
-      [[candidate_id, last_interview_start_time]] = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
+      [[candidate_id, last_interview_start_time, completed_rounds]] = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
 
       expect(candidate_id) |> to(be(interview2.candidate_id))
       expect(Date.from(last_interview_start_time)) |> to(be(interview2.start_time))
+      expect(completed_rounds) |> to(be(2))
     end
 
-    it "should return [] when candidate has not done all rounds" do
+    it "should return [] when candidate has no interview rounds" do
       Repo.delete_all Candidate
       Repo.delete_all InterviewType
 
-      create(:interview, start_time: Date.now)
-      create(:interview_type)
+      create(:candidate)
 
       result = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
       expect(result) |> to(be([]))
@@ -659,15 +659,39 @@ defmodule RecruitxBackend.InterviewSpec do
         interview_type_id: interview_type2.id,
         interview_status_id: create(:interview_status).id,
         start_time: Date.now |> Date.shift(hours: 1))
+      total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
 
-      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
+      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time, total_no_of_interview_types]])
 
       expect(last_status) |> to(be(interview_data2.interview_status_id))
     end
 
-    it "should  not add status of last interview if pipeline is open and candidate has finished all rounds" do
+    it "should add status of last interview if pipeline is closed and if that last interview is pass" do
+      Repo.delete_all Candidate
+      Repo.delete_all InterviewType
+
+      pass_id = InterviewStatus.retrieve_by_name("Pass").id
+      interview_type1 = create(:interview_type)
+      interview_type2 = create(:interview_type)
+      candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data2 = fields_for(:interview,
+        candidate_id: candidate.id,
+        interview_type_id: interview_type2.id,
+        interview_status_id: pass_id,
+        start_time: Date.now |> Date.shift(hours: 1))
+      total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data1))
+      Repo.insert(Interview.changeset(%Interview{}, interview_data2))
+
+      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time, total_no_of_interview_types]])
+
+      expect(last_status) |> to(be(interview_data2.interview_status_id))
+    end
+
+    it "should not add status of last interview if pipeline is open and candidate has finished all rounds" do
       Repo.delete_all Candidate
       Repo.delete_all InterviewType
 
@@ -680,10 +704,11 @@ defmodule RecruitxBackend.InterviewSpec do
         interview_type_id: interview_type2.id,
         interview_status_id: create(:interview_status).id,
         start_time: Date.now |> Date.shift(hours: 1))
+      total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
 
-      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time]])
+      last_status = Interview.get_last_interview_status_for(candidate, [[candidate.id, interview_data2.start_time, total_no_of_interview_types]])
 
       expect(last_status) |> to(be(nil))
     end

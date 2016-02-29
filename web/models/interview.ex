@@ -77,11 +77,9 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_candidates_with_all_rounds_completed do
-    total_no_of_interview_types = Enum.count(InterviewType |> Repo.all)
     (from i in __MODULE__,
       group_by: i.candidate_id,
-      having: count(i.candidate_id) == ^total_no_of_interview_types,
-      select: [i.candidate_id, max(i.start_time)])
+      select: [i.candidate_id, max(i.start_time), count(i.candidate_id)])
   end
 
   def changeset(model, params \\ :empty) do
@@ -278,15 +276,18 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_last_interview_status_for(current_candidate, last_interviews_data) do
+    total_no_of_interview_types = Enum.count(InterviewType |> Repo.all)
     if Candidate.is_pipeline_closed(current_candidate) do
-      result = Enum.filter(last_interviews_data, fn([candidate_id, _])-> current_candidate.id == candidate_id end)
+      result = Enum.filter(last_interviews_data, fn([candidate_id, _, _])-> current_candidate.id == candidate_id end)
       case result do
-        [[candidate_id, last_interview_start_time]] ->
-          (from i in __MODULE__,
-          where: i.start_time == ^last_interview_start_time,
-          where: i.candidate_id == ^candidate_id ,
+        [[candidate_id, last_interview_start_time, number_of_interviews]] ->
+          status_id = (from i in __MODULE__,
+          where: i.start_time == ^last_interview_start_time and
+          i.candidate_id == ^candidate_id ,
           select: i.interview_status_id)
           |> Repo.one
+          if !is_pass(status_id) and total_no_of_interview_types != number_of_interviews, do: status_id = nil
+          status_id
         [] -> nil
       end
     end
