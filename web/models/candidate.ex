@@ -5,6 +5,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
@@ -60,15 +61,19 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_candidates_in_fifo_order do
+    interview_type_id_with_min_priority = (from it in InterviewType,
+                                          select: it.id,
+                                          order_by: it.priority,
+                                          limit: 1)
+                                          |> Repo.one
     from c in Candidate,
       left_join: i in assoc(c, :interviews),
-      where: i.interview_type_id == 1 or is_nil(i.interview_type_id), #TODO: Is this correct?
+      where: i.interview_type_id == ^interview_type_id_with_min_priority or is_nil(i.interview_type_id),
       order_by: i.start_time,
       select: c
   end
 
   def is_pipeline_closed(candidate) do
-    #TODO: Magic string!
     in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
     candidate.pipeline_status_id == in_progress_id
   end
