@@ -713,4 +713,36 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(last_status) |> to(be(nil))
     end
   end
+
+  context "should_less_than_a_month" do
+    it "should insert error into changeset if start_time is more than a month" do
+      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(days: 32)})
+
+      result = Interview.changeset(%Interview{}, interview)
+      expect(result) |> to(have_errors(start_time: "should be less than a month"))
+    end
+
+    it "should not insert error into changeset if start_time is less than a month" do
+      interview = Map.merge(valid_attrs, %{start_time: Date.now})
+
+      result = Interview.changeset(%Interview{}, interview)
+      expect(result) |> to(be_valid)
+    end
+  end
+
+  context "is_in_future" do
+    it "should insert error into changeset if start_time is in past" do
+      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(hours: -1)})
+
+      result = Interview.changeset(%Interview{}, interview)
+      expect(result) |> to(have_errors(start_time: "should be in the future"))
+    end
+
+    it "should not insert error into changeset if start_time is in future" do
+      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(hours: 1)})
+
+      result = Interview.changeset(%Interview{}, interview)
+      expect(result) |> to(be_valid)
+    end
+  end
 end

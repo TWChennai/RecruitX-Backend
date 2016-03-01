@@ -91,6 +91,7 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
     |> is_in_future(:start_time)
+    |> should_less_than_a_month(:start_time)
     |> calculate_end_time
   end
 
@@ -110,6 +111,16 @@ defmodule RecruitxBackend.Interview do
       current_time = (Date.now |> Date.shift(mins: -5))
       valid = TimexHelper.compare(new_start_time, current_time)
       if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be in the future")
+    end
+    existing_changeset
+  end
+
+  def should_less_than_a_month(existing_changeset, field) do
+    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
+      new_start_time = Changeset.get_field(existing_changeset, field)
+      current_time_after_a_month = Date.now |> Date.shift(months: 1)
+      valid = TimexHelper.compare(current_time_after_a_month, new_start_time)
+      if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be less than a month")
     end
     existing_changeset
   end
