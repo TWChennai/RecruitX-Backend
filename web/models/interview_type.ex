@@ -2,6 +2,7 @@ defmodule RecruitxBackend.InterviewType do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Repo
 
   schema "interview_types" do
     field :name, :string
@@ -25,5 +26,13 @@ defmodule RecruitxBackend.InterviewType do
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z0-9]*$/i)
     |> unique_constraint(:name, name: :interview_types_name_index)
+  end
+
+  def get_id_of_min_priority_round do
+    (from it in __MODULE__,
+      select: it.id,
+      order_by: it.priority,
+      limit: 1)
+      |> Repo.one
   end
 end

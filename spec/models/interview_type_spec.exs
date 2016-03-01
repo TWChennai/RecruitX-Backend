@@ -128,4 +128,19 @@ defmodule RecruitxBackend.InterviewTypeSpec do
       expect(interviews) |> to(eq([interview_with_priority_1, interview_with_priority_2_id_1, interview_with_priority_2_id_2]))
     end
   end
+
+  context "get_id_of_min_priority_round" do
+    before do: Repo.delete_all(Interview)
+    before do: Repo.delete_all(InterviewType)
+
+    it "should give interview_type with minimum priority" do
+      interview_with_priority_1 = create(:interview_type, priority: 1)
+      create(:interview_type, priority: 2)
+      create(:interview_type, priority: 3)
+
+      minimum_interview_id = InterviewType.get_id_of_min_priority_round
+
+      expect(minimum_interview_id) |> to(eq(interview_with_priority_1.id))
+    end
+  end
 end

@@ -5,7 +5,6 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
@@ -61,11 +60,7 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_candidates_in_fifo_order do
-    interview_type_id_with_min_priority = (from it in InterviewType,
-                                          select: it.id,
-                                          order_by: it.priority,
-                                          limit: 1)
-                                          |> Repo.one
+    interview_type_id_with_min_priority = RecruitxBackend.InterviewType.get_id_of_min_priority_round
     from c in Candidate,
       left_join: i in assoc(c, :interviews),
       where: i.interview_type_id == ^interview_type_id_with_min_priority or is_nil(i.interview_type_id),
