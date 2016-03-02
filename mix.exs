@@ -2,12 +2,9 @@ defmodule RecruitxBackend.Mixfile do
   use Mix.Project
 
   def project do
-    {result, _exit_code} = System.cmd("git", ["rev-parse", "--short", "HEAD"])
-    git_sha = String.strip(result)
-
     [app: :recruitx_backend,
-     version: "0.0.8-#{git_sha}",
-     elixir: "~> 1.2",
+     version: "1.0.0",
+     elixir: "~> 1.2.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
