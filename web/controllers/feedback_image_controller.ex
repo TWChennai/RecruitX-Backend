@@ -2,12 +2,12 @@ defmodule RecruitxBackend.FeedbackImageController do
   use RecruitxBackend.Web, :controller
 
   alias Ecto.UUID
+  alias RecruitxBackend.Avatar
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
-  alias RecruitxBackend.Avatar
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
@@ -30,7 +30,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     end
   end
 
-  defp store_image_and_generate_changesets(path, data, id) do
+  defp store_image_and_generate_changesets(_path, data, id) do
     Enum.reduce(Map.keys(data), [], fn(key, acc) ->
       {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
       new_file_name = "interview_#{id}_#{random_file_name_suffix}.jpg"

@@ -4,7 +4,6 @@ defmodule RecruitxBackend.Avatar do
   # Include ecto support (requires package arc_ecto installed):
   # use Arc.Ecto.Definition
 
-  alias Ecto.UUID
   alias RecruitxBackend.FeedbackImage
 
   @versions [:original]
@@ -31,7 +30,7 @@ defmodule RecruitxBackend.Avatar do
   #end
 
   # Override the storage directory:
-  def storage_dir(version, {file, scope}) do
+  def storage_dir(_version, {_file, _scope}) do
     FeedbackImage.get_storage_path
   end
 
