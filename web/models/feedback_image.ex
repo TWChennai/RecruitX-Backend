@@ -2,6 +2,7 @@ defmodule RecruitxBackend.FeedbackImage do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Endpoint
 
   schema "feedback_images" do
     field :file_name, :string
@@ -22,5 +23,13 @@ defmodule RecruitxBackend.FeedbackImage do
     |> unique_constraint(:file_name_unique, name: :feedback_file_name_interview_id_unique_index, message: "This file has already been uploaded")
     |> unique_constraint(:file_name, name: :file_name_unique_index)
     |> assoc_constraint(:interview)
+  end
+
+  def get_storage_path do
+    path = Endpoint.config(:path_to_store_images)
+    # TODO: Can't this check to create the path be done only once when the app starts up?
+    # Otherwise, the same check is happening for each request - which is a performance hit
+    if !File.exists?(path) || !File.dir?(path), do: File.mkdir!(path)
+    path
   end
 end

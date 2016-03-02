@@ -8,27 +8,27 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.FeedbackImage
+  alias RecruitxBackend.Avatar
 
   import Ecto.Query, only: [from: 2]
 
   describe "create" do
     it "should update status and feedback images" do
-      allow File |> to(accept(:exists?, fn(_) -> true end))
-      allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
+      file_to_upload = %Plug.Upload{path: "image1"}
+      allow Avatar |> to(accept(:store, fn(file_to_upload) -> {:ok} end))
       interview = create(:interview)
       interview_status = create(:interview_status)
 
-      conn = post conn_with_dummy_authorization(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{interview_status.id}"}
+      conn = post conn_with_dummy_authorization(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => file_to_upload}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(201))
       expect(conn.resp_body) |> to(be("\"Thanks for submitting feedback!\""))
-      expect File |> to(accepted :cp!)
+      expect Avatar |> to(accepted :store)
       updated_interview = Interview |> Repo.get(interview.id)
       expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
     end
 
     it "should not update status and feedback images when status has already been updated" do
-      allow File |> to(accept(:exists?, fn(_) -> true end))
       interview = create(:interview, interview_status_id: create(:interview_status).id)
 
       conn = post conn_with_dummy_authorization(), "/interviews/#{interview.id}/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{create(:interview_status).id}"}
@@ -39,7 +39,6 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
     end
 
     it "should not update status and feedback images when status_id is invalid" do
-      allow File |> to(accept(:exists?, fn(_) -> true end))
       interview = create(:interview)
       expected_reason = %JSONErrorReason{field_name: "interview_status", reason: "does not exist"}
 
@@ -50,20 +49,20 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
     end
 
     it "should not update status and feedback images when interview_id is invalid" do
-      allow File |> to(accept(:exists?, fn(_) -> true end))
       interview_status = create(:interview_status)
-      allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
+      file_to_upload = %Plug.Upload{path: "image1"}
+      allow Avatar |> to(accept(:store, fn(file_to_upload) -> {:ok} end))
 
-      conn = post conn_with_dummy_authorization(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => %Plug.Upload{path: "image1"}}, "status_id" => "#{interview_status.id}"}
+      conn = post conn_with_dummy_authorization(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => file_to_upload}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "does not exist"}
       expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      expect Avatar |> to(accepted :store)
     end
 
     it "should not update status and feedback images when file name is invalid" do
       allow Ecto.UUID |> to(accept(:load, fn(_) -> {:ok, "invalid/file/name"} end))
-      allow File |> to(accept(:cp!, fn("image1", _) -> {:ok} end))
 
       interview = create(:interview)
       interview_status = create(:interview_status)
