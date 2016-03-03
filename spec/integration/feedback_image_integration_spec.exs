@@ -51,11 +51,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
     it "should not update status and feedback images when interview_id is invalid" do
       interview_status = create(:interview_status)
       file_to_upload = %Plug.Upload{path: "image1"}
-<<<<<<< HEAD:spec/integration/feedback_image_integration_spec.exs
-      allow Avatar |> to(accept(:store, fn(_) -> {:ok} end))
-=======
       allow Avatar |> to(accept(:store, fn(file_to_upload) -> {:ok, "file_name"} end))
->>>>>>> Subha/Dinesh: Upload/Download images from S3:spec/integration/feeback_image_integration_spec.exs
 
       conn = post conn_with_dummy_authorization(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => file_to_upload}, "status_id" => "#{interview_status.id}"}
 
