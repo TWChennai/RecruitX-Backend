@@ -2,7 +2,6 @@ defmodule RecruitxBackend.Candidate do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.AppConstants
-  alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
@@ -51,18 +50,18 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def updateCandidateStatusAsPass(id) do
-    candidate = Candidate |> Repo.get(id)
+    candidate = __MODULE__ |> Repo.get(id)
     pass_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
     candidate_params = %{
       "pipeline_status_id": pass_pipeline_status_id
     }
-    change = Candidate.changeset(candidate, candidate_params)
+    change = __MODULE__.changeset(candidate, candidate_params)
     Repo.update(change)
   end
 
   def get_candidates_in_fifo_order do
     interview_type_id_with_min_priority = InterviewType.get_id_of_min_priority_round
-    from c in Candidate,
+    from c in __MODULE__,
       left_join: i in assoc(c, :interviews),
       where: i.interview_type_id == ^interview_type_id_with_min_priority or is_nil(i.interview_type_id),
       order_by: i.start_time,
