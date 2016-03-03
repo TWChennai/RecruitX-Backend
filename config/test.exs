@@ -3,7 +3,7 @@ use Mix.Config
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :recruitx_backend, RecruitxBackend.Endpoint,
-  path_to_store_images: "../uploaded_images",
+  path_to_store_images: "./uploaded_images",
   http: [port: 4001],
   server: false
 
