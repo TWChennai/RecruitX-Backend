@@ -69,7 +69,7 @@ defmodule RecruitxBackend.FeedbackImageSpec do
       changeset = FeedbackImage.changeset(%FeedbackImage{}, with_invalid_interview_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([interview: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([interview: "Interview has been deleted"]))
     end
   end
 

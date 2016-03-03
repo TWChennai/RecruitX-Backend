@@ -56,7 +56,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       conn = post conn_with_dummy_authorization(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => file_to_upload}, "status_id" => "#{interview_status.id}"}
 
       conn |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "does not exist"}
+      expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}
       expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       expect Avatar |> to(accepted :store)
     end
