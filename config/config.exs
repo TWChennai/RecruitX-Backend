@@ -28,6 +28,13 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
+config :arc,
+  bucket: System.get_env("AWS_BUCKET")
+
+config :ex_aws,
+  access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
+  secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
+
 # This line was automatically added by ansible-elixir-stack setup script
 if System.get_env("SERVER") do
   config :phoenix, :serve_endpoints, true

@@ -48,6 +48,8 @@ defmodule RecruitxBackend.Mixfile do
      {:postgrex, "~> 0.11.1"},
      {:cowboy, "~> 1.0.4"},
      {:arc, "~> 0.4.1"},
+     {:ex_aws, "~> 0.4.18"},
+     {:httpoison, "~> 0.8.1"},
      {:plug, "~> 1.0"},
      {:exrm, "~> 0.19.9"},
      {:httpotion, "~> 2.2.1"},

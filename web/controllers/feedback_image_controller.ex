@@ -8,6 +8,8 @@ defmodule RecruitxBackend.FeedbackImageController do
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.Avatar
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
@@ -24,8 +26,13 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   def show(conn, params) do
     file_path = FeedbackImage.get_storage_path <> "/" <> params["id"]
-    case File.exists?(file_path) do
-      true -> conn |> send_file(200, file_path, 0, :all)
+    response = HTTPotion.get(System.get_env("AWS_DOWNLOAD_URL") <> params["id"], [timeout: 60_000])
+    File.write(file_path, response.body,[])
+    case response.status_code do
+      200 ->
+        conn = conn |> send_file(200, file_path, 0, :all)
+        File.rm file_path
+        conn
       _ -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
     end
   end
@@ -35,8 +42,11 @@ defmodule RecruitxBackend.FeedbackImageController do
       {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
       new_file_name = "interview_#{id}_#{random_file_name_suffix}.jpg"
       plug_to_upload = Map.get(data, key)
-      Avatar.store(Map.merge(plug_to_upload, %{filename: new_file_name}))
-      acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
+      {status, _} = Avatar.store(Map.merge(plug_to_upload, %{filename: new_file_name}))
+      case status do
+        :ok -> acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
+        :error -> throw {:error, [%JSONErrorReason{field_name: "upload", reason: "Failed to upload feedback images"}]}
+      end
     end)
   end
 

@@ -4,14 +4,12 @@ defmodule RecruitxBackend.Avatar do
   # Include ecto support (requires package arc_ecto installed):
   # use Arc.Ecto.Definition
 
-  alias RecruitxBackend.FeedbackImage
-
   @versions [:original]
 
   # To add a thumbnail version:
   # @versions [:original, :thumb]
 
-  def __storage, do: Arc.Storage.Local
+  #def __storage, do: Arc.Storage.Local
 
   # Whitelist file extensions:
   # def validate({file, _}) do
@@ -30,9 +28,9 @@ defmodule RecruitxBackend.Avatar do
   #end
 
   # Override the storage directory:
-  def storage_dir(_version, {_file, _scope}) do
-    FeedbackImage.get_storage_path
-  end
+  #def storage_dir(version, {file, scope}) do
+  # FeedbackImage.get_storage_path
+  #end
 
   # Provide a default URL if there hasn't been a file uploaded
   # def default_url(version, scope) do
