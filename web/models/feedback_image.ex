@@ -22,7 +22,7 @@ defmodule RecruitxBackend.FeedbackImage do
     |> validate_format(:file_name, ~r/^[a-z]+[\sa-z0-9_.-]*$/i)
     |> unique_constraint(:file_name_unique, name: :feedback_file_name_interview_id_unique_index, message: "This file has already been uploaded")
     |> unique_constraint(:file_name, name: :file_name_unique_index)
-    |> assoc_constraint(:interview)
+    |> assoc_constraint(:interview, message: "Interview has been deleted")
   end
 
   def get_storage_path do
