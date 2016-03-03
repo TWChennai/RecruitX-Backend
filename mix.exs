@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Mixfile do
   def project do
     [app: :recruitx_backend,
      version: "1.0.0",
-     elixir: "~> 1.2.0",
+     elixir: "~> 1.2.3",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
