@@ -3,7 +3,7 @@ defmodule RecruitxBackend.FeedbackImageView do
 
   def render("feedback_image.json", %{feedback_image: feedback_image}) do
     %{
-      file_name: feedback_image.file_name
+      file_name: feedback_image.id
     }
   end
 end
