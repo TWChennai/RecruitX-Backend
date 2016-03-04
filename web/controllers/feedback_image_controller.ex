@@ -25,11 +25,12 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   def show(conn, params) do
-    file_path = FeedbackImage.get_storage_path <> "/" <> params["id"]
+    {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
+    file_path = FeedbackImage.get_storage_path <> "/" <> random_file_name_suffix
     response = HTTPotion.get(System.get_env("AWS_DOWNLOAD_URL") <> params["id"], [timeout: 60_000])
-    File.write(file_path, response.body,[])
     case response.status_code do
       200 ->
+        File.write(file_path, response.body,[])
         conn = conn |> send_file(200, file_path, 0, :all)
         File.rm file_path
         conn
