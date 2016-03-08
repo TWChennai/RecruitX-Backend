@@ -17,10 +17,10 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     it "should return empty when panelist has taken no interviews" do
       create(:interview)
 
-      response = get conn_with_dummy_authorization(), "/panelists/recruitx/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/recruitx/interviews?page"
 
       expect(response.status) |> to(be(200))
-      expect(response.assigns.interviews) |> to(be([]))
+      expect(response.assigns.interviews.entries) |> to(be([]))
     end
 
     it "should return list of interviews that the panelist has taken" do
@@ -29,10 +29,10 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       create(:candidate_skill, candidate_id: candidate.id)
       create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
 
-      response = get conn_with_dummy_authorization(), "/panelists/test/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/test/interviews?page"
 
       expect(response.status) |> to(be(200))
-      [result_interview] = response.assigns.interviews
+      [result_interview] = response.assigns.interviews.entries
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
     end
@@ -48,10 +48,10 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       Interview.update_status(interview.id, pass_id)
       candidate_changeset = Candidate.changeset(candidate, %{pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id})
       Repo.update(candidate_changeset)
-      response = get conn_with_dummy_authorization(), "/panelists/test/interviews"
+      response = get conn_with_dummy_authorization(), "/panelists/test/interviews?page"
 
       expect(response.status) |> to(be(200))
-      [result_interview] = response.assigns.interviews
+      [result_interview] = response.assigns.interviews.entries
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
       expect(result_interview.last_interview_status) |> to(be(pass_id))

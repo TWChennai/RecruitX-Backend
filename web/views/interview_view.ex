@@ -16,7 +16,10 @@ defmodule RecruitxBackend.InterviewView do
   end
 
   def render("index.json", %{interviews: interviews}) do
-    render_many(interviews, InterviewView, "interview.json")
+    %{
+      total_pages: interviews.total_pages,
+      interviews:  render_many(interviews.entries, InterviewView, "interview.json")
+    }
   end
 
   def render("show.json", %{interview: interview}) do

@@ -29,18 +29,19 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
 
-  def index(conn, %{"panelist_name" => panelist_name}) do
+  def index(conn, %{"panelist_name" => panelist_name, "page" => page}) do
     interview_id_for_panelist = (from ip in InterviewPanelist, select: ip.interview_id)
                                   |> QueryFilter.filter(%{panelist_login_name: panelist_name}, InterviewPanelist)
                                   |> Repo.all
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{id: interview_id_for_panelist}, Interview)
                   |> Interview.descending_order
-                  |> Repo.all
+                  |> Repo.paginate(page: page)
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
-    interviews = Enum.map(interviews, fn(interview) ->
+    interview_entries = Enum.map(interviews.entries, fn(interview) ->
       Map.put(interview, :last_interview_status, Interview.get_last_interview_status_for(interview.candidate, last_interviews_data))
     end)
+    interviews = Map.put(interviews, :entries, interview_entries)
     conn |> render("index.json", interviews: interviews)
   end
 

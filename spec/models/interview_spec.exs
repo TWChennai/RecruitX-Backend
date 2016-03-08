@@ -313,19 +313,14 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should return interviews of candidates" do
       Repo.delete_all(InterviewPanelist)
       Repo.delete_all(Interview)
-      candidate = create(:candidate)
-      create(:candidate_skill, candidate_id: candidate.id)
-      interview = create(:interview, candidate_id: candidate.id)
-      interview_panelist = create(:interview_panelist, interview_id: interview.id)
-      candidate = Candidate |> preload(:candidate_skills) |> Repo.get(candidate.id)
-      interview = Interview |> preload(:candidate) |> Repo.get(interview.id)
+      interview = create(:interview)
+      candidate = Candidate |> preload(:candidate_skills)|> Repo.get(interview.candidate_id)
 
       actual_interview = Interview.get_interviews_with_associated_data |> Repo.one
 
       expect(actual_interview.candidate) |> to(be(candidate))
       expect(actual_interview.id) |> to(be(interview.id))
       expect(actual_interview.start_time) |> to(be(interview.start_time))
-      expect(actual_interview.interview_panelist) |> to(be([interview_panelist]))
     end
 
     it "should return empty array when there no interviews" do

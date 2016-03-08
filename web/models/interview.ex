@@ -56,9 +56,7 @@ defmodule RecruitxBackend.Interview do
 
   def get_interviews_with_associated_data do
     (from i in __MODULE__,
-      join: c in assoc(i, :candidate),
-      join: cs in assoc(c, :candidate_skills),
-      preload: [:interview_panelist, candidate: {c, [candidate_skills: cs]}],
+      preload: [:interview_panelist, candidate: :candidate_skills],
       select: i)
   end
 
