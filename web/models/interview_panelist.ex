@@ -55,13 +55,10 @@ defmodule RecruitxBackend.InterviewPanelist do
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
   defp validate_sign_up_for_interview(existing_changeset, %{candidate_ids_interviewed: candidate_ids_interviewed, my_previous_sign_up_start_times: my_previous_sign_up_start_times, interview: interview})
     when not(is_nil(candidate_ids_interviewed)) and not(is_nil(my_previous_sign_up_start_times)) and not(is_nil(interview)) do
-      has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
-      if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
-      if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
-      if has_panelist_not_interviewed_candidate and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_previous_sign_up_start_times) do
-        existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
-      end
       existing_changeset
+      |> validate_panelist_has_not_interviewed_candidate(candidate_ids_interviewed, interview)
+      |> validate_panelist_has_no_other_interview_within_time_buffer(interview, my_previous_sign_up_start_times)
+      |> validate_interview_is_not_over(interview)
   end
 
   defp validate_sign_up_for_interview(existing_changeset, params) do
@@ -77,6 +74,21 @@ defmodule RecruitxBackend.InterviewPanelist do
           interview: interview})
       end
     end
+    existing_changeset
+  end
+
+  defp validate_panelist_has_not_interviewed_candidate(existing_changeset, candidate_ids_interviewed, interview) do
+    if existing_changeset.valid? and !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed), do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
+    existing_changeset
+  end
+
+  defp validate_panelist_has_no_other_interview_within_time_buffer(existing_changeset, interview, my_previous_sign_up_start_times) do
+    if existing_changeset.valid? and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_previous_sign_up_start_times), do: existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
+    existing_changeset
+  end
+
+  defp validate_interview_is_not_over(existing_changeset, interview) do
+    if existing_changeset.valid? and !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
     existing_changeset
   end
 
