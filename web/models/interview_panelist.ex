@@ -52,25 +52,31 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
-
-  @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
-  #TODO: Need to reduce CC
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
+  defp validate_sign_up_for_interview(existing_changeset, %{panelist_login_name: panelist_login_name,
+    candidate_ids_interviewed: candidate_ids_interviewed,
+    my_previous_sign_up_start_times: my_previous_sign_up_start_times,
+    interview: interview}) do
+      has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
+      if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
+      if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
+      if has_panelist_not_interviewed_candidate and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_previous_sign_up_start_times) do
+        existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
+      end
+      existing_changeset
+  end
+
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     if !is_nil(interview_id) and !is_nil(panelist_login_name) do
-      interview = if is_nil(params[:interview]), do: Interview |> Repo.get(interview_id), else: params[:interview]
+      interview = Interview |> Repo.get(interview_id)
       if !is_nil(interview) do
-        candidate_ids_interviewed = params[:candidate_ids_interviewed]
-        my_sign_up_start_times = params[:my_previous_sign_up_start_times]
-        if is_nil(candidate_ids_interviewed) or is_nil(candidate_ids_interviewed), do: {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
-        has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
-        if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
-        if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
-        if has_panelist_not_interviewed_candidate and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times) do
-          existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
-        end
+        {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
+        existing_changeset = validate_sign_up_for_interview(existing_changeset, %{panelist_login_name: panelist_login_name,
+          candidate_ids_interviewed: candidate_ids_interviewed,
+          my_previous_sign_up_start_times: my_sign_up_start_times,
+          interview: interview})
       end
     end
     existing_changeset
