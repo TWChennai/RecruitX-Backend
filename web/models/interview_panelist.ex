@@ -53,10 +53,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
-  defp validate_sign_up_for_interview(existing_changeset, %{panelist_login_name: panelist_login_name,
-    candidate_ids_interviewed: candidate_ids_interviewed,
-    my_previous_sign_up_start_times: my_previous_sign_up_start_times,
-    interview: interview}) do
+  defp validate_sign_up_for_interview(existing_changeset, %{candidate_ids_interviewed: candidate_ids_interviewed, my_previous_sign_up_start_times: my_previous_sign_up_start_times, interview: interview})
+    when not(is_nil(candidate_ids_interviewed)) and not(is_nil(my_previous_sign_up_start_times)) and not(is_nil(interview)) do
       has_panelist_not_interviewed_candidate = Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed)
       if !has_panelist_not_interviewed_candidate, do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
       if !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
@@ -69,7 +67,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
-    if !is_nil(interview_id) and !is_nil(panelist_login_name) do
+    if check_not_nil([interview_id, panelist_login_name]) do
       interview = Interview |> Repo.get(interview_id)
       if !is_nil(interview) do
         {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
@@ -96,5 +94,9 @@ defmodule RecruitxBackend.InterviewPanelist do
     query_result = get_interviews_for(panelist_login_name) |> Repo.all
     map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
     {Map.keys(map_result), Map.values(map_result)}
+  end
+
+  defp check_not_nil(enumerable) do
+    Enum.all?(enumerable, fn(x) -> !is_nil(x) end)
   end
 end

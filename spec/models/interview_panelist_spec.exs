@@ -130,6 +130,17 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       expect(changeset) |> to(have_errors([signup: "You have already signed up an interview for this candidate"]))
     end
 
+    it "should be invalid when sign up is invalid and some parameters are not passed" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, candidate_id: candidate.id)
+
+      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, %{panelist_login_name: "test", interview_id: interview1.id, candidate_ids_interviewed: [], my_previous_sign_up_start_times: [], interview: nil})
+
+      expect(changeset.valid?) |> to(be_false)
+    end
+
     it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
