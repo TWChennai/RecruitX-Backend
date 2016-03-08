@@ -137,6 +137,7 @@ defmodule RecruitxBackend.Interview do
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
     Enum.map(interviews, fn(interview) ->
       Logger.info("candidate_id:#{interview.candidate_id}")
+      Logger.info("interview_id:#{interview.id}")
       changeset_if_signup = InterviewPanelist.changeset(%InterviewPanelist{},
         %{panelist_login_name: panelist_login_name,
           interview_id: interview.id,
