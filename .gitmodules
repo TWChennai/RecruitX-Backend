@@ -1,3 +1,0 @@
-[submodule "playbooks/roles/HashNuke.elixir-stack"]
-	path = playbooks/roles/HashNuke.elixir-stack
-	url = https://github.com/TWChennai/ansible-elixir-stack.git
