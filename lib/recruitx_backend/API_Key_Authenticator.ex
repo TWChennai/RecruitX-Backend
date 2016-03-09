@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.APIKeyAuthenticator do
+defmodule RecruitxBackend.API_Key_Authenticator do
   import Plug.Conn
 
   @api_key System.get_env("API_KEY")
