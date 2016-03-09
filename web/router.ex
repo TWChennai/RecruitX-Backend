@@ -2,7 +2,7 @@ defmodule RecruitxBackend.Router do
   use RecruitxBackend.Web, :router
 
   pipeline :api  do
-    plug RecruitxBackend.API_Key_Authenticator
+    plug RecruitxBackend.ApiKeyAuthenticator
     plug :accepts, ["json"]
   end
 
