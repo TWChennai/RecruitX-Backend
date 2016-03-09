@@ -63,6 +63,18 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
   end
 
+  describe "delete" do
+    it "should delete the interview panelist of a id" do
+      interview_panelist = create(:interview_panelist)
+
+      response = delete conn_with_dummy_authorization(), "/panelists/#{interview_panelist.id}"
+
+      response |> should(have_http_status(:no_content))
+      expect(response.resp_body) |> to(be(""))
+      expect(Repo.get(InterviewPanelist, interview_panelist.id)) |> to(be(nil))
+    end
+  end
+
   defp getInterviewPanelistWithName(name) do
     InterviewPanelist |> QueryFilter.filter(%{panelist_login_name: name}, InterviewPanelist) |> Repo.one
   end

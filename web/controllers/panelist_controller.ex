@@ -28,4 +28,9 @@ defmodule RecruitxBackend.PanelistController do
           |> json(%JSONError{errors: response})
     end
   end
+
+  def delete(conn, %{"id" => id}) do
+    Repo.delete_all(from i in InterviewPanelist, where: i.id == ^id)
+    send_resp(conn, :no_content, "")
+  end
 end
