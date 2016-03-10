@@ -24,7 +24,7 @@ defmodule RecruitxBackend.ApiKeyAuthenticatorSpec do
     end
 
     it "should return conn to process request if API key is valid" do
-      conn = put_req_header(conn(), "authorization", "recruitx")
+      conn = put_req_header(conn(), "authorization", System.get_env("API_KEY"))
       response = ApiKeyAuthenticator.call(conn, :empty)
 
       expect(response) |> to(be(conn))
