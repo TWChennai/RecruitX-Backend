@@ -75,13 +75,11 @@ defmodule RecruitxBackend.CandidateController do
 
   defp generateCandidateSkillChangesets(_candidate, []), do: []
 
-  defp generateCandidateSkillChangesets(candidate, [first | remaining]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: first}) | generateCandidateSkillChangesets(candidate, remaining)]
+  defp generateCandidateSkillChangesets(candidate, [head | tail]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: head}) | generateCandidateSkillChangesets(candidate, tail)]
 
-  defp generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
-    for single_round <- interview_rounds, do:
-      Interview.changeset(%Interview{},
-        %{candidate_id: candidate.id, interview_type_id: single_round["interview_type_id"], start_time: single_round["start_time"]})
-  end
+  defp generateCandidateInterviewRoundChangesets(_candidate, []), do: []
+
+  defp generateCandidateInterviewRoundChangesets(candidate, [head | tail]), do: [Interview.changeset(%Interview{}, %{candidate_id: candidate.id, interview_type_id: head["interview_type_id"], start_time: head["start_time"]}) | generateCandidateInterviewRoundChangesets(candidate, tail)]
 
   def update(conn, %{"id" => id, "candidate" => candidate_params}) do
     candidate = Candidate |> Repo.get(id)
