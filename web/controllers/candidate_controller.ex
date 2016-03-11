@@ -73,11 +73,9 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  defp generateCandidateSkillChangesets(candidate, skill_ids) do
-    # TODO: Use 'Ecto.build_assoc' instead of this
-    #Ecto.build_assoc generates a model which should be cast to a changeset,which doesn't hold errors before insertion to database
-    for n <- skill_ids, do: CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: n})
-  end
+  defp generateCandidateSkillChangesets(_candidate, []), do: []
+
+  defp generateCandidateSkillChangesets(candidate, [first | remaining]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: first}) | generateCandidateSkillChangesets(candidate, remaining)]
 
   defp generateCandidateInterviewRoundChangesets(candidate, interview_rounds) do
     for single_round <- interview_rounds, do:
