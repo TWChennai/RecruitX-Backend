@@ -9,9 +9,11 @@ defmodule RecruitxBackend.ChangesetErrorParser do
 
   def to_json(_), do: []
 
-  defp recursive_caller([h | t]), do: [parse_error(h) | recursive_caller(t)]
+  defp recursive_caller(input, initial_value \\ [])
 
-  defp recursive_caller([]), do: []
+  defp recursive_caller([h | t], result), do: recursive_caller(t, result ++ [parse_error(h)])
+
+  defp recursive_caller([], result), do: result
 
   defp parse_error({n, value}) when is_tuple(value), do: parse_error({n, elem(value, 0)})
 
