@@ -25,8 +25,6 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   def show(conn, %{"id" => id}) do
-    {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
-    file_path = FeedbackImage.get_storage_path <> "/" <> random_file_name_suffix <> ".jpg"
     feedback_image = FeedbackImage |> Repo.get(id)
     case feedback_image do
       nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json") |> halt
@@ -34,10 +32,8 @@ defmodule RecruitxBackend.FeedbackImageController do
       response = HTTPotion.get(System.get_env("AWS_DOWNLOAD_URL") <> feedback_image.file_name, [timeout: 60_000])
       case response.status_code do
         200 ->
-          File.write(file_path, response.body,[])
-          conn = conn |> send_file(200, file_path, 0, :all)
-          File.rm file_path
-          conn
+          conn |> put_resp_content_type("application/pdf")
+               |> send_resp(200, response.body)
         _ -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
       end
     end
