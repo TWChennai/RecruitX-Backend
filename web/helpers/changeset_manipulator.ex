@@ -47,14 +47,15 @@ defmodule RecruitxBackend.ChangesetManipulator do
     throw ({:changeset_error, errors_without_nil_values})
   end
 
-  def getChangesetErrorsInReadableFormat(%{errors: errors}) do
-    for n <- Keyword.keys(errors) do
-      value = Keyword.get(errors, n)
-      if is_tuple(value), do: value = elem(value, 0)
-      %JSONErrorReason{field_name: n, reason: value}
-    end
-  end
+  def getChangesetErrorsInReadableFormat(%{errors: errors}), do: recursive_caller errors
 
-  def getChangesetErrorsInReadableFormat(_),
-  do: []
+  def getChangesetErrorsInReadableFormat(_), do: []
+
+  def parse_error({n, value}) when is_tuple(value), do: parse_error({n, elem(value, 0)})
+
+  def parse_error({n, value}), do: %JSONErrorReason{field_name: n, reason: value}
+
+  def recursive_caller([h | t]), do: [parse_error(h) | recursive_caller(t)]
+
+  def recursive_caller([]), do: []
 end
