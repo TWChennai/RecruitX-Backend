@@ -35,12 +35,24 @@ defmodule RecruitxBackend.ChangesetErrorParserSpec do
 
     it "when there are multiple changesets with errors" do
       changesets_with_errors =[%{errors: [error1: "is invalid"]}, %{errors: [error2: "is also invalid"]}]
-      [result1,result2] = ChangesetErrorParser.to_json(changesets_with_errors)
+      [result1, result2] = ChangesetErrorParser.to_json(changesets_with_errors)
 
       expect(result1.field_name) |> to(eql(:error1))
       expect(result1.reason) |> to(eql("is invalid"))
       expect(result2.field_name) |> to(eql(:error2))
       expect(result2.reason) |> to(eql("is also invalid"))
+    end
+
+    it "when there are multiple changesets with multiple errors" do
+      changesets_with_errors =[%{errors: [error1: "is invalid"]}, %{errors: [error2: "is also invalid", error3: "is too invalid"]}]
+      [result1, result2, result3] = ChangesetErrorParser.to_json(changesets_with_errors)
+
+      expect(result1.field_name) |> to(eql(:error1))
+      expect(result1.reason) |> to(eql("is invalid"))
+      expect(result2.field_name) |> to(eql(:error2))
+      expect(result2.reason) |> to(eql("is also invalid"))
+      expect(result3.field_name) |> to(eql(:error3))
+      expect(result3.reason) |> to(eql("is too invalid"))
     end
 
     it "when there are multiple changesets with and without errors" do

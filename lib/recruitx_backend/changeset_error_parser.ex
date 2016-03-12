@@ -2,10 +2,8 @@ defmodule RecruitxBackend.ChangesetErrorParser do
 
   alias RecruitxBackend.JSONErrorReason
 
-  def to_json(changesets) when is_list(changesets) do
-    errors = for n <- changesets, do: List.first(to_json(n))
-    Enum.filter(errors, fn(error) -> !is_nil(error) end)
-  end
+  def to_json(changesets = [h | t]) when is_list(changesets),
+  do: to_json(h) ++ to_json(t)
 
   def to_json(%{errors: errors}), do: recursive_caller errors
 
