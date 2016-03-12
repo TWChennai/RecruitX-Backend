@@ -13,11 +13,9 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
       allow File |> to(accept(:rm, fn(_) -> true end))
       allow Plug.Conn |> to(accept(:send_file, fn(conn, 200, _, 0, :all) -> conn end))
 
-      action(:show, %{"id" => 1})
+      response = action(:show, %{"id" => 1})
 
-      expect File |> to(accepted :write)
-      expect File |> to(accepted :rm)
-      expect Elixir.Plug.Conn |> to(accepted :send_file)
+      response |> should(have_http_status(:ok))
     end
 
     it "should send 404 when feedback image does not exist" do
