@@ -15,7 +15,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     {status, result_of_db_transaction} = Repo.transaction fn ->
       try do
         Interview.update_status(id, String.to_integer(status_id))
-        ChangesetManipulator.insertChangesets(store_image_and_generate_changesets(FeedbackImage.get_storage_path, data, id))
+        ChangesetManipulator.insert(store_image_and_generate_changesets(FeedbackImage.get_storage_path, data, id))
         "Thanks for submitting feedback!"
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)

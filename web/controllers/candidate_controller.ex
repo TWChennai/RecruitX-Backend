@@ -28,9 +28,9 @@ defmodule RecruitxBackend.CandidateController do
       # TODO: Need to remove the try-catch block
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetManipulator.insertChangesets
-          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.insertChangesets
-          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.insertChangesets
+          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetManipulator.insert
+          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.insert
+          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.insert
           candidate |> Repo.preload(:candidate_skills)
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)

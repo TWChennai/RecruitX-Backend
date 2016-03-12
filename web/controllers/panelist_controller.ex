@@ -8,7 +8,7 @@ defmodule RecruitxBackend.PanelistController do
   def create(conn, %{"interview_panelist" => post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     try do
-      {status, interview_panelist} = ChangesetManipulator.insertChangesets([interview_panelist_changeset])
+      {status, interview_panelist} = ChangesetManipulator.insert([interview_panelist_changeset])
       conn |> sendResponseBasedOnResult(:create, status, interview_panelist)
     catch {status, error} ->
       conn |> sendResponseBasedOnResult(:create, status, error)
