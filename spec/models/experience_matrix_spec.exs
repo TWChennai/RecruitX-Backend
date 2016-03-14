@@ -80,15 +80,15 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
   end
 
-   context "unique constraint" do
-      it "when panelist_experience_lower_bound,interview_type_id,candidate_experience_upper_bound already exist" do
-        changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, valid_attrs)
-        Repo.insert(changeset)
-        {result, changeset} = Repo.insert(changeset)
+  context "unique constraint" do
+    it "when panelist_experience_lower_bound,interview_type_id,candidate_experience_upper_bound already exist" do
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, valid_attrs)
+      Repo.insert(changeset)
+      {result, changeset} = Repo.insert(changeset)
 
-        expect(result) |> to(be(:error))
-        expect(changeset.valid?) |> to(be_false)
-        expect(changeset.errors) |> to(eql([experience_matrix_unique: "This criteria is already specified"]))
-      end
+      expect(result) |> to(be(:error))
+      expect(changeset.valid?) |> to(be_false)
+      expect(changeset.errors) |> to(eql([experience_matrix_unique: "This criteria is already specified"]))
     end
+  end
 end

@@ -10,6 +10,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateExperienceMatrix do
       timestamps
     end
 
-    create unique_index(:experience_matrices, [:panelist_experience_lower_bound,:candidate_experience_upper_bound,:interview_type_id], name: :experience_matrix_unique_index)
+    create unique_index(:experience_matrices, [:panelist_experience_lower_bound, :candidate_experience_upper_bound, :interview_type_id], name: :experience_matrix_unique_index)
   end
 end
