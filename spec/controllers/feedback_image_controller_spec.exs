@@ -6,7 +6,6 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
 
   describe "show" do
     it "should send file when file is downloaded from S3" do
-      allow FeedbackImage |> to(accept(:get_storage_path, fn(_) -> "dummy" end))
       allow Repo |> to(accept(:get, fn(FeedbackImage, 1) -> %{file_name: "test_file"} end))
       allow HTTPotion |> to(accept(:get, fn(_, _) -> %{status_code: 200, body: ''} end))
       allow File |> to(accept(:write, fn(_, _, []) -> true end))
@@ -19,7 +18,6 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
     end
 
     it "should send 404 when feedback image does not exist" do
-      allow FeedbackImage |> to(accept(:get_storage_path, fn(_) -> "dummy_path" end))
       allow Repo |> to(accept(:get, fn(1) -> nil end))
 
       response = action(:show, %{"id" => 1})
@@ -28,7 +26,6 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
     end
 
     it "should send 404 when feedback image does not exist in S3" do
-      allow FeedbackImage |> to(accept(:get_storage_path, fn(_) -> "dummy_path" end))
       allow Repo |> to(accept(:get, fn(1) -> %{file_name: "test_file"} end))
       allow HTTPotion |> to(accept(:get, fn(_, _) -> %{status_code: 400, body: ''} end))
 

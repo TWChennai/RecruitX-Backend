@@ -15,7 +15,7 @@ defmodule RecruitxBackend.FeedbackImageController do
     {status, result_of_db_transaction} = Repo.transaction fn ->
       try do
         Interview.update_status(id, String.to_integer(status_id))
-        ChangesetManipulator.insert(store_image_and_generate_changesets(FeedbackImage.get_storage_path, data, id))
+        ChangesetManipulator.insert(store_image_and_generate_changesets(data, id))
         "Thanks for submitting feedback!"
       catch {_, result_of_db_transaction} ->
         Repo.rollback(result_of_db_transaction)
@@ -32,14 +32,15 @@ defmodule RecruitxBackend.FeedbackImageController do
       response = HTTPotion.get(System.get_env("AWS_DOWNLOAD_URL") <> feedback_image.file_name, [timeout: 60_000])
       case response.status_code do
         200 ->
-          conn |> put_resp_content_type("application/pdf")
-               |> send_resp(200, response.body)
+          conn
+          |> put_resp_content_type("image/jpeg")
+          |> send_resp(200, response.body)
         _ -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
       end
     end
   end
 
-  defp store_image_and_generate_changesets(_path, data, id) do
+  defp store_image_and_generate_changesets(data, id) do
     Enum.reduce(Map.keys(data), [], fn(key, acc) ->
       {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
       new_file_name = "interview_#{id}_#{random_file_name_suffix}.jpg"
@@ -56,12 +57,12 @@ defmodule RecruitxBackend.FeedbackImageController do
     case {action, status} do
       {:create, :ok} ->
         conn
-          |> put_status(:created)
-          |> json(response)
+        |> put_status(:created)
+        |> json(response)
       {:create, _} ->
         conn
-          |> put_status(:unprocessable_entity)
-          |> json(%JSONError{errors: response})
+        |> put_status(:unprocessable_entity)
+        |> json(%JSONError{errors: response})
     end
   end
 end

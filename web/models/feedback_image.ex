@@ -24,12 +24,4 @@ defmodule RecruitxBackend.FeedbackImage do
     |> unique_constraint(:file_name, name: :file_name_unique_index)
     |> assoc_constraint(:interview, message: "Interview has been deleted")
   end
-
-  def get_storage_path do
-    path = Endpoint.config(:path_to_store_images)
-    # TODO: Can't this check to create the path be done only once when the app starts up?
-    # Otherwise, the same check is happening for each request - which is a performance hit
-    if !File.exists?(path) || !File.dir?(path), do: File.mkdir!(path)
-    path
-  end
 end
