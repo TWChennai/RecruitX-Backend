@@ -15,8 +15,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRole do
 
     flush
 
-    Enum.map(["Dev"], fn role_value ->
-      Repo.insert!(%Role{name: role_value})
-    end)
+    Repo.insert!(%Role{name: Role.dev})
   end
 end

@@ -4,6 +4,9 @@ defmodule RecruitxBackend.Role do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
 
+  def dev, do: "Dev"
+  def qa, do: "QA"
+
   schema "roles" do
     field :name, :string
 
