@@ -2,6 +2,7 @@ defmodule RecruitxBackend.Factory do
   use ExMachina.Ecto, repo: RecruitxBackend.Repo
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
@@ -104,6 +105,14 @@ defmodule RecruitxBackend.Factory do
     %FeedbackImage{
       file_name: sanitize_name(Faker.Name.first_name),
       interview_id: create(:interview).id
+    }
+  end
+
+  def factory(:experience_matrix) do
+    %ExperienceMatrix{
+      panelist_experience_lower_bound: :rand.uniform(100),
+      candidate_experience_upper_bound: :rand.uniform(100),
+      interview_type_id: create(:interview_type).id
     }
   end
 
