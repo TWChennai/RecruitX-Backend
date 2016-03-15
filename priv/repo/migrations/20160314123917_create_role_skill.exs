@@ -18,20 +18,22 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
 
     flush
 
+    dev_role = Role.retrieve_by_name(Role.dev)
     Enum.each(["Java",
               "Ruby",
               "C#",
               "Python",
               "Other"], fn skill_value ->
-      Repo.insert!(%RoleSkill{role_id: Role.retrieve_by_name(Role.dev).id, skill_id: Skill.retrieve_by_name(skill_value).id})
+      Repo.insert!(%RoleSkill{role_id: dev_role.id, skill_id: Skill.retrieve_by_name(skill_value).id})
     end)
 
+    qa_role = Role.retrieve_by_name(Role.qa)
     Enum.each(["Selenium",
               "QTP",
               "Performance",
               "SOAPUI",
               "Other"], fn skill_value ->
-      Repo.insert!(%RoleSkill{role_id: Role.retrieve_by_name(Role.qa).id, skill_id: Skill.retrieve_by_name(skill_value).id})
+      Repo.insert!(%RoleSkill{role_id: qa_role.id, skill_id: Skill.retrieve_by_name(skill_value).id})
     end)
   end
 end
