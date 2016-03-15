@@ -16,8 +16,8 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValues do
       "candidate_experience_upper_bound" => candidate_experience_upper_bound,
       "interview_type" => interview_type} ->
         interview_type = interview_type |> InterviewType.retrieve_by_name
-        Repo.insert!(%ExperienceMatrix{panelist_experience_lower_bound: panelist_experience_lower_bound,
-          candidate_experience_upper_bound: candidate_experience_upper_bound,
+        Repo.insert!(%ExperienceMatrix{panelist_experience_lower_bound: Decimal.new(panelist_experience_lower_bound),
+          candidate_experience_upper_bound: Decimal.new(candidate_experience_upper_bound),
           interview_type_id: interview_type.id})
     end)
   end
