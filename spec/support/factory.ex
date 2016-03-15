@@ -12,6 +12,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
+  alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
   alias Timex.Date
   alias Timex.DateFormat
@@ -113,6 +114,13 @@ defmodule RecruitxBackend.Factory do
       panelist_experience_lower_bound: :rand.uniform(100),
       candidate_experience_upper_bound: :rand.uniform(100),
       interview_type_id: create(:interview_type).id
+    }
+  end
+
+  def factory(:role_skill) do
+    %RoleSkill{
+      role_id: create(:role).id,
+      skill_id: create(:skill).id
     }
   end
 

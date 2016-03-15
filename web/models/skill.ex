@@ -3,6 +3,7 @@ defmodule RecruitxBackend.Skill do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.Repo
 
   schema "skills" do
     field :name, :string
@@ -22,4 +23,6 @@ defmodule RecruitxBackend.Skill do
     |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :skills_name_index)
   end
+
+  def retrieve_by_name(name), do: (from s in __MODULE__, where: s.name == ^name) |> Repo.one
 end

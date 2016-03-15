@@ -3,6 +3,7 @@ defmodule RecruitxBackend.Role do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Repo
 
   def dev, do: "Dev"
   def qa, do: "QA"
@@ -25,4 +26,6 @@ defmodule RecruitxBackend.Role do
     |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :roles_name_index)
   end
+
+  def retrieve_by_name(name), do: (from r in __MODULE__, where: r.name == ^name) |> Repo.one
 end
