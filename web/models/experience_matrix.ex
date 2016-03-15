@@ -4,8 +4,8 @@ defmodule RecruitxBackend.ExperienceMatrix do
   alias RecruitxBackend.InterviewType
 
   schema "experience_matrices" do
-    field :panelist_experience_lower_bound, :integer
-    field :candidate_experience_upper_bound, :integer
+    field :panelist_experience_lower_bound, :decimal
+    field :candidate_experience_upper_bound, :decimal
 
     timestamps
 
@@ -18,8 +18,8 @@ defmodule RecruitxBackend.ExperienceMatrix do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> validate_number(:candidate_experience_upper_bound, greater_than_or_equal_to: 0, less_than_or_equal_to: 100, message: "must be in the range 0-100")
-    |> validate_number(:panelist_experience_lower_bound, greater_than_or_equal_to: 0, less_than_or_equal_to: 100, message: "must be in the range 0-100")
+    |> validate_number(:candidate_experience_upper_bound, greater_than_or_equal_to: Decimal.new(0), less_than_or_equal_to: Decimal.new(100), message: "must be in the range 0-100")
+    |> validate_number(:panelist_experience_lower_bound, greater_than_or_equal_to: Decimal.new(0), less_than_or_equal_to: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:interview_type)
     |> unique_constraint(:experience_matrix_unique, name: :experience_matrix_unique_index, message: "This criteria is already specified")
   end

@@ -6,7 +6,7 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValues do
   alias RecruitxBackend.Repo
 
   def change do
-    Enum.map([%{"panelist_experience_lower_bound" => 1,"candidate_experience_upper_bound" => 2, "interview_type" => InterviewType.coding},
+    Enum.each([%{"panelist_experience_lower_bound" => 1,"candidate_experience_upper_bound" => 2, "interview_type" => InterviewType.coding},
     %{"panelist_experience_lower_bound" => 1,"candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.technical_1},
     %{"panelist_experience_lower_bound" => 1,"candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.technical_2},
     %{"panelist_experience_lower_bound" => 3,"candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.coding},
