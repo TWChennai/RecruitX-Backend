@@ -18,7 +18,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
 
     flush
 
-    Enum.map(["Java",
+    Enum.each(["Java",
               "Ruby",
               "C#",
               "Python",
@@ -26,7 +26,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
       Repo.insert!(%RoleSkill{role_id: Role.retrieve_by_name(Role.dev).id, skill_id: Skill.retrieve_by_name(skill_value).id})
     end)
 
-    Enum.map(["Selenium",
+    Enum.each(["Selenium",
               "QTP",
               "Performance",
               "SOAPUI",

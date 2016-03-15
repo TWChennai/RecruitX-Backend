@@ -16,7 +16,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewType do
 
     flush
 
-    Enum.map(%{"Coding" => 1,
+    Enum.each(%{"Coding" => 1,
                "Tech-1" => 2,
                "Tech-2" => 3,
                "Ldrshp" => 4,

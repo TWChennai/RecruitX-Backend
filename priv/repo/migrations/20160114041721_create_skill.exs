@@ -15,7 +15,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
 
     flush
 
-    Enum.map(["Java",
+    Enum.each(["Java",
               "Ruby",
               "C#",
               "Python",

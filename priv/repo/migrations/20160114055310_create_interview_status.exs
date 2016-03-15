@@ -15,7 +15,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewStatus do
 
     flush
 
-    Enum.map([InterviewStatus.pass,
+    Enum.each([InterviewStatus.pass,
               InterviewStatus.pursue,
               InterviewStatus.strong_pursue], fn status_value ->
       Repo.insert!(%InterviewStatus{name: status_value})
