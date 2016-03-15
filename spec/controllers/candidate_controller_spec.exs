@@ -84,7 +84,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "returns error when skill_ids is empty" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => []})})
         response |> should(have_http_status(:unprocessable_entity))
-        expectedNameErrorReason = %JSONErrorReason{field_name: "skill_ids", reason: "missing/empty required key"}
+        expectedNameErrorReason = %JSONErrorReason{field_name: "interview_rounds", reason: "missing/empty required key"}
         expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
       end
 

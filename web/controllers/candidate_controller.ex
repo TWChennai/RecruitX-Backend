@@ -21,14 +21,10 @@ defmodule RecruitxBackend.CandidateController do
     render(conn, "index.json", candidates: candidates)
   end
 
-  def create(conn, %{"candidate" => post_params}) do
-    try do
-      skill_ids = "skill_ids" |> readQueryParamOrRaiseError(post_params)
-      interview_rounds = "interview_rounds" |> readQueryParamOrRaiseError(post_params)
-      # TODO: Need to remove the try-catch block
+  def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = candidate}) when skill_ids != [] and interview_rounds != [] do
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          {_, candidate} = [Candidate.changeset(%Candidate{}, post_params)] |> ChangesetManipulator.insert
+          {_, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.insert
           candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.insert
           candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.insert
           candidate |> Repo.preload(:candidate_skills)
@@ -37,10 +33,13 @@ defmodule RecruitxBackend.CandidateController do
         end
       end
       conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
-    catch {:missing_param_error, key} ->
-      conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: key, reason: "missing/empty required key"}])
-    end
   end
+
+  def create(conn, %{"candidate" => %{"skill_ids" => _skill_ids}}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "interview_rounds", reason: "missing/empty required key"}])
+
+  def create(conn, %{"candidate" => %{"interview_rounds" => _interview_rounds}}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "skill_ids", reason: "missing/empty required key"}])
+
+  def create(conn, %{"candidate" => _post_params}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "skill_ids and interview_rounds", reason: "missing/empty required key"}])
 
   def show(conn, %{"id" => id}) do
     candidate = Candidate
@@ -52,24 +51,17 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  defp readQueryParamOrRaiseError(key, post_params) do
-    read_query_params = post_params[key]
-    # TODO: Do not 'throw' return a tuple with an error code
-    if !read_query_params || Enum.empty?(read_query_params), do: throw {:missing_param_error, key}
-    read_query_params |> Enum.uniq
-  end
-
   def sendResponseBasedOnResult(conn, action, status, response) do
     case {action, status} do
       {:create, :ok} ->
         conn
-          |> put_status(:created)
-          |> put_resp_header("location", candidate_path(conn, :show, response))
-          |> json("")
+        |> put_status(:created)
+        |> put_resp_header("location", candidate_path(conn, :show, response))
+        |> json("")
       {:create, _} ->
         conn
-          |> put_status(:unprocessable_entity)
-          |> json(%JSONError{errors: response})
+        |> put_status(:unprocessable_entity)
+        |> json(%JSONError{errors: response})
     end
   end
 
