@@ -28,6 +28,12 @@ defmodule RecruitxBackend.InterviewType do
     |> unique_constraint(:name, name: :interview_types_name_index)
   end
 
+  def coding, do: "Coding"
+  def technical_1, do: "Tech-1"
+  def technical_2, do: "Tech-2"
+  def leadership, do: "Ldrshp"
+  def p3, do: "P3"
+
   def get_id_of_min_priority_round do
     (from it in __MODULE__,
       select: it.id,
@@ -35,4 +41,7 @@ defmodule RecruitxBackend.InterviewType do
       limit: 1)
       |> Repo.one
   end
+
+  def retrieve_by_name(name),
+  do: (from it in __MODULE__, where: it.name == ^name) |> Repo.one
 end

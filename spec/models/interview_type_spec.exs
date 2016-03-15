@@ -143,4 +143,23 @@ defmodule RecruitxBackend.InterviewTypeSpec do
       expect(minimum_interview_id) |> to(eq(interview_with_priority_1.id))
     end
   end
+
+  context "retrieve_by_name" do
+    it "should give interview_type if present by that name" do
+      interview_type_test = create(:interview_type, name: "test")
+
+      interview_type = InterviewType.retrieve_by_name("test")
+
+      expect(interview_type.id) |> to(eq(interview_type_test.id))
+    end
+
+    it "should not give interview_type if not present by that name" do
+      Repo.delete_all(Interview)
+      Repo.delete_all(InterviewType)
+
+      interview_type = InterviewType.retrieve_by_name("test")
+
+      expect(interview_type) |> to(be_nil)
+    end
+  end
 end
