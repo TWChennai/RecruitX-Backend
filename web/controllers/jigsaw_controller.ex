@@ -10,7 +10,7 @@ defmodule RecruitxBackend.JigsawController do
 
   @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   def show(conn, %{"id" => id}) do
-    is_recruiter = case id do
+    user_details = case id do
       "ppanelist" -> false
       "ppanelistp" -> false
       "rrecruitx" -> true
@@ -19,18 +19,21 @@ defmodule RecruitxBackend.JigsawController do
         case response.body do
           "" -> @invalid_user
           _  -> case response.body |> Parser.parse do
-                  {:ok, body} -> key_value_response = for {key, val} <- body, into: %{}, do: {String.to_atom(key), val}
-                  department = key_value_response.department
-                  department_key_value_pair = for {key, val} <- department, into: %{}, do: {String.to_atom(key), val}
-                  case department_key_value_pair.name do
-                    @recruitment_department -> true
-                    _ -> false
+                  {:ok, body} -> department = body["department"]
+                                  tw_hire_date = body["hireDate"]
+                                  tw_experience = body["twExperience"]
+                                  total_experience = body["totalExperience"]
+                                  past_experience = Decimal.new(total_experience - tw_experience)
+                                                    |> Decimal.round(2)
+                  case department["name"] do
+                    @recruitment_department -> %{is_recruiter: true, tw_hire_date: tw_hire_date, past_experience: past_experience}
+                    _ -> %{is_recruiter: false, tw_hire_date: tw_hire_date, past_experience: past_experience}
                   end
                   {:error, reason} -> reason
                 end
       end
     end
 
-    conn |> render("show.json", is_recruiter: is_recruiter)
+    conn |> render("show.json", user_details: user_details)
   end
 end
