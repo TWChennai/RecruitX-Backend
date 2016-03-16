@@ -1,8 +1,10 @@
 defmodule RecruitxBackend.SignUpDataContainer do
 
+  alias RecruitxBackend.ExperienceEligibilityData
+
   defstruct panelist_login_name: "",
     candidate_ids_interviewed: [],
     my_previous_sign_up_start_times: [],
     signup_counts: [],
-    panelist_experience: Decimal.new(0)
+    experience_eligibility_criteria: %ExperienceEligibilityData{}
 end

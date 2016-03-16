@@ -3,6 +3,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
 
   alias RecruitxBackend.ExperienceMatrix
   alias Decimal, as: D
+  alias RecruitxBackend.ExperienceEligibilityData
 
   let :valid_attrs, do: fields_for(:experience_matrix)
   let :invalid_attrs, do: %{}
@@ -100,7 +101,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, create(:interview_type).id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, create(:interview_type).id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -111,7 +112,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, create(:interview_type).id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, create(:interview_type).id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -122,7 +123,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(0.5)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, create(:interview_type).id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, create(:interview_type).id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -133,7 +134,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, create(:interview_type).id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, create(:interview_type).id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -145,7 +146,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, create(:interview_type).id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, create(:interview_type).id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -156,7 +157,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
       panelist_experience = D.new(1)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, experience_matrix_create_1.candidate_experience_upper_bound, experience_matrix_create_1.interview_type_id)
+      eligiblity = ExperienceMatrix.is_eligible(experience_matrix_create_1.candidate_experience_upper_bound, experience_matrix_create_1.interview_type_id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_false)
     end
@@ -167,7 +168,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, experience_matrix.interview_type_id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, experience_matrix.interview_type_id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_true)
     end
@@ -179,7 +180,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(1)
       candidate_experience = experience_matrix_panelist_is_not_eligible_for.candidate_experience_upper_bound
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, experience_matrix_panelist_is_not_eligible_for.interview_type_id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, experience_matrix_panelist_is_not_eligible_for.interview_type_id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_false)
     end
@@ -190,9 +191,17 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       panelist_experience = D.new(1)
       candidate_experience = D.new(3)
 
-      eligiblity = ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, experience_matrix.interview_type_id)
+      eligiblity = ExperienceMatrix.is_eligible(candidate_experience, experience_matrix.interview_type_id, populate_experience_eligibility_data(panelist_experience))
 
       expect(eligiblity) |> to(be_false)
     end
+  end
+
+  defp populate_experience_eligibility_data(panelist_experience) do
+    %ExperienceEligibilityData{panelist_experience: panelist_experience,
+      max_experience_with_filter: ExperienceMatrix.get_max_experience_with_filter,
+      interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
+      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience)) |> Repo.all
+    }
   end
 end
