@@ -19,10 +19,7 @@ defmodule RecruitxBackend.Interview do
 
   require Logger
 
-  @max_count 2
-  # TODO: Move the magic number (2) into the db
   @duration_of_interview 1
-  @time_buffer_between_sign_ups 2
 
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
@@ -39,8 +36,6 @@ defmodule RecruitxBackend.Interview do
 
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w(interview_status_id)
-
-  def time_buffer_between_sign_ups, do: @time_buffer_between_sign_ups
 
   def now_or_in_next_seven_days(query) do
     start_of_today = Date.set(Date.now, time: {0, 0, 0})
@@ -202,32 +197,8 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-  def is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times) do
-    is_within_time_buffer_of_my_previous_sign_ups_value = Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
-      abs(Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
-    end)
-    Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
-    is_within_time_buffer_of_my_previous_sign_ups_value
-  end
-
-  def has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
-    has_panelist_not_interviewed_candidate_value = !Enum.member?(candidate_ids_interviewed, model.candidate_id)
-    Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
-    has_panelist_not_interviewed_candidate_value
-  end
-
-  def is_not_completed(model) do
-    is_not_completed_value = is_nil(model.interview_status_id)
-    Logger.info('is_not_complete:#{is_not_completed_value}')
-    is_not_completed_value
-  end
-
-  def is_signup_lesser_than_max_count(model_id, signup_counts) do
-    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
-    is_signup_lesser_than_max_count_value = result == [] or List.first(result).signup_count < @max_count
-    Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
-    is_signup_lesser_than_max_count_value
-  end
+  def is_not_completed(model),
+  do: is_nil(model.interview_status_id)
 
   def update_status(id, status_id) do
     interview = id |> retrieve_interview

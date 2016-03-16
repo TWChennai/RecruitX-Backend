@@ -9,6 +9,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   import Ecto.Query, only: [where: 2, from: 2]
 
   @max_count 2
+  # TODO: Move the magic number (2) into the db
 
   def max_count, do: @max_count
 
