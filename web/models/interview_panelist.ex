@@ -3,6 +3,7 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Repo
 
   import Ecto.Query, only: [where: 2, from: 2]
@@ -59,13 +60,14 @@ defmodule RecruitxBackend.InterviewPanelist do
       |> validate_panelist_has_no_other_interview_within_time_buffer(interview, my_previous_sign_up_start_times)
       |> validate_interview_is_not_over(interview)
       |> validate_signup_count(signup_counts, interview.id)
+      |> validate_with_experience_matrix(Decimal.new(1.0), interview.candidate.experience, interview.interview_type_id)
   end
 
   defp validate_sign_up_for_interview(existing_changeset, _) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     if check_not_nil([interview_id, panelist_login_name]) do
-      interview = Interview |> Repo.get(interview_id)
+      interview = (from i in Interview, preload: [:candidate]) |> Repo.get(interview_id)
       if !is_nil(interview) do
         {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
         signup_counts = __MODULE__.get_interview_type_based_count_of_sign_ups |> where(interview_id: ^interview.id) |> Repo.all
@@ -96,6 +98,13 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   defp validate_signup_count(existing_changeset, signup_counts, interview_id) do
     if existing_changeset.valid? and !Interview.is_signup_lesser_than_max_count(interview_id, signup_counts), do: existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
+    existing_changeset
+  end
+
+  defp validate_with_experience_matrix(existing_changeset, panelist_experience, candidate_experience, interview_type_id) do
+    if existing_changeset.valid? and !ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, interview_type_id) do
+      existing_changeset = add_error(existing_changeset, :experience_matrix, "The panelist does not have enough experience")
+    end
     existing_changeset
   end
 
