@@ -3,12 +3,14 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.SignUpEvaluator
 
   import Ecto.Query, only: [where: 2, from: 2]
 
   @max_count 2
+
+  def max_count, do: @max_count
 
   schema "interview_panelists" do
     field :panelist_login_name, :string
@@ -53,14 +55,10 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
-  defp validate_sign_up_for_interview(existing_changeset, %{candidate_ids_interviewed: candidate_ids_interviewed, my_previous_sign_up_start_times: my_previous_sign_up_start_times, interview: interview, signup_counts: signup_counts})
-    when not(is_nil(candidate_ids_interviewed)) and not(is_nil(my_previous_sign_up_start_times)) and not(is_nil(interview))  and not(is_nil(signup_counts)) do
-      existing_changeset
-      |> validate_panelist_has_not_interviewed_candidate(candidate_ids_interviewed, interview)
-      |> validate_panelist_has_no_other_interview_within_time_buffer(interview, my_previous_sign_up_start_times)
-      |> validate_interview_is_not_over(interview)
-      |> validate_signup_count(signup_counts, interview.id)
-      |> validate_with_experience_matrix(Decimal.new(1.0), interview.candidate.experience, interview.interview_type_id)
+  defp validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
+    when not(is_nil(interview)) and not(is_nil(sign_up_data_container)) do
+      sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
+      existing_changeset |> update_changeset(sign_up_evaluation_status)
   end
 
   defp validate_sign_up_for_interview(existing_changeset, _) do
@@ -69,41 +67,18 @@ defmodule RecruitxBackend.InterviewPanelist do
     if check_not_nil([interview_id, panelist_login_name]) do
       interview = (from i in Interview, preload: [:candidate]) |> Repo.get(interview_id)
       if !is_nil(interview) do
-        {candidate_ids_interviewed, my_sign_up_start_times} = get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
-        signup_counts = __MODULE__.get_interview_type_based_count_of_sign_ups |> where(interview_id: ^interview.id) |> Repo.all
-        existing_changeset = validate_sign_up_for_interview(existing_changeset, %{panelist_login_name: panelist_login_name,
-          candidate_ids_interviewed: candidate_ids_interviewed,
-          my_previous_sign_up_start_times: my_sign_up_start_times,
-          interview: interview,
-          signup_counts: signup_counts})
+        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(5))
+        existing_changeset = validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
       end
     end
     existing_changeset
   end
 
-  defp validate_panelist_has_not_interviewed_candidate(existing_changeset, candidate_ids_interviewed, interview) do
-    if existing_changeset.valid? and !Interview.has_panelist_not_interviewed_candidate(interview, candidate_ids_interviewed), do: existing_changeset = add_error(existing_changeset, :signup, "You have already signed up an interview for this candidate")
-    existing_changeset
-  end
-
-  defp validate_panelist_has_no_other_interview_within_time_buffer(existing_changeset, interview, my_previous_sign_up_start_times) do
-    if existing_changeset.valid? and !Interview.is_within_time_buffer_of_my_previous_sign_ups(interview, my_previous_sign_up_start_times), do: existing_changeset = add_error(existing_changeset, :signup, "You are already signed up for another interview within #{Interview.time_buffer_between_sign_ups} hours")
-    existing_changeset
-  end
-
-  defp validate_interview_is_not_over(existing_changeset, interview) do
-    if existing_changeset.valid? and !Interview.is_not_completed(interview),do: existing_changeset = add_error(existing_changeset, :signup, "Interview is already over!")
-    existing_changeset
-  end
-
-  defp validate_signup_count(existing_changeset, signup_counts, interview_id) do
-    if existing_changeset.valid? and !Interview.is_signup_lesser_than_max_count(interview_id, signup_counts), do: existing_changeset = add_error(existing_changeset, :signup_count, "More than #{@max_count} signups are not allowed")
-    existing_changeset
-  end
-
-  defp validate_with_experience_matrix(existing_changeset, panelist_experience, candidate_experience, interview_type_id) do
-    if existing_changeset.valid? and !ExperienceMatrix.is_eligible(panelist_experience, candidate_experience, interview_type_id) do
-      existing_changeset = add_error(existing_changeset, :experience_matrix, "The panelist does not have enough experience")
+  defp update_changeset(existing_changeset, sign_up_evaluation_status) do
+    if !sign_up_evaluation_status.valid? do
+      existing_changeset = Enum.reduce(sign_up_evaluation_status.errors, existing_changeset, fn({field_name, description}, acc) ->
+        add_error(acc, field_name, description)
+      end)
     end
     existing_changeset
   end

@@ -12,6 +12,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
   alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.SignUpEvaluator
   alias Timex.Date
 
   import Ecto.Query
@@ -133,18 +134,11 @@ defmodule RecruitxBackend.Interview do
   end
 
   def add_signup_eligibity_for(interviews, panelist_login_name) do
-    {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
-    signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
+    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(5))
     Enum.map(interviews, fn(interview) ->
       Logger.info("candidate_id:#{interview.candidate_id}")
       Logger.info("interview_id:#{interview.id}")
-      changeset_if_signup = InterviewPanelist.changeset(%InterviewPanelist{},
-        %{panelist_login_name: panelist_login_name,
-          interview_id: interview.id,
-          candidate_ids_interviewed: candidate_ids_interviewed,
-          my_previous_sign_up_start_times: my_previous_sign_up_start_times,
-          signup_counts: signup_counts,
-          interview: interview})
+      changeset_if_signup = InterviewPanelist.changeset(%InterviewPanelist{}, %{sign_up_data_container: sign_up_data_container,interview: interview})
       signup_eligiblity = changeset_if_signup.valid?
       Map.put(interview, :signup, signup_eligiblity)
     end)

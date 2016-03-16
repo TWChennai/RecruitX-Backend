@@ -2,7 +2,6 @@ defmodule RecruitxBackend.FeedbackImage do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Endpoint
 
   schema "feedback_images" do
     field :file_name, :string
