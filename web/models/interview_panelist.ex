@@ -56,30 +56,13 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
-  defp validate_panelist_experience(existing_changeset, %{"panelist_experience" => panelist_experience}) do
-    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
-    existing_changeset
-  end
-
-  defp validate_panelist_experience(existing_changeset, %{"sign_up_data_container" => %{"experience_eligibility_criteria" => %{"panelist_experience" => panelist_experience}}}) do
-    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
-    existing_changeset
-  end
-
   defp validate_panelist_experience(existing_changeset, params) do
-    if existing_changeset.valid? do
-      existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
-    end
+    panelist_experience = params["panelist_experience"]
+    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
     existing_changeset
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
-  defp validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
-    when not(is_nil(interview)) and not(is_nil(sign_up_data_container)) do
-      sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
-      existing_changeset |> update_changeset(sign_up_evaluation_status)
-  end
-
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
@@ -88,7 +71,8 @@ defmodule RecruitxBackend.InterviewPanelist do
       interview = (Interview) |> Repo.get(interview_id)
       if !is_nil(interview) do
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
-        existing_changeset = validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
+        sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
+        existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status)
       end
     end
     existing_changeset

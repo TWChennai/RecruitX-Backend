@@ -86,6 +86,20 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       expect(changeset) |> to(have_errors([interview_id: "can't be blank"]))
     end
 
+    it "should be invalid when panelist_experience is nil" do
+      with_nil_id = Map.merge(valid_attrs, %{panelist_experience: nil})
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_nil_id)
+
+      expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
+    end
+
+    it "should be invalid when panelist_experience is not present" do
+      with_nil_id = Map.delete(valid_attrs, :panelist_experience)
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_nil_id)
+
+      expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
+    end
+
     it "should be invalid when max signups are already done" do
       interview = create(:interview)
       create(:interview_panelist, interview_id: interview.id)

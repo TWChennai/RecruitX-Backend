@@ -133,12 +133,10 @@ defmodule RecruitxBackend.Interview do
   def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience) do
     sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
     Enum.map(interviews, fn(interview) ->
-      Logger.info("candidate_id:#{interview.candidate_id}")
-      Logger.info("interview_id:#{interview.id}")
-      changeset_if_signup = InterviewPanelist.changeset(%InterviewPanelist{}, %{panelist_login_name: panelist_login_name,interview_id: interview.id, sign_up_data_container: sign_up_data_container,interview: interview})
-      signup_eligiblity = changeset_if_signup.valid?
-      Logger.info("Is sign up valid?: #{signup_eligiblity}")
-      Map.put(interview, :signup, signup_eligiblity)
+      Logger.info("candidate_id:#{interview.candidate_id} interview_id:#{interview.id}")
+      sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
+      Logger.info("Is sign up valid?: #{sign_up_evaluation_status.valid?}")
+      Map.put(interview, :signup, sign_up_evaluation_status.valid?)
     end)
   end
 
