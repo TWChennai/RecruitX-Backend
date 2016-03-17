@@ -3,8 +3,12 @@ defmodule RecruitxBackend.RoleController do
 
   alias RecruitxBackend.Role
 
+  import Ecto.Query, only: [preload: 2]
+
   def index(conn, _params) do
-    roles = Role |> Repo.all
+    roles = Role
+            |> preload(:role_skills)
+            |> Repo.all
     conn |> render("index.json", roles: roles)
   end
 end

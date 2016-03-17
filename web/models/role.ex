@@ -4,6 +4,7 @@ defmodule RecruitxBackend.Role do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.RoleSkill
 
   def dev, do: "Dev"
   def qa, do: "QA"
@@ -14,6 +15,7 @@ defmodule RecruitxBackend.Role do
     timestamps
 
     has_many :candidates, Candidate
+    has_many :role_skills, RoleSkill
   end
 
   @required_fields ~w(name)

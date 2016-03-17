@@ -6,8 +6,8 @@ defmodule RecruitxBackend.RoleSkillView do
   end
 
   def render("role_skill.json", %{role_skill: role_skill}) do
-    %{role_id: role_skill.role_id,
-      skill_id: role_skill.skill_id
+    %{
+      id: role_skill.skill_id
     }
   end
 end

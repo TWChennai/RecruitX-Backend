@@ -3,6 +3,7 @@ defmodule RecruitxBackend.Skill do
 
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Repo
 
   schema "skills" do
@@ -11,6 +12,7 @@ defmodule RecruitxBackend.Skill do
     timestamps
 
     has_many :candidate_skills, CandidateSkill
+    has_many :role_skills, RoleSkill
   end
 
   @required_fields ~w(name)

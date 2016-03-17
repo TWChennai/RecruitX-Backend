@@ -21,7 +21,6 @@ defmodule RecruitxBackend.Router do
     resources "/panelists", PanelistController, only: [:create, :show, :delete]
     resources "/interview_statuses", InterviewStatusController, only: [:index]
     resources "/pipeline_statuses", PipelineStatusController, only: [:index]
-    resources "/role_skills", RoleSkillController, only: [:index]
   end
 
   # Other scopes may use custom stacks.
