@@ -20,14 +20,27 @@ defmodule RecruitxBackend.JigsawController do
           "" -> @invalid_user
           _  -> case response.body |> Parser.parse do
                   {:ok, body} -> department = body["department"]
-                                  tw_hire_date = body["hireDate"]
-                                  tw_experience = body["twExperience"]
-                                  total_experience = body["totalExperience"]
-                                  past_experience = Decimal.new(total_experience - tw_experience)
-                                                    |> Decimal.round(2)
+                                 tw_experience = body["twExperience"]
+                                 total_experience = body["totalExperience"]
+                                 past_experience = Decimal.new(total_experience - tw_experience)
+                                                   |> Decimal.round(2)
+                                 {tw_year_experience, tw_months_experience} = tw_experience
+                                                                                      |> Decimal.new
+                                                                                      |> Decimal.to_string
+                                                                                      |> Integer.parse
+                                 tw_experience_in_months = tw_year_experience * 12
+                                                        |> Decimal.new
+                                                        |> Decimal.add(tw_months_experience
+                                                                        |> Decimal.new
+                                                                        |> Decimal.mult(Decimal.new(12)))
+                                 {tw_experience_in_integer , _} = tw_experience_in_months
+                                                                        |> Decimal.to_string
+                                                                        |> Integer.parse
+                                 calculated_hire_date = Timex.Date.now
+                                                        |> Timex.Date.shift(months: -tw_experience_in_integer)
                   case department["name"] do
-                    @recruitment_department -> %{is_recruiter: true, tw_hire_date: tw_hire_date, past_experience: past_experience}
-                    _ -> %{is_recruiter: false, tw_hire_date: tw_hire_date, past_experience: past_experience}
+                    @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience}
+                    _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience}
                   end
                   {:error, reason} -> reason
                 end

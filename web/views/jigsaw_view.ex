@@ -4,7 +4,7 @@ defmodule RecruitxBackend.JigsawView do
   def render("show.json", %{user_details: user_details}) do
     %{
       is_recruiter: user_details.is_recruiter,
-      tw_hire_date: user_details.tw_hire_date,
+      calculated_hire_date: Timex.DateFormat.format!(user_details.calculated_hire_date, "%Y-%m-%d", :strftime),
       past_experience: user_details.past_experience
     }
   end
