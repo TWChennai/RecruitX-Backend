@@ -56,8 +56,20 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
+  defp validate_panelist_experience(existing_changeset, %{"panelist_experience" => panelist_experience}) do
+    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
+    existing_changeset
+  end
+
+  defp validate_panelist_experience(existing_changeset, %{"sign_up_data_container" => %{"experience_eligibility_criteria" => %{"panelist_experience" => panelist_experience}}}) do
+    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
+    existing_changeset
+  end
+
   defp validate_panelist_experience(existing_changeset, params) do
-    if params["panelist_experience"] |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
+    if existing_changeset.valid? do
+      existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
+    end
     existing_changeset
   end
 
