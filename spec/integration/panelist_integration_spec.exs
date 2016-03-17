@@ -9,7 +9,10 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.ExperienceMatrix
+  alias RecruitxBackend.Candidate
   alias Timex.Date
+  alias Decimal, as: D
 
   describe "create" do
     it "should insert valid data in db and return location path in a success response" do
@@ -58,6 +61,54 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       response |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "signup_count", reason: "More than 2 signups are not allowed"}
+      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+    end
+
+    it "should accept sign up if experience is above maximum experience with filter" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      experience_matrix = create(:experience_matrix)
+      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: D.add(experience_matrix.panelist_experience_lower_bound,D.new(1))})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+
+      expect(response.status) |> to(be(201))
+    end
+
+    it "should accept sign up if there is no filter for the interview type" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      experience_matrix = create(:experience_matrix)
+      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+
+      expect(response.status) |> to(be(201))
+    end
+
+    it "should accept sign up if the panelist is experienced for the interview type and the candidate" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
+      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+
+      expect(response.status) |> to(be(201))
+    end
+
+    it "should not accept sign up if the panelist is experienced for the interview type but not for the candidate" do
+      Repo.delete_all ExperienceMatrix
+      Repo.delete_all Candidate
+
+      candidate = create(:candidate, experience: D.new(5))
+      interview = create(:interview, candidate_id: candidate.id)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, candidate_experience_upper_bound: D.sub(candidate.experience, D.new(1)))
+      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "The panelist does not have enough experience"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
   end
