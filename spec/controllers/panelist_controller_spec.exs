@@ -1,11 +1,11 @@
-defmodule RecruitxBackend.InterviewPanelistControllerSpec do
+defmodule RecruitxBackend.PanelistControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.PanelistController
 
   alias RecruitxBackend.PanelistController
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.JSONError
 
-  let :post_parameters, do: convertKeysFromAtomsToStrings(fields_for(:interview_panelist))
+  let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2}))
 
   describe "create" do
     let :interview_panelist, do: create(:interview_panelist)

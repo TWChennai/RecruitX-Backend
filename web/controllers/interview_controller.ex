@@ -12,12 +12,12 @@ defmodule RecruitxBackend.InterviewController do
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
-  def index(conn, %{"panelist_login_name" => panelist_login_name}) do
+  def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> Interview.now_or_in_next_seven_days
                   |> Interview.default_order
                   |> Repo.all
-    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name)
+    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience)
     conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
   end
 
@@ -46,7 +46,7 @@ defmodule RecruitxBackend.InterviewController do
   end
 
   def index(conn, _) do
-    conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name")
+    conn |> put_status(400) |> render("missing_param_error.json", param: "panelist_login_name/candidate_id/panelist_name/panelist_experience")
   end
 
   def show(conn, %{"id" => id}) do

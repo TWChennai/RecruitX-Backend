@@ -50,9 +50,15 @@ defmodule RecruitxBackend.InterviewPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
+    |> validate_panelist_experience(params)
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")
+  end
+
+  defp validate_panelist_experience(existing_changeset, params) do
+    if params["panelist_experience"] |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
+    existing_changeset
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
@@ -62,13 +68,14 @@ defmodule RecruitxBackend.InterviewPanelist do
       existing_changeset |> update_changeset(sign_up_evaluation_status)
   end
 
-  defp validate_sign_up_for_interview(existing_changeset, _) do
+  defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
-    if check_not_nil([interview_id, panelist_login_name]) do
+    panelist_experience = params["panelist_experience"]
+    if existing_changeset.valid? do
       interview = (Interview) |> Repo.get(interview_id)
       if !is_nil(interview) do
-        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(5))
+        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
         existing_changeset = validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
       end
     end

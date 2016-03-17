@@ -128,8 +128,8 @@ defmodule RecruitxBackend.Interview do
     existing_changeset
   end
 
-  def add_signup_eligibity_for(interviews, panelist_login_name) do
-    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(5))
+  def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience) do
+    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
     Enum.map(interviews, fn(interview) ->
       Logger.info("candidate_id:#{interview.candidate_id}")
       Logger.info("interview_id:#{interview.id}")

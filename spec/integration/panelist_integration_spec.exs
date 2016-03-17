@@ -13,7 +13,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   describe "create" do
     it "should insert valid data in db and return location path in a success response" do
-      interview_panelist_params = fields_for(:interview_panelist)
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2})
 
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist_params}
 
@@ -25,7 +25,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should respond with errors when trying to sign up for the same interview more than once" do
-      interview_panelist_params = fields_for(:interview_panelist)
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2})
 
       post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist_params}
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist_params}
@@ -41,7 +41,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       interview1 = create(:interview, candidate_id: candidate.id)
       interview2 = create(:interview, candidate_id: candidate.id, start_time: interview1.start_time |> Date.shift(hours: 2))
       interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
-      interview_panelist2 = %{interview_id: interview2.id, panelist_login_name: interview_panelist1.panelist_login_name}
+      interview_panelist2 = %{interview_id: interview2.id, panelist_login_name: interview_panelist1.panelist_login_name, panelist_experience: 2}
 
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist2}
 
@@ -52,10 +52,9 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
     it "should respond with errors when trying to sign up for the interview after maximum(2) signups reached" do
       interview = create(:interview)
-      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => fields_for(:interview_panelist, interview_id: interview.id)}
-      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => fields_for(:interview_panelist, interview_id: interview.id)}
-
-      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => fields_for(:interview_panelist, interview_id: interview.id)}
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: 2}))}
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: 2}))}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: 2}))}
 
       response |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "signup_count", reason: "More than 2 signups are not allowed"}
