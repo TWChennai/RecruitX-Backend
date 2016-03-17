@@ -11,10 +11,10 @@ defmodule RecruitxBackend.JigsawController do
   @lint {Credo.Check.Refactor.CyclomaticComplexity, false}
   def show(conn, %{"id" => id}) do
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: "2014-11-11", past_experience: 0.24}
-      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: "2005-11-11", past_experience: 0.24}
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: "2005-11-11", past_experience: 0.24}
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: "2005-11-11", past_experience: 0.24}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Timex.Date.now |> Timex.Date.shift(months: -10), past_experience: 0.24}
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Timex.Date.now |> Timex.Date.shift(months: -100), past_experience: 0.24}
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Timex.Date.now |> Timex.Date.shift(months: -10), past_experience: 0.24}
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Timex.Date.now |> Timex.Date.shift(months: -100), past_experience: 0.24}
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         case response.body do
           "" -> @invalid_user
