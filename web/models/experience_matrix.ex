@@ -26,18 +26,6 @@ defmodule RecruitxBackend.ExperienceMatrix do
     |> unique_constraint(:experience_matrix_unique, name: :experience_matrix_unique_index, message: "This criteria is already specified")
   end
 
-  def is_eligible(candidate_experience, interview_type_id, eligiblity_criteria) do
-    to_float(eligiblity_criteria.panelist_experience) > to_float(eligiblity_criteria.max_experience_with_filter)
-    or !Enum.member?(eligiblity_criteria.interview_types_with_filter, interview_type_id)
-    or eligiblity_criteria.experience_matrix_filters |> is_eligible_based_on_filter(candidate_experience,interview_type_id)
-  end
-
-  defp is_eligible_based_on_filter(experience_matrix_filters, candidate_experience, interview_type_id) do
-    Enum.any?(experience_matrix_filters, fn({eligible_candidate_experience, eligible_interview_type_id}) ->
-      interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_experience)
-    end)
-  end
-
   def filter(panelist_experience) do
     from e in __MODULE__,
     where: e.panelist_experience_lower_bound <= ^panelist_experience,
@@ -47,7 +35,5 @@ defmodule RecruitxBackend.ExperienceMatrix do
   def get_max_experience_with_filter, do: (from e in ExperienceMatrix, select: max(e.panelist_experience_lower_bound)) |> Repo.one
 
   def get_interview_types_with_filter, do: (from e in ExperienceMatrix, distinct: true, select: e.interview_type_id) |> Repo.all
-
-  defp to_float(input), do: Float.parse(input |> Decimal.to_string())
 end
 

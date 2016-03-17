@@ -7,6 +7,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.ExperienceEligibilityData
   alias RecruitxBackend.InterviewRelativeEvaluator
+  alias RecruitxBackend.ExperienceMatrixRelativeEvaluator
 
   def populate_sign_up_data_container(panelist_login_name, panelist_experience) do
     {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
@@ -31,14 +32,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
   def evaluate(sign_up_data_container, interview) do
     %SignUpEvaluationStatus{}
     |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
-    |> is_valid_against_experience_matrix(sign_up_data_container.experience_eligibility_criteria, interview.candidate.experience, interview.interview_type_id)
-  end
-
-  defp is_valid_against_experience_matrix(sign_up_evaluation_status, experience_eligibility_criteria, candidate_experience, interview_type_id) do
-    if sign_up_evaluation_status.valid? and !ExperienceMatrix.is_eligible(candidate_experience, interview_type_id, experience_eligibility_criteria) do
-      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:experience_matrix, "The panelist does not have enough experience"})
-    end
-    sign_up_evaluation_status
+    |> ExperienceMatrixRelativeEvaluator.evaluate(sign_up_data_container.experience_eligibility_criteria, interview)
   end
 end
 
