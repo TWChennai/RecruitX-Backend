@@ -111,8 +111,8 @@ defmodule RecruitxBackend.Factory do
 
   def factory(:experience_matrix) do
     %ExperienceMatrix{
-      panelist_experience_lower_bound: Decimal.new(:rand.uniform(100)),
-      candidate_experience_upper_bound: Decimal.new(:rand.uniform(100)),
+      panelist_experience_lower_bound: Decimal.new(:rand.uniform(99)),
+      candidate_experience_upper_bound: Decimal.new(:rand.uniform(99)),
       interview_type_id: create(:interview_type).id
     }
   end

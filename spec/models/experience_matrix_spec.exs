@@ -96,7 +96,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   context "get_interview_types_with_filter" do
     it "should return the interview types with filter" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(100)})
+      experience_matrix = create(:experience_matrix)
 
       expect(ExperienceMatrix.get_interview_types_with_filter) |> to(eq([experience_matrix.interview_type_id]))
     end
@@ -111,11 +111,11 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   context "get_max_experience_with_filter" do
     it "should return maximum experience" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(100)})
+      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(90)})
       create(:experience_matrix, %{panelist_experience_lower_bound: D.new(10)})
       create(:experience_matrix, %{panelist_experience_lower_bound: D.new(20)})
 
-      expect(ExperienceMatrix.get_max_experience_with_filter) |> to(eq(D.new(100.0)))
+      expect(D.compare(ExperienceMatrix.get_max_experience_with_filter, D.new(90))) |> to(eq(D.new(0)))
     end
 
     it "should nil if no filters are specified" do
