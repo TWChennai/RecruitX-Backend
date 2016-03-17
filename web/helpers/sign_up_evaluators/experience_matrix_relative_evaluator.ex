@@ -1,8 +1,10 @@
 defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.Repo
 
   def evaluate(sign_up_evaluation_status, experience_eligibility_criteria, interview) do
+    interview = Repo.preload interview, :candidate
     sign_up_evaluation_status
     |> is_valid_against_experience_matrix(experience_eligibility_criteria, interview.candidate.experience, interview.interview_type_id)
   end
@@ -14,10 +16,10 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
     sign_up_evaluation_status
   end
 
-  def is_eligible(candidate_experience, interview_type_id, eligiblity_criteria) do
+  defp is_eligible(candidate_experience, interview_type_id, eligiblity_criteria) do
     to_float(eligiblity_criteria.panelist_experience) > to_float(eligiblity_criteria.max_experience_with_filter)
     or !Enum.member?(eligiblity_criteria.interview_types_with_filter, interview_type_id)
-    or eligiblity_criteria.experience_matrix_filters |> is_eligible_based_on_filter(candidate_experience,interview_type_id)
+    or eligiblity_criteria.experience_matrix_filters |> is_eligible_based_on_filter(candidate_experience, interview_type_id)
   end
 
   defp is_eligible_based_on_filter(experience_matrix_filters, candidate_experience, interview_type_id) do

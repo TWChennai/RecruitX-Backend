@@ -3,7 +3,6 @@ defmodule RecruitxBackend.ExperienceMatrix do
 
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.ExperienceMatrix
 
   schema "experience_matrices" do
     field :panelist_experience_lower_bound, :decimal
@@ -32,8 +31,8 @@ defmodule RecruitxBackend.ExperienceMatrix do
     select: {e.candidate_experience_upper_bound, e.interview_type_id}
   end
 
-  def get_max_experience_with_filter, do: (from e in ExperienceMatrix, select: max(e.panelist_experience_lower_bound)) |> Repo.one
+  def get_max_experience_with_filter, do: (from e in __MODULE__, select: max(e.panelist_experience_lower_bound)) |> Repo.one
 
-  def get_interview_types_with_filter, do: (from e in ExperienceMatrix, distinct: true, select: e.interview_type_id) |> Repo.all
+  def get_interview_types_with_filter, do: (from e in __MODULE__, distinct: true, select: e.interview_type_id) |> Repo.all
 end
 

@@ -92,4 +92,35 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       expect(changeset.errors) |> to(eql([experience_matrix_unique: "This criteria is already specified"]))
     end
   end
+
+  context "get_interview_types_with_filter" do
+    it "should return the interview types with filter" do
+      Repo.delete_all ExperienceMatrix
+      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(100)})
+
+      expect(ExperienceMatrix.get_interview_types_with_filter) |> to(eq([experience_matrix.interview_type_id]))
+    end
+
+    it "should return [] if there are no interviews with filters" do
+      Repo.delete_all ExperienceMatrix
+
+      expect(ExperienceMatrix.get_interview_types_with_filter) |> to(eq([]))
+    end
+  end
+
+  context "get_max_experience_with_filter" do
+    it "should return maximum experience" do
+      Repo.delete_all ExperienceMatrix
+      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(100)})
+      create(:experience_matrix, %{panelist_experience_lower_bound: D.new(10)})
+      create(:experience_matrix, %{panelist_experience_lower_bound: D.new(20)})
+
+      expect(ExperienceMatrix.get_max_experience_with_filter) |> to(eq(D.new(100.0)))
+    end
+
+    it "should nil if no filters are specified" do
+      Repo.delete_all ExperienceMatrix
+      expect(ExperienceMatrix.get_max_experience_with_filter) |> to(eq(nil))
+    end
+  end
 end

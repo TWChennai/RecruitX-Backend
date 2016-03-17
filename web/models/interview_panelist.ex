@@ -66,7 +66,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     if check_not_nil([interview_id, panelist_login_name]) do
-      interview = (from i in Interview, preload: [:candidate]) |> Repo.get(interview_id)
+      interview = (Interview) |> Repo.get(interview_id)
       if !is_nil(interview) do
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(5))
         existing_changeset = validate_sign_up_for_interview(existing_changeset, %{interview: interview, sign_up_data_container: sign_up_data_container})
