@@ -50,6 +50,7 @@ defmodule RecruitxBackend.InterviewView do
       candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills.json"),
       status_id: interview.interview_status_id,
       signup: interview.signup,
+      signup_error: interview.signup_error,
       panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
     }
   end

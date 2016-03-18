@@ -145,6 +145,11 @@ defmodule RecruitxBackend.Interview do
       Logger.info("candidate_id:#{interview.candidate_id} interview_id:#{interview.id}")
       sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
       Logger.info("Is sign up valid?: #{sign_up_evaluation_status.valid?}")
+      interview = Map.put(interview, :signup_error, "")
+      if !sign_up_evaluation_status.valid? do
+        {_, error} = sign_up_evaluation_status.errors |> List.first
+        interview = Map.put(interview, :signup_error, error)
+      end
       Map.put(interview, :signup, sign_up_evaluation_status.valid?)
     end)
   end
