@@ -3,89 +3,175 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
 
   alias RecruitxBackend.InterviewRelativeEvaluator
   alias Timex.Date
+  alias RecruitxBackend.SignUpEvaluator
+  alias RecruitxBackend.SignUpEvaluationStatus
+  alias Decimal, as: D
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Repo
 
-  describe "is_signup_lesser_than" do
-    it "should return true when there are no signups" do
-      interview = create(:interview)
+  describe "has_not_interviewed_candidate" do
+    it "should be invalid when panelist has already done a previous interview for the candidate" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, candidate_id: candidate.id)
+      interview2 = create(:interview, candidate_id: candidate.id)
 
-      expect(InterviewRelativeEvaluator.is_signup_lesser_than_max_count(interview.id, [])) |> to(be_true)
+      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", D.new(1))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview2)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "You have already signed up an interview for this candidate"]))
     end
 
-    it "should return true when signups are lesser than max" do
-      interview = create(:interview)
-      signup_counts = [%{"interview_id": interview.id, "signup_count": 1, "interview_type": 1}]
-      expect(InterviewRelativeEvaluator.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_true)
+    it "should be invalid when panelist has already signed up for the same interview" do
+      candidate = create(:candidate)
+      interview1 = create(:interview, candidate_id: candidate.id)
+      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", D.new(1))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview1)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "You have already signed up an interview for this candidate"]))
     end
 
-    it "should return false when signups are greater than max" do
+    it "should be valid when panelist has not interviewed current candidate" do
       interview = create(:interview)
-      signup_counts = [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}]
-      expect(InterviewRelativeEvaluator.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_false)
-    end
+      interview_panelist = fields_for(:interview_panelist)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(1))
 
-    it "should return false when signups are equal to max" do
-      interview = create(:interview)
-      signup_counts = [%{"interview_id": interview.id, "signup_count": 5, "interview_type": 1}]
-      expect(InterviewRelativeEvaluator.is_signup_lesser_than_max_count(interview.id, signup_counts)) |> to(be_false)
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
+
+      expect(errors) |> to(be([]))
+      expect(validity) |> to(be_true)
     end
   end
 
-  describe "has_panelist_not_interviewed_candidate" do
-    it "should return true when panelist has not interviewed current candidate" do
-      interview = build(:interview)
+  describe "is_interview_not_over" do
+    it "should be invalid when feedback is already entered" do
+      interview = create(:interview, interview_status_id: create(:interview_status).id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
 
-      expect(InterviewRelativeEvaluator.has_panelist_not_interviewed_candidate(interview, [])) |> to(be_true)
-    end
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
-    it "should return false when panelist has interviewed current candidate" do
-      interview = build(:interview)
-      candidates_interviewed = [interview.candidate_id]
-
-      expect(InterviewRelativeEvaluator.has_panelist_not_interviewed_candidate(interview, candidates_interviewed)) |> to(be_false)
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "Interview is already over!"]))
     end
   end
 
-  describe "is_within_time_buffer_of_my_previous_sign_ups" do
-    it "should return false if current interview is within 2 hours of signed up interviews" do
+  describe "is_signup_count_lesser_than_max" do
+    it "should be invalid when signups equal to max are already done" do
       interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 1)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+      create(:interview_panelist, interview_id: interview.id)
+      create(:interview_panelist, interview_id: interview.id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup_count: "More than 2 signups are not allowed"]))
     end
 
-    it "should return false if current interview is within 2 hours of signed up interviews" do
+    it "should be valid when signups are less than max" do
       interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -1)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+      create(:interview_panelist, interview_id: interview.id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
     end
 
-    it "should return true if there are no signed up interviews" do
+    it "should be valid when there are no signups" do
       interview = create(:interview)
-      my_sign_up_start_times = []
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
+    end
+  end
+
+  describe "has_no_other_interview_within_time_buffer" do
+    it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(1))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "You are already signed up for another interview within 2 hours"]))
     end
 
-    it "should return true if current interview is exactly 2 hours earlier to signed up interviews" do
-      interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 2)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(1))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "You are already signed up for another interview within 2 hours"]))
     end
 
-    it "should return true if interview is exactly 2 hours later to signed up interviews" do
-      interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -2)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours later" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 3))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
     end
 
-    it "should return true if current interview is more than 2 hours earlier to signed up interviews" do
-      interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: 3)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours before" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -3))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
     end
 
-    it "should return true if interview is more than 2 hours later to signed up interviews" do
-      interview = create(:interview)
-      my_sign_up_start_times = [interview.start_time |> Date.shift(hours: -3)]
-      InterviewRelativeEvaluator.is_within_time_buffer_of_my_previous_sign_ups(interview, my_sign_up_start_times)
+    it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours later" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
+    end
+
+    it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours before" do
+      interview_signed_up = create(:interview_panelist)
+      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
     end
   end
 end

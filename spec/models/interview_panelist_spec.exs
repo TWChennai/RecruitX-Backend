@@ -15,26 +15,6 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
 
     it do: should be_valid
-
-    it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours" do
-      interview_signed_up = create(:interview_panelist)
-      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 3))
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id, panelist_experience: 2}))
-
-      expect(changeset) |> to(be_valid)
-    end
-
-    it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours" do
-      interview_signed_up = create(:interview_panelist)
-      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id, panelist_experience: 2}))
-
-      expect(changeset) |> to(be_valid)
-    end
   end
 
   context "invalid changeset" do
@@ -99,51 +79,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
       expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
     end
-
-    it "should be invalid when max signups are already done" do
-      interview = create(:interview)
-      create(:interview_panelist, interview_id: interview.id)
-      create(:interview_panelist, interview_id: interview.id)
-      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(interview_panelist, %{panelist_experience: 2})))
-
-      expect(changeset) |> to(have_errors([signup_count: "More than 2 signups are not allowed"]))
-    end
-
-    it "should be invalid when feedback is already entered" do
-      interview = create(:interview, interview_status_id: create(:interview_status).id)
-      interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(interview_panelist, %{panelist_experience: 2})))
-
-      expect(changeset) |> to(have_errors([signup: "Interview is already over!"]))
-    end
-
-    it "should be invalid when panelist has already done a previous interview for the candidate" do
-      candidate = create(:candidate)
-      interview1 = create(:interview, candidate_id: candidate.id)
-      interview2 = create(:interview, candidate_id: candidate.id)
-
-      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
-      interview_panelist = fields_for(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(interview_panelist, %{panelist_experience: 2})))
-
-      expect(changeset) |> to(have_errors([signup: "You have already signed up an interview for this candidate"]))
-    end
-
-    it "should be invalid when panelist has already signed up for the same interview" do
-      candidate = create(:candidate)
-      interview1 = create(:interview, candidate_id: candidate.id)
-
-      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: "test", interview_id: interview1.id, panelist_experience: 2}))
-
-      expect(changeset) |> to(have_errors([signup: "You have already signed up an interview for this candidate"]))
-    end
-
+    
     it "should be invalid when sign up is invalid and some parameters are not passed" do
       candidate = create(:candidate)
       interview1 = create(:interview, candidate_id: candidate.id)
@@ -153,16 +89,6 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: "test", interview_id: interview1.id, candidate_ids_interviewed: [], my_previous_sign_up_start_times: [], interview: nil}))
 
       expect(changeset.valid?) |> to(be_false)
-    end
-
-    it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
-      interview_signed_up = create(:interview_panelist)
-      signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 1))
-
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: interview_signed_up.panelist_login_name, interview_id: new_interview.id, panelist_experience: 2}))
-
-      expect(changeset) |> to(have_errors([signup: "You are already signed up for another interview within 2 hours"]))
     end
   end
 
