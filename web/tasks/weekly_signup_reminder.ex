@@ -2,6 +2,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
   import Ecto.Query
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
+  alias Timex.DateFormat
 
   def get_candidates_and_interviews(sub_query) do
     candidates = Candidate
@@ -17,7 +18,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
       role: candidate.role.name,
       interviews: Enum.map(candidate.interviews, fn(interview) -> %{
         name: interview.interview_type.name,
-        date: Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)
+        date: DateFormat.format!(interview.start_time, "%b-%d", :strftime)
       }
       end),
       skills: (Enum.reduce(candidate.candidate_skills, "", fn(candidate_skill, accumulator) ->
