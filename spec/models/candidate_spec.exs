@@ -1,6 +1,8 @@
 defmodule RecruitxBackend.CandidateSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Candidate
 
+  import Ecto.Query
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
@@ -220,5 +222,58 @@ defmodule RecruitxBackend.CandidateSpec do
 
       expect(updated_candidate.pipeline_status_id) |> to(be(pass_id))
     end
+  end
+
+  context "get formattted skills" do
+    let :candidate, do: create(:candidate, other_skills: "Other Skills")
+    before do
+      create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate.id)
+      create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate.id)
+		end
+
+    it "should contain concatenated skills for the candidate in the result" do
+      formatted_skills = Candidate
+        |> preload([:skills])
+        |> Repo.get(candidate.id)
+        |> Candidate.get_formatted_skills
+
+      expect(formatted_skills) |> to(be("Skill 1, Skill 2"))
+    end
+
+    it "should append other skills for the candidate in the result" do
+			create(:candidate_skill, skill_id: other_skill_id, candidate_id: candidate.id)
+      formatted_skills = Candidate
+        |> preload([:skills])
+        |> Repo.get(candidate.id)
+        |> Candidate.get_formatted_skills
+
+      expect(formatted_skills) |> to(be("Skill 1, Skill 2, Other Skills"))
+    end
+  end
+
+  context "get formatted interviews" do
+    let :candidate, do: create(:candidate)
+    let :interview_type_one, do: create(:interview_type)
+    let :interview_type_two, do: create(:interview_type)
+    before do
+      create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_one.id)
+      create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_two.id)
+    end
+
+    it "should return list of formatted interviews" do
+      formatted_interviews = Candidate
+        |> preload([:interviews, interviews: [:interview_type]])
+        |> Repo.get(candidate.id)
+        |> Candidate.get_formatted_interviews
+
+      expect(Enum.count(formatted_interviews)) |> to(be(2))
+    end
+  end
+
+  defp other_skill_id do
+    RecruitxBackend.Skill
+      |> where([i], i.name=="Other")
+      |> select([i], i.id)
+      |> Repo.one
   end
 end

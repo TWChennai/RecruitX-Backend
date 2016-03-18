@@ -716,4 +716,19 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(result) |> to(be_valid)
     end
   end
+
+  context "format interview" do
+    let :interview_type, do: create(:interview_type)
+    let :interview, do: create(:interview, interview_type_id: interview_type.id)
+
+    it "should contain interview names and dates for the candidate in the result" do
+      formatted_interview = Interview
+        |> preload([:interview_type])
+        |> Repo.get(interview.id)
+        |> Interview.format
+
+        expect(formatted_interview.name) |> to(be(interview_type.name))
+        expect(formatted_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
+      end
+  end
 end

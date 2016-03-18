@@ -72,4 +72,19 @@ defmodule RecruitxBackend.Candidate do
     in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
     candidate.pipeline_status_id == in_progress_id
   end
+
+  def get_formatted_skills(candidate) do
+    (Enum.reduce(candidate.skills, "", fn(skill, accumulator) ->
+      skill_name = skill.name
+      if skill_name == "Other", do: skill_name = candidate.other_skills
+      accumulator <> ", " <> skill_name
+    end))
+    |> String.lstrip(?,)
+    |> String.lstrip
+  end
+
+  def get_formatted_interviews(candidate) do
+    Enum.map(candidate.interviews, &(Interview.format(&1)))
+  end
+
 end

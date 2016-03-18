@@ -25,9 +25,10 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills")
     let :interview_type, do: create(:interview_type)
     let :interview, do: create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id)
-    let :candidate_skill1, do: create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate.id)
-    let :candidate_skill2, do: create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate.id)
-    let :candidate_other_skill, do: create(:candidate_skill, skill_id: other_skill_id, candidate_id: candidate.id)
+    before do
+			create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate.id)
+			create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate.id)
+		end
 
     it "should conatin name, role and experience of candidate in the result" do
       candidates = WeeklySignupReminder.get_candidates_and_interviews(
@@ -67,6 +68,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should append other skills for the candidate in the result" do
+			create(:candidate_skill, skill_id: other_skill_id, candidate_id: candidate.id)
       candidates_and_interviews = Interview
         |> where([i], i.id == ^interview.id)
         |> preload([:interview_type])

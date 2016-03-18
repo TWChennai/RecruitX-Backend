@@ -14,6 +14,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.SignUpEvaluator
   alias Timex.Date
+  alias Timex.DateFormat
 
   import Ecto.Query
 
@@ -279,5 +280,12 @@ defmodule RecruitxBackend.Interview do
         [] -> nil
       end
     end
+  end
+
+  def format(interview) do
+    %{
+      name: interview.interview_type.name,
+      date: DateFormat.format!(interview.start_time, "%b-%d", :strftime)
+    }
   end
 end
