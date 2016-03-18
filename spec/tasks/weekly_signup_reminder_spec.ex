@@ -1,13 +1,12 @@
 defmodule RecruitxBackend.WeeklySignupReminderSpec do
 	use ESpec.Phoenix, model: RecruitxBackend.WeeklySignupReminder
 
-  import Ecto.Query
   alias RecruitxBackend.Interview
   alias RecruitxBackend.WeeklySignupReminder
 
   describe "get candidates and interviews" do
     let :interview, do: create(:interview)
-    
+
     it "should return candidates with interviews based on sub query" do
       [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id == ^interview.id))
 
@@ -16,7 +15,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
     it "should return empty array when sub query returns empty result" do
       result = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id != ^interview.id))
-      
+
       expect(result) |> to(be([]))
     end
 	end
@@ -32,15 +31,15 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
     it "should conatin name, role and experience of candidate in the result" do
       candidates = WeeklySignupReminder.get_candidates_and_interviews(
-        Interview 
-        |> where([i], i.id == ^interview.id) 
+        Interview
+        |> where([i], i.id == ^interview.id)
         |> preload([:interview_type])
       )
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates)
 
       expect(actual_data.name) |> to(be(candidate.first_name <> " " <> candidate.last_name))
       expect(actual_data.experience) |> to(be(candidate.experience))
-      expect(actual_data.role) |> to(be(role.name))   
+      expect(actual_data.role) |> to(be(role.name))
     end
 
     it "should contain interview names and dates for the candidate in the result" do
@@ -48,7 +47,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
         |> where([i], i.id == ^interview.id)
         |> preload([:interview_type])
         |> WeeklySignupReminder.get_candidates_and_interviews
-      
+
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
       [ actual_interview | _ ] = actual_data.interviews
 
@@ -61,9 +60,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
         |> where([i], i.id == ^interview.id)
         |> preload([:interview_type])
         |> WeeklySignupReminder.get_candidates_and_interviews
-      
+
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
-      
+
       expect(actual_data.skills) |> to(be("Skill 1, Skill 2"))
     end
 
@@ -74,15 +73,15 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
         |> WeeklySignupReminder.get_candidates_and_interviews
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
-      
+
       expect(actual_data.skills) |> to(be("Skill 1, Skill 2, Other Skills"))
     end
   end
 
   defp other_skill_id do
-    RecruitxBackend.Skill 
-      |> where([i], i.name=="Other") 
-      |> select([i], i.id) 
+    RecruitxBackend.Skill
+      |> where([i], i.name=="Other")
+      |> select([i], i.id)
       |> Repo.one
   end
 end

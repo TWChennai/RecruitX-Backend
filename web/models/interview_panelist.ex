@@ -6,8 +6,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluator
 
-  import Ecto.Query, only: [where: 2, from: 2]
-
   @max_count 2
   # TODO: Move the magic number (2) into the db
 
@@ -91,9 +89,5 @@ defmodule RecruitxBackend.InterviewPanelist do
     query_result = get_interviews_for(panelist_login_name) |> Repo.all
     map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
     {Map.keys(map_result), Map.values(map_result)}
-  end
-
-  defp check_not_nil(enumerable) do
-    Enum.all?(enumerable, fn(x) -> !is_nil(x) end)
   end
 end

@@ -10,8 +10,6 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Avatar
 
-  import Ecto.Query, only: [from: 2]
-
   describe "create" do
     it "should update status and feedback images" do
       file_to_upload = %Plug.Upload{path: "image1"}

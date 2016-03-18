@@ -4,8 +4,6 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
-  import Ecto.Query, only: [from: 2]
-
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist

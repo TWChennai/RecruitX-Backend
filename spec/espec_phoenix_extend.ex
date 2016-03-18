@@ -4,6 +4,7 @@ defmodule ESpec.Phoenix.Extend do
       alias RecruitxBackend.Repo
       import RecruitxBackend.Factory
       import RecruitxBackend.TestHelpers
+      import Ecto.Query, only: [from: 2, where: 2, preload: 2]
     end
   end
 
@@ -13,6 +14,7 @@ defmodule ESpec.Phoenix.Extend do
       import RecruitxBackend.Router.Helpers
       import RecruitxBackend.Factory
       import RecruitxBackend.TestHelpers
+      import Ecto.Query, only: [from: 1, from: 2, where: 2]
     end
   end
 

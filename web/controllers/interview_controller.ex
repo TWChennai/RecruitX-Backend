@@ -1,8 +1,6 @@
 defmodule RecruitxBackend.InterviewController do
   use RecruitxBackend.Web, :controller
 
-  import Ecto.Query
-
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview

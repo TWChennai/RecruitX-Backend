@@ -3,8 +3,6 @@ defmodule RecruitxBackend.RoleController do
 
   alias RecruitxBackend.Role
 
-  import Ecto.Query, only: [preload: 2]
-
   def index(conn, _params) do
     roles = Role
             |> preload(:role_skills)

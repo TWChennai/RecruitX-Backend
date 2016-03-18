@@ -1,7 +1,6 @@
 defmodule RecruitxBackend.CandidateController do
   use RecruitxBackend.Web, :controller
 
-  import Ecto.Query
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.ChangesetManipulator

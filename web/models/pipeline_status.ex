@@ -5,8 +5,6 @@ defmodule RecruitxBackend.PipelineStatus do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
 
-  import Ecto.Query, only: [from: 2, where: 2]
-
   def pass, do: "Pass"
   def in_progress, do: "In Progress"
   def closed, do: "Closed"

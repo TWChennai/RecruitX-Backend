@@ -5,8 +5,6 @@ defmodule RecruitxBackend.InterviewStatus do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
-  import Ecto.Query, only: [from: 2, where: 2]
-
   def pass, do: "Pass"
   def pursue, do: "Pursue"
   def strong_pursue, do: "Strong Pursue"

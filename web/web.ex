@@ -23,7 +23,7 @@ defmodule RecruitxBackend.Web do
 
       import Ecto
       import Ecto.Changeset
-      import Ecto.Query, only: [from: 1, from: 2]
+      import Ecto.Query, only: [from: 1, from: 2, where: 2, preload: 3]
     end
   end
 
@@ -33,7 +33,7 @@ defmodule RecruitxBackend.Web do
 
       alias RecruitxBackend.Repo
       import Ecto
-      import Ecto.Query, only: [from: 1, from: 2]
+      import Ecto.Query, only: [from: 1, from: 2, preload: 2]
 
       import RecruitxBackend.Router.Helpers
     end

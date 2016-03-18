@@ -12,8 +12,6 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Repo
   alias Timex.Date
 
-  import Ecto.Query, only: [preload: 2]
-
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
 
