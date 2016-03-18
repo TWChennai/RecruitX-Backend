@@ -291,6 +291,39 @@ defmodule RecruitxBackend.InterviewSpec do
     end
   end
 
+  describe "interviews_with_insufficient_panelists" do
+    before do
+      Repo.delete_all(InterviewPanelist)
+      Repo.delete_all(Interview)
+    end
+
+    it "should return interviews with no panelists" do
+      interview = create(:interview)
+
+      actual_interview = Interview.interviews_with_insufficient_panelists |> Repo.one
+
+      expect(actual_interview.id) |> to(be(interview.id))
+    end
+
+    it "should return interviews with one panelists" do
+      interview_panelist = create(:interview_panelist)
+
+      actual_interview = Interview.interviews_with_insufficient_panelists |> Repo.one
+
+      expect(actual_interview.id) |> to(be(interview_panelist.interview_id))
+    end
+
+    it "should not return interviews with two panelists" do
+      interview = create(:interview)
+      create(:interview_panelist, interview_id: interview.id, panelist_login_name: "dinesh")
+      create(:interview_panelist, interview_id: interview.id, panelist_login_name: "ashwin")
+
+      actual_interviews = Interview.interviews_with_insufficient_panelists |> Repo.all
+      list = Enum.filter(actual_interviews, &(&1.id == interview.id))
+      expect(list) |> to(be([]))
+    end
+  end
+
   describe "update_status" do
     it "should not update interview when status is already entered" do
       interview = create(:interview)

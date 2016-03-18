@@ -76,6 +76,14 @@ defmodule RecruitxBackend.Interview do
       select: [i.candidate_id, max(i.start_time), count(i.candidate_id)])
   end
 
+
+  def interviews_with_insufficient_panelists do
+    __MODULE__
+    |> join(:left, [i], ip in assoc(i, :interview_panelist))
+    |> group_by([i], i.id)
+    |> having([i], count(i.id) < ^InterviewPanelist.max_count)
+  end
+
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
