@@ -2,7 +2,9 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewPanelist
 
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.SignUpEvaluator
   alias RecruitxBackend.Repo
   alias Timex.Date
 
@@ -10,7 +12,8 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   let :invalid_attrs, do: %{}
 
   before do: Repo.delete_all(Interview)
-
+  before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  %SignUpEvaluationStatus{} end))
+  
   context "valid changeset" do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
 
@@ -79,16 +82,14 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
       expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
     end
-    
-    it "should be invalid when sign up is invalid and some parameters are not passed" do
-      candidate = create(:candidate)
-      interview1 = create(:interview, candidate_id: candidate.id)
 
-      create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
+    it "should be invalid when sign up evaluation is invalid" do
+      invalid = %SignUpEvaluationStatus{valid?: false, errors: [error: "errors"]}
+      allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  invalid end))
 
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(%{panelist_login_name: "test", interview_id: interview1.id, candidate_ids_interviewed: [], my_previous_sign_up_start_times: [], interview: nil}))
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
 
-      expect(changeset.valid?) |> to(be_false)
+      expect(changeset) |> to(have_errors([error: "errors"]))
     end
   end
 
