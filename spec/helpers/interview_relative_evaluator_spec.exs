@@ -1,14 +1,13 @@
 defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewRelativeEvaluator
 
-  alias RecruitxBackend.InterviewRelativeEvaluator
-  alias Timex.Date
-  alias RecruitxBackend.SignUpEvaluator
-  alias RecruitxBackend.SignUpEvaluationStatus
-  alias Decimal, as: D
+  alias Decimal
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.InterviewRelativeEvaluator
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.SignUpEvaluator
+  alias Timex.Date
 
   describe "has_not_interviewed_candidate" do
     it "should be invalid when panelist has already done a previous interview for the candidate" do
@@ -17,8 +16,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview2 = create(:interview, candidate_id: candidate.id)
 
       create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
-      interview_panelist = fields_for(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", D.new(1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", Decimal.new(1))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview2)
 
@@ -30,7 +28,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       candidate = create(:candidate)
       interview1 = create(:interview, candidate_id: candidate.id)
       create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", D.new(1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", Decimal.new(1))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview1)
 
@@ -41,7 +39,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should be valid when panelist has not interviewed current candidate" do
       interview = create(:interview)
       interview_panelist = fields_for(:interview_panelist)
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(1))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
@@ -54,7 +52,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should be invalid when feedback is already entered" do
       interview = create(:interview, interview_status_id: create(:interview_status).id)
       interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
@@ -69,7 +67,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       create(:interview_panelist, interview_id: interview.id)
       create(:interview_panelist, interview_id: interview.id)
       interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
@@ -81,7 +79,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview = create(:interview)
       create(:interview_panelist, interview_id: interview.id)
       interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
@@ -92,7 +90,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should be valid when there are no signups" do
       interview = create(:interview)
       interview_panelist = fields_for(:interview_panelist, interview_id: interview.id)
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, interview)
 
@@ -106,7 +104,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 1))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(1))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 
@@ -118,7 +116,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -1))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(1))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(1))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 
@@ -130,7 +128,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 3))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 
@@ -142,7 +140,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -3))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 
@@ -154,7 +152,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 
@@ -166,7 +164,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -2))
-      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, D.new(2))
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2))
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
 

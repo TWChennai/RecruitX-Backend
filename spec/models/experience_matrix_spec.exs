@@ -2,7 +2,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   use ESpec.Phoenix, model: RecruitxBackend.ExperienceMatrix
 
   alias RecruitxBackend.ExperienceMatrix
-  alias Decimal, as: D
+  alias Decimal
 
   let :valid_attrs, do: fields_for(:experience_matrix)
   let :invalid_attrs, do: %{}
@@ -42,31 +42,31 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
 
     it "when candidate_experience_upper_bound is lesser than 0" do
-      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{candidate_experience_upper_bound: D.new(-1)}))
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{candidate_experience_upper_bound: Decimal.new(-1)}))
 
       expect(changeset.valid?) |> to(be_false)
-      expect(changeset.errors) |> to(eql([candidate_experience_upper_bound: {"must be in the range 0-100", [count: D.new(0)]}]))
+      expect(changeset.errors) |> to(eql([candidate_experience_upper_bound: {"must be in the range 0-100", [count: Decimal.new(0)]}]))
     end
 
     it "when candidate_experience_upper_bound is greater than 100" do
-      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{candidate_experience_upper_bound: D.new(101)}))
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{candidate_experience_upper_bound: Decimal.new(101)}))
 
       expect(changeset.valid?) |> to(be_false)
-      expect(changeset.errors) |> to(eql([candidate_experience_upper_bound: {"must be in the range 0-100", [count: D.new(100)]}]))
+      expect(changeset.errors) |> to(eql([candidate_experience_upper_bound: {"must be in the range 0-100", [count: Decimal.new(100)]}]))
     end
 
     it "when panelist_experience_lower_bound is lesser than 0" do
-      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{panelist_experience_lower_bound: D.new(-1)}))
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{panelist_experience_lower_bound: Decimal.new(-1)}))
 
       expect(changeset.valid?) |> to(be_false)
-      expect(changeset.errors) |> to(eql([panelist_experience_lower_bound: {"must be in the range 0-100", [count: D.new(0)]}]))
+      expect(changeset.errors) |> to(eql([panelist_experience_lower_bound: {"must be in the range 0-100", [count: Decimal.new(0)]}]))
     end
 
     it "when candidate_experience_upper_bound is greater than 100" do
-      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{panelist_experience_lower_bound: D.new(101)}))
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{panelist_experience_lower_bound: Decimal.new(101)}))
 
       expect(changeset.valid?) |> to(be_false)
-      expect(changeset.errors) |> to(eql([panelist_experience_lower_bound: {"must be in the range 0-100", [count: D.new(100)]}]))
+      expect(changeset.errors) |> to(eql([panelist_experience_lower_bound: {"must be in the range 0-100", [count: Decimal.new(100)]}]))
     end
   end
 
@@ -111,11 +111,11 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   context "get_max_experience_with_filter" do
     it "should return maximum experience" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix = create(:experience_matrix, %{panelist_experience_lower_bound: D.new(90)})
-      create(:experience_matrix, %{panelist_experience_lower_bound: D.new(10)})
-      create(:experience_matrix, %{panelist_experience_lower_bound: D.new(20)})
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90)})
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10)})
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(20)})
 
-      expect(D.compare(ExperienceMatrix.get_max_experience_with_filter, D.new(90))) |> to(eq(D.new(0)))
+      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter, Decimal.new(90))) |> to(eq(Decimal.new(0)))
     end
 
     it "should nil if no filters are specified" do

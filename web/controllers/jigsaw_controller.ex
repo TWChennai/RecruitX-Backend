@@ -47,18 +47,6 @@ defmodule RecruitxBackend.JigsawController do
   end
 
   defp year_to_month(experience) do
-    {year_experience, months_experience} = experience
-                                           |> Decimal.new
-                                           |> Decimal.to_string
-                                           |> Integer.parse
-    experience_in_months = year_experience * 12
-                           |> Decimal.new
-                           |> Decimal.add(months_experience
-                                           |> Decimal.new
-                                           |> Decimal.mult(Decimal.new(12)))
-    {experience_in_integer, _} = experience_in_months
-                                  |> Decimal.to_string
-                                  |> Integer.parse
-    experience_in_integer
+    trunc(experience * 12)
   end
 end
