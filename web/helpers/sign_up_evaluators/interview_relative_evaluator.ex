@@ -5,7 +5,6 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
   alias RecruitxBackend.SignUpEvaluationStatus
   alias Timex.Date
 
-  require Logger
   @time_buffer_between_sign_ups 2
 
   def evaluate(sign_up_evaluation_status, sign_up_data_container, interview) do
@@ -45,23 +44,17 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
   end
 
   defp is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times) do
-    is_within_time_buffer_of_my_previous_sign_ups_value = Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
+    Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
       abs(Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
     end)
-    Logger.info('is_within_time_buffer_of_my_previous_sign_ups:#{is_within_time_buffer_of_my_previous_sign_ups_value}')
-    is_within_time_buffer_of_my_previous_sign_ups_value
   end
 
   defp has_panelist_not_interviewed_candidate(model, candidate_ids_interviewed) do
-    has_panelist_not_interviewed_candidate_value = !Enum.member?(candidate_ids_interviewed, model.candidate_id)
-    Logger.info('has_panelist_not_interviewed_candidate:#{has_panelist_not_interviewed_candidate_value}')
-    has_panelist_not_interviewed_candidate_value
+    !Enum.member?(candidate_ids_interviewed, model.candidate_id)
   end
 
   defp is_signup_lesser_than_max_count(model_id, signup_counts) do
     result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
-    is_signup_lesser_than_max_count_value = result == [] or List.first(result).signup_count < InterviewPanelist.max_count
-    Logger.info('is_signup_lesser_than_max_count:#{is_signup_lesser_than_max_count_value}')
-    is_signup_lesser_than_max_count_value
+    result == [] or List.first(result).signup_count < InterviewPanelist.max_count
   end
 end
