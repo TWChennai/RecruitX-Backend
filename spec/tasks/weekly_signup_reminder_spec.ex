@@ -2,6 +2,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 	use ESpec.Phoenix, model: RecruitxBackend.WeeklySignupReminder
 
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Skill
   alias RecruitxBackend.WeeklySignupReminder
 
   describe "get candidates and interviews" do
@@ -68,7 +69,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should append other skills for the candidate in the result" do
-			create(:candidate_skill, skill_id: other_skill_id, candidate_id: candidate.id)
+			create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
       candidates_and_interviews = Interview
         |> where([i], i.id == ^interview.id)
         |> preload([:interview_type])
@@ -78,12 +79,5 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
       expect(actual_data.skills) |> to(be("Skill 1, Skill 2, Other Skills"))
     end
-  end
-
-  defp other_skill_id do
-    RecruitxBackend.Skill
-      |> where([i], i.name=="Other")
-      |> select([i], i.id)
-      |> Repo.one
   end
 end

@@ -6,6 +6,7 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Skill
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
@@ -241,7 +242,7 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should append other skills for the candidate in the result" do
-			create(:candidate_skill, skill_id: other_skill_id, candidate_id: candidate.id)
+			create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
       formatted_skills = Candidate
         |> preload([:skills])
         |> Repo.get(candidate.id)
@@ -255,6 +256,7 @@ defmodule RecruitxBackend.CandidateSpec do
     let :candidate, do: create(:candidate)
     let :interview_type_one, do: create(:interview_type)
     let :interview_type_two, do: create(:interview_type)
+
     before do
       create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_one.id)
       create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_two.id)
@@ -268,12 +270,5 @@ defmodule RecruitxBackend.CandidateSpec do
 
       expect(Enum.count(formatted_interviews)) |> to(be(2))
     end
-  end
-
-  defp other_skill_id do
-    RecruitxBackend.Skill
-      |> where([i], i.name=="Other")
-      |> select([i], i.id)
-      |> Repo.one
   end
 end
