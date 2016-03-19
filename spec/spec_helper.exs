@@ -14,9 +14,11 @@ ESpec.configure fn(config) ->
     Faker.start
     #restart transactions
     Ecto.Adapters.SQL.restart_test_transaction(RecruitxBackend.Repo, [])
+    Mailman.TestServer.start
   end
 
   config.finally fn ->
     Ecto.Adapters.SQL.rollback_test_transaction(RecruitxBackend.Repo, [])
+    Mailman.TestServer.clear_deliveries
   end
 end

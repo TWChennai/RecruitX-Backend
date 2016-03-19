@@ -1,0 +1,72 @@
+  <p>Hi all,</p>
+
+  <h2>Interviews that require signups</h2>
+  <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid #000;">Name</th>
+        <th style="border: 1px solid #000;">Experience</th>
+        <th style="border: 1px solid #000;">Skills</th>
+        <th style="border: 1px solid #000;">Role</th>
+        <th style="border: 1px solid #000;">Round</th>
+        <th style="border: 1px solid #000;">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for candidate <- candidates_with_insufficient_signups do %>
+        <tr>
+          <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.name%></td>
+          <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.experience%></td>
+          <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.skills |> String.rstrip |> String.rstrip(?,) %></td>
+          <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.role%></td>
+          <% [head | tail] = candidate.interviews %>
+          <td style="border: 1px solid #000;"><%= head.name %></td>
+          <td style="border: 1px solid #000;"><%= head.date %></td>
+        </tr>
+        <%= for interview <- tail do %>
+          <tr>
+            <td style="border: 1px solid #000;"><%= interview.name%></td>
+            <td style="border: 1px solid #000;"><%= interview.date%></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+<br />
+
+<h2>Interview signups</h2>
+<table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #000;">Name</th>
+      <th style="border: 1px solid #000;">Experience</th>
+      <th style="border: 1px solid #000;">Skills</th>
+      <th style="border: 1px solid #000;">Role</th>
+      <th style="border: 1px solid #000;">Round</th>
+      <th style="border: 1px solid #000;">Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for candidate <- candidates_with_sufficient_signups do %>
+      <tr>
+        <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.name%></td>
+        <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.experience%></td>
+        <td rowspan="<%= Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.skills |> String.rstrip |> String.rstrip(?,) %></td>
+        <td rowspan="<%=Enum.count(candidate.interviews) %>" style="border: 1px solid #000;"><%= candidate.role%></td>
+        <% [head | tail] = candidate.interviews %>
+        <td style="border: 1px solid #000;"><%= head.name %></td>
+        <td style="border: 1px solid #000;"><%= head.date %></td>
+      </tr>
+      <%= for interview <- tail do %>
+        <tr>
+          <td style="border: 1px solid #000;"><%= interview.name%></td>
+          <td style="border: 1px solid #000;"><%= interview.date%></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<br/>
+<strong>Thanks</strong><br />
+Recruitment Team

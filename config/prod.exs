@@ -66,3 +66,12 @@ config :recruitx_backend, RecruitxBackend.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   pool_size: 20
+
+config :mailman,
+  username: System.get_env("SMTP_USERNAME"),
+  password: System.get_env("SMTP_PASSWORD"),
+  port: String.to_integer(System.get_env("SMTP_PORT")),
+  relay: System.get_env("SMTP_RELAY"),
+  tls: :always,
+  ssl: :always,
+  auth: true

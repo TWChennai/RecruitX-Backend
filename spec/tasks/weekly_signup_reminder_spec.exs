@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.WeeklySignupReminderSpec do
 	use ESpec.Phoenix, model: RecruitxBackend.WeeklySignupReminder
 
+	import Ecto.Query
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Skill
   alias RecruitxBackend.WeeklySignupReminder
@@ -9,9 +10,10 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     let :interview, do: create(:interview)
 
     it "should return candidates with interviews based on sub query" do
+			expected_candidate_id = interview.candidate_id
       [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id == ^interview.id))
 
-      expect(candidate.id) |> to(be(interview.candidate_id))
+      expect(candidate.id) |> to(be(expected_candidate_id))
     end
 
     it "should return empty array when sub query returns empty result" do
@@ -80,4 +82,50 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       expect(actual_data.skills) |> to(be("Skill 1, Skill 2, Other Skills"))
     end
   end
+
+	describe "get interview set" do
+		before do
+			create(:interview, id: 1)
+			create(:interview, id: 2)
+			create(:interview, id: 3)
+		end
+
+		it "should return interviews with given interview ids and remaining ids in a different list" do
+			{insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([1])
+			[interview1] = insufficient_panelists_query |> Repo.all
+			[interview2, interview3] = sufficient_panelists_query |> Repo.all
+
+			expect(interview1.id) |> to(be(1))
+			expect(interview2.id) |> to(be(2))
+			expect(interview3.id) |> to(be(3))
+		end
+
+		it "should return interviews with given interview ids and remaining ids in a different list when the given list is empty" do
+			{insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([])
+			interviews_with_insufficient_panelists = insufficient_panelists_query |> Repo.all
+			[interview1, interview2, interview3] = sufficient_panelists_query |> Repo.all
+
+			expect(interviews_with_insufficient_panelists) |> to(be([]))
+			expect(interview1.id) |> to(be(1))
+			expect(interview2.id) |> to(be(2))
+			expect(interview3.id) |> to(be(3))
+		end
+	end
+
+	describe "execute weekly signup reminder" do
+		it "should call MailmanExtensions deliver with correct arguments" do
+			email = %{
+				subject: "[RecruitX]Reminder: Upcoming Interviews",
+				to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
+				html: "html content"
+	    }
+			allow MailmanExtensions.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
+			allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+
+			WeeklySignupReminder.execute
+
+			expect MailmanExtensions.Templates |> to(accepted :weekly_signup_reminder)
+			expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+		end
+	end
 end

@@ -38,3 +38,6 @@ config :recruitx_backend, RecruitxBackend.Repo,
   database: "recruitx_backend_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :mailman,
+  port: String.to_integer(System.get_env("SMTP_PORT"))

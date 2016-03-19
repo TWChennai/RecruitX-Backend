@@ -32,7 +32,7 @@ defmodule RecruitxBackend.Mixfile do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
-                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc]]
+                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :mailman, :eiconv]]
   end
 
   # Specifies which paths to compile per environment.
@@ -59,6 +59,10 @@ defmodule RecruitxBackend.Mixfile do
      {:timex_ecto, "~> 0.9.0"},
      {:scrivener, "~> 1.1"},
      {:gettext, "~> 0.10.0"},
+     # TODO: Get dependency from Hex once the bug is fixed / pull request is merged
+     {:mailman, github: "arunvelsriram/mailman", branch: "fix_config_type_decision"},
+     # TODO: Package not available through Hex. Find a way to manage the version
+     {:eiconv, github: "zotonic/eiconv"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.3.8", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},
