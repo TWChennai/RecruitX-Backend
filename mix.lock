@@ -11,7 +11,7 @@
   "credo": {:hex, :credo, "0.3.8"},
   "db_connection": {:hex, :db_connection, "0.2.4"},
   "decimal": {:hex, :decimal, "1.1.1"},
-  "ecto": {:hex, :ecto, "1.1.4"},
+  "ecto": {:hex, :ecto, "1.1.5"},
   "ectoo": {:hex, :ectoo, "0.0.4"},
   "erlware_commons": {:hex, :erlware_commons, "0.15.0"},
   "espec": {:hex, :espec, "0.8.11"},
