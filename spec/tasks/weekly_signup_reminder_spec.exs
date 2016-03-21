@@ -7,6 +7,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   alias RecruitxBackend.WeeklySignupReminder
 
   describe "get candidates and interviews" do
+		before do
+			Repo.delete_all(Interview)
+		end
     let :interview, do: create(:interview)
 
     it "should return candidates with interviews based on sub query" do
@@ -85,6 +88,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
 	describe "get interview set" do
 		before do
+			Repo.delete_all(Interview)
 			create(:interview, id: 1)
 			create(:interview, id: 2)
 			create(:interview, id: 3)
