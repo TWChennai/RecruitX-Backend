@@ -35,6 +35,13 @@ config :ex_aws,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
   secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
 
+config :quantum, cron: [
+  weekly_signup_reminder: [
+    schedule: "0 3 * * 5",
+    task: "RecruitxBackend.WeeklySignupReminder.execute"
+  ]
+]
+
 # This line was automatically added by ansible-elixir-stack setup script
 if System.get_env("SERVER") do
   config :phoenix, :serve_endpoints, true

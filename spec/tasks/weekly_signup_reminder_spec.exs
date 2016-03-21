@@ -131,5 +131,13 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 			expect MailmanExtensions.Templates |> to(accepted :weekly_signup_reminder)
 			expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
 		end
+
+    it "should be called every week on friday at 3.0 UTC" do
+      job = Quantum.find_job(:weekly_signup_reminder)
+
+      expect(job.schedule) |> to(be("0 3 * * 5"))
+      expect(job.task) |> to(be({"RecruitxBackend.WeeklySignupReminder", "execute"}))
+    end
+
 	end
 end
