@@ -8,6 +8,13 @@ defmodule RecruitxBackend.RoleView do
     render_many(roles, RoleView, "role.json")
   end
 
+ def render("role_without_skills.json", %{role: role}) do
+    %{
+      id: role.id,
+      name: role.name
+    }
+ end
+
  def render("role.json", %{role: role}) do
     %{
       id: role.id,

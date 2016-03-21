@@ -6,5 +6,6 @@ defmodule RecruitxBackend.Repo.Migrations.AddRoleQa do
 
   def change do
       Repo.insert!(%Role{name: Role.qa})
+      Repo.insert!(%Role{name: Role.other})
   end
 end

@@ -69,4 +69,23 @@ defmodule RecruitxBackend.RoleSpec do
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
   end
+
+  context "retrieve_by_name" do
+    it "should return role if it exists" do
+      role = create(:role)
+
+      result = Role.retrieve_by_name role.name
+
+      expect(result.id) |> to(eql(result.id))
+      expect(result.name) |> to(eql(result.name))
+    end
+
+    it "should return other if role does not exist" do
+      other_role = create(:role, name: Role.other)
+
+      result = Role.retrieve_by_name "dummy_role"
+
+      expect(result.name) |> to(eql(Role.other))
+    end
+  end
 end

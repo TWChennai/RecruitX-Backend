@@ -8,6 +8,7 @@ defmodule RecruitxBackend.Role do
 
   def dev, do: "Dev"
   def qa, do: "QA"
+  def other, do: "Other"
 
   schema "roles" do
     field :name, :string
@@ -29,5 +30,9 @@ defmodule RecruitxBackend.Role do
     |> unique_constraint(:name, name: :roles_name_index)
   end
 
-  def retrieve_by_name(name), do: (from r in __MODULE__, where: r.name == ^name) |> Repo.one
+  def retrieve_by_name(name) do
+    role = (from r in __MODULE__, where: r.name == ^name) |> Repo.one
+    if is_nil(role), do: role = (from r in __MODULE__, where: r.name == ^other) |> Repo.one
+    role
+  end
 end

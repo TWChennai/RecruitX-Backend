@@ -3,6 +3,7 @@ defmodule RecruitxBackend.JigsawController do
 
   alias Poison.Parser
   alias Timex.Date
+  alias RecruitxBackend.Role
 
   @recruitment_department "People Recruiting"
   @invalid_user "not a valid user"
@@ -12,16 +13,19 @@ defmodule RecruitxBackend.JigsawController do
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def show(conn, %{"id" => id}) do
     {experience, id} = parse_experience(id)
+    role = Role.retrieve_by_name(Role.other)
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience}
-      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience}
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience}
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: role}
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: role}
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         case response.body do
           "" -> %{is_recruiter: @invalid_user, calculated_hire_date: Date.now, past_experience: 0}
           _  -> case response.body |> Parser.parse do
-                  {:ok, body} -> department = body["department"]
+                  {:ok, body} -> role_name = body["role"]["name"]
+                                 role = Role.retrieve_by_name(role_name)
+                                 department = body["department"]
                                  tw_experience = body["twExperience"]
                                  total_experience = body["totalExperience"]
                                  past_experience = Decimal.new(total_experience - tw_experience)
@@ -30,10 +34,10 @@ defmodule RecruitxBackend.JigsawController do
                                  calculated_hire_date = Date.now
                                                         |> Date.shift(months: -tw_experience_in_month)
                   case department["name"] do
-                    @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience}
-                    _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience}
+                    @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role}
+                    _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role}
                   end
-                  {:error, reason} -> %{is_recruiter: reason, calculated_hire_date: Date.now, past_experience: 0}
+                  {:error, reason} -> %{is_recruiter: reason, calculated_hire_date: Date.now, past_experience: 0, role: role}
                 end
         end
     end
