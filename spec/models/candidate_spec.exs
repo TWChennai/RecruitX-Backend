@@ -238,7 +238,8 @@ defmodule RecruitxBackend.CandidateSpec do
         |> Repo.get(candidate.id)
         |> Candidate.get_formatted_skills
 
-      expect(formatted_skills) |> to(be("Skill 1, Skill 2"))
+      expect(formatted_skills) |> to(have("Skill 1"))
+      expect(formatted_skills) |> to(have("Skill 2"))
     end
 
     it "should append other skills for the candidate in the result" do
@@ -248,7 +249,9 @@ defmodule RecruitxBackend.CandidateSpec do
         |> Repo.get(candidate.id)
         |> Candidate.get_formatted_skills
 
-      expect(formatted_skills) |> to(be("Skill 1, Skill 2, Other Skills"))
+      expect(formatted_skills) |> to(have("Skill 1"))
+      expect(formatted_skills) |> to(have("Skill 2"))
+      expect(formatted_skills) |> to(have("Other Skills"))
     end
   end
 
