@@ -120,7 +120,6 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       create(:interview, id: 4, start_time: Date.now |> Date.shift(days: -10))
       {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([])
       interviews_with_insufficient_panelists = insufficient_panelists_query |> Repo.all
-      interviews = sufficient_panelists_query |> Repo.all
       [interview1, interview2, interview3] = sufficient_panelists_query |> Repo.all
 
       expect(interviews_with_insufficient_panelists) |> to(be([]))
