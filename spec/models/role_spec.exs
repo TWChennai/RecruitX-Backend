@@ -81,8 +81,6 @@ defmodule RecruitxBackend.RoleSpec do
     end
 
     it "should return other if role does not exist" do
-      other_role = create(:role, name: Role.other)
-
       result = Role.retrieve_by_name "dummy_role"
 
       expect(result.name) |> to(eql(Role.other))
