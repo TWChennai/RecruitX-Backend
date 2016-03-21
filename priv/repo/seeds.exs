@@ -24,7 +24,7 @@ alias Timex.Date
 
 import Ecto.Query, only: [from: 2, where: 2]
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
-roles = Repo.all(Role)
+roles = Repo.all(from r in Role, where: r.name != ^Role.other)
 skills = Repo.all(Skill)
 in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
 
