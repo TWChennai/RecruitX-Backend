@@ -5,6 +5,7 @@ defmodule RecruitxBackend.Role do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleSkill
+  alias RecruitxBackend.RoleInterviewType
 
   def dev, do: "Dev"
   def qa, do: "QA"
@@ -17,6 +18,7 @@ defmodule RecruitxBackend.Role do
 
     has_many :candidates, Candidate
     has_many :role_skills, RoleSkill
+    has_many :role_interview_types, RoleInterviewType
   end
 
   @required_fields ~w(name)

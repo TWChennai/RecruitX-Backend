@@ -28,6 +28,7 @@ defmodule RecruitxBackend.InterviewType do
     |> unique_constraint(:name, name: :interview_types_name_index)
   end
 
+  def telephonic, do: "TP"
   def coding, do: "Coding"
   def technical_1, do: "Tech-1"
   def technical_2, do: "Tech-2"

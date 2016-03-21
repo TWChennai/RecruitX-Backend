@@ -3,6 +3,7 @@ defmodule RecruitxBackend.RoleView do
 
   alias RecruitxBackend.RoleView
   alias RecruitxBackend.RoleSkillView
+  alias RecruitxBackend.RoleInterviewTypeView
 
   def render("index.json", %{roles: roles}) do
     render_many(roles, RoleView, "role.json")
@@ -19,7 +20,8 @@ defmodule RecruitxBackend.RoleView do
     %{
       id: role.id,
       name: role.name,
-      skills: render_many(role.role_skills, RoleSkillView, "role_skill.json")
+      skills: render_many(role.role_skills, RoleSkillView, "role_skill.json"),
+      interview_types: render_many(role.role_interview_types, RoleInterviewTypeView, "role_interview_type.json")
     }
   end
 end

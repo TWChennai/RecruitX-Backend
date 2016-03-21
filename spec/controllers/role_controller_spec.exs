@@ -3,7 +3,7 @@ defmodule RecruitxBackend.RoleControllerSpec do
 
   describe "index" do
     let :roles do
-      Enum.map([build(:role), build(:role)], fn(c) -> c |> Repo.preload(:role_skills) end)
+      Enum.map([build(:role), build(:role)], fn(c) -> c |> Repo.preload(:role_skills) |>  Repo.preload(:role_interview_types) end)
     end
 
     before do: allow Repo |> to(accept(:all, fn(_) -> roles end))

@@ -14,6 +14,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.RoleInterviewType
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -121,6 +122,13 @@ defmodule RecruitxBackend.Factory do
     %RoleSkill{
       role_id: create(:role).id,
       skill_id: create(:skill).id
+    }
+  end
+
+  def factory(:role_interview_type) do
+    %RoleInterviewType{
+      role_id: create(:role).id,
+      interview_type_id: create(:interview_type).id
     }
   end
 
