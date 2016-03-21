@@ -6,6 +6,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluator
 
+  @lower_bound "LB"
+  @upper_bound "UB"
   @max_count 2
   # TODO: Move the magic number (2) into the db
 
@@ -13,6 +15,7 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   schema "interview_panelists" do
     field :panelist_login_name, :string
+    field :satisfied_criteria, :string
 
     belongs_to :interview, Interview
 
@@ -77,10 +80,33 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   defp update_changeset(existing_changeset, sign_up_evaluation_status) do
-    if !sign_up_evaluation_status.valid? do
-      existing_changeset = Enum.reduce(sign_up_evaluation_status.errors, existing_changeset, fn({field_name, description}, acc) ->
+    if sign_up_evaluation_status.valid? do
+      existing_changeset |> update_best_satisfied_criteria(sign_up_evaluation_status.satisfied_criteria)
+    else
+      Enum.reduce(sign_up_evaluation_status.errors, existing_changeset, fn({field_name, description}, acc) ->
         add_error(acc, field_name, description)
       end)
+    end
+  end
+
+  defp update_best_satisfied_criteria(existing_changeset, @lower_bound) do
+    interview_id = get_field(existing_changeset, :interview_id)
+    existing_satisfied_criteria = (from i in __MODULE__, select: i.satisfied_criteria, where: i.interview_id == ^interview_id) |> Repo.one
+    if existing_satisfied_criteria == @lower_bound do
+      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @upper_bound)
+    else
+      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @lower_bound)
+    end
+    existing_changeset
+  end
+
+  defp update_best_satisfied_criteria(existing_changeset, @upper_bound) do
+    interview_id = get_field(existing_changeset, :interview_id)
+    existing_satisfied_criteria = (from i in __MODULE__, select: i.satisfied_criteria, where: i.interview_id == ^interview_id) |> Repo.one
+    if existing_satisfied_criteria == @upper_bound do
+      existing_changeset = existing_changeset |> add_error(:experience_matrix, "Panelist with the required eligibility already met")
+    else
+      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @upper_bound)
     end
     existing_changeset
   end

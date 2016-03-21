@@ -125,7 +125,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return false when panelist is experienced for the interview but not for the candidate" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1),candidate_experience_upper_bound: D.new(2))
+      experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1),candidate_experience_upper_bound: D.new(2), candidate_experience_lower_bound: D.new(-1))
       panelist_experience = D.new(1)
       candidate_experience = D.new(3)
 

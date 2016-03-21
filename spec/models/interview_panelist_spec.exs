@@ -12,8 +12,8 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   let :invalid_attrs, do: %{}
 
   before do: Repo.delete_all(Interview)
-  before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  %SignUpEvaluationStatus{} end))
-  
+  before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  %SignUpEvaluationStatus{satisfied_criteria: "LB"} end))
+
   context "valid changeset" do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
 

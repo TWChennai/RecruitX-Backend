@@ -6,6 +6,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
 
   schema "experience_matrices" do
     field :panelist_experience_lower_bound, :decimal
+    field :candidate_experience_lower_bound, :decimal
     field :candidate_experience_upper_bound, :decimal
 
     timestamps
@@ -13,7 +14,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
     belongs_to :interview_type, InterviewType
   end
 
-  @required_fields ~w(panelist_experience_lower_bound candidate_experience_upper_bound interview_type_id)
+  @required_fields ~w(panelist_experience_lower_bound candidate_experience_lower_bound candidate_experience_upper_bound interview_type_id)
   @optional_fields ~w()
 
   def changeset(model, params \\ :empty) do
@@ -28,11 +29,10 @@ defmodule RecruitxBackend.ExperienceMatrix do
   def filter(panelist_experience) do
     from e in __MODULE__,
     where: e.panelist_experience_lower_bound <= ^panelist_experience,
-    select: {e.candidate_experience_upper_bound, e.interview_type_id}
+    select: {e.candidate_experience_lower_bound, e.candidate_experience_upper_bound, e.interview_type_id}
   end
 
   def get_max_experience_with_filter, do: (from e in __MODULE__, select: max(e.panelist_experience_lower_bound)) |> Repo.one
 
   def get_interview_types_with_filter, do: (from e in __MODULE__, distinct: true, select: e.interview_type_id) |> Repo.all
 end
-
