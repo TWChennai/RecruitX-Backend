@@ -118,6 +118,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
 	describe "execute weekly signup reminder" do
 		it "should call MailmanExtensions deliver with correct arguments" do
+		  create(:interview)
 			email = %{
 				subject: "[RecruitX]Reminder: Upcoming Interviews",
 				to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
@@ -131,6 +132,22 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 			expect MailmanExtensions.Templates |> to(accepted :weekly_signup_reminder)
 			expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
 		end
+
+    it "should not call MailmanExtensions deliver if there are no interviews" do
+      Repo.delete_all(Interview)
+      email = %{
+        subject: "[RecruitX]Reminder: Upcoming Interviews",
+        to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
+        html: "html content"
+      }
+      allow MailmanExtensions.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
+      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+
+      WeeklySignupReminder.execute
+
+      expect MailmanExtensions.Templates |> (to_not(accepted :weekly_signup_reminder))
+      expect MailmanExtensions.Mailer |> (to_not(accepted :deliver, [email]))
+    end
 
     it "should be called every week on friday at 3.0 UTC" do
       job = Quantum.find_job(:weekly_signup_reminder)

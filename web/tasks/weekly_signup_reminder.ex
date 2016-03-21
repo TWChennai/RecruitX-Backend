@@ -21,12 +21,14 @@ defmodule RecruitxBackend.WeeklySignupReminder do
       |> get_candidates_and_interviews
       |> construct_view_data
 
-    email_content = Templates.weekly_signup_reminder(candidates_with_insufficient_signups, candidates_with_sufficient_signups)
-    Mailer.deliver(%{
-      subject: "[RecruitX]Reminder: Upcoming Interviews",
-      to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
-      html: email_content
-    })
+    if candidates_with_insufficient_signups != [] or candidates_with_sufficient_signups != [] do
+      email_content = Templates.weekly_signup_reminder(candidates_with_insufficient_signups, candidates_with_sufficient_signups)
+      Mailer.deliver(%{
+        subject: "[RecruitX]Reminder: Upcoming Interviews",
+        to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
+        html: email_content
+      })
+    end
   end
 
   def get_interview_sub_queries(interview_ids) do
