@@ -5,6 +5,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Skill
   alias RecruitxBackend.WeeklySignupReminder
+  alias Timex.Date
 
   describe "get candidates and interviews" do
 		before do
@@ -86,7 +87,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
   end
 
-	describe "get interview set" do
+	describe "get interview sub-query" do
 		before do
 			Repo.delete_all(Interview)
 			create(:interview, id: 1)
@@ -114,6 +115,30 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 			expect(interview2.id) |> to(be(2))
 			expect(interview3.id) |> to(be(3))
 		end
+
+		it "should not return interviews that is not in next 7 days" do
+      create(:interview, id: 4, start_time: Date.now |> Date.shift(days: -10))
+      {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([])
+      interviews_with_insufficient_panelists = insufficient_panelists_query |> Repo.all
+      interviews = sufficient_panelists_query |> Repo.all
+      [interview1, interview2, interview3] = sufficient_panelists_query |> Repo.all
+
+      expect(interviews_with_insufficient_panelists) |> to(be([]))
+      expect(interview1.id) |> to_not(be(4))
+      expect(interview2.id) |> to_not(be(4))
+      expect(interview3.id) |> to_not(be(4))
+		end
+
+		it "should not return signed up interviews that is not in next 7 days" do
+      create(:interview, id: 4, start_time: Date.now |> Date.shift(days: 10))
+      {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([1])
+      [interview1] = insufficient_panelists_query |> Repo.all
+      [interview2, interview3] = sufficient_panelists_query |> Repo.all
+
+      expect(interview1.id) |> to_not(be(4))
+      expect(interview2.id) |> to_not(be(4))
+      expect(interview3.id) |> to_not(be(4))
+    end
 	end
 
 	describe "execute weekly signup reminder" do
