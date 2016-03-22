@@ -1,6 +1,6 @@
 <p>Hi all,</p>
 <p>Here are the interviews scheduled for the next week:</p>
-<h2>Interviews Requiring Panelists</h2>
+<h2>Interviews Requiring Signups</h2>
 <%= unless Enum.empty?(candidates_with_insufficient_signups) do %>
   <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
     <thead>
@@ -17,7 +17,7 @@
           <%= candidate.role%>
         </td>
         <td style="border: 1px solid #000;">
-          <%= candidate.name%>, <%= candidate.experience%> <br/>
+          <%= candidate.name%>, <%= candidate.experience%> yrs <br/>
           Skills: <%= candidate.skills |> String.rstrip |> String.rstrip(?,) %>
         </td>
         <td style="border: 1px solid #000;">
@@ -30,10 +30,10 @@
     </tbody>
   </table>
 <%= else %>
-  <p>Awesome! All the upcoming interviews have panelists.</p>
+  <p>Awesome! All the upcoming interviews have signups.</p>
 <% end %>
 
-<h2>Interviews with panelists</h2>
+<h2>Interviews with Signups</h2>
 <%= unless Enum.empty?(candidates_with_sufficient_signups) do %>
   <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
     <thead>
@@ -50,7 +50,7 @@
         <%= candidate.role%>
       </td>
       <td style="border: 1px solid #000;">
-        <%= candidate.name%>, <%= candidate.experience%> <br/>
+        <%= candidate.name%>, <%= candidate.experience%> yrs<br/>
         Skills: <%= candidate.skills |> String.rstrip |> String.rstrip(?,) %>
       </td>
       <td style="border: 1px solid #000;">
@@ -63,7 +63,7 @@
     </tbody>
   </table>
 <%= else %>
-  <p>No upcoming interviews have panelist. Hurry up!</p>
+  <p>No upcoming interviews have signups. Hurry up!</p>
 <% end %>
 <strong>Thanks</strong><br />
 Recruitment Team
