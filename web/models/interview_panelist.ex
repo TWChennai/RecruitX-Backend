@@ -6,8 +6,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluator
 
-  @lower_bound "LB"
-  @upper_bound "UB"
   @max_count 2
   # TODO: Move the magic number (2) into the db
 
@@ -51,17 +49,15 @@ defmodule RecruitxBackend.InterviewPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
-    |> validate_panelist_experience(params)
+    |> validate_panelist_experience(params["panelist_experience"])
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
 
-  defp validate_panelist_experience(existing_changeset, params) do
-    panelist_experience = params["panelist_experience"]
-    if existing_changeset.valid? and panelist_experience |> is_nil, do: existing_changeset = add_error(existing_changeset, :panelist_experience, "can't be blank")
-    existing_changeset
-  end
+  defp validate_panelist_experience(%{valid?: true} = existing_changeset, nil), do: add_error(existing_changeset, :panelist_experience, "can't be blank")
+
+  defp validate_panelist_experience(existing_changeset, _), do: existing_changeset
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
   defp validate_sign_up_for_interview(existing_changeset, params) do
@@ -73,42 +69,20 @@ defmodule RecruitxBackend.InterviewPanelist do
       if !is_nil(interview) do
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
         sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
-        existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status)
+        existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
       end
     end
     existing_changeset
   end
 
-  defp update_changeset(existing_changeset, sign_up_evaluation_status) do
-    if sign_up_evaluation_status.valid? do
-      existing_changeset |> update_best_satisfied_criteria(sign_up_evaluation_status.satisfied_criteria)
-    else
-      Enum.reduce(sign_up_evaluation_status.errors, existing_changeset, fn({field_name, description}, acc) ->
-        add_error(acc, field_name, description)
-      end)
-    end
+  defp update_changeset(existing_changeset, sign_up_evaluation_status, true) do
+    existing_changeset |> put_change(:satisfied_criteria, sign_up_evaluation_status.satisfied_criteria)
   end
 
-  defp update_best_satisfied_criteria(existing_changeset, @lower_bound) do
-    interview_id = get_field(existing_changeset, :interview_id)
-    existing_satisfied_criteria = (from i in __MODULE__, select: i.satisfied_criteria, where: i.interview_id == ^interview_id) |> Repo.one
-    if existing_satisfied_criteria == @lower_bound do
-      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @upper_bound)
-    else
-      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @lower_bound)
-    end
-    existing_changeset
-  end
-
-  defp update_best_satisfied_criteria(existing_changeset, @upper_bound) do
-    interview_id = get_field(existing_changeset, :interview_id)
-    existing_satisfied_criteria = (from i in __MODULE__, select: i.satisfied_criteria, where: i.interview_id == ^interview_id) |> Repo.one
-    if existing_satisfied_criteria == @upper_bound do
-      existing_changeset = existing_changeset |> add_error(:experience_matrix, "Panelist with the required eligibility already met")
-    else
-      existing_changeset = existing_changeset |> put_change(:satisfied_criteria, @upper_bound)
-    end
-    existing_changeset
+  defp update_changeset(existing_changeset, sign_up_evaluation_status, false) do
+    Enum.reduce(sign_up_evaluation_status.errors, existing_changeset, fn({field_name, description}, acc) ->
+      add_error(acc, field_name, description)
+    end)
   end
 
   def get_candidate_ids_and_start_times_interviewed_by(panelist_login_name) do

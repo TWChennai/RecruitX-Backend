@@ -3,6 +3,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
+  @lower_bound "LB"
+  @upper_bound "UB"
 
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.InterviewPanelist
@@ -23,8 +25,9 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(response.status) |> to(be(201))
       inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
       List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{inserted_panelist.id}"}))
-      expect(interview_panelist_params.panelist_login_name) |> to(eql(inserted_panelist.panelist_login_name))
-      expect(interview_panelist_params.interview_id) |> to(eql(inserted_panelist.interview_id))
+      expect(inserted_panelist.panelist_login_name) |> to(eql(interview_panelist_params.panelist_login_name))
+      expect(inserted_panelist.interview_id) |> to(eql(interview_panelist_params.interview_id))
+      expect(inserted_panelist.satisfied_criteria) |> to(eql(@lower_bound))
     end
 
     it "should respond with errors when trying to sign up for the same interview more than once" do
@@ -69,10 +72,12 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       interview = create(:interview)
       experience_matrix = create(:experience_matrix)
-      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: D.add(experience_matrix.panelist_experience_lower_bound,D.new(1))})
-      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: D.add(experience_matrix.panelist_experience_lower_bound,D.new(1))})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+      inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
 
       expect(response.status) |> to(be(201))
+      expect(inserted_panelist.satisfied_criteria) |> to(be(@lower_bound))
     end
 
     it "should accept sign up if there is no filter for the interview type" do
@@ -80,10 +85,12 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       interview = create(:interview)
       experience_matrix = create(:experience_matrix)
-      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
-      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+      inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
 
       expect(response.status) |> to(be(201))
+      expect(inserted_panelist.satisfied_criteria) |> to(be(@lower_bound))
     end
 
     it "should accept sign up if the panelist is experienced for the interview type and the candidate" do
@@ -91,10 +98,46 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       interview = create(:interview)
       experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
-      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
-      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+      inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
 
       expect(response.status) |> to(be(201))
+      expect(inserted_panelist.satisfied_criteria) |> to(be(@lower_bound))
+    end
+
+    it "should accept sign up if the panelist is experienced for the interview type and the candidate when already lower_bound is met" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
+      interview_panelist_1_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      interview_panelist_2_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_1_params)}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_2_params)}
+      inserted_panelist_1 = getInterviewPanelistWithName(interview_panelist_1_params.panelist_login_name)
+      inserted_panelist_2 = getInterviewPanelistWithName(interview_panelist_2_params.panelist_login_name)
+
+      expect(response.status) |> to(be(201))
+      expect(inserted_panelist_1.satisfied_criteria) |> to(be(@lower_bound))
+      expect(inserted_panelist_2.satisfied_criteria) |> to(be(@lower_bound))
+    end
+
+    it "should not accept sign up if the panelist is experienced for the interview type and the candidate when already upper_bound is met" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(5), candidate_experience_lower_bound: D.new(-1))
+      interview_panelist_1_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      interview_panelist_2_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_1_params)}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_2_params)}
+      inserted_panelist_1 = getInterviewPanelistWithName(interview_panelist_1_params.panelist_login_name)
+      expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "Panelist with the required eligibility already met"}
+
+      expect(response.status) |> to(be(422))
+      expect(inserted_panelist_1.satisfied_criteria) |> to(be(@upper_bound))
+      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
     end
 
     it "should not accept sign up if the panelist is experienced for the interview type but not for the candidate" do
@@ -110,6 +153,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "The panelist does not have enough experience"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      expect(response.body_params["interview_panelist"]["satisfied_criteria"]) |> to(be(nil))
     end
   end
 
