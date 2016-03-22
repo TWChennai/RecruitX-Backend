@@ -42,7 +42,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
     sign_up_evaluation_status
   end
 
-  defp is_eligible_with_LB_filters(sign_up_evaluation_status, _experience_matrix_filters, _candidate_experience, _interview_type_id), do: sign_up_evaluation_status
+  defp is_eligible_with_LB_filters(sign_up_evaluation_status, _, _, _), do: sign_up_evaluation_status
 
   defp is_eligible_with_UB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
     result = Enum.any?(experience_matrix_filters,fn({_eligible_candidate_lower_experience,eligible_candidate_upper_experience, eligible_interview_type_id}) -> interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_upper_experience)
@@ -63,11 +63,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   defp find_the_best_fit_criteria(%{valid?: false} = sign_up_evaluation_status, _interview_id), do: sign_up_evaluation_status
 
-  defp update_best_satisfied_criteria(sign_up_evaluation_status, @lower_bound, true) do
-    sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
-  end
-
-  defp update_best_satisfied_criteria(sign_up_evaluation_status, @lower_bound, false) do
+  defp update_best_satisfied_criteria(sign_up_evaluation_status, @lower_bound, _) do
     sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
   end
 
