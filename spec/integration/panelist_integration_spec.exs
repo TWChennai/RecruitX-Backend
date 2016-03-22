@@ -8,8 +8,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.JSONErrorReason
-  alias RecruitxBackend.JSONError
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Candidate
@@ -39,8 +37,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist_params}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You have already signed up an interview for this candidate"}
-      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You have already signed up an interview for this candidate"]}}))
     end
 
 
@@ -54,8 +52,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => interview_panelist2}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup", reason: "You have already signed up an interview for this candidate"}
-      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You have already signed up an interview for this candidate"]}}))
     end
 
     it "should respond with errors when trying to sign up for the interview after maximum(2) signups reached" do
@@ -65,8 +63,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: 2}))}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "signup_count", reason: "More than 2 signups are not allowed"}
-      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup_count" => ["More than 2 signups are not allowed"]}}))
     end
 
     it "should accept sign up if experience is above maximum experience with filter" do
@@ -135,11 +133,11 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_1_params)}
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_2_params)}
       inserted_panelist_1 = getInterviewPanelistWithName(interview_panelist_1_params.panelist_login_name)
-      expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "Panelist with the required eligibility already met"}
 
       expect(response.status) |> to(be(422))
       expect(inserted_panelist_1.satisfied_criteria) |> to(be(@upper_bound))
-      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"experience_matrix" => ["Panelist with the required eligibility already met"]}}))
     end
 
     it "should not accept sign up if the panelist is experienced for the interview type but not for the candidate" do
@@ -153,9 +151,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
 
       response |> should(have_http_status(:unprocessable_entity))
-      expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "The panelist does not have enough experience"}
-      expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
-      expect(response.body_params["interview_panelist"]["satisfied_criteria"]) |> to(be(nil))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"experience_matrix" => ["The panelist does not have enough experience"]}}))
     end
 
     it "should accept sign up if the panelist is experienced for the interview type but not for the candidate and the role has no filters" do
