@@ -71,7 +71,8 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
 
-      expect(actual_data.skills) |> to(be("Skill 1, Skill 2"))
+      expect(actual_data.skills) |> to(have("Skill 1"))
+      expect(actual_data.skills) |> to(have("Skill 2"))
     end
 
     it "should append other skills for the candidate in the result" do
@@ -83,7 +84,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
 
-      expect(actual_data.skills) |> to(be("Skill 1, Skill 2, Other Skills"))
+			expect(actual_data.skills) |> to(have("Skill 1"))
+			expect(actual_data.skills) |> to(have("Skill 2"))
+			expect(actual_data.skills) |> to(have("Other Skills"))
     end
   end
 
