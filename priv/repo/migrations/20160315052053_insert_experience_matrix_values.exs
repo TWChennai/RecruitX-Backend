@@ -12,7 +12,7 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValues do
     %{"panelist_experience_lower_bound" => 1, "candidate_experience_lower_bound" => -1, "candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.technical_2},
     %{"panelist_experience_lower_bound" => 3, "candidate_experience_lower_bound" => 5, "candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.coding},
     %{"panelist_experience_lower_bound" => 3, "candidate_experience_lower_bound" => 5, "candidate_experience_upper_bound" => 8, "interview_type" => InterviewType.technical_1},
-    %{"panelist_experience_lower_bound" => 3, "candidate_experience_lower_bound" => -1, "candidate_experience_upper_bound" => 5, "interview_type" => InterviewType.technical_2},
+    %{"panelist_experience_lower_bound" => 3, "candidate_experience_lower_bound" => -1, "candidate_experience_upper_bound" => 8, "interview_type" => InterviewType.technical_2},
     %{"panelist_experience_lower_bound" => 5, "candidate_experience_lower_bound" => 8, "candidate_experience_upper_bound" => 8, "interview_type" => InterviewType.coding},
     %{"panelist_experience_lower_bound" => 5, "candidate_experience_lower_bound" => 8, "candidate_experience_upper_bound" => 12, "interview_type" => InterviewType.technical_1},
     %{"panelist_experience_lower_bound" => 5, "candidate_experience_lower_bound" => 5, "candidate_experience_upper_bound" => 12, "interview_type" => InterviewType.technical_2},
