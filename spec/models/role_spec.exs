@@ -79,11 +79,5 @@ defmodule RecruitxBackend.RoleSpec do
       expect(result.id) |> to(eql(result.id))
       expect(result.name) |> to(eql(result.name))
     end
-
-    it "should return other if role does not exist" do
-      result = Role.retrieve_by_name "dummy_role"
-
-      expect(result.name) |> to(eql(Role.other))
-    end
   end
 end

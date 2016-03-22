@@ -25,6 +25,7 @@ defmodule RecruitxBackend.JigsawController do
           _  -> case response.body |> Parser.parse do
                   {:ok, body} -> role_name = body["role"]["name"]
                                  role = Role.retrieve_by_name(role_name)
+                                 if is_nil(role), do: role = Map.merge(Role.retrieve_by_name(Role.other), %{name: role_name})
                                  department = body["department"]
                                  tw_experience = body["twExperience"]
                                  total_experience = body["totalExperience"]

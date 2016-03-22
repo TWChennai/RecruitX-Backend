@@ -33,8 +33,6 @@ defmodule RecruitxBackend.Role do
   end
 
   def retrieve_by_name(name) do
-    role = (from r in __MODULE__, where: r.name == ^name) |> Repo.one
-    if is_nil(role), do: role = (from r in __MODULE__, where: r.name == ^other) |> Repo.one
-    role
+    (from r in __MODULE__, where: r.name == ^name) |> Repo.one
   end
 end
