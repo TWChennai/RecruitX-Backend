@@ -3,6 +3,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.ExperienceMatrix
 
   @lower_bound "LB"
   @upper_bound "UB"
@@ -14,15 +15,18 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   def evaluate(sign_up_evaluation_status, experience_eligibility_criteria, interview) do
     interview = Repo.preload interview, :candidate
     sign_up_evaluation_status
-    |> is_eligible_without_LB_and_UB_filters(interview.candidate.experience, interview.interview_type_id, experience_eligibility_criteria)
+    |> is_eligible_without_LB_and_UB_filters(interview.candidate, interview.interview_type_id, experience_eligibility_criteria)
     |> is_eligible_with_LB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
     |> is_eligible_with_UB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
     |> find_the_best_fit_criteria(interview.id)
   end
 
-  defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, candidate_experience, interview_type_id,  experience_eligibility_criteria) do
+  defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, candidate, interview_type_id,  experience_eligibility_criteria) do
+    candidate_experience = candidate.experience
+    candidate = Repo.preload candidate, :role
     result = to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
     or !Enum.member?(experience_eligibility_criteria.interview_types_with_filter, interview_type_id)
+    or !ExperienceMatrix.should_filter_role(candidate.role)
     Logger.info("Panelist exp: #{experience_eligibility_criteria.panelist_experience} Candidate exp:#{candidate_experience} interview_type_id: #{interview_type_id} result: #{result}")
     if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
     sign_up_evaluation_status

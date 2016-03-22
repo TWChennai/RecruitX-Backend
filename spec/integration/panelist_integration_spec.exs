@@ -16,6 +16,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias Timex.Date
   alias Decimal, as: D
 
+  before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
+
   describe "create" do
     it "should insert valid data in db and return location path in a success response" do
       interview_panelist_params = Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2})
@@ -154,6 +156,25 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expectedErrorReason = %JSONErrorReason{field_name: "experience_matrix", reason: "The panelist does not have enough experience"}
       expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       expect(response.body_params["interview_panelist"]["satisfied_criteria"]) |> to(be(nil))
+    end
+
+    it "should accept sign up if the panelist is experienced for the interview type but not for the candidate and the role has no filters" do
+      allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
+      Repo.delete_all ExperienceMatrix
+      Repo.delete_all Candidate
+      candidate = create(:candidate, experience: D.new(5))
+      interview = create(:interview, candidate_id: candidate.id)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, candidate_experience_upper_bound: D.sub(candidate.experience, D.new(1)), candidate_experience_lower_bound: D.new(-1))
+      params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound})
+
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
+
+      expect(response.status) |> to(be(201))
+      inserted_panelist = getInterviewPanelistWithName(params.panelist_login_name)
+      List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{inserted_panelist.id}"}))
+      expect(inserted_panelist.panelist_login_name) |> to(eql(params.panelist_login_name))
+      expect(inserted_panelist.interview_id) |> to(eql(params.interview_id))
+      expect(inserted_panelist.satisfied_criteria) |> to(eql(@lower_bound))
     end
   end
 

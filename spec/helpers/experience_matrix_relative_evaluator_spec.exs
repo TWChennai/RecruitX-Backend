@@ -12,6 +12,8 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
   @upper_bound "UB"
   @empty ""
 
+  before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
+
   context "evaluate" do
     it "should return true if experience is greater than maximum experience with filter" do
       Repo.delete_all ExperienceMatrix
@@ -102,6 +104,22 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
       expect(eligiblity.valid?) |> to(be_false)
       expect(eligiblity.satisfied_criteria) |> to(be(@empty))
+    end
+
+    it "should return true if role has no filters but current interview type has filters and panelist is below minimum experience level in experience matrix" do
+      Repo.delete_all ExperienceMatrix
+      allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
+      experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
+      _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
+      panelist_experience = D.new(1)
+
+      candidate = create(:candidate)
+      interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_create_1.interview_type_id)
+
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience), interview)
+
+      expect(eligiblity.valid?) |> to(be_true)
+      expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
     end
 
     it "should return true when the panelist is experienced for the current interview and candidate" do
