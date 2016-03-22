@@ -31,7 +31,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
     Enum.each(["Selenium",
               "QTP",
               "Performance",
-              "SOAPUI",
+              "CI",
               "Other"], fn skill_value ->
       Repo.insert!(%RoleSkill{role_id: qa_role.id, skill_id: Skill.retrieve_by_name(skill_value).id})
     end)
