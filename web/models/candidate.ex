@@ -60,10 +60,10 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_candidates_in_fifo_order do
-    interview_type_id_with_min_priority = InterviewType.get_id_of_min_priority_round
+    interview_type_id_with_min_priority = InterviewType.get_ids_of_min_priority_round
     from c in __MODULE__,
       left_join: i in assoc(c, :interviews),
-      where: i.interview_type_id == ^interview_type_id_with_min_priority or is_nil(i.interview_type_id),
+      where: i.interview_type_id in ^interview_type_id_with_min_priority or is_nil(i.interview_type_id),
       order_by: i.start_time,
       select: c
   end

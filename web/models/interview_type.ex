@@ -35,12 +35,11 @@ defmodule RecruitxBackend.InterviewType do
   def leadership, do: "Ldrshp"
   def p3, do: "P3"
 
-  def get_id_of_min_priority_round do
+  def get_ids_of_min_priority_round do
     (from it in __MODULE__,
       select: it.id,
-      order_by: it.priority,
-      limit: 1)
-      |> Repo.one
+      where: fragment("? = (select it.priority from interview_types it order by it.priority limit 1)", it.priority))
+      |> Repo.all
   end
 
   def retrieve_by_name(name),
