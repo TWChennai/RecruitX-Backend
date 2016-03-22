@@ -7,8 +7,8 @@ defmodule RecruitxBackend.Repo.Migrations.AddNewSkills do
   def change do
     Enum.each(["Selenium",
               "QTP",
-              "Performance",
-              "SOAPUI"], fn skill_value ->
+              "CI",
+              "Performance"], fn skill_value ->
       Repo.insert!(%Skill{name: skill_value})
     end)
   end
