@@ -147,7 +147,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 		it "should call MailmanExtensions deliver with correct arguments" do
 		  create(:interview)
 			email = %{
-				subject: "[RecruitX]Reminder: Upcoming Interviews",
+				subject: "[Signup Reminder] Upcoming Interviews for the Week",
 				to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
 				html: "html content"
 	    }
@@ -163,7 +163,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should not call MailmanExtensions deliver if there are no interviews" do
       Repo.delete_all(Interview)
       email = %{
-        subject: "[RecruitX]Reminder: Upcoming Interviews",
+        subject: "[Signup Reminder] Upcoming Interviews for the Week",
         to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
         html: "html content"
       }

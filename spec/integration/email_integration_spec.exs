@@ -29,9 +29,9 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       expect(delivery) |> to_not(be([]))
       expect(delivery) |> to(have("From: no-reply-recruitx@thoughtworks.com"))
       expect(delivery) |> to(have("To: Chennai <chennai@thoughtworks.com>"))
-      expect(delivery) |> to(have("Subject: [RecruitX]Reminder: Upcoming Interviews"))
+      expect(delivery) |> to(have("Subject: [Signup Reminder] Upcoming Interviews for the Week"))
       expect(delivery) |> to(have(candidate.first_name <> " " <> candidate.last_name))
-      expect(delivery) |> to(have(to_string(candidate.experience)))
+      expect(delivery) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
       expect(delivery) |> to(have("Special Skill, Other Skill"))
       expect(delivery) |> to(have("Round 1 on " <> DateFormat.format!(date_time, "%b-%d", :strftime) ))
     end

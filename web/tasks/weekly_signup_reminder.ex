@@ -24,7 +24,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
     if candidates_with_insufficient_signups != [] or candidates_with_sufficient_signups != [] do
       email_content = Templates.weekly_signup_reminder(candidates_with_insufficient_signups, candidates_with_sufficient_signups)
       Mailer.deliver(%{
-        subject: "[RecruitX]Reminder: Upcoming Interviews",
+        subject: "[Signup Reminder] Upcoming Interviews for the Week",
         to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
         html: email_content
       })
