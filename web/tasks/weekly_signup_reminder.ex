@@ -49,6 +49,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
     |> preload([:role, :skills, interviews: ^sub_query])
     |> Repo.all
 
+    # TODO: Is there a better way to invoke the 'having' clause via Ecto?
     Enum.filter(candidates, &(!Enum.empty?(&1.interviews)))
   end
 

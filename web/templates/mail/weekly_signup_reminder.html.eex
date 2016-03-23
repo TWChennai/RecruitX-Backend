@@ -14,15 +14,15 @@
     <%= for candidate <- candidates_with_insufficient_signups do %>
       <tr>
         <td style="border: 1px solid #000;">
-          <%= candidate.role%>
+          <%= candidate.role %>
         </td>
         <td style="border: 1px solid #000;">
-          <%= candidate.name%>, <%= Decimal.round(candidate.experience, 1) %> yrs <br/>
+          <%= candidate.name %>, <%= Decimal.round(candidate.experience, 1) %> yrs <br/>
           Skills: <%= candidate.skills |> String.rstrip |> String.rstrip(?,) %>
         </td>
         <td style="border: 1px solid #000;">
           <%= for interview <- candidate.interviews do %>
-           <%= interview.name%> on <%= interview.date%> <br />
+           <%= interview.name %> on <%= interview.date %> <br />
           <% end %>
         </td>
       </tr>
@@ -47,15 +47,15 @@
     <%= for candidate <- candidates_with_sufficient_signups do %>
     <tr>
       <td style="border: 1px solid #000;">
-        <%= candidate.role%>
+        <%= candidate.role %>
       </td>
       <td style="border: 1px solid #000;">
-        <%= candidate.name%>, <%= Decimal.round(candidate.experience, 1) %> yrs<br/>
+        <%= candidate.name %>, <%= Decimal.round(candidate.experience, 1) %> yrs<br/>
         Skills: <%= candidate.skills |> String.rstrip |> String.rstrip(?,) %>
       </td>
       <td style="border: 1px solid #000;">
         <%= for interview <- candidate.interviews do %>
-        <%= interview.name%> on <%= interview.date%> <br />
+        <%= interview.name %> on <%= interview.date %> <br />
         <% end %>
       </td>
     </tr>
