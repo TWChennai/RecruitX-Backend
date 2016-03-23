@@ -15,11 +15,12 @@ defmodule RecruitxBackend.JigsawController do
     {experience, id} = parse_experience(id)
     role = Role.retrieve_by_name(Role.other)
     ba_role = Map.merge(Role.retrieve_by_name(Role.other), %{name: "BA"})
+    recruiter_role = Map.merge(Role.retrieve_by_name(Role.other), %{name: "Specialist"})
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: ba_role}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
       "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: role}
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: role}
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role}
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role}
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         case response.body do
           "" -> %{is_recruiter: @invalid_user, calculated_hire_date: Date.now, past_experience: 0}
