@@ -4,6 +4,10 @@ defmodule RecruitxBackend.InterviewType do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
+  @panelists_for_leadership ["ppanelistp"]
+
+  @panelists_for_p3 ["ppanelistp"]
+
   schema "interview_types" do
     field :name, :string
     field :priority, :integer
@@ -34,6 +38,13 @@ defmodule RecruitxBackend.InterviewType do
   def technical_2, do: "Tech-2"
   def leadership, do: "Ldrshp"
   def p3, do: "P3"
+
+  def get_type_specific_panelists do
+    %{
+      (retrieve_by_name(__MODULE__.leadership)).id => @panelists_for_leadership,
+      (retrieve_by_name(__MODULE__.p3)).id => @panelists_for_p3
+    }
+  end
 
   def get_ids_of_min_priority_round do
     (from it in __MODULE__,

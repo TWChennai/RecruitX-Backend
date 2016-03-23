@@ -6,5 +6,6 @@ defmodule RecruitxBackend.SignUpDataContainer do
     candidate_ids_interviewed: [],
     my_previous_sign_up_start_times: [],
     signup_counts: [],
-    experience_eligibility_criteria: %ExperienceEligibilityData{}
+    experience_eligibility_criteria: %ExperienceEligibilityData{},
+    interview_type_specfic_criteria: %{}
 end

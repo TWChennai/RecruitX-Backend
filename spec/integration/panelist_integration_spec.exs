@@ -11,6 +11,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.InterviewType
   alias Timex.Date
   alias Decimal, as: D
 
@@ -91,6 +92,28 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       expect(response.status) |> to(be(201))
       expect(inserted_panelist.satisfied_criteria) |> to(be(@lower_bound))
+    end
+
+    it "should not accept sign up if panelist is not one of the eligible panelists for a interview type" do
+      leadership = create(:interview_type)
+      interview = create(:interview, interview_type_id: leadership.id)
+      allow InterviewType |> to(accept(:get_type_specific_panelists, fn() -> %{leadership.id => ["dummy"]} end))
+      interview_panelist_params = %{interview_id: interview.id, panelist_login_name: "test", panelist_experience: Decimal.new(2)}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You are not eligible to sign up for this interview"]}}))
+    end
+
+    it "should accept sign up if panelist is one of the eligible panelists for a interview type" do
+      leadership = create(:interview_type)
+      interview = create(:interview, interview_type_id: leadership.id)
+      allow InterviewType |> to(accept(:get_type_specific_panelists, fn() -> %{leadership.id => ["test"]} end))
+      interview_panelist_params = %{interview_id: interview.id, panelist_login_name: "test", panelist_experience: Decimal.new(2)}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+
+      expect(response.status) |> to(be(201))
     end
 
     it "should accept sign up if the panelist is experienced for the interview type and the candidate" do
