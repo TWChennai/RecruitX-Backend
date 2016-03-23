@@ -50,6 +50,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
     |> validate_panelist_experience(params["panelist_experience"])
+    |> validate_panelist_role(params["panelist_role"])
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")
@@ -59,15 +60,20 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   defp validate_panelist_experience(existing_changeset, _), do: existing_changeset
 
+  defp validate_panelist_role(%{valid?: true} = existing_changeset, nil), do: add_error(existing_changeset, :panelist_role, "can't be blank")
+
+  defp validate_panelist_role(existing_changeset, _), do: existing_changeset
+
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
     panelist_experience = params["panelist_experience"]
+    panelist_role = params["panelist_role"]
     if existing_changeset.valid? do
       interview = (Interview) |> Repo.get(interview_id)
       if !is_nil(interview) do
-        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
+        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role)
         sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
         existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
       end

@@ -142,8 +142,8 @@ defmodule RecruitxBackend.Interview do
   require Logger
 
   def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role) do
-    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
-    role = Role.retrieve_by_name(panelist_role)
+    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role)
+    role = sign_up_data_container.panelist_role
     interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
     Enum.reduce(interviews, [], fn(interview, acc) ->
       if __MODULE__.is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria),do: acc = acc ++ [__MODULE__.put_sign_up_status(sign_up_data_container, interview)]

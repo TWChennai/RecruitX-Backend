@@ -14,8 +14,9 @@ defmodule RecruitxBackend.JigsawController do
   def show(conn, %{"id" => id}) do
     {experience, id} = parse_experience(id)
     role = Role.retrieve_by_name(Role.other)
+    ba_role = Map.merge(Role.retrieve_by_name(Role.other), %{name: "BA"})
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: ba_role}
       "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
       "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: role}
       "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: role}

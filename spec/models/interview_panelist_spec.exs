@@ -10,12 +10,13 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
   let :valid_attrs, do: fields_for(:interview_panelist)
   let :invalid_attrs, do: %{}
+  let :role, do: create(:role)
 
   before do: Repo.delete_all(Interview)
   before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  %SignUpEvaluationStatus{satisfied_criteria: "LB"} end))
 
   context "valid changeset" do
-    subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
+    subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
 
     it do: should be_valid
   end
@@ -70,7 +71,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     end
 
     it "should be invalid when panelist_experience is nil" do
-      with_nil_id = Map.merge(valid_attrs, %{panelist_experience: nil})
+      with_nil_id = Map.merge(valid_attrs, %{panelist_experience: nil, panelist_role: role.name})
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_nil_id)
 
       expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
@@ -87,7 +88,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       invalid = %SignUpEvaluationStatus{valid?: false, errors: [error: "errors"]}
       allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  invalid end))
 
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
 
       expect(changeset) |> to(have_errors([error: "errors"]))
     end
@@ -95,7 +96,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
   context "unique_index constraint" do
     it "should not allow same panelist to be added more than once for same interview" do
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2})))
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
@@ -107,7 +108,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       Repo.insert(changeset)
       signed_up_interview = Interview |> Repo.get(valid_attrs.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{interview_id: new_interview.id, panelist_experience: 2})))
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{interview_id: new_interview.id, panelist_experience: 2, panelist_role: role.name})))
 
       {status, _} = Repo.insert(changeset)
 
@@ -118,7 +119,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   context "assoc constraint" do
     it "when candidate id not present in candidates table" do
       interview_id_not_present = -1
-      with_invalid_interview_id = convertKeysFromAtomsToStrings(Map.merge(valid_attrs, convertKeysFromAtomsToStrings(%{interview_id: interview_id_not_present, panelist_experience: 2})))
+      with_invalid_interview_id = convertKeysFromAtomsToStrings(Map.merge(valid_attrs, convertKeysFromAtomsToStrings(%{interview_id: interview_id_not_present, panelist_experience: 2, panelist_role: role.name})))
 
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_invalid_interview_id)
 

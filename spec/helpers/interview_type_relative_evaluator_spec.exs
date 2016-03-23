@@ -8,7 +8,7 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluatorSpec do
     it "should be valid when interview type has no specific panelists" do
       interview = create(:interview)
 
-      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, %{}, "test", interview)
+      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, %{}, "test", create(:role), interview)
 
       expect(validity) |> to(be_true)
       expect(errors) |> to(be([]))
@@ -18,7 +18,7 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluatorSpec do
       interview = create(:interview)
       allowed_panelists = %{interview.interview_type_id => ["test"]}
 
-      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", interview)
+      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", create(:role), interview)
 
       expect(validity) |> to(be_true)
       expect(errors) |> to(be([]))
@@ -28,7 +28,7 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluatorSpec do
       interview = create(:interview)
       allowed_panelists = %{interview.interview_type_id => ["testing"]}
 
-      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", interview)
+      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", create(:role), interview)
 
       expect(validity) |> to(be_false)
       expect(errors) |> to(be([signup: "You are not eligible to sign up for this interview"]))
@@ -38,7 +38,7 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluatorSpec do
       interview = create(:interview)
       allowed_panelists = %{interview.interview_type_id => ["testing"], create(:interview_type) => ["test"]}
 
-      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", interview)
+      %{valid?: validity, errors: errors}  = InterviewTypeRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, allowed_panelists, "test", create(:role), interview)
 
       expect(validity) |> to(be_false)
       expect(errors) |> to(be([signup: "You are not eligible to sign up for this interview"]))

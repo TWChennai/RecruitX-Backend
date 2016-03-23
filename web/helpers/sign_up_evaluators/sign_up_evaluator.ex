@@ -10,8 +10,9 @@ defmodule RecruitxBackend.SignUpEvaluator do
   alias RecruitxBackend.ExperienceMatrixRelativeEvaluator
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.Role
 
-  def populate_sign_up_data_container(panelist_login_name, panelist_experience) do
+  def populate_sign_up_data_container(panelist_login_name, panelist_experience, panelist_role) do
     {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
 
@@ -20,7 +21,8 @@ defmodule RecruitxBackend.SignUpEvaluator do
     my_previous_sign_up_start_times: my_previous_sign_up_start_times,
     signup_counts: signup_counts,
     experience_eligibility_criteria: panelist_experience |> populate_experience_eligiblity_criteria,
-    interview_type_specfic_criteria: InterviewType.get_type_specific_panelists
+    interview_type_specfic_criteria: InterviewType.get_type_specific_panelists,
+    panelist_role: Role.retrieve_by_name(panelist_role)
     }
   end
 
@@ -34,7 +36,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
 
   def evaluate(sign_up_data_container, interview) do
     %SignUpEvaluationStatus{}
-    |> InterviewTypeRelativeEvaluator.evaluate(sign_up_data_container.interview_type_specfic_criteria, sign_up_data_container.panelist_login_name, interview)
+    |> InterviewTypeRelativeEvaluator.evaluate(sign_up_data_container.interview_type_specfic_criteria, sign_up_data_container.panelist_login_name, sign_up_data_container.panelist_role, interview)
     |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
     |> ExperienceMatrixRelativeEvaluator.evaluate(sign_up_data_container.experience_eligibility_criteria, interview)
   end
