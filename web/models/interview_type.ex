@@ -4,9 +4,9 @@ defmodule RecruitxBackend.InterviewType do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
-  @panelists_for_leadership ["ppanelistp"]
+  @panelists_for_leadership ["ppanelist", "gayathm"]
 
-  @panelists_for_p3 ["ppanelistp"]
+  @panelists_for_p3 ["ppanelistp", "subham"]
 
   schema "interview_types" do
     field :name, :string

@@ -22,7 +22,7 @@ defmodule RecruitxBackend.InterviewControllerSpec do
     it "should report missing panelist_login_name param" do
       conn = action(:index, %{})
       conn |> should(have_http_status(400))
-      expect(conn.assigns.param) |> to(eql("panelist_login_name/candidate_id/panelist_name/panelist_experience"))
+      expect(conn.assigns.param) |> to(eql("panelist_login_name/candidate_id/panelist_name/panelist_experience/panelist_role"))
     end
   end
 

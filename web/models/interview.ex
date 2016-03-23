@@ -13,6 +13,8 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.SignUpEvaluator
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias Timex.Date
   alias Timex.DateFormat
 
@@ -139,19 +141,31 @@ defmodule RecruitxBackend.Interview do
 
   require Logger
 
-  def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience) do
+  def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role) do
     sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience))
-    Enum.map(interviews, fn(interview) ->
-      Logger.info("candidate_id:#{interview.candidate_id} interview_id:#{interview.id}")
-      sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
-      Logger.info("Is sign up valid?: #{sign_up_evaluation_status.valid?}")
-      interview = Map.put(interview, :signup_error, "")
-      if !sign_up_evaluation_status.valid? do
-        {_, error} = sign_up_evaluation_status.errors |> List.first
-        interview = Map.put(interview, :signup_error, error)
-      end
-      Map.put(interview, :signup, sign_up_evaluation_status.valid?)
+    role = Role.retrieve_by_name(panelist_role)
+    interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
+    Enum.reduce(interviews, [], fn(interview, acc) ->
+      if __MODULE__.is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria),do: acc = acc ++ [__MODULE__.put_sign_up_status(sign_up_data_container, interview)]
+      acc
     end)
+  end
+
+  def is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria) do
+    (InterviewTypeRelativeEvaluator.is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
+      and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
+    or panelist_role == nil
+    or interview.candidate.role_id == panelist_role.id
+  end
+
+  def put_sign_up_status(sign_up_data_container, interview) do
+    sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
+    interview = Map.put(interview, :signup_error, "")
+    if !sign_up_evaluation_status.valid? do
+      {_, error} = sign_up_evaluation_status.errors |> List.first
+      interview = Map.put(interview, :signup_error, error)
+    end
+    Map.put(interview, :signup, sign_up_evaluation_status.valid?)
   end
 
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
@@ -213,9 +227,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def is_not_completed(model) do
-    is_over = is_nil(model.interview_status_id)
-    Logger.info("Is interview over? #{is_over}")
-    is_over
+    is_nil(model.interview_status_id)
   end
 
   def update_status(id, status_id) do
