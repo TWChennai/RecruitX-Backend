@@ -179,7 +179,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should be called every week on friday at 3.0 UTC" do
       job = Quantum.find_job(:weekly_signup_reminder)
 
-      expect(job.schedule) |> to(be("0 3 * * 5"))
+      expect(job.schedule) |> to(be("30 10 * * *"))
       expect(job.task) |> to(be({"RecruitxBackend.WeeklySignupReminder", "execute"}))
     end
 
