@@ -14,4 +14,9 @@ defmodule RecruitxBackend.ErrorView do
   def template_not_found(_template, assigns) do
     render "500.json", assigns
   end
+
+  def render("bad_request.json", %{error: error}) do
+    %{errors: [error]}
+  end
+
 end

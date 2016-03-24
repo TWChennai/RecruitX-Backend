@@ -34,11 +34,23 @@ defmodule RecruitxBackend.CandidateController do
       conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
-  def create(conn, %{"candidate" => %{"skill_ids" => _skill_ids}}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "interview_rounds", reason: "missing/empty required key"}])
+  def create(conn, %{"candidate" => %{"skill_ids" => skill_ids}}) when skill_ids != [] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(ErrorView, "bad_request.json", %{error: %{interview_rounds: ["missing/empty required key"]}})
+  end
 
-  def create(conn, %{"candidate" => %{"interview_rounds" => _interview_rounds}}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "skill_ids", reason: "missing/empty required key"}])
+  def create(conn, %{"candidate" => %{"interview_rounds" => interview_rounds}}) when interview_rounds != [] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(ErrorView, "bad_request.json", %{error: %{skill_ids: ["missing/empty required key"]}})
+  end
 
-  def create(conn, %{"candidate" => _post_params}), do: conn |> sendResponseBasedOnResult(:create, :error, [%JSONErrorReason{field_name: "skill_ids and interview_rounds", reason: "missing/empty required key"}])
+  def create(conn, %{"candidate" => _post_params}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(ErrorView, "bad_request.json", %{error: %{skill_ids: ["missing/empty required key"], interview_rounds: ["missing/empty required key"]}})
+   end
 
   def show(conn, %{"id" => id}) do
     candidate = Candidate
