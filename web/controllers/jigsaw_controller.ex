@@ -14,8 +14,8 @@ defmodule RecruitxBackend.JigsawController do
   def show(conn, %{"id" => id}) do
     {experience, id} = parse_experience(id)
     role = Role.retrieve_by_name(Role.other)
-    ba_role = Map.merge(Role.retrieve_by_name(Role.other), %{name: "BA"})
-    recruiter_role = Map.merge(Role.retrieve_by_name(Role.other), %{name: "Specialist"})
+    ba_role = Map.merge(role, %{name: "BA"})
+    recruiter_role = Map.merge(role, %{name: "Specialist"})
     user_details = case id do
       "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
       "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
@@ -54,6 +54,6 @@ defmodule RecruitxBackend.JigsawController do
   end
 
   defp year_to_month(experience) do
-    trunc(experience * 12)
+    round(experience * 12)
   end
 end
