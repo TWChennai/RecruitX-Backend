@@ -85,14 +85,14 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => []})})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => [%{"skill_ids" => ["missing/empty required key"]}]}
+        expectedNameErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
         expect(parsed_response) |> to(be(expectedNameErrorReason))
       end
 
       it "returns error when skill_ids is not given" do
         response = action(:create, %{"candidate" => Map.delete(post_parameters, "skill_ids")})
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => [%{"skill_ids" => ["missing/empty required key"]}]}
+        expectedNameErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
         response |> should(have_http_status(:unprocessable_entity))
         expect(parsed_response) |> to(be(expectedNameErrorReason))
       end
@@ -101,7 +101,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"interview_rounds" => []})})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason = %{"errors" => [%{"interview_rounds" => ["missing/empty required key"]}]}
+        expectedNameErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
         expect(parsed_response) |> to(be(expectedNameErrorReason))
       end
 
@@ -109,7 +109,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.delete(post_parameters, "interview_rounds")})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason = %{"errors" => [%{"interview_rounds" => ["missing/empty required key"]}]}
+        expectedNameErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
         expect(parsed_response) |> to(be(expectedNameErrorReason))
       end
     end
