@@ -2,8 +2,6 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValues do
   use Ecto.Migration
 
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.ExperienceMatrix
-  alias RecruitxBackend.Repo
 
   def change do
     Enum.each([
@@ -28,10 +26,7 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValues do
       "candidate_experience_upper_bound" => candidate_experience_upper_bound,
       "interview_type" => interview_type} ->
         interview_type = interview_type |> InterviewType.retrieve_by_name
-        Repo.insert!(%ExperienceMatrix{panelist_experience_lower_bound: Decimal.new(panelist_experience_lower_bound),
-          candidate_experience_lower_bound: Decimal.new(candidate_experience_lower_bound),
-          candidate_experience_upper_bound: Decimal.new(candidate_experience_upper_bound),
-          interview_type_id: interview_type.id})
+        execute "INSERT INTO experience_matrices (panelist_experience_lower_bound, candidate_experience_lower_bound, candidate_experience_upper_bound, interview_type_id, inserted_at, updated_at) VALUES (#{Decimal.new(panelist_experience_lower_bound)}, #{Decimal.new(candidate_experience_lower_bound)}, #{Decimal.new(candidate_experience_upper_bound)}, #{interview_type.id}, now(), now());"
     end)
   end
 end

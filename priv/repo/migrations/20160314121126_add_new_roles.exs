@@ -1,11 +1,10 @@
 defmodule RecruitxBackend.Repo.Migrations.AddRoleQa do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.Role
-
   def change do
-      Repo.insert!(%Role{name: Role.qa})
-      Repo.insert!(%Role{name: Role.other})
+    Enum.each(["QA",
+              "Other"], fn role_value ->
+      execute "INSERT INTO roles (name, inserted_at, updated_at) VALUES ('#{role_value}', now(), now());"
+    end)
   end
 end

@@ -1,15 +1,12 @@
 defmodule RecruitxBackend.Repo.Migrations.AddNewSkills do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.Skill
-
   def change do
     Enum.each(["Selenium",
               "QTP",
               "CI",
               "Performance"], fn skill_value ->
-      Repo.insert!(%Skill{name: skill_value})
+      execute "INSERT INTO skills (name, inserted_at, updated_at) VALUES ('#{skill_value}', now(), now());"
     end)
   end
 end

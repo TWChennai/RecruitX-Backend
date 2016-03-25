@@ -1,9 +1,7 @@
 defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
-  alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
 
   def change do
@@ -24,7 +22,8 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
               "C#",
               "Python",
               "Other"], fn skill_value ->
-      Repo.insert!(%RoleSkill{role_id: dev_role.id, skill_id: Skill.retrieve_by_name(skill_value).id})
+      skill_id = Skill.retrieve_by_name(skill_value).id
+      execute "INSERT INTO role_skills (role_id, skill_id, inserted_at, updated_at) VALUES (#{dev_role.id}, #{skill_id}, now(), now());"
     end)
 
     qa_role = Role.retrieve_by_name(Role.qa)
@@ -33,7 +32,8 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
               "Performance",
               "CI",
               "Other"], fn skill_value ->
-      Repo.insert!(%RoleSkill{role_id: qa_role.id, skill_id: Skill.retrieve_by_name(skill_value).id})
+      skill_id = Skill.retrieve_by_name(skill_value).id
+      execute "INSERT INTO role_skills (role_id, skill_id, inserted_at, updated_at) VALUES (#{qa_role.id}, #{skill_id}, now(), now());"
     end)
   end
 end

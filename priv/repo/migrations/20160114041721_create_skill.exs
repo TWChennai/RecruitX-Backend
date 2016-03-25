@@ -1,9 +1,6 @@
 defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.Skill
-
   def change do
     create table(:skills) do
       add :name, :string, null: false
@@ -20,7 +17,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
               "C#",
               "Python",
               "Other"], fn skill_value ->
-      Repo.insert!(%Skill{name: skill_value})
+      execute "INSERT INTO skills (name, inserted_at, updated_at) VALUES ('#{skill_value}', now(), now());"
     end)
   end
 end

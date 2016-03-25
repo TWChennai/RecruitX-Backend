@@ -1,12 +1,8 @@
 defmodule RecruitxBackend.Repo.Migrations.AddOneMorePipelineStatus do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.PipelineStatus
-
   def change do
     #TODO it should be moved to create_pipeline_status migration
-
-    Repo.insert!(%PipelineStatus{name: PipelineStatus.pass})
+    execute "INSERT INTO pipeline_statuses (name, inserted_at, updated_at) VALUES ('Pass', now(), now());"
   end
 end

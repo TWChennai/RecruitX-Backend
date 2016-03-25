@@ -2,7 +2,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewStatus do
   use Ecto.Migration
 
   alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.Repo
 
   def change do
     create table(:interview_status) do
@@ -18,7 +17,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewStatus do
     Enum.each([InterviewStatus.pass,
               InterviewStatus.pursue,
               InterviewStatus.strong_pursue], fn status_value ->
-      Repo.insert!(%InterviewStatus{name: status_value})
+      execute "INSERT INTO interview_status (name, inserted_at, updated_at) VALUES ('#{status_value}', now(), now());"
     end)
   end
 end

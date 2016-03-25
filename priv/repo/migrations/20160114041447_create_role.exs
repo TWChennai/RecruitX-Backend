@@ -1,9 +1,6 @@
 defmodule RecruitxBackend.Repo.Migrations.CreateRole do
   use Ecto.Migration
 
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.Role
-
   def change do
     create table(:roles) do
       add :name, :string, null: false
@@ -15,6 +12,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRole do
 
     flush
 
-    Repo.insert!(%Role{name: Role.dev})
+    execute "INSERT INTO roles (name, inserted_at, updated_at) VALUES ('Dev', now(), now());"
   end
 end

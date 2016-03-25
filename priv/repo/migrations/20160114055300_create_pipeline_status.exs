@@ -1,9 +1,6 @@
 defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
   use Ecto.Migration
 
-  alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.Repo
-
   def change do
     create table(:pipeline_statuses) do
       add :name, :string, null: false
@@ -15,9 +12,9 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
 
     flush
 
-    Enum.each([PipelineStatus.in_progress,
-              PipelineStatus.closed], fn pipeline_status_value ->
-      Repo.insert!(%PipelineStatus{name: pipeline_status_value})
+    Enum.each(["In Progress",
+              "Closed"], fn pipeline_status_value ->
+      execute "INSERT INTO pipeline_statuses (name, inserted_at, updated_at) VALUES ('#{pipeline_status_value}', now(), now());"
     end)
   end
 end
