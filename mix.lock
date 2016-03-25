@@ -5,7 +5,7 @@
   "combine": {:hex, :combine, "0.7.0"},
   "conform": {:hex, :conform, "0.17.0"},
   "connection": {:hex, :connection, "1.0.2"},
-  "corsica": {:hex, :corsica, "0.4.0"},
+  "corsica": {:hex, :corsica, "0.4.1"},
   "cowboy": {:hex, :cowboy, "1.0.4"},
   "cowlib": {:hex, :cowlib, "1.0.2"},
   "credo": {:hex, :credo, "0.3.8"},

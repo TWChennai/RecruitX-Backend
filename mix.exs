@@ -54,7 +54,7 @@ defmodule RecruitxBackend.Mixfile do
      {:exrm, "~> 0.19.9"},
      {:httpotion, "~> 2.2.2"},
      {:json, "~> 0.3.3"},
-     {:corsica, "~> 0.4.0"},
+     {:corsica, "~> 0.4.1"},
      {:timex, "~> 1.0.1"},
      {:timex_ecto, "~> 0.9.0"},
      {:scrivener, "~> 1.1"},
@@ -62,7 +62,7 @@ defmodule RecruitxBackend.Mixfile do
      # TODO: Get dependency from Hex once the bug is fixed / pull request is merged
      {:mailman, github: "arunvelsriram/mailman", branch: "fix_config_type_decision"},
      # TODO: Package not available through Hex. Find a way to manage the version
-     {:eiconv, github: "zotonic/eiconv"},
+     {:eiconv, github: "zotonic/eiconv"},   # Note: Introduced for mailman
      {:quantum, ">= 1.7.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.3.8", only: :test, app: false},
