@@ -55,8 +55,8 @@ defmodule RecruitxBackend.Mixfile do
      {:httpotion, "~> 2.2.2"},
      {:json, "~> 0.3.3"},
      {:corsica, "~> 0.4.1"},
-     {:timex, "~> 1.0.1"},
-     {:timex_ecto, "~> 0.9.0"},
+     {:timex, "~> 2.1.2"},
+     {:timex_ecto, "~> 1.0.4"},
      {:scrivener, "~> 1.1"},
      {:gettext, "~> 0.10.0"},
      # TODO: Get dependency from Hex once the bug is fixed / pull request is merged
