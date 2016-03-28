@@ -29,7 +29,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
   describe "construct view data and returns it as a map" do
     let :role, do: create(:role, name: "Role Name")
-    let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills")
+    let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
     let :interview_type, do: create(:interview_type)
     let :interview, do: create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id)
     before do
@@ -46,7 +46,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates)
 
       expect(actual_data.name) |> to(be(candidate.first_name <> " " <> candidate.last_name))
-      expect(actual_data.experience) |> to(be(candidate.experience))
+      expect(actual_data.experience) |> to(be("5.5"))
       expect(actual_data.role) |> to(be(role.name))
     end
 

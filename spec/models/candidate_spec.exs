@@ -274,4 +274,22 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(Enum.count(formatted_interviews)) |> to(be(2))
     end
   end
+
+  context "get rounded experience" do
+    it "should return experience in single precision" do
+      candidate = create(:candidate, experience: Decimal.new(4.67))
+
+      actual_experience = Candidate.get_rounded_experience(candidate)
+
+      expect(actual_experience) |> to(be("4.7"))
+    end
+
+    it "should not return experience mantissa-exponent format" do
+      candidate = create(:candidate, experience: Decimal.new(10.00))
+
+      actual_experience = Candidate.get_rounded_experience(candidate)
+
+      expect(actual_experience) |> to(be("10.0"))
+    end
+  end
 end

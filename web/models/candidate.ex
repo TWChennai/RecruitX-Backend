@@ -87,4 +87,10 @@ defmodule RecruitxBackend.Candidate do
     Enum.map(candidate.interviews, &(Interview.format(&1)))
   end
 
+  def get_rounded_experience(candidate) do
+    experience_as_string = Decimal.to_string(candidate.experience)
+    experience_as_float = String.to_float(experience_as_string)
+    Float.to_string(experience_as_float, decimals: 1)
+  end
+
 end

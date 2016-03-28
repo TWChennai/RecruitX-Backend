@@ -58,7 +58,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
   def construct_view_data(candidates_and_interviews) do
     Enum.map(candidates_and_interviews, fn(candidate) -> %{
       name: candidate.first_name <> " " <> candidate.last_name,
-      experience: candidate.experience,
+      experience: Candidate.get_rounded_experience(candidate),
       role: candidate.role.name,
       interviews: Candidate.get_formatted_interviews(candidate),
       skills: Candidate.get_formatted_skills(candidate)
