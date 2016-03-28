@@ -230,7 +230,7 @@ defmodule RecruitxBackend.CandidateSpec do
     before do
       create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate.id)
       create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate.id)
-		end
+    end
 
     it "should contain concatenated skills for the candidate in the result" do
       formatted_skills = Candidate
@@ -243,7 +243,7 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should append other skills for the candidate in the result" do
-			create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
+      create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
       formatted_skills = Candidate
         |> preload([:skills])
         |> Repo.get(candidate.id)
