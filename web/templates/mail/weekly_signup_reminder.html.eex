@@ -1,7 +1,8 @@
 <p>Hi all,</p>
 <p>Here are the interviews scheduled for the next week:</p>
-<h4>Interviews Requiring Signups</h4>
+
 <%= unless Enum.empty?(candidates_with_insufficient_signups) do %>
+<h4>Interviews that need signups</h4>
   <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
     <thead>
     <tr>
@@ -29,12 +30,10 @@
     <% end %>
     </tbody>
   </table>
-<%= else %>
-  <p>Awesome! All the upcoming interviews have signups.</p>
 <% end %>
 
-<h4>Interviews with Signups</h4>
 <%= unless Enum.empty?(candidates_with_sufficient_signups) do %>
+  <h4>Interviews already signed up</h4>
   <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
     <thead>
     <tr>
@@ -62,8 +61,6 @@
     <% end %>
     </tbody>
   </table>
-<%= else %>
-  <p>No upcoming interviews have signups. Hurry up!</p>
 <% end %>
 <br />
 <div>
