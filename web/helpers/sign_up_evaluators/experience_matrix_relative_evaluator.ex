@@ -10,8 +10,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   import Ecto.Query, only: [from: 2, where: 2]
 
-  require Logger
-
   def evaluate(sign_up_evaluation_status, experience_eligibility_criteria, interview) do
     interview = Repo.preload interview, :candidate
     sign_up_evaluation_status
@@ -22,12 +20,10 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   end
 
   defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, candidate, interview_type_id,  experience_eligibility_criteria) do
-    candidate_experience = candidate.experience
     candidate = Repo.preload candidate, :role
     result = to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
-    or !Enum.member?(experience_eligibility_criteria.interview_types_with_filter, interview_type_id)
-    or !ExperienceMatrix.should_filter_role(candidate.role)
-    Logger.info("Panelist exp: #{experience_eligibility_criteria.panelist_experience} Candidate exp:#{candidate_experience} interview_type_id: #{interview_type_id} result: #{result}")
+              or !Enum.member?(experience_eligibility_criteria.interview_types_with_filter, interview_type_id)
+              or !ExperienceMatrix.should_filter_role(candidate.role)
     if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
     sign_up_evaluation_status
   end
@@ -36,7 +32,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
 
   defp is_eligible_with_LB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
-    result = Enum.any?(experience_matrix_filters,fn({eligible_candidate_lower_experience, _eligible_candidate_upper_experience, eligible_interview_type_id}) ->interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_lower_experience)
+    result = Enum.any?(experience_matrix_filters, fn({eligible_candidate_lower_experience, _eligible_candidate_upper_experience, eligible_interview_type_id}) ->interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_lower_experience)
     end)
     if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
     sign_up_evaluation_status
@@ -45,7 +41,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   defp is_eligible_with_LB_filters(sign_up_evaluation_status, _, _, _), do: sign_up_evaluation_status
 
   defp is_eligible_with_UB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
-    result = Enum.any?(experience_matrix_filters,fn({_eligible_candidate_lower_experience,eligible_candidate_upper_experience, eligible_interview_type_id}) -> interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_upper_experience)
+    result = Enum.any?(experience_matrix_filters, fn({_eligible_candidate_lower_experience,eligible_candidate_upper_experience, eligible_interview_type_id}) -> interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_upper_experience)
     end)
     if result do
       sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@upper_bound)

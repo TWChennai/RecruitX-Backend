@@ -20,8 +20,6 @@ defmodule RecruitxBackend.Interview do
 
   import Ecto.Query
 
-  require Logger
-
   @duration_of_interview 1
 
   schema "interviews" do
@@ -138,8 +136,6 @@ defmodule RecruitxBackend.Interview do
     end
     existing_changeset
   end
-
-  require Logger
 
   def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role) do
     sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role)

@@ -8,7 +8,6 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
-  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.PipelineStatus
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed

@@ -6,8 +6,6 @@ defmodule RecruitxBackend.ApiKeyAuthenticatorSpec do
 
   alias RecruitxBackend.ApiKeyAuthenticator
 
-  require Logger
-
   describe "api key authentication" do
     it "should return 401 and not process request if authorization header is not present" do
       response = ApiKeyAuthenticator.call(conn(), :empty)
