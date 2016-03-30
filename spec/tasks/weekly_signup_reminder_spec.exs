@@ -16,7 +16,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
     it "should return candidates with interviews based on sub query" do
       expected_candidate_id = interview.candidate_id
-      [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id == ^interview.id))
+      [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id))
 
       expect(candidate.id) |> to(be(expected_candidate_id))
     end
@@ -42,7 +42,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should conatin name, role and experience of candidate in the result" do
       candidates = WeeklySignupReminder.get_candidates_and_interviews(
         Interview
-        |> where([i], i.id == ^interview.id)
+        |> where(id: ^interview.id)
         |> preload([:interview_type])
       )
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates)
@@ -54,7 +54,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
     it "should contain interview names and dates for the candidate in the result" do
       candidates_and_interviews = Interview
-        |> where([i], i.id == ^interview.id)
+        |> where(id: ^interview.id)
         |> preload([:interview_type])
         |> WeeklySignupReminder.get_candidates_and_interviews
 
@@ -67,7 +67,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
     it "should contain concatenated skills for the candidate in the result" do
       candidates_and_interviews = Interview
-        |> where([i], i.id == ^interview.id)
+        |> where(id: ^interview.id)
         |> preload([:interview_type])
         |> WeeklySignupReminder.get_candidates_and_interviews
 
@@ -80,7 +80,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should append other skills for the candidate in the result" do
       create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
       candidates_and_interviews = Interview
-        |> where([i], i.id == ^interview.id)
+        |> where(id: ^interview.id)
         |> preload([:interview_type])
         |> WeeklySignupReminder.get_candidates_and_interviews
 

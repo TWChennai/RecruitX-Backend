@@ -36,12 +36,12 @@ defmodule RecruitxBackend.WeeklySignupReminder do
       Interview
         |> preload(:interview_type)
         |> where([i], i.id in ^interview_ids)
-        |> order_by([i], asc: i.start_time)
+        |> order_by(asc: :start_time)
         |> Interview.now_or_in_next_seven_days,
       Interview
         |> preload(:interview_type)
         |> where([i], not(i.id in ^interview_ids))
-        |> order_by([i], asc: i.start_time)
+        |> order_by(asc: :start_time)
         |> Interview.now_or_in_next_seven_days
     }
   end
