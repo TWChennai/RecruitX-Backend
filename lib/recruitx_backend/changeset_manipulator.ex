@@ -5,13 +5,13 @@ defmodule RecruitxBackend.ChangesetManipulator do
   def insert(changesets) do
     changesets
     |> check_changesets_validity
-    |> manipulate_changesets(changesets, fn(i) -> Repo.insert(i) end)
+    |> manipulate_changesets(changesets, &(Repo.insert(&1)))
   end
 
   def update(changesets) do
     changesets
     |> check_changesets_validity
-    |> manipulate_changesets(changesets, fn(i) -> Repo.update(i) end)
+    |> manipulate_changesets(changesets, &(Repo.update(&1)))
   end
 
   defp manipulate_changesets(true, changesets, db_operation) do
