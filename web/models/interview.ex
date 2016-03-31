@@ -3,18 +3,17 @@ defmodule RecruitxBackend.Interview do
 
   alias Ecto.Changeset
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.TimexHelper
-  alias RecruitxBackend.SignUpEvaluator
-  alias RecruitxBackend.Role
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
+  alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.SignUpEvaluator
+  alias RecruitxBackend.TimexHelper
   alias Timex.Date
   alias Timex.DateFormat
 

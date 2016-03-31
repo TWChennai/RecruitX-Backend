@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.ChangesetManipulator do
-  alias RecruitxBackend.Repo
+
   alias RecruitxBackend.ChangesetErrorParser
+  alias RecruitxBackend.Repo
 
   def insert(changesets) do
     changesets
@@ -15,7 +16,7 @@ defmodule RecruitxBackend.ChangesetManipulator do
   end
 
   defp manipulate_changesets(true, changesets, db_operation) do
-    {status, changeset} = Enum.reduce_while(changesets, [], fn i, _ ->
+    {_, _} = Enum.reduce_while(changesets, [], fn i, _ ->
       {status, result} = db_operation.(i)
       if status == :error, do: throw {status, ChangesetErrorParser.to_json result}
       {:cont, {status, result}}
