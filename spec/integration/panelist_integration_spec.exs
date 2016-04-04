@@ -167,7 +167,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
-      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, role_id: role.id)
       interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
       inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
@@ -176,13 +176,29 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(inserted_panelist.satisfied_criteria) |> to(be(@lower_bound))
     end
 
-    it "should accept sign up if the panelist is experienced for the interview type and the candidate when already lower_bound is met" do
+    it "should not accept sign up if the panelist is experienced for the interview type and the candidate of a different_role" do
       Repo.delete_all ExperienceMatrix
 
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
       experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
+      interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
+      inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"experience_matrix" => ["The panelist does not have enough experience"]}}))
+    end
+
+    it "should accept sign up if the panelist is experienced for the interview type and the candidate when already lower_bound is met" do
+      Repo.delete_all ExperienceMatrix
+
+      interview = create(:interview)
+      role_id = (Repo.preload interview, :candidate).candidate.role_id
+      role = Role |> Repo.get(role_id)
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, role_id: role.id)
       interview_panelist_1_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       interview_panelist_2_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_1_params)}
@@ -201,7 +217,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
-      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(5), candidate_experience_lower_bound: D.new(-1))
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(5), candidate_experience_lower_bound: D.new(-1), role_id: role.id)
       interview_panelist_1_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       interview_panelist_2_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_1_params)}
@@ -222,7 +238,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       interview = create(:interview, candidate_id: candidate.id)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
-      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, candidate_experience_upper_bound: D.sub(candidate.experience, D.new(1)), candidate_experience_lower_bound: D.new(-1))
+      experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id, candidate_experience_upper_bound: D.sub(candidate.experience, D.new(1)), candidate_experience_lower_bound: D.new(-1), role_id: role.id)
       params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(params)}
 

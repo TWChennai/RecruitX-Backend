@@ -31,10 +31,13 @@ defmodule RecruitxBackend.ExperienceMatrix do
     |> unique_constraint(:experience_matrix_unique, name: :experience_matrix_unique_index, message: "This criteria is already specified")
   end
 
-  def filter(panelist_experience) do
-    from e in __MODULE__,
-    where: e.panelist_experience_lower_bound <= ^panelist_experience,
-    select: {e.candidate_experience_lower_bound, e.candidate_experience_upper_bound, e.interview_type_id}
+  def filter(panelist_experience, nil), do: []
+
+  def filter(panelist_experience, panelist_role) do
+    (from e in __MODULE__,
+    where: e.panelist_experience_lower_bound <= ^panelist_experience and e.role_id == ^(panelist_role.id),
+    select: {e.candidate_experience_lower_bound, e.candidate_experience_upper_bound, e.interview_type_id})
+    |> Repo.all
   end
 
   def get_max_experience_with_filter, do: (from e in __MODULE__, select: max(e.panelist_experience_lower_bound)) |> Repo.one

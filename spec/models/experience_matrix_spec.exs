@@ -150,6 +150,50 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
   end
 
+  context "filter" do
+    it "should return empty array if the panelist role is nil" do
+      result = ExperienceMatrix.filter(Decimal.new(5), nil)
+
+      expect(result) |> to(be([]))
+    end
+
+    it "should return all the filters with lower bound less than panelist experience of the same role" do
+      Repo.delete_all ExperienceMatrix
+      role = create(:role)
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role.id})
+      expected_filter = create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: role.id})
+
+      [{expected_LB, expected_UB, expected_interview_type_id}] = ExperienceMatrix.filter(Decimal.new(20), role)
+
+      expect(Decimal.compare(expected_LB, expected_filter.candidate_experience_lower_bound)) |> to(eq(Decimal.new(0)))
+      expect(Decimal.compare(expected_UB, expected_filter.candidate_experience_upper_bound)) |> to(eq(Decimal.new(0)))
+      expect(expected_interview_type_id) |> to(eql(expected_filter.interview_type_id))
+    end
+
+    it "should return all the filters with lower bound equal to panelist experience of the same role" do
+      Repo.delete_all ExperienceMatrix
+      role = create(:role)
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role.id})
+      expected_filter = create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: role.id})
+
+      [{expected_LB, expected_UB, expected_interview_type_id}] = ExperienceMatrix.filter(Decimal.new(10), role)
+
+      expect(Decimal.compare(expected_LB, expected_filter.candidate_experience_lower_bound)) |> to(eq(Decimal.new(0)))
+      expect(Decimal.compare(expected_UB, expected_filter.candidate_experience_upper_bound)) |> to(eq(Decimal.new(0)))
+      expect(expected_interview_type_id) |> to(eql(expected_filter.interview_type_id))
+    end
+
+    it "should not return all the filters with lower bound equal to panelist experience of different role" do
+      Repo.delete_all ExperienceMatrix
+      role = create(:role)
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10)})
+
+      result = ExperienceMatrix.filter(Decimal.new(10), role)
+
+      expect(result) |> to(eql([]))
+    end
+  end
+
   context "should_filter_role" do
     it "should return true if the role is Dev" do
       result = Role.dev
