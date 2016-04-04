@@ -2,6 +2,7 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   use ESpec.Phoenix, model: RecruitxBackend.ExperienceMatrix
 
   alias RecruitxBackend.ExperienceMatrix
+  alias RecruitxBackend.Role
   alias Decimal
 
   let :valid_attrs, do: fields_for(:experience_matrix)
@@ -146,6 +147,40 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     it "should nil if no filters are specified" do
       Repo.delete_all ExperienceMatrix
       expect(ExperienceMatrix.get_max_experience_with_filter) |> to(eq(nil))
+    end
+  end
+
+  context "should_filter_role" do
+    it "should return true if the role is Dev" do
+      result = Role.dev
+                |> Role.retrieve_by_name
+                |> ExperienceMatrix.should_filter_role
+
+      expect(result) |> to(be(true))
+    end
+
+    it "should return true if the role is QA" do
+      result = Role.qa
+                |> Role.retrieve_by_name
+                |> ExperienceMatrix.should_filter_role
+
+      expect(result) |> to(be(true))
+    end
+
+    it "should return false if the role is Other" do
+      result = Role.other
+                |> Role.retrieve_by_name
+                |> ExperienceMatrix.should_filter_role
+
+      expect(result) |> to(be(false))
+    end
+
+    it "should return false if the role is unknown" do
+      result = "unknown"
+                |> Role.retrieve_by_name
+                |> ExperienceMatrix.should_filter_role
+
+      expect(result) |> to(be(false))
     end
   end
 end

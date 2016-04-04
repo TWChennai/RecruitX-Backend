@@ -193,6 +193,14 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@upper_bound))
     end
+
+    it "should return true when the candidate's role is not filtered based on panelist experience" do
+      allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
+      eligibility = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(D.new(5)), create(:interview))
+
+      expect(eligibility.valid?) |> to(be_true)
+      expect(eligibility.satisfied_criteria) |> to(be(@lower_bound))
+    end
   end
 
   defp populate_experience_eligibility_data(panelist_experience) do

@@ -5,7 +5,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
 
-  @roles_which_are_filtered [Role.dev]
+  @roles_which_are_filtered [Role.dev, Role.qa]
 
   schema "experience_matrices" do
     field :panelist_experience_lower_bound, :decimal
@@ -41,5 +41,5 @@ defmodule RecruitxBackend.ExperienceMatrix do
 
   def get_interview_types_with_filter, do: (from e in __MODULE__, distinct: true, select: e.interview_type_id) |> Repo.all
 
-  def should_filter_role(role), do: Enum.member?(@roles_which_are_filtered, role.name)
+  def should_filter_role(role), do: !is_nil(role) and Enum.member?(@roles_which_are_filtered, role.name)
 end

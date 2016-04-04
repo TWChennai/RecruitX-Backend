@@ -30,7 +30,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   defp is_eligible_without_LB_and_UB_filters(%{valid?: false} = sign_up_evaluation_status, _candidate_experience, _interview_type_id,  _experience_eligibility_criteria), do: sign_up_evaluation_status
 
-
   defp is_eligible_with_LB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
     result = Enum.any?(experience_matrix_filters, fn({eligible_candidate_lower_experience, _eligible_candidate_upper_experience, eligible_interview_type_id}) ->interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_lower_experience)
     end)
