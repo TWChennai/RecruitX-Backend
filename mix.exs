@@ -65,7 +65,7 @@ defmodule RecruitxBackend.Mixfile do
      {:eiconv, github: "zotonic/eiconv"},   # Note: Introduced for mailman
      {:quantum, ">= 1.7.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
-     {:credo, "~> 0.3.8", only: :test, app: false},
+     {:credo, "~> 0.3.10", only: :test, app: false},
      {:ectoo, "~> 0.0.4", only: :test, app: false},
      {:espec_phoenix, "~> 0.2.0", only: :test, app: false},
      {:excoveralls, "~> 0.5.1", only: :test, app: false},

@@ -8,7 +8,7 @@
   "corsica": {:hex, :corsica, "0.4.1"},
   "cowboy": {:hex, :cowboy, "1.0.4"},
   "cowlib": {:hex, :cowlib, "1.0.2"},
-  "credo": {:hex, :credo, "0.3.8"},
+  "credo": {:hex, :credo, "0.3.10"},
   "db_connection": {:hex, :db_connection, "0.2.4"},
   "decimal": {:hex, :decimal, "1.1.1"},
   "earmark": {:hex, :earmark, "0.2.1"},
