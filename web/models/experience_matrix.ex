@@ -15,9 +15,10 @@ defmodule RecruitxBackend.ExperienceMatrix do
     timestamps
 
     belongs_to :interview_type, InterviewType
+    belongs_to :role, Role
   end
 
-  @required_fields ~w(panelist_experience_lower_bound candidate_experience_lower_bound candidate_experience_upper_bound interview_type_id)
+  @required_fields ~w(panelist_experience_lower_bound candidate_experience_lower_bound candidate_experience_upper_bound interview_type_id role_id)
   @optional_fields ~w()
 
   def changeset(model, params \\ :empty) do
@@ -26,6 +27,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
     |> validate_number(:candidate_experience_upper_bound, greater_than_or_equal_to: Decimal.new(0), less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> validate_number(:panelist_experience_lower_bound, greater_than_or_equal_to: Decimal.new(0), less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:interview_type)
+    |> assoc_constraint(:role)
     |> unique_constraint(:experience_matrix_unique, name: :experience_matrix_unique_index, message: "This criteria is already specified")
   end
 

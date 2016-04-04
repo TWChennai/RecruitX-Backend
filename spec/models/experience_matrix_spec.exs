@@ -41,6 +41,13 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       expect(changeset.errors) |> to(eql([interview_type_id: "can't be blank"]))
     end
 
+    it "when role_id is nil" do
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{role_id: nil}))
+
+      expect(changeset.valid?) |> to(be_false)
+      expect(changeset.errors) |> to(eql([role_id: "can't be blank"]))
+    end
+
     it "when candidate_experience_upper_bound is lesser than 0" do
       changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{candidate_experience_upper_bound: Decimal.new(-1)}))
 
@@ -78,6 +85,15 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       expect(result) |> to(be(:error))
       expect(changeset.valid?) |> to(be_false)
       expect(changeset.errors) |> to(eql([interview_type: "does not exist"]))
+    end
+
+    it "should throw error when role does not exist" do
+      changeset = ExperienceMatrix.changeset(%ExperienceMatrix{}, Map.merge(valid_attrs, %{role_id: 0}))
+      {result, changeset} = Repo.insert(changeset)
+
+      expect result |> to(be(:error))
+      expect changeset.valid? |> to(be_false)
+      expect changeset.errors |> to(eql([role: "does not exist"]))
     end
   end
 
