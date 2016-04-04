@@ -42,6 +42,11 @@ defmodule RecruitxBackend.Interview do
     from i in query, where: i.start_time >= ^start_of_today and i.start_time <= ^(start_of_today |> Date.shift(days: 7))
   end
 
+  def now_or_in_previous_seven_days(query) do
+    start_of_today = Date.set(Date.now, time: {0, 0, 0})
+    from i in query, where: i.start_time <= ^start_of_today and i.start_time >= ^(start_of_today |> Date.shift(days: -7))
+  end
+
   def default_order(query) do
     from i in query, order_by: [asc: i.start_time, asc: i.id]
   end
@@ -299,5 +304,22 @@ defmodule RecruitxBackend.Interview do
       name: interview.interview_type.name,
       date: DateFormat.format!(interview.start_time, "%b-%d", :strftime)
     }
+  end
+
+  def format_with_result_and_panelist(interview) do
+    status = "Feedback NOT entered"
+    if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
+    %{
+      name: interview.interview_type.name,
+      date: DateFormat.format!(interview.start_time, "%b-%d", :strftime),
+      result: status,
+      panelists: get_formatted_interview_panelists(interview)
+    }
+  end
+
+  def get_formatted_interview_panelists(interview) do
+    Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
+      accumulator <> ", " <> panelist.panelist_login_name
+    end)
   end
 end

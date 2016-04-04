@@ -7,6 +7,7 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.Interview
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
@@ -274,6 +275,30 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(Enum.count(formatted_interviews)) |> to(be(2))
     end
   end
+
+  context "get formatted interviews with result" do
+    let :candidate, do: create(:candidate)
+    let :interview_type_one, do: create(:interview_type)
+    let :interview_type_two, do: create(:interview_type)
+
+    before do
+      create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_one.id)
+      create(:interview, candidate_id: candidate.id, interview_type_id: interview_type_two.id)
+    end
+
+    it "should call formatted interviews with result and panelists for all interviews" do
+      allow Interview |> to(accept(:format_with_result_and_panelist, fn(_) -> ""  end))
+      query = Interview |> preload([:interview_panelist, :interview_status, :interview_type])
+      candidates = Candidate |> preload([:role, interviews: ^query]) |>  where([i], i.id == ^candidate.id) |> Repo.one
+      [interview1, interview2] = candidates.interviews
+
+      Candidate.get_formatted_interviews_with_result(candidates)
+
+      expect RecruitxBackend.Interview |> to(accepted :format_with_result_and_panelist, [interview1])
+      expect RecruitxBackend.Interview |> to(accepted :format_with_result_and_panelist, [interview2])
+    end
+  end
+
 
   context "get rounded experience" do
     it "should return experience in single precision" do

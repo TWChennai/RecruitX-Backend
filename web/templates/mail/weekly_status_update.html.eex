@@ -1,0 +1,50 @@
+<p>Hi all,</p>
+<p>Here is a quick update on the weekly recruitment drive that happened over the previous week [<%=start_date%> , <%=to_date%>] </p>
+<%= unless Enum.empty?(candidates) do %>
+<h4> Details </h4>
+  <table cellpadding="10" style="border-collapse: collapse;">
+    <thead>
+    <tr>
+      <th style="border: 1px solid #000;">Candidate</th>
+      <th style="border: 1px solid #000;">Role</th>
+      <th style="border: 1px solid #000; border-bottom: 0;">Interviews</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%= for candidate <- candidates do %>
+      <tr>
+        <td style="border: 1px solid #000;">
+          <%= candidate.name %>
+        </td>
+        <td style="border: 1px solid #000; border-right: 0;">
+          <%= candidate.role %>
+        </td>
+        <td style="padding: 0px; border: 0px">
+          <table cellpadding="10" style="margin: 0px; border-collapse: collapse;">
+            <%= for interview <- candidate.interviews do %>
+            <tr>
+              <td style="border: 1px solid #000;">
+               <%= interview.name %>
+              </td>
+              <td style="border: 1px solid #000;">
+               <%= interview.date %>
+              </td>
+              <td style="border: 1px solid #000;">
+               <%= interview.panelists %>
+              </td>
+              <td style="border: 1px solid #000;">
+               <%= interview.result %>
+              </td>
+            </tr>
+            <% end %>
+        </table>
+      </td>
+    </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<br />
+<strong>Thanks</strong><br />
+Recruitment Team
