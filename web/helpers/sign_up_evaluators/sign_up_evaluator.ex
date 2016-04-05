@@ -28,7 +28,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
 
   defp populate_experience_eligiblity_criteria(panelist_experience, panelist_role) do
     %ExperienceEligibilityData{panelist_experience: panelist_experience,
-      max_experience_with_filter: ExperienceMatrix.get_max_experience_with_filter,
+      max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
       interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
       experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role))
     }

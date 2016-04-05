@@ -124,10 +124,10 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return true when the panelist is experienced for the current interview and candidate" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1),candidate_experience_upper_bound: D.new(2))
+      role = create(:role)
+      experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1),candidate_experience_upper_bound: D.new(2), role_id: role.id)
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
-      role = create(:role)
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
@@ -143,7 +143,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       experience_matrix_panelist_is_not_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
       panelist_experience = D.new(1)
       candidate_experience = experience_matrix_panelist_is_not_eligible_for.candidate_experience_upper_bound
-      role = create(:role)  
+      role = create(:role)
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_panelist_is_not_eligible_for.interview_type_id)
 
@@ -208,7 +208,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
   defp populate_experience_eligibility_data(panelist_experience, panelist_role) do
     %ExperienceEligibilityData{panelist_experience: panelist_experience,
-      max_experience_with_filter: ExperienceMatrix.get_max_experience_with_filter,
+      max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
       interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
       experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role))
     }
