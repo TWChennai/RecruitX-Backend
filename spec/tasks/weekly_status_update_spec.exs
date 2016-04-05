@@ -95,5 +95,12 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update)
       expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
     end
+
+    it "should be called every week on friday at 5.0 UTC" do
+      job = Quantum.find_job(:weekly_status_update)
+
+      expect(job.schedule) |> to(be("30 11 * * 5"))
+      expect(job.task) |> to(be({"RecruitxBackend.WeeklyStatusUpdate", "execute"}))
+    end
   end
 end
