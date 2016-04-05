@@ -322,8 +322,8 @@ defmodule RecruitxBackend.Interview do
     }
   end
 
-  def get_formatted_interview_panelists(interview) do
     # TODO: Isn't there a simpler logic to join an array of strings?
+  defp get_formatted_interview_panelists(interview) do
     Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
       accumulator <> ", " <> panelist.panelist_login_name
     end)

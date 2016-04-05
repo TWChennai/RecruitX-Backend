@@ -736,19 +736,21 @@ defmodule RecruitxBackend.InterviewSpec do
     let :interview_type, do: create(:interview_type)
     let :interview_status, do: create(:interview_status)
     let :interview, do: create(:interview, interview_type_id: interview_type.id, interview_status_id: interview_status.id)
-    let :interview_panelist, do: create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test")
 
 
+    require IEx
     it "should contain interview names, date, result, panelists for the candidate in the result" do
-      input_interview = Interview
-        |> preload([:interview_panelist, :interview_status, :interview_type])
-        |> Repo.get(interview.id)
+      interview_panelist1 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
+      interview_panelist2 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test2")
+
+      input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
+
       formatted_interview = Interview.format_with_result_and_panelist(input_interview)
 
       expect(formatted_interview.name) |> to(be(interview_type.name))
       expect(formatted_interview.result) |> to(be(interview_status.name))
       expect(formatted_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
-      expect(formatted_interview.panelists) |> to(be(Interview.get_formatted_interview_panelists(input_interview)))
+      expect(formatted_interview.panelists) |> to(be("test2, test1"))
       end
   end
 end
