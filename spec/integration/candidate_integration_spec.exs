@@ -74,9 +74,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
       response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
-      updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
+      created_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
-      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      %{"id": updated_candidate_id, "pipeline_status_id": updated_pipeline_status_id} = response.assigns.candidate;
+      expect(updated_candidate_id) |> to(be(created_candidate.id))
+      expect(updated_pipeline_status_id) |> to(be(created_candidate.pipeline_status_id))
       expect(Interview |> Repo.get(interview.id)) |> to(be_nil)
       expect(InterviewPanelist |> Repo.get(interview_panelist.id)) |> to(be_nil)
     end
@@ -89,9 +91,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
       response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
-      updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
+      created_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
-      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      %{"id": updated_candidate_id, "pipeline_status_id": updated_pipeline_status_id} = response.assigns.candidate;
+      expect(updated_candidate_id) |> to(be(created_candidate.id))
+      expect(updated_pipeline_status_id) |> to(be(created_candidate.pipeline_status_id))
       expect(Interview |> Repo.get(interview.id)) |> to(be(nil))
     end
 
@@ -103,9 +107,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
       response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}}
 
-      updated_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
+      created_candidate = Map.merge(candidate, %{pipeline_status_id: closed_pipeline_status_id})
       response |> should(have_http_status(200))
-      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      %{"id": updated_candidate_id, "pipeline_status_id": updated_pipeline_status_id} = response.assigns.candidate;
+      expect(updated_candidate_id) |> to(be(created_candidate.id))
+      expect(updated_pipeline_status_id) |> to(be(created_candidate.pipeline_status_id))
       expect(Interview |> Repo.get(interview.id)) |> to(be(interview))
       expect(InterviewPanelist |> Repo.get(interview_panelist.id)) |> to(be(interview_panelist))
     end
@@ -119,9 +125,11 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
       pipeline_status = create(:pipeline_status)
       response = put conn_with_dummy_authorization(), "/candidates/#{candidate.id}", %{"candidate" => %{"pipeline_status_id" => pipeline_status.id}}
 
-      updated_candidate = Map.merge(candidate, %{pipeline_status_id: pipeline_status.id})
+      created_candidate = Map.merge(candidate, %{pipeline_status_id: pipeline_status.id})
       response |> should(have_http_status(200))
-      expect(response.assigns.candidate) |> to(be(updated_candidate))
+      %{"id": updated_candidate_id, "pipeline_status_id": updated_pipeline_status_id} = response.assigns.candidate;
+      expect(updated_candidate_id) |> to(be(created_candidate.id))
+      expect(updated_pipeline_status_id) |> to(be(created_candidate.pipeline_status_id))
       expect(Interview |> Repo.get(interview1.id)) |> to(be(interview1))
       expect(Interview |> Repo.get(interview2.id)) |> to(be(interview2))
       expect(InterviewPanelist |> Repo.get(interview_panelist1.id)) |> to(be(interview_panelist1))
