@@ -321,5 +321,7 @@ defmodule RecruitxBackend.Interview do
     Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
       accumulator <> ", " <> panelist.panelist_login_name
     end)
+    |> String.lstrip(?,)
+    |> String.lstrip
   end
 end

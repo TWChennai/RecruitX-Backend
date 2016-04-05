@@ -7,7 +7,7 @@
     <tr>
       <th style="border: 1px solid #000;">Candidate</th>
       <th style="border: 1px solid #000;">Role</th>
-      <th style="border: 1px solid #000; border-bottom: 0;">Interviews</th>
+      <th style="border: 1px solid #000;">Interviews</th>
     </tr>
     </thead>
     <tbody>
@@ -16,14 +16,14 @@
         <td style="border: 1px solid #000;">
           <%= candidate.name %>
         </td>
-        <td style="border: 1px solid #000; border-right: 0;">
+        <td style="border: 1px solid #000;">
           <%= candidate.role %>
         </td>
-        <td style="padding: 0px; border: 0px">
-          <table cellpadding="10" style="margin: 0px; border-collapse: collapse;">
+        <td style="padding: 0px; border: 1px solid #000;">
+          <table width="200px" cellpadding="10" style="width:300px; margin: 0px; border-collapse: collapse;">
             <%= for interview <- candidate.interviews do %>
             <tr>
-              <td style="border: 1px solid #000;">
+              <td style="border: 1px solid #000; border-left: 0;">
                <%= interview.name %>
               </td>
               <td style="border: 1px solid #000;">
@@ -32,7 +32,7 @@
               <td style="border: 1px solid #000;">
                <%= interview.panelists %>
               </td>
-              <td style="border: 1px solid #000;">
+              <td style="border: 1px solid #000; border-right: 0;">
                <%= interview.result %>
               </td>
             </tr>
