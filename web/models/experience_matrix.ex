@@ -31,7 +31,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
     |> unique_constraint(:experience_matrix_unique, name: :experience_matrix_unique_index, message: "This criteria is already specified")
   end
 
-  def filter(panelist_experience, nil), do: []
+  def filter(_, nil), do: []
 
   def filter(panelist_experience, panelist_role) do
     (from e in __MODULE__,

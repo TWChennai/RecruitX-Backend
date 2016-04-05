@@ -53,6 +53,5 @@ defmodule RecruitxBackend.InterviewType do
       |> Repo.all
   end
 
-  def retrieve_by_name(name),
-  do: (from it in __MODULE__, where: it.name == ^name) |> Repo.one
+  def retrieve_by_name(name), do: (from it in __MODULE__, where: it.name == ^name) |> Repo.one
 end

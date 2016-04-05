@@ -39,12 +39,14 @@ defmodule RecruitxBackend.Interview do
 
   def now_or_in_next_seven_days(query) do
     start_of_today = Date.set(Date.now, time: {0, 0, 0})
-    from i in query, where: i.start_time >= ^start_of_today and i.start_time <= ^(start_of_today |> Date.shift(days: 7))
+    seven_days_from_now = start_of_today |> Date.shift(days: 7)
+    within_date_range(query, start_of_today, seven_days_from_now)
   end
 
   def now_or_in_previous_seven_days(query) do
     start_of_today = Date.set(Date.now, time: {0, 0, 0})
-    from i in query, where: i.start_time <= ^start_of_today and i.start_time >= ^(start_of_today |> Date.shift(days: -7))
+    seven_days_ago = start_of_today |> Date.shift(days: -7)
+    within_date_range(query, seven_days_ago, start_of_today)
   end
 
   def default_order(query) do
@@ -81,7 +83,6 @@ defmodule RecruitxBackend.Interview do
       select: [i.candidate_id, max(i.start_time), count(i.candidate_id)])
   end
 
-
   def interviews_with_insufficient_panelists do
     __MODULE__
     |> join(:left, [i], ip in assoc(i, :interview_panelist))
@@ -100,6 +101,10 @@ defmodule RecruitxBackend.Interview do
     |> is_in_future(:start_time)
     |> should_less_than_a_month(:start_time)
     |> calculate_end_time
+  end
+
+  defp within_date_range(query, start_time, end_time) do
+    from i in query, where: i.start_time >= ^start_time and i.start_time <= ^end_time
   end
 
   #TODO: When end_time is sent from UI, validations on end time to be done
@@ -318,6 +323,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_formatted_interview_panelists(interview) do
+    # TODO: Isn't there a simpler logic to join an array of strings?
     Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
       accumulator <> ", " <> panelist.panelist_login_name
     end)

@@ -28,7 +28,5 @@ defmodule RecruitxBackend.PipelineStatus do
     |> unique_constraint(:name, name: :pipeline_statuses_name_index)
   end
 
-  def retrieve_by_name(name) do
-    (from ps in __MODULE__, where: ps.name == ^name) |> Repo.one
-  end
+  def retrieve_by_name(name), do: (from ps in __MODULE__, where: ps.name == ^name) |> Repo.one
 end

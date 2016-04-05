@@ -28,7 +28,5 @@ defmodule RecruitxBackend.InterviewStatus do
     |> unique_constraint(:name, name: :interview_status_name_index)
   end
 
-  def retrieve_by_name(name) do
-    (from is in __MODULE__, where: is.name == ^name) |> Repo.one
-  end
+  def retrieve_by_name(name), do: (from is in __MODULE__, where: is.name == ^name) |> Repo.one
 end

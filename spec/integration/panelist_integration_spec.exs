@@ -185,7 +185,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
       interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
-      inserted_panelist = getInterviewPanelistWithName(interview_panelist_params.panelist_login_name)
 
       response |> should(have_http_status(:unprocessable_entity))
       parsed_response = response.resp_body |> Poison.Parser.parse!
