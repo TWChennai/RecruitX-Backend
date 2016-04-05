@@ -16,6 +16,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
       email_content = Templates.weekly_status_update("","",candidates)
       Mailer.deliver(%{
         subject: "[RecruitX] Weekly Status Update",
+        # TODO: get actual TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS in environment variable
         to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
         html: email_content
       })
