@@ -11,6 +11,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Repo
   alias Timex.Date
+  alias Timex.DateFormat
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -739,8 +740,8 @@ defmodule RecruitxBackend.InterviewSpec do
 
 
     it "should contain interview names, date, result, panelists for the candidate in the result" do
-      interview_panelist1 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
-      interview_panelist2 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test2")
+      interview_panelist = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
+      {:ok , interview_date} = interview.start_time |> DateFormat.format("{D}/{M}/{YY}")
 
       input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
 
@@ -748,13 +749,14 @@ defmodule RecruitxBackend.InterviewSpec do
 
       expect(formatted_interview.name) |> to(be(interview_type.name))
       expect(formatted_interview.result) |> to(be(interview_status.name))
-      expect(formatted_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
-      expect(formatted_interview.panelists) |> to(be("test2, test1"))
+      expect(formatted_interview.date) |> to(be(interview_date))
+      expect(formatted_interview.panelists) |> to(be("test1"))
       end
   end
 
   context "get the interviews in the past 5 days" do
     it "should return the interview from the past 5 days" do
+      Repo.delete_all(Interview)
       interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: -5))
       interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
       interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
@@ -767,6 +769,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "get the interviews in the next 7 days" do
     it "should return the interview from the next 7 days" do
+      Repo.delete_all(Interview)
       interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: +8))
       interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
       interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
