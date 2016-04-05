@@ -317,4 +317,22 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(actual_experience) |> to(be("10.0"))
     end
   end
+
+  context "get candidate by id" do
+    it "should return empty array when given an non-existing candidate id" do
+
+      candidate = Candidate.get_candidate_by_id(1000) |> Repo.one
+      expect(candidate) |> to(be_nil)
+    end
+
+    it "should return candidate details when given an existing candidate id" do
+      candidate = create(:candidate, id: 1)
+      interview = create(:interview, candidate_id: candidate.id)
+
+      actual_candidate = Candidate.get_candidate_by_id(candidate.id) |> Repo.one
+
+      expect(actual_candidate.id) |> to(be(1))
+      expect(Enum.count(actual_candidate.interviews)) |> to(be(candidate.id))
+    end
+  end
 end

@@ -40,6 +40,12 @@ defmodule RecruitxBackend.Candidate do
     |> assoc_constraint(:pipeline_status)
   end
 
+  def get_candidate_by_id(id) do
+    from c in __MODULE__,
+    where: c.id == ^id,
+    preload: [:role, interviews: [:interview_type, :interview_panelist, :feedback_images]]
+  end
+
   defp add_default_pipeline_status(existing_changeset) do
     incoming_id = existing_changeset |> get_field(:pipeline_status_id)
     if is_nil(incoming_id) do
