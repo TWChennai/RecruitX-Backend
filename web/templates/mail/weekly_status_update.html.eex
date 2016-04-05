@@ -5,9 +5,19 @@
   <table cellpadding="10" style="border-collapse: collapse;">
     <thead>
     <tr>
-      <th style="border: 1px solid #000;">Candidate</th>
-      <th style="border: 1px solid #000;">Role</th>
-      <th style="border: 1px solid #000;">Interviews</th>
+      <th rowspan=2 style="border: 1px solid #000;">Candidate</th>
+      <th rowspan=2 style="border: 1px solid #000;">Role</th>
+      <th colspan=4 scope="colgroup" style="border: 1px solid #000;">Interviews</th>
+    </tr>
+    <tr>
+      <th style="padding: 0px;">
+        <table style="width:100%; margin: 0px; border-collapse: collapse;">
+          <th width="25%" style="border: 1px solid #000;">Round</th>
+          <th width="25%" style="border: 1px solid #000;">Date (DD/MM/YY)</th>
+          <th width="25%" style="border: 1px solid #000;">Panelists</th>
+          <th width="25%" style="border: 1px solid #000;">Results</th>
+        </table>
+      </th>
     </tr>
     </thead>
     <tbody>
