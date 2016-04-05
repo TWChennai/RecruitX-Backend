@@ -738,7 +738,6 @@ defmodule RecruitxBackend.InterviewSpec do
     let :interview, do: create(:interview, interview_type_id: interview_type.id, interview_status_id: interview_status.id)
 
 
-    require IEx
     it "should contain interview names, date, result, panelists for the candidate in the result" do
       interview_panelist1 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
       interview_panelist2 = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test2")
@@ -752,5 +751,29 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(formatted_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
       expect(formatted_interview.panelists) |> to(be("test2, test1"))
       end
+  end
+
+  context "get the interviews in the past 5 days" do
+    it "should return the interview from the past 5 days" do
+      interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: -5))
+      interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
+      interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
+
+      actual_result = Interview |> Interview.now_or_in_previous_five_days |> Repo.one
+
+      expect(actual_result.id) |> to(be(900))
+    end
+  end
+
+  context "get the interviews in the next 7 days" do
+    it "should return the interview from the next 7 days" do
+      interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: +8))
+      interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
+      interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
+
+      actual_result = Interview |> Interview.now_or_in_next_seven_days |> Repo.one
+
+      expect(actual_result.id) |> to(be(902))
+    end
   end
 end
