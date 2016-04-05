@@ -43,7 +43,7 @@ defmodule RecruitxBackend.Candidate do
   def get_candidate_by_id(id) do
     from c in __MODULE__,
     where: c.id == ^id,
-    preload: [:role, interviews: [:interview_type, :interview_panelist, :feedback_images]]
+    preload: [:role, interviews: [:interview_type, :interview_panelist, :interview_status, :feedback_images]]
   end
 
   defp add_default_pipeline_status(existing_changeset) do

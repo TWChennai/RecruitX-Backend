@@ -1,0 +1,26 @@
+<p>Hi,</p>
+<p>Here is the quick feedback for the candidate <%= candidate.first_name %> <%= candidate.last_name %> who had applied for the <%= candidate.role.name %> role:</p>
+<table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th style="border: 1px solid #000;">Round</th>
+      <th style="border: 1px solid #000;">Panelists</th>
+      <th style="border: 1px solid #000;">Result</th>
+      <th style="border: 1px solid #000;">Date and Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for interview <- candidate.interviews do %>
+      <% formatted_interview =  RecruitxBackend.Interview.format_with_result_and_panelist(interview) %>
+      <tr>
+        <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
+        <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
+        <td style="border: 1px solid #000;"><%= formatted_interview.result %></td>
+        <td style="border: 1px solid #000;"><%= formatted_interview.date %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<br />
+<strong>Thanks</strong><br />
+RecruitX

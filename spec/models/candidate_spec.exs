@@ -4,7 +4,6 @@ defmodule RecruitxBackend.CandidateSpec do
   import Ecto.Query
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Role
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
