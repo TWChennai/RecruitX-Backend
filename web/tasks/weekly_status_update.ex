@@ -10,7 +10,10 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
 
   def execute do
     query = Interview |> Interview.now_or_in_previous_five_days |> preload([:interview_panelist, :interview_status, :interview_type])
-    candidates_weekly_status = Candidate |> preload([:role, interviews: ^query]) |> Repo.all
+    candidates_weekly_status = Candidate
+                                |> preload([:role, interviews: ^query])
+                                |> order_by(asc: :role_id)
+                                |> Repo.all
     candidates = candidates_weekly_status
     |> filter_out_candidates_without_interviews
     |> construct_view_data
