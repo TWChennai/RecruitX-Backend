@@ -4,8 +4,8 @@ defmodule RecruitxBackend.CandidateSpec do
   import Ecto.Query
 
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Role
   alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
   alias Timex.Date
@@ -326,13 +326,13 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return candidate details when given an existing candidate id" do
-      candidate = create(:candidate, id: 1)
+      candidate = create(:candidate)
       interview = create(:interview, candidate_id: candidate.id)
 
       actual_candidate = Candidate.get_candidate_by_id(candidate.id) |> Repo.one
 
-      expect(actual_candidate.id) |> to(be(1))
-      expect(Enum.count(actual_candidate.interviews)) |> to(be(candidate.id))
+      expect(actual_candidate.id) |> to(be(candidate.id))
+      expect(Enum.count(actual_candidate.interviews)) |> to(be(1))
     end
   end
 end
