@@ -42,15 +42,9 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
   describe "execute weekly status update" do
 
-    it "should filter previous weeks interviews" do
-      allow Interview |> to(accept(:now_or_in_previous_seven_days, fn(_) -> "" end))
-
-      WeeklyStatusUpdate.execute
-
-      expect Interview |> to(accepted :now_or_in_previous_seven_days)
-    end
-
     it "should filter previous weeks interviews and construct email" do
+      Repo.delete_all Candidate
+      Repo.delete_all Interview
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
       query = Interview |> preload([:interview_panelist, :interview_status, :interview_type])
       candidates_weekly_status = Candidate |> preload([:role, interviews: ^query]) |> Repo.all
