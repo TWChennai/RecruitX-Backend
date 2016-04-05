@@ -5,15 +5,19 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   alias RecruitxBackend.Interview
   alias MailmanExtensions.Templates
   alias MailmanExtensions.Mailer
+  alias Timex.Date
+  alias Timex.DateFormat
 
   def execute do
-    query = Interview |> Interview.now_or_in_previous_seven_days |> preload([:interview_panelist, :interview_status, :interview_type])
+    query = Interview |> Interview.now_or_in_previous_five_days |> preload([:interview_panelist, :interview_status, :interview_type])
     candidates_weekly_status = Candidate |> preload([:role, interviews: ^query]) |> Repo.all
     candidates = candidates_weekly_status
     |> filter_out_candidates_without_interviews
     |> construct_view_data
     if(candidates != []) do
-      email_content = Templates.weekly_status_update("","",candidates)
+      {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
+      {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
+      email_content = Templates.weekly_status_update(start_date, to_date, candidates)
       Mailer.deliver(%{
         subject: "[RecruitX] Weekly Status Update",
         # TODO: get actual TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS in environment variable

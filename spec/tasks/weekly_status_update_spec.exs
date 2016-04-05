@@ -6,6 +6,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.WeeklyStatusUpdate
   alias Timex.Date
+  alias Timex.DateFormat
 
   describe "filter out candidates without interviews" do
 
@@ -45,6 +46,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
     it "should filter previous weeks interviews and construct email" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
+      {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
+      {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
       query = Interview |> preload([:interview_panelist, :interview_status, :interview_type])
       candidates_weekly_status = Candidate |> preload([:role, interviews: ^query]) |> Repo.all
@@ -55,7 +58,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update,["","",candidates])
+      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update,[start_date, to_date, candidates])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
@@ -90,10 +93,10 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
     end
 
-    it "should be called every week on friday at 5.0 UTC" do
+    it "should be called every week on saturday at 6.0am UTC" do
       job = Quantum.find_job(:weekly_status_update)
 
-      expect(job.schedule) |> to(be("30 11 * * 5"))
+      expect(job.schedule) |> to(be("30 00 * * 6"))
       expect(job.task) |> to(be({"RecruitxBackend.WeeklyStatusUpdate", "execute"}))
     end
   end

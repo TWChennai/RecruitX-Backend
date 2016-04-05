@@ -41,7 +41,7 @@ config :quantum, cron: [
     task: "RecruitxBackend.WeeklySignupReminder.execute"
   ],
   weekly_status_update: [
-    schedule: "30 11 * * 5",
+    schedule: "30 00 * * 6",
     task: "RecruitxBackend.WeeklyStatusUpdate.execute"
   ]
 ]

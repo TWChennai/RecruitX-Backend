@@ -43,10 +43,10 @@ defmodule RecruitxBackend.Interview do
     within_date_range(query, start_of_today, seven_days_from_now)
   end
 
-  def now_or_in_previous_seven_days(query) do
+  def now_or_in_previous_five_days(query) do
     start_of_today = Date.set(Date.now, time: {0, 0, 0})
-    seven_days_ago = start_of_today |> Date.shift(days: -7)
-    within_date_range(query, seven_days_ago, start_of_today)
+    five_days_ago = start_of_today |> Date.shift(days: -5)
+    within_date_range(query, five_days_ago, start_of_today)
   end
 
   def default_order(query) do
@@ -312,7 +312,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def format_with_result_and_panelist(interview) do
-    status = "Feedback NOT entered"
+    status = "Not Evaluated"
     if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
     %{
       name: interview.interview_type.name,

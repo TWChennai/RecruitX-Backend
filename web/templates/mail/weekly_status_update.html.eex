@@ -1,5 +1,5 @@
 <p>Hi all,</p>
-<p>Here is a quick update on the weekly recruitment drive that happened over the previous week [<%=start_date%> , <%=to_date%>] </p>
+<p>Here is a quick update on the weekly recruitment drive that happened over the week of "(Monday) <%=start_date%>" to "(Friday) <%=to_date%>" </p>
 <%= unless Enum.empty?(candidates) do %>
 <h4> Details </h4>
   <table cellpadding="10" style="border-collapse: collapse;">
@@ -20,19 +20,19 @@
           <%= candidate.role %>
         </td>
         <td style="padding: 0px; border: 1px solid #000;">
-          <table width="200px" cellpadding="10" style="width:300px; margin: 0px; border-collapse: collapse;">
+          <table cellpadding="10" style="width:100%; margin: 0px; border-collapse: collapse;">
             <%= for interview <- candidate.interviews do %>
             <tr>
-              <td style="border: 1px solid #000; border-left: 0;">
+              <td width="25%" style="border: 1px solid #000; border-left: 0;">
                <%= interview.name %>
               </td>
-              <td style="border: 1px solid #000;">
+              <td width="25%" style="border: 1px solid #000;">
                <%= interview.date %>
               </td>
-              <td style="border: 1px solid #000;">
+              <td width="25%" style="border: 1px solid #000;">
                <%= interview.panelists %>
               </td>
-              <td style="border: 1px solid #000; border-right: 0;">
+              <td width="25%" style="border: 1px solid #000; border-right: 0;">
                <%= interview.result %>
               </td>
             </tr>
