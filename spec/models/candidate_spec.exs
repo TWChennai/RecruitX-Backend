@@ -326,7 +326,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return candidate details when given an existing candidate id" do
       candidate = create(:candidate)
-      interview = create(:interview, candidate_id: candidate.id)
+      create(:interview, candidate_id: candidate.id)
 
       actual_candidate = Candidate.get_candidate_by_id(candidate.id) |> Repo.one
 

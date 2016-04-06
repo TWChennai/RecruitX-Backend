@@ -750,16 +750,16 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(formatted_interview.name) |> to(be(interview_type.name))
       expect(formatted_interview.result) |> to(be(interview_status.name))
       expect(formatted_interview.date) |> to(be(interview_date))
-      expect(formatted_interview.panelists) |> to(be("test1"))
+      expect(formatted_interview.panelists) |> to(be(interview_panelist.panelist_login_name))
       end
   end
 
   context "get the interviews in the past 5 days" do
     it "should return the interview from the past 5 days" do
       Repo.delete_all(Interview)
-      interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: -5))
-      interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
-      interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
+      create(:interview, id: 900, start_time: Date.now |> Date.shift(days: -5))
+      create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
+      create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
 
       actual_result = Interview |> Interview.now_or_in_previous_five_days |> Repo.one
 
@@ -770,9 +770,9 @@ defmodule RecruitxBackend.InterviewSpec do
   context "get the interviews in the next 7 days" do
     it "should return the interview from the next 7 days" do
       Repo.delete_all(Interview)
-      interview1 = create(:interview, id: 900, start_time: Date.now |> Date.shift(days: +8))
-      interview2 = create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
-      interview3 = create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
+      create(:interview, id: 900, start_time: Date.now |> Date.shift(days: +8))
+      create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
+      create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
 
       actual_result = Interview |> Interview.now_or_in_next_seven_days |> Repo.one
 

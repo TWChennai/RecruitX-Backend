@@ -89,7 +89,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update_default)
+      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update_default)
+      expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update)
       expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
     end
 

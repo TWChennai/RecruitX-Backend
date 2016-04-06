@@ -3,7 +3,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.ExperienceMatrix
 
   @lower_bound "LB"
   @upper_bound "UB"

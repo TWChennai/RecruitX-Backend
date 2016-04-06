@@ -13,7 +13,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
   describe "create" do
     it "should update status and feedback images" do
       file_to_upload = %Plug.Upload{path: "image1"}
-      allow Avatar |> to(accept(:store, fn(file_to_upload) -> {:ok, "file_name"} end))
+      allow Avatar |> to(accept(:store, fn(_) -> {:ok, "file_name"} end))
       interview = create(:interview)
       interview_status = create(:interview_status)
 
@@ -49,7 +49,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
     it "should not update status and feedback images when interview_id is invalid" do
       interview_status = create(:interview_status)
       file_to_upload = %Plug.Upload{path: "image1"}
-      allow Avatar |> to(accept(:store, fn(file_to_upload) -> {:ok, "file_name"} end))
+      allow Avatar |> to(accept(:store, fn(_) -> {:ok, "file_name"} end))
 
       conn = post conn_with_dummy_authorization(), "/interviews/0/feedback_images", %{"feedback_images" => %{"0" => file_to_upload}, "status_id" => "#{interview_status.id}"}
 
