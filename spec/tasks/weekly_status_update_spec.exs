@@ -78,6 +78,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
     end
 
     it "should send a default mail if there are no interview in previous week" do
+      Repo.delete_all Candidate
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: +1))
       email = %{
           subject: "[RecruitX] Weekly Status Update",
