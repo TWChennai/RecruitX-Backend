@@ -2,8 +2,11 @@ defmodule  MailmanExtensions.MailerSpec do
   use ESpec.Phoenix, model:  MailmanExtensions.Mailer
 
   alias MailmanExtensions.Mailer
+  alias RecruitxBackend.Interview
   alias Mailman.Email
   alias Mailman.Context
+
+  import Ecto.Query
 
   describe "override default email" do
     let :default_email do
@@ -49,4 +52,29 @@ defmodule  MailmanExtensions.MailerSpec do
     end
   end
 
+  describe "get feedback images as attachment" do
+    it "should return attachments for the given feedback images" do
+      feedback_image_1 = create(:feedback_image)
+      feedback_image_2 = create(:feedback_image)
+      allow Mailman.Attachment |> to(accept(:attach!, fn(_, _) -> "attachment" end))
+
+      attachments = Mailer.get_feedback_images_as_attachment([feedback_image_1, feedback_image_2], "interview_name")
+
+      expect(attachments) |> to(be(["attachment", "attachment"]))
+    end
+  end
+
+  describe "get feedback images as attachment for the given interview" do
+    it "should return feedback images as an array of attachments" do
+      interview = create(:interview)
+      create(:feedback_image, interview_id: interview.id)
+      create(:feedback_image, interview_id: interview.id)
+      allow Mailman.Attachment |> to(accept(:attach!, fn(_, _) -> "attachment" end))
+
+      interviews = Interview |> preload([:feedback_images, :interview_type]) |> where([i], i.id == ^interview.id) |> Repo.all
+      attachments = Mailer.get_feedback_images_as_attachment_for(interviews)
+
+      expect(attachments) |> to(be(["attachment", "attachment"]))
+    end
+  end
 end

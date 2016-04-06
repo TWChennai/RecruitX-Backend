@@ -100,7 +100,7 @@ defmodule RecruitxBackend.CandidateController do
             if !is_nil(pipeline_status_id) do
               closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
               if pipeline_status_id == closed_pipeline_status_id do
-                send_feedback_email(candidate)
+                send_feedback_email(id)
                 # TODO: Combine the two following calls into a single one - and possibly push to the db
                 last_completed_round_start_time = Interview.get_last_completed_rounds_start_time_for(id)
                 Interview.delete_successive_interviews_and_panelists(id, last_completed_round_start_time)
@@ -115,12 +115,16 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  defp send_feedback_email(candidate) do
-    email_content = Templates.consolidated_feedback(Candidate.get_candidate_by_id(candidate.id) |> Repo.one)
+  defp send_feedback_email(id) do
+    candidate = Candidate.get_candidate_by_id(id) |> Repo.one
+    email_content = Templates.consolidated_feedback(candidate)
+    attachments = Mailer.get_feedback_images_as_attachment_for(candidate.interviews)
+
     Mailer.deliver(%{
       subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}",
       to: ["arunvel@thoughtworks.com"],
-      html: email_content
+      html: email_content,
+      attachments: attachments
     })
   end
 

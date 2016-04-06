@@ -5,6 +5,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   alias Ecto.DateTime
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.CandidateController
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONError
@@ -240,28 +241,35 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   describe "update action" do
     let :candidate, do: create(:candidate)
-    let :interview, do: create(:interview, candidate_id: candidate.id)
-    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: ["arunvel@thoughtworks.com"], html: "html content"}
+    before do
+      create(:interview, candidate_id: candidate.id)
+    end
+    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: ["arunvel@thoughtworks.com"], html: "html content", attachments: "attachments"}
 
     it "should not send email when the pipeline is not closed" do
       allow MailmanExtensions.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
+      allow Interview |> to(accept(:get_feedback_images_as_attachment_for, fn(_) -> "attachments" end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
       in_progress_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
       action(:update, %{"id" => candidate.id, "candidate" => %{"pipeline_status_id" => in_progress_pipeline_status_id}})
 
       expect MailmanExtensions.Templates |> to_not(accepted :consolidated_feedback)
+      expect MailmanExtensions.Templates |> to_not(accepted :get_feedback_images_as_attachment_for)
       expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
     end
 
     it "should send email when the pipeline is closed" do
       allow MailmanExtensions.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
+      allow MailmanExtensions.Mailer |> to(accept(:get_feedback_images_as_attachment_for, fn(_) -> "attachments" end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      interviews = (Candidate.get_candidate_by_id(candidate.id) |> Repo.one).interviews
 
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
       action(:update, %{"id" => candidate.id, "candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}})
 
       expect MailmanExtensions.Templates |> to(accepted :consolidated_feedback)
+      expect MailmanExtensions.Mailer |> to(accepted :get_feedback_images_as_attachment_for, [interviews])
       expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
     end
   end
