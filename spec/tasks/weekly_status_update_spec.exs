@@ -56,7 +56,9 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       |> WeeklyStatusUpdate.construct_view_data
       summary = %{
         candidates_appeared: 1,
-        interviews_count: 1}
+        interviews_count: 1,
+        candidates_in_progress: 0
+      }
       allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
 
       WeeklyStatusUpdate.execute

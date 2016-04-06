@@ -4,6 +4,7 @@
 <ol>
   <li>No. of Candidates Appeared : <%=summary.candidates_appeared%></li>
   <li>No. of Interviews : <%=summary.interviews_count%></li>
+  <li>No. of Candidates In Progress : <%=summary.candidates_in_progress%></li>
 </ol>
 <br />
 <%= unless Enum.empty?(candidates) do %>

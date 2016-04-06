@@ -42,7 +42,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   defp construct_summary_data(candidates) do
     %{
       candidates_appeared: Enum.count(candidates),
-      interviews_count: candidates |> get_total_no_of_interviews
+      interviews_count: candidates |> get_total_no_of_interviews,
+      candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress
       }
   end
 

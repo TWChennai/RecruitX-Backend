@@ -93,6 +93,13 @@ defmodule RecruitxBackend.Candidate do
     Enum.map(candidate.interviews, &(Interview.format(&1)))
   end
 
+  def get_total_no_of_candidates_in_progress do
+    in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
+    (from c in __MODULE__,
+    where: c.pipeline_status_id == ^in_progress_id)
+    |> Repo.all |> Enum.count
+  end
+
   def get_formatted_interviews_with_result(candidate) do
     Enum.map(candidate.interviews, &(Interview.format_with_result_and_panelist(&1)))
   end
