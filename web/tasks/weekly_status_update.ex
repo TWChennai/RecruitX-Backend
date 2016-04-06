@@ -17,17 +17,16 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     candidates = candidates_weekly_status
     |> filter_out_candidates_without_interviews
     |> construct_view_data
-    if(candidates != []) do
-      {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
-      {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
-      email_content = Templates.weekly_status_update(start_date, to_date, candidates)
-      Mailer.deliver(%{
-        subject: "[RecruitX] Weekly Status Update",
-        # TODO: get actual TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS in environment variable
-        to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
-        html: email_content
-      })
-    end
+    {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
+    if candidates != [], do: email_content = Templates.weekly_status_update(start_date, to_date, candidates),
+  else: email_content = Templates.weekly_status_update_default(start_date, to_date)
+  Mailer.deliver(%{
+    subject: "[RecruitX] Weekly Status Update",
+    # TODO: get actual TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS in environment variable
+    to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
+    html: email_content
+  })
   end
 
   def construct_view_data(candidates_weekly_status) do
