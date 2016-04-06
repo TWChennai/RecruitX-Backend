@@ -342,7 +342,6 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return the total no. of candidates in progress" do
-      IO.inspect Repo.all PipelineStatus
       in_progress_pipeline = create(:pipeline_status, name: PipelineStatus.in_progress)
       closed_pipeline = create(:pipeline_status, name: PipelineStatus.closed)
       in_progress_candidate = create(:candidate, other_skills: "Other Skills", pipeline_status_id: in_progress_pipeline.id)

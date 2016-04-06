@@ -741,7 +741,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should contain interview names, date, result, panelists for the candidate in the result" do
       interview_panelist = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
-      {:ok , interview_date} = interview.start_time |> DateFormat.format("{D}/{M}/{YY}")
+      {:ok , interview_date} = interview.start_time |> DateFormat.format("%d/%m/%y", :strftime)
 
       input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
 

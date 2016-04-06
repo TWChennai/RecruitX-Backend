@@ -311,9 +311,9 @@ defmodule RecruitxBackend.Interview do
     }
   end
 
-  def format_with_result_and_panelist(interview) do
+  def format_with_result_and_panelist(interview, date_format \\ "%d/%m/%y") do
     status = "Not Evaluated"
-    {:ok , interview_date} = interview.start_time |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok , interview_date} = interview.start_time |> DateFormat.format(date_format, :strftime)
     if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
     %{
       name: interview.interview_type.name,
