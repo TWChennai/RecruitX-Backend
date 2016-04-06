@@ -121,5 +121,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# OS files
+.DS_Store
+
 # Project specific env variables
 .envrc
