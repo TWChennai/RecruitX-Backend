@@ -2,8 +2,8 @@
 <p>Here is a quick update on the weekly recruitment drive that happened over the week of "<%=start_date%>" to "<%=to_date%>" </p>
 <h4>Summary</h4>
 <ol>
-  <li>No. of Candidates Appeared : <%=candidates_appeared%></li>
-  <li>No. of Interviews : <%=interviews_count%></li>
+  <li>No. of Candidates Appeared : <%=summary.candidates_appeared%></li>
+  <li>No. of Interviews : <%=summary.interviews_count%></li>
 </ol>
 <br />
 <%= unless Enum.empty?(candidates) do %>

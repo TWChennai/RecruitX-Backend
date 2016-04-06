@@ -17,11 +17,10 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     candidates = candidates_weekly_status
     |> filter_out_candidates_without_interviews
     |> construct_view_data
-    candidates_appeared = Enum.count(candidates)
-    interviews_count = candidates |> get_total_no_of_interviews
+    summary = candidates |> construct_summary_data
     {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
     {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
-    email_content = if candidates != [], do: Templates.weekly_status_update(start_date, to_date, candidates, candidates_appeared, interviews_count),
+    email_content = if candidates != [], do: Templates.weekly_status_update(start_date, to_date, candidates, summary),
                     else: Templates.weekly_status_update_default(start_date, to_date)
     Mailer.deliver(%{
       subject: "[RecruitX] Weekly Status Update",
@@ -40,7 +39,14 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     end)
   end
 
-  def get_total_no_of_interviews(candidates) do
+  defp construct_summary_data(candidates) do
+    %{
+      candidates_appeared: Enum.count(candidates),
+      interviews_count: candidates |> get_total_no_of_interviews
+      }
+  end
+
+  defp get_total_no_of_interviews(candidates) do
     total_count = Enum.reduce(candidates, 0, fn(candidate, acc) ->
       Enum.count(candidate.interviews) + acc
     end)

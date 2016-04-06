@@ -54,11 +54,14 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       candidates = candidates_weekly_status
       |> WeeklyStatusUpdate.filter_out_candidates_without_interviews
       |> WeeklyStatusUpdate.construct_view_data
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _, _) -> "html content"  end))
+      summary = %{
+        candidates_appeared: 1,
+        interviews_count: 1}
+      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update,[start_date, to_date, candidates, 1, 1])
+      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update,[start_date, to_date, candidates, summary])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
@@ -68,7 +71,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
           to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
           html: "html content"
       }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _, _) -> "html content"  end))
+      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklyStatusUpdate.execute
@@ -88,7 +91,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       }
 
       allow MailmanExtensions.Templates |> to(accept(:weekly_status_update_default, fn(_, _) -> "html content"  end))
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _, _) -> "html content"  end))
+      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(email) -> "" end))
 
       WeeklyStatusUpdate.execute
