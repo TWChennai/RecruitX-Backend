@@ -13,7 +13,7 @@
       <th style="padding: 0px;">
         <table style="width:100%; margin: 0px; border-collapse: collapse;">
           <th width="25%" style="border: 1px solid #000;">Round</th>
-          <th width="25%" style="border: 1px solid #000;">Date (DD/MM/YY)</th>
+          <th width="25%" style="border: 1px solid #000;">Date</th>
           <th width="25%" style="border: 1px solid #000;">Panelists</th>
           <th width="25%" style="border: 1px solid #000;">Results</th>
         </table>
