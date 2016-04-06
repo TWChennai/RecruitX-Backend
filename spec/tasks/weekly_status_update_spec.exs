@@ -77,19 +77,19 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
     end
 
-    it "should not call MailmanExtensions deliver if there are no interview in previous week" do
+    it "should send a default mail if there are no interview in previous week" do
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: +1))
       email = %{
           subject: "[RecruitX] Weekly Status Update",
           to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
           html: "html content"
       }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _) -> "html content"  end))
+      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update_default, fn(_, _, _) -> "html content"  end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update)
+      expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update_default)
       expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
     end
 
