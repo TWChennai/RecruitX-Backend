@@ -2,7 +2,6 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   use ESpec.Phoenix, model: RecruitxBackend.ExperienceMatrix
 
   alias RecruitxBackend.ExperienceMatrix
-  alias RecruitxBackend.Role
   alias Decimal
 
   let :valid_attrs, do: fields_for(:experience_matrix)
@@ -137,25 +136,25 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   context "get_max_experience_with_filter" do
     it "should return maximum experience for specific role" do
       Repo.delete_all ExperienceMatrix
-      dev_role = Role.retrieve_by_name(Role.dev)
-      qa_role = Role.retrieve_by_name(Role.qa)
-      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: dev_role.id})
-      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: qa_role.id})
-      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(99), role_id: qa_role.id})
+      role1 = create(:role)
+      role2 = create(:role)
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role1.id})
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: role2.id})
+      create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(99), role_id: role2.id})
 
-      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(dev_role), Decimal.new(90))) |> to(eq(Decimal.new(0)))
-      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(qa_role), Decimal.new(99))) |> to(eq(Decimal.new(0)))
+      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(role1), Decimal.new(90))) |> to(eq(Decimal.new(0)))
+      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(role2), Decimal.new(99))) |> to(eq(Decimal.new(0)))
     end
 
     it "should return max experience if no filters are specified for a role" do
       Repo.delete_all ExperienceMatrix
       role = create(:role)
-      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(role), Decimal.new(99))) |> to(eq(Decimal.new(0)))
+      expect(ExperienceMatrix.get_max_experience_with_filter(role)) |> to(be(nil))
     end
 
     it "should return max experience if role is nil" do
       Repo.delete_all ExperienceMatrix
-      expect(Decimal.compare(ExperienceMatrix.get_max_experience_with_filter(nil), Decimal.new(99))) |> to(eq(Decimal.new(0)))
+      expect(ExperienceMatrix.get_max_experience_with_filter(nil)) |> to(be(nil))
     end
   end
 
@@ -200,40 +199,6 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
       result = ExperienceMatrix.filter(Decimal.new(10), role)
 
       expect(result) |> to(eql([]))
-    end
-  end
-
-  context "should_filter_role" do
-    it "should return true if the role is Dev" do
-      result = Role.dev
-                |> Role.retrieve_by_name
-                |> ExperienceMatrix.should_filter_role
-
-      expect(result) |> to(be(true))
-    end
-
-    it "should return true if the role is QA" do
-      result = Role.qa
-                |> Role.retrieve_by_name
-                |> ExperienceMatrix.should_filter_role
-
-      expect(result) |> to(be(true))
-    end
-
-    it "should return false if the role is Other" do
-      result = Role.other
-                |> Role.retrieve_by_name
-                |> ExperienceMatrix.should_filter_role
-
-      expect(result) |> to(be(false))
-    end
-
-    it "should return false if the role is unknown" do
-      result = "unknown"
-                |> Role.retrieve_by_name
-                |> ExperienceMatrix.should_filter_role
-
-      expect(result) |> to(be(false))
     end
   end
 end

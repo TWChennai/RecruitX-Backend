@@ -21,9 +21,9 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, candidate, interview_type_id,  experience_eligibility_criteria) do
     candidate = Repo.preload candidate, :role
-    result = to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
+    result = !Enum.member?(experience_eligibility_criteria.role_ids_with_filter, candidate.role_id)
+              or to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
               or !Enum.member?(experience_eligibility_criteria.interview_types_with_filter, interview_type_id)
-              or !ExperienceMatrix.should_filter_role(candidate.role)
     if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
     sign_up_evaluation_status
   end

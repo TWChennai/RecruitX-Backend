@@ -179,10 +179,11 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     it "should not accept sign up if the panelist is experienced for the interview type and the candidate of a different_role" do
       Repo.delete_all ExperienceMatrix
 
-      interview = create(:interview)
-      role_id = (Repo.preload interview, :candidate).candidate.role_id
-      role = Role |> Repo.get(role_id)
+      role = create(:role)
+      candidate = create(:candidate, role_id: role.id)
+      interview = create(:interview, candidate_id: candidate.id)
       experience_matrix = create(:experience_matrix, interview_type_id: interview.interview_type_id)
+      experience_matrix_for_same_role = create(:experience_matrix, interview_type_id: interview.interview_type_id, role_id: role.id)
       interview_panelist_params = Map.merge(fields_for(:interview_panelist, interview_id: interview.id), %{panelist_experience: experience_matrix.panelist_experience_lower_bound, panelist_role: role.name})
       response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(interview_panelist_params)}
 

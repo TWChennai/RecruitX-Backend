@@ -5,9 +5,6 @@ defmodule RecruitxBackend.ExperienceMatrix do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
 
-  @roles_which_are_filtered [Role.dev, Role.qa]
-  @max_experience Decimal.new(99)
-
   schema "experience_matrices" do
     field :panelist_experience_lower_bound, :decimal
     field :candidate_experience_lower_bound, :decimal
@@ -41,14 +38,12 @@ defmodule RecruitxBackend.ExperienceMatrix do
     |> Repo.all
   end
 
-  def get_max_experience_with_filter(role), do: get_max_experience_based_on_role(role, should_filter_role(role))
+  def get_max_experience_with_filter(nil), do: nil
 
-  defp get_max_experience_based_on_role(role, true),
+  def get_max_experience_with_filter(role),
   do: (from e in __MODULE__, where: e.role_id == ^role.id, select: max(e.panelist_experience_lower_bound)) |> Repo.one
-
-  defp get_max_experience_based_on_role(_, false), do: @max_experience
 
   def get_interview_types_with_filter, do: (from e in __MODULE__, distinct: true, select: e.interview_type_id) |> Repo.all
 
-  def should_filter_role(role), do: !is_nil(role) and Enum.member?(@roles_which_are_filtered, role.name)
+  def get_role_ids_with_filter, do: (from e in __MODULE__, distinct: true, select: e.role_id) |> Repo.all
 end

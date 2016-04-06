@@ -12,8 +12,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
   @upper_bound "UB"
   @empty ""
 
-  before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
-
   context "evaluate" do
     it "should return true if experience is greater than maximum experience with filter" do
       Repo.delete_all ExperienceMatrix
@@ -93,13 +91,13 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return false if current interview type has filters and panelist is below minimum experience level in experience matrix" do
       Repo.delete_all ExperienceMatrix
-      experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
-      _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
+      role = create(:role)
+      experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2), role_id: role.id)
+      _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3), role_id: role.id)
       panelist_experience = D.new(1)
 
-      candidate = create(:candidate)
+      candidate = create(:candidate, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_create_1.interview_type_id)
-      role = create(:role)
       eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
 
       expect(eligiblity.valid?) |> to(be_false)
@@ -108,7 +106,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return true if role has no filters but current interview type has filters and panelist is below minimum experience level in experience matrix" do
       Repo.delete_all ExperienceMatrix
-      allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
       experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
       _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
       panelist_experience = D.new(1)
@@ -139,12 +136,12 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return false when the panelist is not experienced for the interview" do
       Repo.delete_all ExperienceMatrix
-      _experience_matrix_panelist_is_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
-      experience_matrix_panelist_is_not_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
+      role = create(:role)
+      _experience_matrix_panelist_is_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), role_id: role.id)
+      experience_matrix_panelist_is_not_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(2), role_id: role.id)
       panelist_experience = D.new(1)
       candidate_experience = experience_matrix_panelist_is_not_eligible_for.candidate_experience_upper_bound
-      role = create(:role)
-      candidate = create(:candidate, experience: candidate_experience)
+      candidate = create(:candidate, experience: candidate_experience, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_panelist_is_not_eligible_for.interview_type_id)
 
       eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
@@ -160,7 +157,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       panelist_experience = D.new(1)
       candidate_experience = D.new(3)
 
-      candidate = create(:candidate, experience: candidate_experience)
+      candidate = create(:candidate, experience: candidate_experience, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
       eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
@@ -174,7 +171,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(5), candidate_experience_lower_bound: D.new(-1), role_id: role.id)
 
-      candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound)
+      candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
       eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview)
@@ -188,7 +185,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(99), candidate_experience_lower_bound: D.new(5), role_id: role.id)
 
-      candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound)
+      candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
       eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview)
@@ -210,7 +207,8 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     %ExperienceEligibilityData{panelist_experience: panelist_experience,
       max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
       interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
-      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role))
+      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role)),
+      role_ids_with_filter: ExperienceMatrix.get_role_ids_with_filter
     }
   end
 end

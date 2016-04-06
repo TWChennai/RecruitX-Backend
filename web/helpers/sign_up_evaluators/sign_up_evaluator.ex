@@ -30,7 +30,8 @@ defmodule RecruitxBackend.SignUpEvaluator do
     %ExperienceEligibilityData{panelist_experience: panelist_experience,
       max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
       interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
-      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role))
+      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role)),
+      role_ids_with_filter: ExperienceMatrix.get_role_ids_with_filter
     }
   end
 
