@@ -1,6 +1,8 @@
 defmodule RecruitxBackend.PanelistControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.PanelistController
 
+  alias RecruitxBackend.InterviewPanelist
+
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2}))
 
   describe "create" do
@@ -18,12 +20,12 @@ defmodule RecruitxBackend.PanelistControllerSpec do
     end
 
     context "invalid changeset due to constraints on insertion to database" do
-      before do: allow Repo |> to(accept(:insert, fn(_) -> {:error, %Ecto.Changeset{ errors: [test: "does not exist"]}} end))
-      #TODO: Find a way to fix this
-      xit "should return 422(Unprocessable entity) and the reason" do
+      before do: allow Repo |> to(accept(:insert, fn(_) -> {:error, InterviewPanelist.changeset(%InterviewPanelist{}, %{})} end))
+      it "should return 422(Unprocessable entity) and the reason" do
         response = action(:create, %{"interview_panelist" => post_parameters})
         response |> should(have_http_status(:unprocessable_entity))
-        expect(response.resp_body) |> to(be(""))
+        parsed_response = response.resp_body |> Poison.Parser.parse!
+        expect(parsed_response) |> to(be(%{"errors" => %{"panelist_login_name" => ["can't be blank"], "interview_id" =>["can't be blank"]}}))
       end
     end
 

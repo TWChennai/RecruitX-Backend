@@ -56,9 +56,9 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     it do: is_expected |> to(be_successful)
 
     context "not found" do
-      before do: allow Repo |> to(accept(:get!, fn(Candidate, 1) -> nil end))
+      before do: allow Repo |> to(accept(:get, fn(Candidate, 1) -> nil end))
 
-      xit "raises exception" do
+      it "raises exception" do
         expect(fn -> action(:show, %{"id" => 1}) end) |> to(raise_exception)
       end
     end
