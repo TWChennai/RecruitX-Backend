@@ -37,7 +37,7 @@
   "idna": {:hex, :idna, "1.2.0"},
   "json": {:hex, :json, "0.3.3"},
   "jsx": {:hex, :jsx, "2.6.2"},
-  "mailman": {:git, "https://github.com/arunvelsriram/mailman.git", "05939873e6df9b65ee3cce4530586ce67cada9ae", [branch: "fix_config_type_decision"]},
+  "mailman": {:git, "https://github.com/arunvelsriram/mailman.git", "9c10b4960a0f19706bcebbb6ec1c703c185f9bf5", []},
   "meck": {:hex, :meck, "0.8.4"},
   "metrics": {:hex, :metrics, "1.0.1"},
   "mimerl": {:hex, :mimerl, "1.0.2"},

@@ -60,7 +60,7 @@ defmodule RecruitxBackend.Mixfile do
      {:scrivener, "~> 1.1"},
      {:gettext, "~> 0.10.0"},
      # TODO: Get dependency from Hex once the bug is fixed / pull request is merged
-     {:mailman, github: "arunvelsriram/mailman", branch: "fix_config_type_decision"},
+     {:mailman, github: "arunvelsriram/mailman"},
      # TODO: Package not available through Hex. Find a way to manage the version
      {:eiconv, github: "zotonic/eiconv"},   # Note: Introduced for mailman
      {:quantum, ">= 1.7.0"},
