@@ -1,5 +1,5 @@
 <p>Hi all,</p>
-<p>Here is a quick update on the weekly recruitment drive that happened over the week of "(Monday) <%=start_date%>" to "(Friday) <%=to_date%>" </p>
+<p>Here is a quick update on the weekly recruitment drive that happened over the week of "<%=start_date%>" to "<%=to_date%>" </p>
 <%= unless Enum.empty?(candidates) do %>
 <h4> Details </h4>
   <table cellpadding="10" style="border-collapse: collapse;">
