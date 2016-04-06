@@ -56,10 +56,14 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     it do: is_expected |> to(be_successful)
 
     context "not found" do
-      before do: allow Repo |> to(accept(:get, fn(Candidate, 1) -> nil end))
+      before do: allow Repo |> to(accept(:get, fn(_, 1) -> nil end))
 
       it "raises exception" do
-        expect(fn -> action(:show, %{"id" => 1}) end) |> to(raise_exception)
+        response = action(:show, %{"id" => 1})
+        response |> should_not(be_successful)
+        response |> should(have_http_status(:not_found))
+        parsed_response = response.resp_body |> Poison.Parser.parse!
+        expect(parsed_response) |> to(be(%{"error" => "Page not found"}))
       end
     end
   end
