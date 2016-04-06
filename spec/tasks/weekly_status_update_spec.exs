@@ -96,7 +96,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
     it "should be called every week on saturday at 6.0am UTC" do
       job = Quantum.find_job(:weekly_status_update)
 
-      expect(job.schedule) |> to(be("30 00 * * 6"))
+      expect(job.schedule) |> to(be("30 06 * * *"))
       expect(job.task) |> to(be({"RecruitxBackend.WeeklyStatusUpdate", "execute"}))
     end
   end
