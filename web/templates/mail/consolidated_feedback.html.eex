@@ -19,9 +19,13 @@
         <td style="border: 1px solid #000;"><%= formatted_interview.result %></td>
         <td style="border: 1px solid #000;"><%= formatted_interview.date %></td>
         <td style="border: 1px solid #000;">
-          <%= for feedback_image <- interview.feedback_images do %>
-            <a href="<%= RecruitxBackend.FeedbackImage.get_full_path(feedback_image) %>">Feedback</a>
-          <% end %>
+          <%= if Enum.empty?(interview.feedback_images) do %>
+           Not Provided
+         <% else %>
+           <%= for feedback_image <- interview.feedback_images do %>
+             <a href="<%= RecruitxBackend.FeedbackImage.get_full_path(feedback_image) %>">Feedback</a>
+           <% end %>
+         <% end %>
         </td>
       </tr>
     <% end %>
