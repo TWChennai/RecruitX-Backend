@@ -5,7 +5,6 @@ defmodule RecruitxBackend.CandidateControllerSpec do
 
   alias Ecto.DateTime
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.Interview
   alias RecruitxBackend.CandidateController
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONError

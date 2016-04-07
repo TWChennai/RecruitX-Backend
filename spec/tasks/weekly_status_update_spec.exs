@@ -94,7 +94,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
       allow MailmanExtensions.Templates |> to(accept(:weekly_status_update_default, fn(_, _) -> "html content"  end))
       allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(email) -> "" end))
+      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklyStatusUpdate.execute
 

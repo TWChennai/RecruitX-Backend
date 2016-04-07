@@ -2,11 +2,8 @@ defmodule  MailmanExtensions.MailerSpec do
   use ESpec.Phoenix, model:  MailmanExtensions.Mailer
 
   alias MailmanExtensions.Mailer
-  alias RecruitxBackend.Interview
   alias Mailman.Email
   alias Mailman.Context
-
-  import Ecto.Query
 
   describe "override default email" do
     let :default_email do
