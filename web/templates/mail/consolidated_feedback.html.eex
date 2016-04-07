@@ -7,16 +7,22 @@
       <th style="border: 1px solid #000;">Panelists</th>
       <th style="border: 1px solid #000;">Result</th>
       <th style="border: 1px solid #000;">Date and Time</th>
+      <th style="border: 1px solid #000;">Feedback</th>
     </tr>
   </thead>
   <tbody>
     <%= for interview <- candidate.interviews do %>
-      <% formatted_interview =  RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %R") %>
+      <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %R") %>
       <tr>
         <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
         <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
         <td style="border: 1px solid #000;"><%= formatted_interview.result %></td>
         <td style="border: 1px solid #000;"><%= formatted_interview.date %></td>
+        <td style="border: 1px solid #000;">
+          <%= for feedback_image <- interview.feedback_images do %>
+            <a href="<%= RecruitxBackend.FeedbackImage.get_full_path(feedback_image) %>">Feedback</a>
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>

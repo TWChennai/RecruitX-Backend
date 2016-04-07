@@ -118,13 +118,11 @@ defmodule RecruitxBackend.CandidateController do
   defp send_feedback_email(id) do
     candidate = Candidate.get_candidate_by_id(id) |> Repo.one
     email_content = Templates.consolidated_feedback(candidate)
-    attachments = Mailer.get_feedback_images_as_attachment_for(candidate.interviews)
 
     Mailer.deliver(%{
       subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}",
       to: ["arunvel@thoughtworks.com"],
-      html: email_content,
-      attachments: attachments
+      html: email_content
     })
   end
 

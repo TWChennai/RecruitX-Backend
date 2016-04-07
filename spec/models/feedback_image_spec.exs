@@ -95,4 +95,13 @@ defmodule RecruitxBackend.FeedbackImageSpec do
       expect(changeset) |> to(have_errors(file_name: "has already been taken"))
     end
   end
+
+  context "get_full_path" do
+    it "should return the full path when given a feedback image" do
+      feedback_image = create(:feedback_image)
+      full_path = FeedbackImage.get_full_path(feedback_image)
+
+      expect(full_path) |> to(be("https://s3.amazonaws.com/recruitx-feedback-image/uploads/" <> feedback_image.file_name))
+    end
+  end
 end
