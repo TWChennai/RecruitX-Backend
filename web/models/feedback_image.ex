@@ -23,7 +23,7 @@ defmodule RecruitxBackend.FeedbackImage do
     |> unique_constraint(:file_name, name: :file_name_unique_index)
     |> assoc_constraint(:interview, message: "Interview has been deleted")
   end
-  
+
   def get_full_path(feedback_image) do
     "https://" <> System.get_env("AWS_DOWNLOAD_URL") <> feedback_image.file_name
   end
