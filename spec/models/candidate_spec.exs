@@ -344,8 +344,8 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should return the total no. of candidates in progress" do
       in_progress_pipeline = create(:pipeline_status, name: PipelineStatus.in_progress)
       closed_pipeline = create(:pipeline_status, name: PipelineStatus.closed)
-      in_progress_candidate = create(:candidate, other_skills: "Other Skills", pipeline_status_id: in_progress_pipeline.id)
-      closed_candidate = create(:candidate, other_skills: "Other Skills", pipeline_status_id: closed_pipeline.id)
+      create(:candidate, other_skills: "Other Skills", pipeline_status_id: in_progress_pipeline.id)   # in-progress candidate
+      create(:candidate, other_skills: "Other Skills", pipeline_status_id: closed_pipeline.id)        # closed candidate
 
       expect(Candidate.get_total_no_of_candidates_in_progress) |> to(be(1))
     end

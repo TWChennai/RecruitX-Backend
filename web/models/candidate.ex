@@ -61,8 +61,7 @@ defmodule RecruitxBackend.Candidate do
     candidate_params = %{
       "pipeline_status_id": pass_pipeline_status_id
     }
-    change = __MODULE__.changeset(candidate, candidate_params)
-    Repo.update(change)
+    __MODULE__.changeset(candidate, candidate_params) |> Repo.update
   end
 
   def get_candidates_in_fifo_order do
@@ -75,8 +74,8 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def is_pipeline_closed(candidate) do
-    in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
-    candidate.pipeline_status_id == in_progress_id
+    closed_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
+    candidate.pipeline_status_id == closed_id
   end
 
   def get_formatted_skills(candidate) do
@@ -94,9 +93,11 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_total_no_of_candidates_in_progress do
+    # TODO: Use a 'join' to accomplish this in one db call
     in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
     (from c in __MODULE__,
     where: c.pipeline_status_id == ^in_progress_id)
+    # TODO: Use Ectoo to get the count directly - instead of loading into VM memory and then counting the number of ohjects
     |> Repo.all |> Enum.count
   end
 
@@ -109,5 +110,4 @@ defmodule RecruitxBackend.Candidate do
     experience_as_float = String.to_float(experience_as_string)
     Float.to_string(experience_as_float, decimals: 1)
   end
-
 end
