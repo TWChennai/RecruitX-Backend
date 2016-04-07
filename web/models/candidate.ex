@@ -8,12 +8,14 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
+  alias Timex.Date
 
   schema "candidates" do
     field :first_name, :string
     field :last_name, :string
     field :experience, :decimal
     field :other_skills, :string
+    field :pipeline_closure_time, Timex.Ecto.DateTime
 
     timestamps
 
@@ -25,7 +27,7 @@ defmodule RecruitxBackend.Candidate do
   end
 
   @required_fields ~w(first_name last_name experience role_id)
-  @optional_fields ~w(other_skills pipeline_status_id)
+  @optional_fields ~w(other_skills pipeline_status_id pipeline_closure_time)
 
   def changeset(model, params \\ :empty) do
     model
@@ -38,7 +40,17 @@ defmodule RecruitxBackend.Candidate do
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)
+    |> populate_pipeline_closure_time
   end
+
+  defp populate_pipeline_closure_time(existing_changeset) do
+    pipeline_status_id = existing_changeset |> get_field(:pipeline_status_id)
+    if !is_nil(pipeline_status_id) do
+      closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
+      if pipeline_status_id == closed_pipeline_status_id, do: existing_changeset = existing_changeset |> put_change(:pipeline_closure_time, Date.now())
+    end
+    existing_changeset
+ end
 
   def get_candidate_by_id(id) do
     from c in __MODULE__,
