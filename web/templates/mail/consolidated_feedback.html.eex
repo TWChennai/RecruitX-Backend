@@ -1,5 +1,5 @@
 <p>Hi,</p>
-<p>Here is the quick feedback for the candidate <%= candidate.first_name %> <%= candidate.last_name %> who had applied for the <%= candidate.role.name %> role:</p>
+<p>Here is the quick feedback for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role:</p>
 <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
   <thead>
     <tr>
