@@ -12,7 +12,7 @@
   </thead>
   <tbody>
     <%= for interview <- candidate.interviews do %>
-      <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %R") %>
+      <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %I:%M%P") %>
       <tr>
         <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
         <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
