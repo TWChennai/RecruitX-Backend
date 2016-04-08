@@ -121,7 +121,7 @@ defmodule RecruitxBackend.CandidateController do
 
     Mailer.deliver(%{
       subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}",
-      to: ["arunvel@thoughtworks.com"],
+      to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
       html: email_content
     })
   end
