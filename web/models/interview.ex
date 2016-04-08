@@ -9,6 +9,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
@@ -287,7 +288,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_last_interview_status_for(current_candidate, last_interviews_data) do
-    total_no_of_interview_types = Enum.count(InterviewType |> Repo.all)
+    total_no_of_interview_types = Enum.count(RoleInterviewType |> where([i], ^current_candidate.role_id == i.role_id)|> Repo.all)
     if Candidate.is_pipeline_closed(current_candidate) do
       result = Enum.filter(last_interviews_data, fn([candidate_id, _, _])-> current_candidate.id == candidate_id end)
       case result do

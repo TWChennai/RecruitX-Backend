@@ -7,6 +7,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Repo
@@ -621,17 +622,20 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should add status of last interview if pipeline is closed and candidate has finished all rounds" do
       Repo.delete_all Candidate
       Repo.delete_all InterviewType
+      Repo.delete_all RoleInterviewType
 
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
       candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id)
+      role_interview_type1 = create(:role_interview_type, role_id: candidate.role_id, interview_type_id: interview_type1.id)
+      role_interview_type1 = create(:role_interview_type, role_id: candidate.role_id, interview_type_id: interview_type2.id)
       interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
       interview_data2 = fields_for(:interview,
         candidate_id: candidate.id,
         interview_type_id: interview_type2.id,
         interview_status_id: create(:interview_status).id,
         start_time: Date.now |> Date.shift(hours: 1))
-      total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
+      total_no_of_interview_types = Enum.count(Repo.all(RoleInterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
 
