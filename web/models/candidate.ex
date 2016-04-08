@@ -6,6 +6,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias Timex.Date
@@ -51,6 +52,65 @@ defmodule RecruitxBackend.Candidate do
     end
     existing_changeset
  end
+
+  def pipeline_closure_within_range(query, start_date, end_date) do
+   from c in query, where: c.pipeline_closure_time >= ^start_date and c.pipeline_closure_time <= ^end_date
+  end
+
+  def get_all_candidates_pursued_after_pipeline_closure do
+  end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+  start_date = end_date |> Date.shift(days: -4)
+
+   pipeline_closed_candidates = __MODULE__
+   |> pipeline_closure_within_range(start_date, end_date)
+   |> Repo.all
+
+   pursue_interview_status_id = (InterviewStatus.pursue |> InterviewStatus.retrieve_by_name).id
+   strong_pursue_interview_status_id = (InterviewStatus.strong_pursue |> InterviewStatus.retrieve_by_name).id
+   last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
+
+   Enum.filter(
+     pipeline_closed_candidates, fn(candidate) ->
+       status = Interview.get_last_interview_status_for(candidate, last_interviews_data)
+       status == strong_pursue_interview_status_id ||
+       status == pursue_interview_status_id
+     end)
+  end
+
+  def get_all_candidates_rejected_after_pipeline_closure do
+   end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+   start_date = end_date |> Date.shift(days: -4)
+
+   pipeline_closed_candidates = __MODULE__
+   |> pipeline_closure_within_range(start_date, end_date)
+   |> Repo.all
+
+   pass_interview_status_id = (InterviewStatus.pass |> InterviewStatus.retrieve_by_name).id
+   last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
+
+   Enum.filter(
+     pipeline_closed_candidates, fn(candidate) ->
+       status = Interview.get_last_interview_status_for(candidate, last_interviews_data)
+       status == pass_interview_status_id ||
+       is_nil(status)
+     end)
+  end
+
+  def get_pass_candidates_within_range(start_date, end_date) do
+   pass_status_id = (PipelineStatus.retrieve_by_name(PipelineStatus.pass)).id
+   candidates_passed = (from c in __MODULE__, where: c.pipeline_status_id == ^pass_status_id) |> Repo.all
+   last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
+
+   Enum.filter(candidates_passed, fn(candidate) ->
+     Enum.any?(last_interviews_data, fn (last_interview)->
+       [candidate_id, max_start_time, count] = last_interview
+       pass_interview_start_time = Date.from(max_start_time)
+       candidate_id == candidate.id &&
+       pass_interview_start_time >= start_date  &&
+       pass_interview_start_time <= end_date
+     end)
+   end)
+  end
 
   def get_candidate_by_id(id) do
     from c in __MODULE__,

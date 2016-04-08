@@ -3,6 +3,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.PipelineStatus
   alias MailmanExtensions.Templates
   alias MailmanExtensions.Mailer
   alias Timex.Date
@@ -43,8 +44,16 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     %{
       candidates_appeared: Enum.count(candidates),
       interviews_count: candidates |> get_total_no_of_interviews,
-      candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress
+      candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress,
+      candidates_pursued: Enum.count(Candidate.get_all_candidates_pursued_after_pipeline_closure),
+      candidates_rejected: get_total_no_of_rejects
       }
+  end
+
+  defp get_total_no_of_rejects() do
+    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+    start_date = end_date |> Date.shift(days: -4)
+    Enum.count(Candidate.get_pass_candidates_within_range(start_date, end_date)) + Enum.count(Candidate.get_all_candidates_rejected_after_pipeline_closure)
   end
 
   defp get_total_no_of_interviews(candidates) do

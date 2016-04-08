@@ -4,6 +4,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
   import Ecto.Query
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.WeeklyStatusUpdate
   alias Timex.Date
   alias Timex.DateFormat
@@ -46,20 +47,30 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
     it "should filter previous weeks interviews and construct email" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
+      Repo.delete_all PipelineStatus
+
+      interview = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
+      candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
+      candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
+
       {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
-      create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
+      pass_pipeline = create(:pipeline_status, name: "Pass", id: 2)
+
+      allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
+
       query = Interview |> preload([:interview_panelist, :interview_status, :interview_type])
       candidates_weekly_status = Candidate |> preload([:role, interviews: ^query]) |> Repo.all
       candidates = candidates_weekly_status
       |> WeeklyStatusUpdate.filter_out_candidates_without_interviews
       |> WeeklyStatusUpdate.construct_view_data
-      summary = %{
-        candidates_appeared: 1,
-        interviews_count: 1,
-        candidates_in_progress: 0
+      summary = %{candidates_appeared: 1,
+        candidates_in_progress: 1,
+        candidates_pursued: 0,
+        candidates_rejected: 0,
+        interviews_count: 1
       }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
+      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content" end))
 
       WeeklyStatusUpdate.execute
 

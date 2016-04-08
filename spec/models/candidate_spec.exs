@@ -5,6 +5,10 @@ defmodule RecruitxBackend.CandidateSpec do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
   alias Timex.Date
@@ -348,6 +352,231 @@ defmodule RecruitxBackend.CandidateSpec do
       create(:candidate, other_skills: "Other Skills", pipeline_status_id: closed_pipeline.id)        # closed candidate
 
       expect(Candidate.get_total_no_of_candidates_in_progress) |> to(be(1))
+    end
+  end
+
+  context "pipeline closure within date range" do
+
+    it "should return candidate with pipeline closure time within given date range" do
+      pipeline_closure_time = Date.now
+      start_date = pipeline_closure_time |> Date.shift(days: -1)
+      end_date = pipeline_closure_time |> Date.shift(days: 1)
+      candidate = create(:candidate, other_skills: "Other Skills", pipeline_closure_time: pipeline_closure_time)
+
+      candidate_result = Candidate |> Candidate.pipeline_closure_within_range(start_date, end_date) |> Repo.one
+
+      expect(candidate_result) |> to(be(candidate))
+    end
+
+    it "should NOT return candidate with pipeline closure time NOT within given date range" do
+      pipeline_closure_time = Date.now
+      start_date = pipeline_closure_time |> Date.shift(days: 1)
+      end_date = pipeline_closure_time |> Date.shift(days: 2)
+      candidate = create(:candidate, other_skills: "Other Skills", pipeline_closure_time: pipeline_closure_time)
+
+      candidate_result = Candidate |> Candidate.pipeline_closure_within_range(start_date, end_date) |> Repo.one
+
+      expect(candidate_result) |> to(be(nil))
+    end
+  end
+
+  context "get all candidates pursued after pipeline closure" do
+    before do
+      Repo.delete_all (Candidate)
+      Repo.delete_all (RoleInterviewType)
+      Repo.delete_all (PipelineStatus)
+      Repo.delete_all (InterviewType)
+      Repo.delete_all (InterviewStatus)
+      Repo.delete_all (Role)
+    end
+
+    let :role1, do: create(:role, role_id: 1 ,name: "Role1")
+    let :interview_type1, do: create(:interview_type, name: "interview_type1")
+    let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
+    let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
+    let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+
+    it "should return candidate who is pursue in all interviews and pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+
+      [candidates] = Candidate.get_all_candidates_pursued_after_pipeline_closure()
+
+      expect(candidates) |> to(be(candidate1))
+    end
+
+    it "should NOT return candidate who is pursue in all interviews and pipeline is NOT closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
+      candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_all_candidates_pursued_after_pipeline_closure()
+
+      expect(candidates) |> to(be([]))
+    end
+
+    it "should NOT return candidate who is pass in one interview after pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_all_candidates_pursued_after_pipeline_closure()
+
+      expect(candidates) |> to(be([]))
+    end
+
+    it "should NOT return candidate who is not completed all interviews after pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+
+      candidates = Candidate.get_all_candidates_pursued_after_pipeline_closure()
+
+      expect(candidates) |> to(be([]))
+    end
+  end
+
+  context "get all candidates rejected after pipeline closure" do
+    before do
+      Repo.delete_all (Candidate)
+      Repo.delete_all (RoleInterviewType)
+      Repo.delete_all (PipelineStatus)
+      Repo.delete_all (InterviewType)
+      Repo.delete_all (InterviewStatus)
+      Repo.delete_all (Role)
+    end
+
+    let :role1, do: create(:role, role_id: 1 ,name: "Role1")
+    let :interview_type1, do: create(:interview_type, name: "interview_type1")
+    let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
+    let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
+    let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+
+    it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_all_candidates_rejected_after_pipeline_closure()
+
+      expect(candidates) |> to(be([]))
+    end
+
+    it "should NOT return candidate whose pipeline is NOT closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
+      candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_all_candidates_rejected_after_pipeline_closure()
+
+      expect(candidates) |> to(be([]))
+    end
+
+    it "should return candidate who is pass in one interview and pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
+
+      [candidates] = Candidate.get_all_candidates_rejected_after_pipeline_closure()
+
+      expect(candidates) |> to(be(candidate1))
+    end
+
+    it "should return candidate who is not completed all interviews after pipeline is closed" do
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+
+      [candidates] = Candidate.get_all_candidates_rejected_after_pipeline_closure()
+
+      expect(candidates) |> to(be(candidate1))
+    end
+  end
+
+  context "get_pass_candidates_within_range" do
+    before do
+      Repo.delete_all (Candidate)
+      Repo.delete_all (RoleInterviewType)
+      Repo.delete_all (PipelineStatus)
+      Repo.delete_all (InterviewType)
+      Repo.delete_all (InterviewStatus)
+      Repo.delete_all (Role)
+    end
+
+    let :role1, do: create(:role, role_id: 1 ,name: "Role1")
+    let :interview_type1, do: create(:interview_type, name: "interview_type1")
+    let :start_date, do: Date.now |> Date.shift(days: -5)
+    let :end_date, do: Date.now |> Date.shift(days: -1)
+
+    it "should return candidate who is a pass in an interview within range and pipeline is pass" do
+      progress_pipeline_status = create(:pipeline_status, name: "In Progress")
+      pass_pipeline_status = create(:pipeline_status, name: "Pass")
+      closed_pipeline_status = create(:pipeline_status, name: "Closed")
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
+
+      [candidates] = Candidate.get_pass_candidates_within_range(start_date, end_date)
+
+      expect(candidates) |> to(be(candidate1))
+    end
+
+    it "should NOT return candidate who is pass in an interview NOT IN RANGE and pipeline is pass" do
+      progress_pipeline_status = create(:pipeline_status, name: "In Progress")
+      pass_pipeline_status = create(:pipeline_status, name: "Pass")
+      closed_pipeline_status = create(:pipeline_status, name: "Closed")
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: +1), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_pass_candidates_within_range(start_date, end_date)
+
+      expect(candidates) |> to(be([]))
+    end
+
+    it "should NOT return candidate who is pursue in an interview within range" do
+      progress_pipeline_status = create(:pipeline_status, name: "In Progress")
+      pass_pipeline_status = create(:pipeline_status, name: "Pass")
+      closed_pipeline_status = create(:pipeline_status, name: "Closed")
+      role_interview_type = create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
+      pass = create(:interview_status, name: "Pass")
+      pursue = create(:interview_status, name: "Pursue")
+      strong_pursue = create(:interview_status, name: "Strong Pursue")
+      candidate1 = create(:candidate, pipeline_status_id: progress_pipeline_status.id, role_id: role1.id)
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+
+      candidates = Candidate.get_pass_candidates_within_range(start_date, end_date)
+
+      expect(candidates) |> to(be([]))
     end
   end
 end
