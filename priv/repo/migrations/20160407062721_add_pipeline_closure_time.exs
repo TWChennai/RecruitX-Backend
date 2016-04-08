@@ -15,7 +15,6 @@ defmodule RecruitxBackend.Repo.Migrations.AddPipelineClosureTime do
 
  flush
 
- # closed_candidates = Repo.all(from c in Candidate, where: c.pipeline_status_id == ^closed_pipeline_status_id)
  execute "UPDATE candidates SET pipeline_closure_time = candidates.updated_at WHERE pipeline_status_id = #{closed_pipeline_status_id}"
  end
 
