@@ -47,7 +47,11 @@
                <%= interview.date %>
               </td>
               <td width="25%" style="border: 1px solid #000;">
-               <%= interview.panelists %>
+                <%= if interview.panelists != "" do
+                  interview.panelists
+                else
+                  'N/A'
+                end %>
               </td>
               <td width="25%" style="border: 1px solid #000; border-right: 0;">
                <%= interview.result %>
