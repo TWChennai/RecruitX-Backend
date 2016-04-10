@@ -4,13 +4,13 @@ defmodule RecruitxBackend.CandidateSpec do
   import Ecto.Query
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.Role
-  alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.Skill
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.Skill
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
@@ -297,8 +297,8 @@ defmodule RecruitxBackend.CandidateSpec do
 
       Candidate.get_formatted_interviews_with_result(candidates)
 
-      expect RecruitxBackend.Interview |> to(accepted :format_with_result_and_panelist, [interview1])
-      expect RecruitxBackend.Interview |> to(accepted :format_with_result_and_panelist, [interview2])
+      expect Interview |> to(accepted :format_with_result_and_panelist, [interview1])
+      expect Interview |> to(accepted :format_with_result_and_panelist, [interview2])
     end
   end
 
@@ -341,8 +341,8 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "get the total no. of candidates in progress" do
     before do
-      Repo.delete_all Candidate
-      Repo.delete_all PipelineStatus
+      Repo.delete_all(Candidate)
+      Repo.delete_all(PipelineStatus)
     end
 
     it "should return the total no. of candidates in progress" do
@@ -382,12 +382,12 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "get all candidates pursued after pipeline closure" do
     before do
-      Repo.delete_all (Candidate)
-      Repo.delete_all (RoleInterviewType)
-      Repo.delete_all (PipelineStatus)
-      Repo.delete_all (InterviewType)
-      Repo.delete_all (InterviewStatus)
-      Repo.delete_all (Role)
+      Repo.delete_all(Candidate)
+      Repo.delete_all(RoleInterviewType)
+      Repo.delete_all(PipelineStatus)
+      Repo.delete_all(InterviewType)
+      Repo.delete_all(InterviewStatus)
+      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
@@ -450,12 +450,12 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "get all candidates rejected after pipeline closure" do
     before do
-      Repo.delete_all (Candidate)
-      Repo.delete_all (RoleInterviewType)
-      Repo.delete_all (PipelineStatus)
-      Repo.delete_all (InterviewType)
-      Repo.delete_all (InterviewStatus)
-      Repo.delete_all (Role)
+      Repo.delete_all(Candidate)
+      Repo.delete_all(RoleInterviewType)
+      Repo.delete_all(PipelineStatus)
+      Repo.delete_all(InterviewType)
+      Repo.delete_all(InterviewStatus)
+      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
@@ -518,12 +518,12 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "get_pass_candidates_within_range" do
     before do
-      Repo.delete_all (Candidate)
-      Repo.delete_all (RoleInterviewType)
-      Repo.delete_all (PipelineStatus)
-      Repo.delete_all (InterviewType)
-      Repo.delete_all (InterviewStatus)
-      Repo.delete_all (Role)
+      Repo.delete_all(Candidate)
+      Repo.delete_all(RoleInterviewType)
+      Repo.delete_all(PipelineStatus)
+      Repo.delete_all(InterviewType)
+      Repo.delete_all(InterviewStatus)
+      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
