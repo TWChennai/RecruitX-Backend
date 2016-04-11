@@ -401,8 +401,8 @@ defmodule RecruitxBackend.CandidateSpec do
       pass = create(:interview_status, name: "Pass")
       pursue = create(:interview_status, name: "Pursue")
       strong_pursue = create(:interview_status, name: "Strong Pursue")
-      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
-      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
+      candidate1_interview1 = create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
       [candidates] = Candidate.get_all_candidates_pursued_after_pipeline_closure()
 
@@ -427,7 +427,7 @@ defmodule RecruitxBackend.CandidateSpec do
       pass = create(:interview_status, name: "Pass")
       pursue = create(:interview_status, name: "Pursue")
       strong_pursue = create(:interview_status, name: "Strong Pursue")
-      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
       candidates = Candidate.get_all_candidates_pursued_after_pipeline_closure()
@@ -440,7 +440,7 @@ defmodule RecruitxBackend.CandidateSpec do
       pass = create(:interview_status, name: "Pass")
       pursue = create(:interview_status, name: "Pursue")
       strong_pursue = create(:interview_status, name: "Strong Pursue")
-      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
       candidates = Candidate.get_all_candidates_pursued_after_pipeline_closure()
 
@@ -495,7 +495,7 @@ defmodule RecruitxBackend.CandidateSpec do
       pass = create(:interview_status, name: "Pass")
       pursue = create(:interview_status, name: "Pursue")
       strong_pursue = create(:interview_status, name: "Strong Pursue")
-      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       candidate1_interview1 = create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
       [candidates] = Candidate.get_all_candidates_rejected_after_pipeline_closure()
@@ -508,7 +508,7 @@ defmodule RecruitxBackend.CandidateSpec do
       pass = create(:interview_status, name: "Pass")
       pursue = create(:interview_status, name: "Pursue")
       strong_pursue = create(:interview_status, name: "Strong Pursue")
-      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
       [candidates] = Candidate.get_all_candidates_rejected_after_pipeline_closure()
 

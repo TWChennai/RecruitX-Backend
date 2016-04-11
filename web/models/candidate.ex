@@ -61,7 +61,7 @@ defmodule RecruitxBackend.Candidate do
   # TODO: TOO many db calls - combine into single db invocation
   def get_all_candidates_pursued_after_pipeline_closure do
     # TODO: Pass in start_date and end_date as args into this fn
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
     start_date = end_date |> Date.shift(days: -4)
 
     pipeline_closed_candidates = __MODULE__
@@ -82,7 +82,7 @@ defmodule RecruitxBackend.Candidate do
   # TODO: TOO many db calls - combine into single db invocation
   def get_all_candidates_rejected_after_pipeline_closure do
     # TODO: Pass in start_date and end_date as args into this fn
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
     start_date = end_date |> Date.shift(days: -4)
 
     pipeline_closed_candidates = __MODULE__

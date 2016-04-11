@@ -49,8 +49,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     }
   end
 
-  defp get_total_no_of_rejects do
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: +1)
+  defp get_total_no_of_rejects() do
+    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
     start_date = end_date |> Date.shift(days: -4)
     Enum.count(Candidate.get_pass_candidates_within_range(start_date, end_date)) + Enum.count(Candidate.get_all_candidates_rejected_after_pipeline_closure)
   end
