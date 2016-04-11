@@ -328,10 +328,14 @@ defmodule RecruitxBackend.Interview do
 
     # TODO: Isn't there a simpler logic to join an array of strings?
   defp get_formatted_interview_panelists(interview) do
-    Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
-      accumulator <> ", " <> panelist.panelist_login_name
-    end)
-    |> String.lstrip(?,)
-    |> String.lstrip
+    if Enum.empty?(interview.interview_panelist) do
+      "NA"
+    else
+      Enum.reduce(interview.interview_panelist, "", fn(panelist, accumulator) ->
+        accumulator <> ", " <> panelist.panelist_login_name
+      end)
+      |> String.lstrip(?,)
+      |> String.lstrip
+    end
   end
 end
