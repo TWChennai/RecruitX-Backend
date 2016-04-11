@@ -25,7 +25,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
                     else: Templates.weekly_status_update_default(start_date, to_date)
     Mailer.deliver(%{
       subject: "[RecruitX] Weekly Status Update",
-      to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
+      to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
       html: email_content
     })
   end

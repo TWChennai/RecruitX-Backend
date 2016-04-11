@@ -243,7 +243,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     before do
       create(:interview, candidate_id: candidate.id)
     end
-    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")], html: "html content"}
+    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: System.get_env("CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES") |> String.split, html: "html content"}
 
     it "should not send email when the pipeline is not closed" do
       allow MailmanExtensions.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))

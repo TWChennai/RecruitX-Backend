@@ -81,7 +81,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
       email = %{
           subject: "[RecruitX] Weekly Status Update",
-          to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
+          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html: "html content"
       }
       allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
@@ -99,7 +99,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: +1))
       email = %{
           subject: "[RecruitX] Weekly Status Update",
-          to: [System.get_env("TW_CHENNAI_RECRUITMENT_TEAM_EMAIL_ADDRESS")],
+          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html: "html content"
       }
 

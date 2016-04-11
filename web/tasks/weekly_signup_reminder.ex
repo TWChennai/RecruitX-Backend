@@ -25,7 +25,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
       email_content = Templates.weekly_signup_reminder(candidates_with_insufficient_signups, candidates_with_sufficient_signups)
       Mailer.deliver(%{
         subject: "[RecruitX] Signup Reminder",
-        to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
+        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
         html: email_content
       })
     end
