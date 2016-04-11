@@ -55,7 +55,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
       {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
-      pass_pipeline = create(:pipeline_status, name: "Pass", id: 2)
+      create(:pipeline_status, name: "Pass", id: 2)
 
       allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
