@@ -106,6 +106,12 @@ defmodule RecruitxBackend.Interview do
     |> calculate_end_time
   end
 
+  def get_interviews_ordered_by_start_time do
+    from i in __MODULE__,
+    preload: [:interview_type, :interview_panelist, :interview_status, :feedback_images],
+    order_by: [i.start_time]
+  end
+
   defp within_date_range(query, start_time, end_time) do
     from i in query, where: i.start_time >= ^start_time and i.start_time <= ^end_time
   end

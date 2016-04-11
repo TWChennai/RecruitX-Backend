@@ -166,7 +166,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       Repo.delete_all(Interview)
       email = %{
         subject: "[RecruitX] Signup Reminder",
-        to: [System.get_env("TW_CHENNAI_EMAIL_ADDRESS")],
+        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
         html: "html content"
       }
       allow MailmanExtensions.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))

@@ -1,36 +1,42 @@
 <p>Hi,</p>
-<p>Here is the quick feedback for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role:</p>
-<table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
-  <thead>
-    <tr>
-      <th style="border: 1px solid #000;">Round</th>
-      <th style="border: 1px solid #000;">Panelists</th>
-      <th style="border: 1px solid #000;">Result</th>
-      <th style="border: 1px solid #000;">Date and Time</th>
-      <th style="border: 1px solid #000;">Feedback</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= for interview <- candidate.interviews do %>
-      <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %I:%M%P") %>
+<%= if Enum.empty?(candidate.interviews) do %>
+  <p>
+    The pipeline for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role</p> was closed before any of the interviews took place.
+  </p>
+<% else %>
+  <p>Here is the quick feedback for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role:</p>
+  <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
+    <thead>
       <tr>
-        <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
-        <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
-        <td style="border: 1px solid #000;"><%= formatted_interview.result %></td>
-        <td style="border: 1px solid #000;"><%= formatted_interview.date %></td>
-        <td style="border: 1px solid #000;">
-          <%= if Enum.empty?(interview.feedback_images) do %>
-           Not Provided
-         <% else %>
-           <%= for feedback_image <- interview.feedback_images do %>
-             <a href="<%= RecruitxBackend.FeedbackImage.get_full_path(feedback_image) %>">Feedback</a>
-           <% end %>
-         <% end %>
-        </td>
+        <th style="border: 1px solid #000;">Round</th>
+        <th style="border: 1px solid #000;">Panelists</th>
+        <th style="border: 1px solid #000;">Result</th>
+        <th style="border: 1px solid #000;">Date and Time</th>
+        <th style="border: 1px solid #000;">Feedback</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <%= for interview <- candidate.interviews do %>
+        <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %I:%M%P") %>
+        <tr>
+          <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
+          <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
+          <td style="border: 1px solid #000;"><%= formatted_interview.result %></td>
+          <td style="border: 1px solid #000;"><%= formatted_interview.date %></td>
+          <td style="border: 1px solid #000;">
+            <%= if Enum.empty?(interview.feedback_images) do %>
+             Not Provided
+           <% else %>
+             <%= for feedback_image <- interview.feedback_images do %>
+               <a href="<%= RecruitxBackend.FeedbackImage.get_full_path(feedback_image) %>">Feedback</a>
+             <% end %>
+           <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
 <br />
 <strong>Thanks</strong><br />
 RecruitX
