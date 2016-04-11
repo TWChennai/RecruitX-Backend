@@ -1,7 +1,7 @@
 <p>Hi,</p>
 <%= if Enum.empty?(candidate.interviews) do %>
   <p>
-    The pipeline for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role</p> was closed before any of the interviews took place.
+    The pipeline for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role was closed before any of the interviews took place.
   </p>
 <% else %>
   <p>Here is the quick feedback for the candidate <strong> <%= candidate.first_name %> <%= candidate.last_name %> </strong> who had applied for the <strong> <%= candidate.role.name %> </strong> role:</p>
@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       <%= for interview <- candidate.interviews do %>
-        <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%D at %I:%M%P") %>
+        <% formatted_interview = RecruitxBackend.Interview.format_with_result_and_panelist(interview, "%d/%m/%y at %I:%M%P") %>
         <tr>
           <td style="border: 1px solid #000;"><%= formatted_interview.name %></td>
           <td style="border: 1px solid #000;"><%= formatted_interview.panelists %></td>
