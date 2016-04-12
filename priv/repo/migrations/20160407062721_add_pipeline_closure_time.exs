@@ -2,9 +2,6 @@ defmodule RecruitxBackend.Repo.Migrations.AddPipelineClosureTime do
  use Ecto.Migration
 
  alias RecruitxBackend.PipelineStatus
- alias RecruitxBackend.Candidate
-
- import Ecto.Query
 
  def change do
    alter table(:candidates) do

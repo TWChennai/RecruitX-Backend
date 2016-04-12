@@ -355,31 +355,6 @@ defmodule RecruitxBackend.CandidateSpec do
     end
   end
 
-  context "pipeline closure within date range" do
-
-    it "should return candidate with pipeline closure time within given date range" do
-      pipeline_closure_time = Date.now
-      start_date = pipeline_closure_time |> Date.shift(days: -1)
-      end_date = pipeline_closure_time |> Date.shift(days: 1)
-      candidate = create(:candidate, other_skills: "Other Skills", pipeline_closure_time: pipeline_closure_time)
-
-      candidate_result = Candidate |> Candidate.pipeline_closure_within_range(start_date, end_date) |> Repo.one
-
-      expect(candidate_result) |> to(be(candidate))
-    end
-
-    it "should NOT return candidate with pipeline closure time NOT within given date range" do
-      pipeline_closure_time = Date.now
-      start_date = pipeline_closure_time |> Date.shift(days: 1)
-      end_date = pipeline_closure_time |> Date.shift(days: 2)
-      create(:candidate, other_skills: "Other Skills", pipeline_closure_time: pipeline_closure_time)
-
-      candidate_result = Candidate |> Candidate.pipeline_closure_within_range(start_date, end_date) |> Repo.one
-
-      expect(candidate_result) |> to(be(nil))
-    end
-  end
-
   context "get all candidates pursued after pipeline closure" do
     before do
       Repo.delete_all(Candidate)

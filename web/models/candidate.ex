@@ -53,8 +53,7 @@ defmodule RecruitxBackend.Candidate do
     existing_changeset
   end
 
-  # TODO: Do not expose a method from private to public just so that it can be tested. ESPECIALLY A SINGLE-LINE METHOD!!!
-  def pipeline_closure_within_range(query, start_date, end_date) do
+  defp pipeline_closure_within_range(query, start_date, end_date) do
     from c in query, where: c.pipeline_closure_time >= ^start_date and c.pipeline_closure_time <= ^end_date
   end
 
@@ -168,12 +167,11 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_total_no_of_candidates_in_progress do
-    # TODO: Use a 'join' to accomplish this in one db call
-    in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
     (from c in __MODULE__,
-    where: c.pipeline_status_id == ^in_progress_id)
-    # TODO: Use Ectoo to get the count directly - instead of loading into VM memory and then counting the number of ohjects
-    |> Repo.all |> Enum.count
+    join: p in assoc(c, :pipeline_status),
+    where: p.name == ^PipelineStatus.in_progress,
+    select: count(c.id))
+      |> Repo.one
   end
 
   def get_formatted_interviews_with_result(candidate) do
