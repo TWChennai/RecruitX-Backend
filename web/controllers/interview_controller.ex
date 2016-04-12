@@ -51,7 +51,10 @@ defmodule RecruitxBackend.InterviewController do
     interview = Interview.get_interviews_with_associated_data |> Repo.get(id)
     case interview do
       nil -> conn |> put_status(:not_found) |> render(ErrorView, "404.json")
-      _ -> conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
+      _ ->
+        previous_interview_status = Interview.get_last_completed_rounds_status_for(interview.candidate_id, interview.start_time)
+        interview = Map.put(interview, :previous_interview_status, previous_interview_status)
+        conn |> render("show.json", interview: interview |> Repo.preload(:feedback_images))
     end
   end
 

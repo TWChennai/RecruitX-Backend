@@ -460,6 +460,38 @@ defmodule RecruitxBackend.InterviewSpec do
     end
   end
 
+  describe "get_last_completed_rounds_status_for" do
+    it "should return true for first interviews" do
+      candidate = create(:candidate)
+      interview = create(:interview, candidate_id: candidate.id)
+
+      actual_value = Interview.get_last_completed_rounds_status_for(candidate.id, interview.start_time )
+
+      expect(actual_value) |> to(be(true))
+    end
+
+    it "should return true if previous interview has feedback" do
+      candidate = create(:candidate)
+      create(:interview, candidate_id: candidate.id, start_time: Date.now()|> Date.shift(days: -1), interview_status_id: 1)
+      interview2 = create(:interview, candidate_id: candidate.id, start_time: Date.now())
+
+      actual_value = Interview.get_last_completed_rounds_status_for(candidate.id, interview2.start_time )
+
+      expect(actual_value) |> to(be(true))
+    end
+
+    it "should return false if previous interview has NO feedback" do
+      candidate = create(:candidate)
+      create(:interview, candidate_id: candidate.id, start_time: Date.now()|> Date.shift(days: -1))
+      interview2 = create(:interview, candidate_id: candidate.id, start_time: Date.now())
+
+      actual_value = Interview.get_last_completed_rounds_status_for(candidate.id, interview2.start_time )
+
+      expect(actual_value) |> to(be(false))
+    end
+
+  end
+
   describe "validation for updating the interview schedule" do
     let :tomorrow, do: Date.now() |> Date.shift(days: 1)
     let :candidate, do: create(:candidate)

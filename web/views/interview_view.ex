@@ -86,7 +86,8 @@ defmodule RecruitxBackend.InterviewView do
       candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills.json"),
       status_id: interview.interview_status_id,
       panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json"),
-      feedback_images: render_many(interview.feedback_images, FeedbackImageView, "feedback_image.json")
+      feedback_images: render_many(interview.feedback_images, FeedbackImageView, "feedback_image.json"),
+      previous_interview_status: interview.previous_interview_status
     }
   end
 end

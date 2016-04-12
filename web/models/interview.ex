@@ -80,6 +80,21 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
+  def get_last_completed_rounds_status_for(candidate_id, interview_start_time) do
+    no_of_interviews_with_no_feedback =
+                              (from i in __MODULE__,
+                              where: i.candidate_id == ^candidate_id and
+                              is_nil(i.interview_status_id) and
+                              i.start_time < ^ interview_start_time,
+                              select: count(i.id)
+                              )
+                              |> Repo.one
+    case no_of_interviews_with_no_feedback do
+      0 -> true
+      _ -> false
+    end
+  end
+
   def get_candidates_with_all_rounds_completed do
     (from i in __MODULE__,
       group_by: i.candidate_id,
