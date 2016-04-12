@@ -163,18 +163,6 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     end
   end
 
-  context "trigger check_signup_validity" do
-    it "should raise exception when trying to insert more than 2 panelists for the same interview" do
-      interview = create(:interview)
-      create(:interview_panelist, interview_id: interview.id)
-      create(:interview_panelist, interview_id: interview.id)
-
-      create = fn -> create(:interview_panelist, interview_id: interview.id) end
-
-      expect(create).to raise_exception(Elixir.Postgrex.Error, "ERROR (raise_exception): More than 2 sign-ups not allowed")
-    end
-  end
-
   describe "query" do
     context "get_interviews_for" do
       before do:  Repo.delete_all(InterviewPanelist)

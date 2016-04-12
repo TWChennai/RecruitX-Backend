@@ -2,7 +2,10 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValuesForQa do
   use Ecto.Migration
 
   alias RecruitxBackend.Role
+  alias RecruitxBackend.Repo
   alias RecruitxBackend.InterviewType
+
+  import Ecto.Query, only: [from: 2, where: 2]
 
   def change do
     qa_role_id = Role.retrieve_by_name(Role.qa).id
@@ -20,8 +23,8 @@ defmodule RecruitxBackend.Repo.Migrations.InsertExperienceMatrixValuesForQa do
       "candidate_experience_lower_bound" => candidate_experience_lower_bound,
       "candidate_experience_upper_bound" => candidate_experience_upper_bound,
       "interview_type" => interview_type} ->
-        interview_type = interview_type |> InterviewType.retrieve_by_name
-        execute "INSERT INTO experience_matrices (panelist_experience_lower_bound, candidate_experience_lower_bound, candidate_experience_upper_bound, interview_type_id, role_id, inserted_at, updated_at) VALUES (#{Decimal.new(panelist_experience_lower_bound)}, #{Decimal.new(candidate_experience_lower_bound)}, #{Decimal.new(candidate_experience_upper_bound)}, #{interview_type.id}, #{qa_role_id}, now(), now());"
+        interview_type_id = (from it in InterviewType, where: it.name==^interview_type, select: it.id) |> Repo.one
+        execute "INSERT INTO experience_matrices (panelist_experience_lower_bound, candidate_experience_lower_bound, candidate_experience_upper_bound, interview_type_id, role_id, inserted_at, updated_at) VALUES (#{Decimal.new(panelist_experience_lower_bound)}, #{Decimal.new(candidate_experience_lower_bound)}, #{Decimal.new(candidate_experience_upper_bound)}, #{interview_type_id}, #{qa_role_id}, now(), now());"
     end)
   end
 end

@@ -58,7 +58,8 @@ defmodule RecruitxBackend.Factory do
   def factory(:interview_type) do
     %InterviewType{
       name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}"),   # TODO: Find a way to specify from a list of known langugages
-      priority: :rand.uniform(4)
+      priority: :rand.uniform(4),
+      max_sign_up_limit: 2
     }
   end
 

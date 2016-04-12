@@ -3,6 +3,9 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleInterviewType do
 
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
+  alias RecruitxBackend.Repo
+
+  import Ecto.Query, only: [from: 2, where: 2]
 
   def change do
     create table(:role_interview_types) do
@@ -23,7 +26,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleInterviewType do
       InterviewType.leadership,
       InterviewType.p3
     ], fn interview_type_value ->
-      interview_type_id = InterviewType.retrieve_by_name(interview_type_value).id
+      interview_type_id = (from it in InterviewType, where: it.name==^interview_type_value, select: it.id) |> Repo.one
       execute "INSERT INTO role_interview_types (role_id, interview_type_id, inserted_at, updated_at) VALUES (#{dev_role.id}, #{interview_type_id}, now(), now());"
     end)
 
@@ -34,7 +37,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleInterviewType do
       InterviewType.leadership,
       InterviewType.p3
     ], fn interview_type_value ->
-      interview_type_id = InterviewType.retrieve_by_name(interview_type_value).id
+      interview_type_id = (from it in InterviewType, where: it.name==^interview_type_value, select: it.id) |> Repo.one
       execute "INSERT INTO role_interview_types (role_id, interview_type_id, inserted_at, updated_at) VALUES (#{qa_role.id}, #{interview_type_id}, now(), now());"
     end)
   end

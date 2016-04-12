@@ -22,7 +22,8 @@ defmodule RecruitxBackend.SignUpEvaluator do
     signup_counts: signup_counts,
     experience_eligibility_criteria: populate_experience_eligiblity_criteria(panelist_experience, retrieved_panelist_role),
     interview_type_specfic_criteria: InterviewType.get_type_specific_panelists,
-    panelist_role: retrieved_panelist_role
+    panelist_role: retrieved_panelist_role,
+    interview_type_based_sign_up_limits: InterviewType.get_sign_up_limits
     }
   end
 

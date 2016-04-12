@@ -6,11 +6,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluator
 
-  @max_count 2
-  # TODO: Move the magic number (2) into the db
-
-  def max_count, do: @max_count
-
   schema "interview_panelists" do
     field :panelist_login_name, :string
     field :satisfied_criteria, :string

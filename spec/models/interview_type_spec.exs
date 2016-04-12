@@ -72,14 +72,14 @@ defmodule RecruitxBackend.InterviewTypeSpec do
   context "unique_constraint" do
     it "should be invalid when interview already exists with same name" do
       new_interview_type = create(:interview_type)
-      valid_interview = InterviewType.changeset(%InterviewType{}, %{name: new_interview_type.name})
+      valid_interview = InterviewType.changeset(%InterviewType{}, fields_for(:interview_type, name: new_interview_type.name))
       {:error, changeset} = Repo.insert(valid_interview)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
 
     it "should be invalid when interview already exists with same name but different case" do
       new_interview_type = create(:interview_type)
-      valid_interview = InterviewType.changeset(%InterviewType{}, %{name: String.upcase(new_interview_type.name)})
+      valid_interview = InterviewType.changeset(%InterviewType{}, fields_for(:interview_type, name: String.upcase(new_interview_type.name)))
       {:error, changeset} = Repo.insert(valid_interview)
       expect(changeset) |> to(have_errors(name: "has already been taken"))
     end
@@ -172,6 +172,28 @@ defmodule RecruitxBackend.InterviewTypeSpec do
       interview_type = InterviewType.retrieve_by_name("test")
 
       expect(interview_type) |> to(be_nil)
+    end
+  end
+
+  context "get_sign_up_limits" do
+    it "should give the maximum sign up limit for all interview rounds" do
+      Repo.delete_all(Interview)
+      Repo.delete_all(InterviewType)
+
+      interview_type_1 = create(:interview_type)
+      interview_type_2 = create(:interview_type)
+
+      [result1, result2] = InterviewType.get_sign_up_limits
+
+      expect result1 |> to(be({interview_type_1.id, interview_type_1.max_sign_up_limit}))
+      expect result2 |> to(be({interview_type_2.id, interview_type_2.max_sign_up_limit}))
+    end
+
+    it "should give an empty result set when no entries are present" do
+      Repo.delete_all(Interview)
+      Repo.delete_all(InterviewType)
+
+      expect InterviewType.get_sign_up_limits |> to(be([]))
     end
   end
 end

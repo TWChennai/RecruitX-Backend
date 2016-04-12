@@ -11,18 +11,15 @@ defmodule RecruitxBackend.InterviewType do
   schema "interview_types" do
     field :name, :string
     field :priority, :integer
+    field :max_sign_up_limit, :integer
 
     timestamps
 
     has_many :interviews, Interview
   end
 
-  @required_fields ~w(name)
+  @required_fields ~w(name max_sign_up_limit)
   @optional_fields ~w(priority)
-
-  def default_order(query) do
-    from i in query, order_by: [asc: i.priority, asc: i.id]
-  end
 
   def changeset(model, params \\ :empty) do
     model
@@ -46,12 +43,19 @@ defmodule RecruitxBackend.InterviewType do
     }
   end
 
+  def default_order(query) do
+    from i in query, order_by: [asc: i.priority, asc: i.id]
+  end
+
   def get_ids_of_min_priority_round do
     (from it in __MODULE__,
       select: it.id,
       where: fragment("? = (select it.priority from interview_types it order by it.priority limit 1)", it.priority))
       |> Repo.all
   end
+
+  def get_sign_up_limits,
+    do: (from it in __MODULE__, select: {it.id, it.max_sign_up_limit}) |> Repo.all
 
   def retrieve_by_name(name), do: (from it in __MODULE__, where: it.name == ^name) |> Repo.one
 end

@@ -305,7 +305,7 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(actual_interview.id) |> to(be(interview.id))
     end
 
-    it "should return interviews with one panelists" do
+    it "should return interviews with panelists count less than the max_sign_up_limit" do
       interview_panelist = create(:interview_panelist)
 
       actual_interview = Interview.interviews_with_insufficient_panelists |> Repo.one
@@ -313,7 +313,7 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(actual_interview.id) |> to(be(interview_panelist.interview_id))
     end
 
-    it "should not return interviews with two panelists" do
+    it "should not return interviews with panelists equal to max_sign_up_limit" do
       interview = create(:interview)
       create(:interview_panelist, interview_id: interview.id, panelist_login_name: "dinesh")
       create(:interview_panelist, interview_id: interview.id, panelist_login_name: "ashwin")

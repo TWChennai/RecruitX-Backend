@@ -1,7 +1,6 @@
 defmodule RecruitxBackend.InterviewRelativeEvaluator do
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.SignUpEvaluationStatus
   alias Timex.Date
 
@@ -12,7 +11,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
     |> has_not_interviewed_candidate(sign_up_data_container.candidate_ids_interviewed, interview)
     |> has_no_other_interview_within_time_buffer(sign_up_data_container.my_previous_sign_up_start_times, interview)
     |> is_interview_not_over(interview)
-    |> is_signup_count_lesser_than_max(sign_up_data_container.signup_counts, interview.id)
+    |> is_signup_count_lesser_than_max(sign_up_data_container.signup_counts, sign_up_data_container.interview_type_based_sign_up_limits, interview)
   end
 
   defp has_not_interviewed_candidate(sign_up_evaluation_status, candidate_ids_interviewed, interview) do
@@ -36,9 +35,10 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
     sign_up_evaluation_status
   end
 
-  defp is_signup_count_lesser_than_max(sign_up_evaluation_status, signup_counts, interview_id) do
-    if sign_up_evaluation_status.valid? and !is_signup_lesser_than_max_count(interview_id, signup_counts) do
-      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup_count, "More than #{InterviewPanelist.max_count} signups are not allowed"})
+  defp is_signup_count_lesser_than_max(sign_up_evaluation_status, signup_counts, interview_type_based_sign_up_limits, interview) do
+    max_sign_up_limit = Enum.find_value(interview_type_based_sign_up_limits, 0, fn({interview_type_id, max_sign_up_limit}) -> interview_type_id == interview.interview_type_id && max_sign_up_limit end)
+    if sign_up_evaluation_status.valid? and !is_signup_lesser_than_max_count(interview.id, signup_counts, max_sign_up_limit) do
+      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup_count, "More than #{max_sign_up_limit} signups are not allowed"})
     end
     sign_up_evaluation_status
   end
@@ -53,8 +53,8 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
     !Enum.member?(candidate_ids_interviewed, model.candidate_id)
   end
 
-  defp is_signup_lesser_than_max_count(model_id, signup_counts) do
-    result = Enum.filter(signup_counts, fn(i) -> i.interview_id == model_id end)
-    result == [] or List.first(result).signup_count < InterviewPanelist.max_count
+  defp is_signup_lesser_than_max_count(model_id, signup_counts, max_sign_up_limit) do
+    signup_count = Enum.find_value(signup_counts, 0, fn(i) -> i.interview_id == model_id && i.signup_count end)
+    signup_count < max_sign_up_limit
   end
 end

@@ -105,7 +105,7 @@ defmodule RecruitxBackend.Interview do
     __MODULE__
     |> join(:left, [i], ip in assoc(i, :interview_panelist))
     |> group_by([i], i.id)
-    |> having([i], count(i.id) < ^InterviewPanelist.max_count)
+    |> having([i], count(i.id) < fragment("(select max_sign_up_limit from interview_types where id = ?)", i.interview_type_id))
   end
 
   def changeset(model, params \\ :empty) do
