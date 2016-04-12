@@ -13,6 +13,9 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Repo
   alias Timex.Date
   alias Timex.DateFormat
+  alias Timex.Timezone
+
+  @interview_time_zone_name "Asia/Kolkata"
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -777,7 +780,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should contain interview names, date, result, panelists for the candidate in the result" do
       interview_panelist = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
-      {:ok , interview_date} = interview.start_time |> DateFormat.format("%d/%m/%y", :strftime)
+      {:ok , interview_date} = interview.start_time |> Timezone.convert(@interview_time_zone_name) |> DateFormat.format("%d/%m/%y", :strftime)
 
       input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
 

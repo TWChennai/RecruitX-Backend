@@ -506,8 +506,6 @@ defmodule RecruitxBackend.CandidateSpec do
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
-    let :start_date, do: Date.now |> Date.shift(days: -5)
-    let :end_date, do: Date.now |> Date.shift(days: -1)
     let :previous_week, do: %PreviousWeek{}
 
     it "should return 1 when a candidate is pass in an interview within range and pipeline is pass" do
