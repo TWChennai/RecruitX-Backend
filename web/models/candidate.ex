@@ -57,11 +57,7 @@ defmodule RecruitxBackend.Candidate do
     from c in query, where: c.pipeline_closure_time >= ^start_date and c.pipeline_closure_time <= ^end_date
   end
 
-  def get_candidates_pursued_and_rejected_after_pipeline_closure_separately do
-    # TODO: Pass in start_date and end_date as args into this fn
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
-    start_date = end_date |> Date.shift(days: -4)
-
+  def get_candidates_pursued_and_rejected_after_pipeline_closure_separately(%{starting: start_date, ending: end_date}) do
     pipeline_closed_candidates = __MODULE__
                                   |> pipeline_closure_within_range(start_date, end_date)
                                   |> Repo.all
@@ -77,12 +73,12 @@ defmodule RecruitxBackend.Candidate do
       end)
   end
 
-  def get_pass_candidates_within_range(start_date, end_date) do
+  def get_no_of_pass_candidates_within_range(%{starting: start_date, ending: end_date}) do
     pass_status_id = (PipelineStatus.retrieve_by_name(PipelineStatus.pass)).id
     candidates_passed = (from c in __MODULE__, where: c.pipeline_status_id == ^pass_status_id) |> Repo.all
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
 
-    Enum.filter(candidates_passed, fn(candidate) ->
+    Enum.count(candidates_passed, fn(candidate) ->
       Enum.any?(last_interviews_data, fn (last_interview)->
         [candidate_id, max_start_time, _] = last_interview
         pass_interview_start_time = Date.from(max_start_time)

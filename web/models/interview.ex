@@ -41,13 +41,13 @@ defmodule RecruitxBackend.Interview do
   @optional_fields ~w(interview_status_id)
 
   def now_or_in_next_seven_days(query) do
-    start_of_today = Date.set(Date.now, time: {0, 0, 0})
+    start_of_today = Date.beginning_of_day(Date.now)
     seven_days_from_now = start_of_today |> Date.shift(days: 7)
     within_date_range(query, start_of_today, seven_days_from_now)
   end
 
   def now_or_in_previous_five_days(query) do
-    start_of_today = Date.set(Date.now, time: {0, 0, 0})
+    start_of_today = Date.beginning_of_day(Date.now)
     five_days_ago = start_of_today |> Date.shift(days: -5)
     within_date_range(query, five_days_ago, start_of_today)
   end

@@ -6,8 +6,11 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.PreviousWeek
   alias Timex.Date
   alias Timex.DateFormat
+
+  @previous_week %PreviousWeek{}
 
   def execute do
     query = Interview |> Interview.now_or_in_previous_five_days |> preload([:interview_panelist, :interview_status, :interview_type])
@@ -19,8 +22,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
                   |> filter_out_candidates_without_interviews
                   |> construct_view_data
     summary = candidates |> construct_summary_data
-    {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
-    {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, start_date} = @previous_week.starting |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, to_date} = @previous_week.ending |> DateFormat.format("{D}/{M}/{YY}")
     email_content = if candidates != [], do: Templates.weekly_status_update(start_date, to_date, candidates, summary),
                     else: Templates.weekly_status_update_default(start_date, to_date)
     Mailer.deliver(%{
@@ -40,7 +43,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   end
 
   defp construct_summary_data(candidates) do
-    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately
+    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(@previous_week)
     %{
       candidates_appeared: Enum.count(candidates),
       interviews_count: candidates |> get_total_no_of_interviews,
@@ -51,9 +54,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   end
 
   defp get_total_no_of_rejects(candidates_rejected) do
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
-    start_date = end_date |> Date.shift(days: -4)
-    Enum.count(Candidate.get_pass_candidates_within_range(start_date, end_date)) + Enum.count(candidates_rejected)
+    Candidate.get_no_of_pass_candidates_within_range(@previous_week) + Enum.count(candidates_rejected)
   end
 
   defp get_total_no_of_interviews(candidates) do

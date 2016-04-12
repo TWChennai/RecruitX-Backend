@@ -11,6 +11,7 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.PreviousWeek
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
@@ -370,6 +371,7 @@ defmodule RecruitxBackend.CandidateSpec do
     let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
     let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
     let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+    let :previous_week, do: %PreviousWeek{}
 
     it "should return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
@@ -379,7 +381,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
-      {[candidates], _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {[candidates], _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be(candidate1))
     end
@@ -392,7 +394,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
-      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be([]))
     end
@@ -405,7 +407,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
-      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be([]))
     end
@@ -417,7 +419,7 @@ defmodule RecruitxBackend.CandidateSpec do
       create(:interview_status, name: "Strong Pursue")
       create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
-      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be([]))
     end
@@ -438,6 +440,7 @@ defmodule RecruitxBackend.CandidateSpec do
     let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
     let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
     let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+    let :previous_week, do: %PreviousWeek{}
 
     it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
@@ -447,7 +450,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
       create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
-      {_, candidates}= Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {_, candidates}= Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be([]))
     end
@@ -460,7 +463,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
-      {_, candidates} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {_, candidates} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be([]))
     end
@@ -473,7 +476,7 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
-      {_, [candidates]} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {_, [candidates]} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be(candidate1))
     end
@@ -485,13 +488,13 @@ defmodule RecruitxBackend.CandidateSpec do
       create(:interview_status, name: "Strong Pursue")
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
-      {_, [candidates]} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately()
+      {_, [candidates]} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
 
       expect(candidates) |> to(be(candidate1))
     end
   end
 
-  context "get_pass_candidates_within_range" do
+  context "get_no_of_pass_candidates_within_range" do
     before do
       Repo.delete_all(Candidate)
       Repo.delete_all(RoleInterviewType)
@@ -505,8 +508,9 @@ defmodule RecruitxBackend.CandidateSpec do
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
     let :start_date, do: Date.now |> Date.shift(days: -5)
     let :end_date, do: Date.now |> Date.shift(days: -1)
+    let :previous_week, do: %PreviousWeek{}
 
-    it "should return candidate who is a pass in an interview within range and pipeline is pass" do
+    it "should return 1 when a candidate is pass in an interview within range and pipeline is pass" do
       create(:pipeline_status, name: "In Progress")
       pass_pipeline_status = create(:pipeline_status, name: "Pass")
       create(:pipeline_status, name: "Closed")
@@ -517,12 +521,12 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
-      [candidates] = Candidate.get_pass_candidates_within_range(start_date, end_date)
+      candidates_count = Candidate.get_no_of_pass_candidates_within_range(previous_week)
 
-      expect(candidates) |> to(be(candidate1))
+      expect(candidates_count) |> to(be(1))
     end
 
-    it "should NOT return candidate who is pass in an interview NOT IN RANGE and pipeline is pass" do
+    it "should return 0 when candidate is pass in an interview NOT IN RANGE and pipeline is pass" do
       create(:pipeline_status, name: "In Progress")
       pass_pipeline_status = create(:pipeline_status, name: "Pass")
       create(:pipeline_status, name: "Closed")
@@ -533,12 +537,12 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: +1), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
-      candidates = Candidate.get_pass_candidates_within_range(start_date, end_date)
+      candidates_count = Candidate.get_no_of_pass_candidates_within_range(previous_week)
 
-      expect(candidates) |> to(be([]))
+      expect(candidates_count) |> to(be(0))
     end
 
-    it "should NOT return candidate who is pursue in an interview within range" do
+    it "should return 0 when candidate is pursue in an interview within range" do
       progress_pipeline_status = create(:pipeline_status, name: "In Progress")
       create(:pipeline_status, name: "Pass")
       create(:pipeline_status, name: "Closed")
@@ -549,9 +553,9 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = create(:candidate, pipeline_status_id: progress_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
-      candidates = Candidate.get_pass_candidates_within_range(start_date, end_date)
+      candidates_count = Candidate.get_no_of_pass_candidates_within_range(previous_week)
 
-      expect(candidates) |> to(be([]))
+      expect(candidates_count) |> to(be(0))
     end
   end
 end
