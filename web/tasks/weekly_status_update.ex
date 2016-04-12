@@ -40,19 +40,20 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   end
 
   defp construct_summary_data(candidates) do
+    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately
     %{
       candidates_appeared: Enum.count(candidates),
       interviews_count: candidates |> get_total_no_of_interviews,
       candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress,
-      candidates_pursued: Enum.count(Candidate.get_all_candidates_pursued_after_pipeline_closure),
-      candidates_rejected: get_total_no_of_rejects
+      candidates_pursued: Enum.count(candidates_pursued),
+      candidates_rejected: get_total_no_of_rejects(candidates_rejected)
     }
   end
 
-  defp get_total_no_of_rejects() do
+  defp get_total_no_of_rejects(candidates_rejected) do
     end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
     start_date = end_date |> Date.shift(days: -4)
-    Enum.count(Candidate.get_pass_candidates_within_range(start_date, end_date)) + Enum.count(Candidate.get_all_candidates_rejected_after_pipeline_closure)
+    Enum.count(Candidate.get_pass_candidates_within_range(start_date, end_date)) + Enum.count(candidates_rejected)
   end
 
   defp get_total_no_of_interviews(candidates) do

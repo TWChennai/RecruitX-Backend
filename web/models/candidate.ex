@@ -57,8 +57,7 @@ defmodule RecruitxBackend.Candidate do
     from c in query, where: c.pipeline_closure_time >= ^start_date and c.pipeline_closure_time <= ^end_date
   end
 
-  # TODO: TOO many db calls - combine into single db invocation
-  def get_all_candidates_pursued_after_pipeline_closure do
+  def get_candidates_pursued_and_rejected_after_pipeline_closure_separately do
     # TODO: Pass in start_date and end_date as args into this fn
     end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
     start_date = end_date |> Date.shift(days: -4)
@@ -71,30 +70,10 @@ defmodule RecruitxBackend.Candidate do
     strong_pursue_interview_status_id = (InterviewStatus.strong_pursue |> InterviewStatus.retrieve_by_name).id
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
 
-    Enum.filter(
+    Enum.partition(
       pipeline_closed_candidates, fn(candidate) ->
         status = Interview.get_last_interview_status_for(candidate, last_interviews_data)
         status == strong_pursue_interview_status_id || status == pursue_interview_status_id
-      end)
-  end
-
-  # TODO: TOO many db calls - combine into single db invocation
-  def get_all_candidates_rejected_after_pipeline_closure do
-    # TODO: Pass in start_date and end_date as args into this fn
-    end_date = Date.set(Date.now, time: {0, 0, 0}) |> Date.shift(days: -1)
-    start_date = end_date |> Date.shift(days: -4)
-
-    pipeline_closed_candidates = __MODULE__
-                                  |> pipeline_closure_within_range(start_date, end_date)
-                                  |> Repo.all
-
-    pass_interview_status_id = (InterviewStatus.pass |> InterviewStatus.retrieve_by_name).id
-    last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
-
-    Enum.filter(
-      pipeline_closed_candidates, fn(candidate) ->
-        status = Interview.get_last_interview_status_for(candidate, last_interviews_data)
-        status == pass_interview_status_id || is_nil(status)
       end)
   end
 
