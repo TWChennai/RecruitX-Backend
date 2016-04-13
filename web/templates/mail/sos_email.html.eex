@@ -1,0 +1,51 @@
+<p>Hi all,</p>
+<p>We have the following interviews scheduled in next 48 hrs without the required number of Panelist. Kindly signup for them ASAP.</p>
+
+<h4>Interviews that need signups</h4>
+  <table cellpadding="10" style="border: 1px solid #000; border-collapse: collapse;">
+    <thead>
+    <tr>
+      <th style="border: 1px solid #000;">Candidate</th>
+      <th style="border: 1px solid #000;">Role</th>
+      <th style="border: 1px solid #000;">Experience</th>
+      <th style="border: 1px solid #000;">Skills</th>
+      <th style="border: 1px solid #000;">Round Name</th>
+      <th style="border: 1px solid #000;">Schedule</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%= for interview <- interviews_with_insufficient_panelists do %>
+      <tr>
+        <td style="border: 1px solid #000;">
+          <%= interview.candidate.name %>
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.candidate.role %>
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.candidate.experience %> yrs
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.candidate.skills |> String.rstrip |> String.rstrip(?,) %>
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.name%>
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.date%>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+
+<br />
+<div>
+  <p>Not on RecruitX yet ?</p>
+  <img height="120px" width="120px" style="padding-right: 15px; border-right: 1px solid #000;" src='<%= System.get_env("QR_CODE_URL") %>' />
+  <a href='<%= System.get_env("APK_URL") %>'>
+    <img height="100px" width="100px" style="margin-left: 15px; padding-bottom: 10px;" src='<%= System.get_env("LOGO_URL") %>' />
+  </a>
+<br />
+<strong>Thanks</strong><br />
+Recruitment Team

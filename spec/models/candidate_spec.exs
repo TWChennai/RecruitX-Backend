@@ -8,7 +8,6 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.PreviousWeek
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Skill

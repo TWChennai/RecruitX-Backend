@@ -4,4 +4,5 @@ defmodule MailmanExtensions.Templates do
   EEx.function_from_file(:def, :weekly_status_update, "web/templates/mail/weekly_status_update.html.eex", [:start_date, :to_date, :candidates, :summary])
   EEx.function_from_file(:def, :weekly_status_update_default, "web/templates/mail/weekly_status_update_default.html.eex", [:start_date, :to_date])
   EEx.function_from_file(:def, :consolidated_feedback, "web/templates/mail/consolidated_feedback.html.eex", [:candidate])
+  EEx.function_from_file(:def, :sos_email, "web/templates/mail/sos_email.html.eex", [:interviews_with_insufficient_panelists])
 end
