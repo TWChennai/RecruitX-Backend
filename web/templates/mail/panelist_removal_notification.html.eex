@@ -1,0 +1,7 @@
+<p>Hi,</p>
+  <p>
+    The recruiter has unassigned you from <strong> <%= candidate_first_name %> <%= candidate_last_name %> </strong>’s <strong><%= interview_name %></strong> Interview. Please contact Recruiter for more information.
+  </p>
+<br />
+<strong>Thanks</strong><br />
+RecruitX
