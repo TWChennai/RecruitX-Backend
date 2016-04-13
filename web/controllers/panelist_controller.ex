@@ -22,7 +22,12 @@ defmodule RecruitxBackend.PanelistController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(%{path_info: ["panelists", _]} = conn, %{"id" => id}) do
+    Repo.delete_all(from i in InterviewPanelist, where: i.id == ^id)
+    send_resp(conn, :no_content, "")
+  end
+
+  def delete(%{path_info: ["remove_panelists", _]} = conn, %{"id" => id}) do
     send_notification_to_panelist(id)
     Repo.delete_all(from i in InterviewPanelist, where: i.id == ^id)
     send_resp(conn, :no_content, "")

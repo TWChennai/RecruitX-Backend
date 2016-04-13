@@ -19,6 +19,7 @@ defmodule RecruitxBackend.Router do
     resources "/interviews", InterviewController, only: [:index, :show, :update, :create]
     resources "/interviews/:interview_id/feedback_images", FeedbackImageController, only: [:create, :show]
     resources "/panelists", PanelistController, only: [:create, :show, :delete]
+    resources "/remove_panelists", PanelistController, only: [:delete]
     resources "/interview_statuses", InterviewStatusController, only: [:index]
     resources "/pipeline_statuses", PipelineStatusController, only: [:index]
   end
