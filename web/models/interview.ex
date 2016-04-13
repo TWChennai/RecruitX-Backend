@@ -105,7 +105,7 @@ defmodule RecruitxBackend.Interview do
     __MODULE__
     |> join(:left, [i], ip in assoc(i, :interview_panelist))
     |> group_by([i], i.id)
-    |> having([i], count(i.id) < fragment("(select max_sign_up_limit from interview_types where id = ?)", i.interview_type_id))
+    |> having([i], count(i.id) < fragment("(select max_sign_up_limit from interview_types where id = ?)", i.interview_type_id) or not(i.id in fragment("(select interview_id from interview_panelists where interview_id = ?)", i.id)))
   end
 
   def changeset(model, params \\ :empty) do
@@ -127,7 +127,7 @@ defmodule RecruitxBackend.Interview do
     order_by: [i.start_time]
   end
 
-  defp within_date_range(query, start_time, end_time) do
+  def within_date_range(query, start_time, end_time) do
     from i in query, where: i.start_time >= ^start_time and i.start_time <= ^end_time
   end
 

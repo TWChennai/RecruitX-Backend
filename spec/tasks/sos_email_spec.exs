@@ -23,22 +23,23 @@ defmodule RecruitxBackend.SosEmailSpec do
       expect MailmanExtensions.Templates |> (to_not(accepted :sos_email))
     end
 
-    it "should send an email with the formatted data ordered by start time" do
+    it "should send an email with the formatted data ordered by start time within the next 48 hours only" do
       Repo.delete_all Interview
 
+      allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))
       create(:interview, start_time: Date.set(Date.epoch, [date: {2011, 1, 1}]))
-      create(:interview, start_time: Date.set(Date.epoch, [date: {2011, 2, 1}]))
+      create(:interview, start_time: Date.set(Date.epoch, [date: {2011, 3, 1}]))
       allow MailmanExtensions.Templates |> to(accept(:sos_email, &(&1)))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, &(&1)))
 
-      %{html: [interview1, interview2]} = SosEmail.execute
+      %{html: [interview1]} = SosEmail.execute
 
       expect interview1.date |> to(eql("Jan-01"))
-      expect interview2.date |> to(eql("Feb-01"))
     end
 
     it "should send an email with the formatted data when there are interviews with insufficient panelists" do
       Repo.delete_all Interview
+      allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))      
       role = create(:role)
       candidate = create(:candidate, role_id: role.id, experience: Decimal.new(1))
       create(:candidate_skill, skill_id: create(:skill, name: "test skill1").id, candidate_id: candidate.id)

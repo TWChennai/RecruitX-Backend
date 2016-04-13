@@ -316,6 +316,16 @@ defmodule RecruitxBackend.InterviewSpec do
       expect(actual_interview.id) |> to(be(interview_panelist.interview_id))
     end
 
+    it "should return interview when the max_sign_up_limit is one and the interview has no sign_up" do
+      Repo.delete_all Interview
+      interview_type = create(:interview_type, max_sign_up_limit: 1)
+      interview = create(:interview, interview_type_id: interview_type.id)
+
+      result = Interview.interviews_with_insufficient_panelists |> Repo.one
+
+      expect(result.id) |> to(be(interview.id))
+    end
+
     it "should not return interviews with panelists equal to max_sign_up_limit" do
       interview = create(:interview)
       create(:interview_panelist, interview_id: interview.id, panelist_login_name: "dinesh")
