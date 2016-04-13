@@ -37,9 +37,23 @@ defmodule RecruitxBackend.SosEmailSpec do
       expect interview1.date |> to(eql("Jan-01"))
     end
 
-    it "should send an email with the formatted data when there are interviews with insufficient panelists" do
+    it "should send an email with the formatted data when there are interviews with less than required signups" do
       Repo.delete_all Interview
-      allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))      
+      Repo.delete_all InterviewPanelist
+      allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))
+      interview = create(:interview, start_time: Date.set(Date.epoch, [date: {2011, 1, 1}]))
+      Repo.insert(%InterviewPanelist{panelist_login_name: "test", interview_id: interview.id})
+      allow MailmanExtensions.Templates |> to(accept(:sos_email, &(&1)))
+      allow MailmanExtensions.Mailer |> to(accept(:deliver, &(&1)))
+
+      %{html: [%{count_of_panelists_required: count_of_panelists_required}]} = SosEmail.execute
+
+      expect(count_of_panelists_required) |> to(be(1))
+    end
+
+    it "should send an email with the formatted data when there are interviews with zero signups" do
+      Repo.delete_all Interview
+      allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))
       role = create(:role)
       candidate = create(:candidate, role_id: role.id, experience: Decimal.new(1))
       create(:candidate_skill, skill_id: create(:skill, name: "test skill1").id, candidate_id: candidate.id)
@@ -61,6 +75,7 @@ defmodule RecruitxBackend.SosEmailSpec do
      expect interview.name |> to(eql(interview_type.name))
      expect interview.date |> to(eql("Jan-01"))
      expect interview.candidate.skills |> to(eql("test skill1, test skill2"))
+     expect interview.count_of_panelists_required |> to(eql(interview_type.max_sign_up_limit))
     end
   end
 end

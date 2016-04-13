@@ -1,4 +1,5 @@
 defmodule RecruitxBackend.Interview do
+
   use RecruitxBackend.Web, :model
 
   alias Ecto.Changeset

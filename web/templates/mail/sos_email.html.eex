@@ -11,6 +11,7 @@
       <th style="border: 1px solid #000;">Skills</th>
       <th style="border: 1px solid #000;">Round Name</th>
       <th style="border: 1px solid #000;">Schedule</th>
+      <th style="border: 1px solid #000;">Number of Panelists Required</th>
     </tr>
     </thead>
     <tbody>
@@ -33,6 +34,9 @@
         </td>
         <td style="border: 1px solid #000;">
           <%= interview.date%>
+        </td>
+        <td style="border: 1px solid #000;">
+          <%= interview.count_of_panelists_required%>
         </td>
       </tr>
     <% end %>

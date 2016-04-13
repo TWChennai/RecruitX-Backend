@@ -1,5 +1,6 @@
 defmodule RecruitxBackend.SosEmail do
-  import Ecto.Query, only: [preload: 2, order_by: 2, where: 2]
+  import Ecto.Query, only: [preload: 2, order_by: 2, where: 2, select: 3]
+  import Ecto.Query.API, only: [fragment: 1]
 
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
@@ -13,6 +14,7 @@ defmodule RecruitxBackend.SosEmail do
       |> preload([:interview_type, candidate: [:role,:skills]])
       |> order_by(asc: :start_time)
       |> Interview.within_date_range(Date.now, Date.now |> Date.shift(days: 2))
+      |> select([i], {i, fragment("( select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
       |> Repo.all
       |> construct_view_data
 
@@ -26,8 +28,8 @@ defmodule RecruitxBackend.SosEmail do
   end
 
   defp construct_view_data(interviews) do
-    Enum.map(interviews, fn(interview) ->
-      %{candidate: interview.candidate |> Candidate.format}
+    Enum.map(interviews, fn({interview, count_of_panelists_required}) ->
+      %{candidate: interview.candidate |> Candidate.format, count_of_panelists_required: count_of_panelists_required}
       |> Map.merge(interview |> Interview.format)
     end)
   end
