@@ -25,16 +25,8 @@ defmodule RecruitxBackend.SosEmail do
 
   defp construct_view_data(interviews) do
     Enum.map(interviews, fn(interview) ->
-      %{
-        candidate: %{
-          name: interview.candidate.first_name <> " " <> interview.candidate.last_name,
-          role: interview.candidate.role.name,
-          experience: interview.candidate |> Candidate.get_rounded_experience,
-          skills: interview.candidate |> Candidate.get_formatted_skills
-        }
-      }
-      |> Map.merge(Interview.format interview)
+      %{candidate: interview.candidate |> Candidate.format}
+      |> Map.merge(interview |> Interview.format)
     end)
   end
-
 end

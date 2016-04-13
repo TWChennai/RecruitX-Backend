@@ -158,4 +158,13 @@ defmodule RecruitxBackend.Candidate do
     experience_as_float = String.to_float(experience_as_string)
     Float.to_string(experience_as_float, decimals: 1)
   end
+
+  def format(candidate) do
+    %{
+      name: candidate.first_name <> " " <> candidate.last_name,
+      role: candidate.role.name,
+      experience: candidate |> get_rounded_experience,
+      skills: candidate |> get_formatted_skills
+    }
+  end
 end

@@ -15,6 +15,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
+  let :previous_week, do: %RecruitxBackend.PreviousWeek{}
 
   context "valid changeset" do
     subject do: Candidate.changeset(%Candidate{}, valid_attrs)
@@ -370,7 +371,6 @@ defmodule RecruitxBackend.CandidateSpec do
     let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
     let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
     let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
-    let :previous_week, do: %PreviousWeek{}
 
     it "should return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
@@ -439,7 +439,6 @@ defmodule RecruitxBackend.CandidateSpec do
     let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
     let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
     let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
-    let :previous_week, do: %PreviousWeek{}
 
     it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
@@ -505,7 +504,6 @@ defmodule RecruitxBackend.CandidateSpec do
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
-    let :previous_week, do: %PreviousWeek{}
 
     it "should return 1 when a candidate is pass in an interview within range and pipeline is pass" do
       create(:pipeline_status, name: "In Progress")
