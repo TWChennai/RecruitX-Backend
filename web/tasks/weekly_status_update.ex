@@ -5,9 +5,8 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   alias MailmanExtensions.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.PreviousWeek
-  alias Timex.Date
+  alias RecruitxBackend.Repo
   alias Timex.DateFormat
 
   @previous_week %PreviousWeek{}

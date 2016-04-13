@@ -1,6 +1,4 @@
 defmodule MailmanExtensions.Mailer do
-  alias Mailman.Attachment
-
   def deliver(email) do
     email = override_default(email)
     Mailman.deliver(email, %Mailman.Context{})

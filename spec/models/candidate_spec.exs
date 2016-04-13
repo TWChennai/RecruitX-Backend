@@ -8,10 +8,10 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.PreviousWeek
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.PreviousWeek
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)

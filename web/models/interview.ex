@@ -9,10 +9,10 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.SignUpEvaluator
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
@@ -21,7 +21,7 @@ defmodule RecruitxBackend.Interview do
 
   import Ecto.Query
 
-  @duration_of_interview 1
+  @duration_of_interview 1  # in hours
   @interview_time_zone_name "Asia/Kolkata"
 
   schema "interviews" do
@@ -347,7 +347,7 @@ defmodule RecruitxBackend.Interview do
     }
   end
 
-    # TODO: Isn't there a simpler logic to join an array of strings?
+  # TODO: Isn't there a simpler logic to join an array of strings?
   defp get_formatted_interview_panelists(interview) do
     if Enum.empty?(interview.interview_panelist) do
       "NA"

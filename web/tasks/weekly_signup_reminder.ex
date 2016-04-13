@@ -1,10 +1,11 @@
 defmodule RecruitxBackend.WeeklySignupReminder do
   import Ecto.Query
-  alias RecruitxBackend.Repo
+
+  alias MailmanExtensions.Mailer
+  alias MailmanExtensions.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
-  alias MailmanExtensions.Templates
-  alias MailmanExtensions.Mailer
+  alias RecruitxBackend.Repo
 
   def execute do
     interview_ids = Interview.interviews_with_insufficient_panelists
