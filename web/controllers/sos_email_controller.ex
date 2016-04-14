@@ -3,8 +3,8 @@ defmodule RecruitxBackend.SosEmailController do
 
   alias RecruitxBackend.SosEmail
 
-  def create(conn, _params) do
+  def index(conn, _params) do
     SosEmail.execute
-    conn |> put_status(:ok)
+    conn |> put_status(:ok) |> json("")
   end
 end

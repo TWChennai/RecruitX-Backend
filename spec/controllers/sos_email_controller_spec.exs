@@ -3,10 +3,10 @@ defmodule RecruitxBackend.SosEmailControllerSpec do
 
   alias RecruitxBackend.SosEmail
 
-  describe "create" do
+  describe "index" do
     it "should send a sos email" do
       allow SosEmail |> to(accept(:execute, fn() -> "" end))
-      conn = action(:create, %{})
+      conn = action(:index, %{})
 
       conn |> should(have_http_status(:ok))
       expect SosEmail |> to(accepted :execute)

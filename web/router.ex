@@ -22,7 +22,7 @@ defmodule RecruitxBackend.Router do
     resources "/remove_panelists", PanelistController, only: [:delete]
     resources "/interview_statuses", InterviewStatusController, only: [:index]
     resources "/pipeline_statuses", PipelineStatusController, only: [:index]
-    resources "/sos_email", SosEmailController, only: [:create]
+    resources "/sos_email", SosEmailController, only: [:index]
   end
 
   # Other scopes may use custom stacks.
