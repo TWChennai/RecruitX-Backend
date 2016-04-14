@@ -47,7 +47,6 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
     it "should filter previous weeks interviews and construct email" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
-      Repo.delete_all PipelineStatus
 
       interview = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(days: -1))
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
@@ -55,7 +54,6 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
 
       {:ok, start_date} = Date.now |> Date.shift(days: -5) |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = Date.now |> Date.shift(days: -1) |> DateFormat.format("{D}/{M}/{YY}")
-      create(:pipeline_status, name: "Pass", id: 2)
 
       allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 

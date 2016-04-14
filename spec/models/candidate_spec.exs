@@ -343,12 +343,11 @@ defmodule RecruitxBackend.CandidateSpec do
   context "get the total no. of candidates in progress" do
     before do
       Repo.delete_all(Candidate)
-      Repo.delete_all(PipelineStatus)
     end
 
     it "should return the total no. of candidates in progress" do
-      in_progress_pipeline = create(:pipeline_status, name: PipelineStatus.in_progress)
-      closed_pipeline = create(:pipeline_status, name: PipelineStatus.closed)
+      in_progress_pipeline = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
+      closed_pipeline = PipelineStatus.retrieve_by_name(PipelineStatus.closed)
       create(:candidate, other_skills: "Other Skills", pipeline_status_id: in_progress_pipeline.id)   # in-progress candidate
       create(:candidate, other_skills: "Other Skills", pipeline_status_id: closed_pipeline.id)        # closed candidate
 
@@ -359,24 +358,17 @@ defmodule RecruitxBackend.CandidateSpec do
   context "get all candidates pursued after pipeline closure" do
     before do
       Repo.delete_all(Candidate)
-      Repo.delete_all(RoleInterviewType)
-      Repo.delete_all(PipelineStatus)
-      Repo.delete_all(InterviewType)
-      Repo.delete_all(InterviewStatus)
-      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
-    let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
-    let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
-    let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+    let :progress_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
+    let :pass_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.pass)
+    let :closed_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.closed)
 
     it "should return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      pursue = create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
       candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
@@ -387,9 +379,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should NOT return candidate who is pursue in all interviews and pipeline is NOT closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      pursue = create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
@@ -400,9 +390,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should NOT return candidate who is pass in one interview after pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      pass = create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
@@ -413,9 +401,6 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should NOT return candidate who is not completed all interviews after pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
       create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
       {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
@@ -427,24 +412,17 @@ defmodule RecruitxBackend.CandidateSpec do
   context "get all candidates rejected after pipeline closure" do
     before do
       Repo.delete_all(Candidate)
-      Repo.delete_all(RoleInterviewType)
-      Repo.delete_all(PipelineStatus)
-      Repo.delete_all(InterviewType)
-      Repo.delete_all(InterviewStatus)
-      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
-    let :progress_pipeline_status, do: create(:pipeline_status, name: "In Progress")
-    let :pass_pipeline_status, do: create(:pipeline_status, name: "Pass")
-    let :closed_pipeline_status, do: create(:pipeline_status, name: "Closed")
+    let :progress_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
+    let :pass_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.pass)
+    let :closed_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.closed)
 
     it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      pursue = create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
       candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
       create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
@@ -455,9 +433,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should NOT return candidate whose pipeline is NOT closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      pursue = create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: progress_pipeline_status.id)
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
@@ -468,9 +444,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return candidate who is pass in one interview and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      pass = create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
@@ -481,9 +455,6 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return candidate who is not completed all interviews after pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
       candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
 
       {_, [candidates]} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
@@ -495,24 +466,14 @@ defmodule RecruitxBackend.CandidateSpec do
   context "get_no_of_pass_candidates_within_range" do
     before do
       Repo.delete_all(Candidate)
-      Repo.delete_all(RoleInterviewType)
-      Repo.delete_all(PipelineStatus)
-      Repo.delete_all(InterviewType)
-      Repo.delete_all(InterviewStatus)
-      Repo.delete_all(Role)
     end
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
 
     it "should return 1 when a candidate is pass in an interview within range and pipeline is pass" do
-      create(:pipeline_status, name: "In Progress")
-      pass_pipeline_status = create(:pipeline_status, name: "Pass")
-      create(:pipeline_status, name: "Closed")
-      create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      pass = create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pass_pipeline_status = PipelineStatus.retrieve_by_name(PipelineStatus.pass)
+      pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
       candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: -2), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
@@ -522,13 +483,8 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return 0 when candidate is pass in an interview NOT IN RANGE and pipeline is pass" do
-      create(:pipeline_status, name: "In Progress")
-      pass_pipeline_status = create(:pipeline_status, name: "Pass")
-      create(:pipeline_status, name: "Closed")
-      create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      pass = create(:interview_status, name: "Pass")
-      create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      pass_pipeline_status = PipelineStatus.retrieve_by_name(PipelineStatus.pass)
+      pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
       candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: +1), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
@@ -538,13 +494,8 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return 0 when candidate is pursue in an interview within range" do
-      progress_pipeline_status = create(:pipeline_status, name: "In Progress")
-      create(:pipeline_status, name: "Pass")
-      create(:pipeline_status, name: "Closed")
-      create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:interview_status, name: "Pass")
-      pursue = create(:interview_status, name: "Pursue")
-      create(:interview_status, name: "Strong Pursue")
+      progress_pipeline_status = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
+      pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
       candidate1 = create(:candidate, pipeline_status_id: progress_pipeline_status.id, role_id: role1.id)
       create(:interview, start_time: Date.now |> Date.shift(days: -1), interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
