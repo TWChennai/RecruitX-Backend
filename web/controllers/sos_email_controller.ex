@@ -3,6 +3,12 @@ defmodule RecruitxBackend.SosEmailController do
 
   alias RecruitxBackend.SosEmail
 
+  def index(conn, %{"get_status" => _}) do
+    conn
+    |> put_status(:ok)
+    |> json(%{sos_validity: SosEmail.get_interviews_with_insufficient_panelists != []})
+  end
+
   def index(conn, _params) do
     SosEmail.execute
     conn |> put_status(:ok) |> json("")

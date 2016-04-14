@@ -1,6 +1,5 @@
 defmodule RecruitxBackend.SosEmail do
   import Ecto.Query, only: [preload: 2, order_by: 2, where: 2, select: 3]
-  import Ecto.Query.API, only: [fragment: 1]
 
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
@@ -10,21 +9,24 @@ defmodule RecruitxBackend.SosEmail do
   alias Timex.Date
 
   def execute do
-    interviews_with_insufficient_panelists = Interview.interviews_with_insufficient_panelists
-      |> preload([:interview_type, candidate: [:role,:skills]])
-      |> order_by(asc: :start_time)
-      |> Interview.within_date_range(Date.now, Date.now |> Date.shift(days: 2))
-      |> select([i], {i, fragment("( select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
-      |> Repo.all
-      |> construct_view_data
+    interviews_with_insufficient_panelists = get_interviews_with_insufficient_panelists |> construct_view_data
 
-      if interviews_with_insufficient_panelists != [] do
-        Mailer.deliver %{
-           subject: "[RecruitX] SOS Signup Reminder",
-           to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-           html: interviews_with_insufficient_panelists |> Templates.sos_email
-       }
+    if interviews_with_insufficient_panelists != [] do
+      Mailer.deliver %{
+         subject: "[RecruitX] SOS Signup Reminder",
+         to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+         html: interviews_with_insufficient_panelists |> Templates.sos_email
+     }
     end
+  end
+
+  def get_interviews_with_insufficient_panelists do
+    Interview.interviews_with_insufficient_panelists
+    |> preload([:interview_type, candidate: [:role,:skills]])
+    |> order_by(asc: :start_time)
+    |> Interview.within_date_range(Date.now, Date.now |> Date.shift(days: 2))
+    |> select([i], {i, fragment("( select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
+    |> Repo.all
   end
 
   defp construct_view_data(interviews) do
