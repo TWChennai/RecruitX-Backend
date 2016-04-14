@@ -9,7 +9,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   alias RecruitxBackend.Repo
   alias Timex.DateFormat
 
-  @previous_week %PreviousWeek{}
+  @previous_week PreviousWeek.get
 
   def execute do
     query = Interview |> Interview.now_or_in_previous_five_days |> preload([:interview_panelist, :interview_status, :interview_type])
