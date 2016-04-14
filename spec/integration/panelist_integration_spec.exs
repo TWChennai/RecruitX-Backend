@@ -285,10 +285,27 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     let :candidate, do: create(:candidate)
     let :interview, do: create(:interview, candidate_id: candidate.id)
     let :interview_panelist, do: create(:interview_panelist, interview_id: interview.id)
-    let :email, do: %{subject: "[RecruitX] Update on the Interview for #{candidate.first_name} #{candidate.last_name}", to: interview_panelist.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html: "html content"}
+
 
     it "should send email to signed up panelist" do
-      allow MailmanExtensions.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _) -> "html content"  end))
+      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html: "html content"}
+      allow MailmanExtensions.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
+      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+
+      response = delete conn_with_dummy_authorization(), "/remove_panelists/#{interview_panelist.id}"
+
+      response |> should(have_http_status(:no_content))
+      expect(response.resp_body) |> to(be(""))
+      expect(Repo.get(InterviewPanelist, interview_panelist.id)) |> to(be(nil))
+      expect MailmanExtensions.Templates |> to(accepted :panelist_removal_notification)
+      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+    end
+
+    it "should send email to other panelist who signed up" do
+      interview_panelist2 = create(:interview_panelist, interview_id: interview.id)
+      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist2.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html: "html content"}
+
+      allow MailmanExtensions.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
       response = delete conn_with_dummy_authorization(), "/remove_panelists/#{interview_panelist.id}"

@@ -1,6 +1,21 @@
 <p>Hi,</p>
   <p>
-    The recruiter has unassigned you from <strong> <%= candidate_first_name %> <%= candidate_last_name %> </strong>’s <strong><%= interview_name %></strong> Interview. Please contact Recruiter for more information.
+    The recruitment team had to change
+    <%= if panliest_removed do %>
+    the panel composition
+    <% else %>
+    your pair
+    <% end %>
+     for <b><%= interview_name %></b> interview of candidate <b> <%= candidate_first_name %> <%= candidate_last_name %></b> on <b><%= interview_date %></b>.
+     This is owing to some specific context obtained as feedback in an earlier round which needs to be closely evaluated.
+     Hence, they felt a need to choose some one else in
+     <%= if panliest_removed do %>
+     your place
+     <% else %>
+     place of your pair
+     <% end %>
+     for the interview.
+     This is not a common occurrence but more of an exception. Please get in touch with them for more details.
   </p>
 <br />
 <strong>Thanks</strong><br />
