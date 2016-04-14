@@ -18,12 +18,10 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
   alias Timex.DateFormat
-  alias Timex.Timezone
 
   import Ecto.Query
 
   @duration_of_interview 1  # in hours
-  @interview_time_zone_name "Asia/Kolkata"
 
   schema "interviews" do
     field :start_time, Timex.Ecto.DateTime
@@ -336,13 +334,19 @@ defmodule RecruitxBackend.Interview do
     }
   end
 
+  def format(interview, date_format) do
+    %{
+      name: interview.interview_type.name,
+      date: interview.start_time |> TimexHelper.format(date_format)
+    }
+  end
+
   def format_with_result_and_panelist(interview, date_format \\ "%d/%m/%y") do
     status = "Not Evaluated"
-    {:ok , interview_date} = interview.start_time |> Timezone.convert(@interview_time_zone_name) |> DateFormat.format(date_format, :strftime)
     if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
     %{
       name: interview.interview_type.name,
-      date: interview_date,
+      date: interview.start_time |> TimexHelper.format(date_format),
       result: status,
       panelists: get_formatted_interview_panelists(interview)
     }
