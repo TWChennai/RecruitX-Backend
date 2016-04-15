@@ -10,7 +10,9 @@ defmodule RecruitxBackend.SosEmailController do
   end
 
   def index(conn, _params) do
-    SosEmail.execute
-    conn |> put_status(:ok) |> json("")
+    case SosEmail.execute do
+      nil -> conn |> put_status(428) |> json("")
+      _ -> conn |> put_status(:ok) |> json("")
+    end
   end
 end

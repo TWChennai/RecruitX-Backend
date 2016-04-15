@@ -13,10 +13,10 @@ defmodule RecruitxBackend.SosEmail do
 
     if interviews_with_insufficient_panelists != [] do
       Mailer.deliver %{
-         subject: "[RecruitX] SOS Signup Reminder",
-         to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-         html: interviews_with_insufficient_panelists |> Templates.sos_email
-     }
+        subject: "[RecruitX] SOS Signup Reminder",
+        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+        html: interviews_with_insufficient_panelists |> Templates.sos_email
+      }
     end
   end
 

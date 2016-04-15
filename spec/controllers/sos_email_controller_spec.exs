@@ -11,5 +11,13 @@ defmodule RecruitxBackend.SosEmailControllerSpec do
       conn |> should(have_http_status(:ok))
       expect SosEmail |> to(accepted :execute)
     end
+
+    it "should send error when there are no interviews needing signups" do
+      allow SosEmail |> to(accept(:execute, fn() -> nil end))
+      conn = action(:index, %{})
+
+      conn |> should(have_http_status(428))
+      expect SosEmail |> to(accepted :execute)
+    end
   end
 end

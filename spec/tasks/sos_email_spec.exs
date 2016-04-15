@@ -17,8 +17,9 @@ defmodule RecruitxBackend.SosEmailSpec do
       allow MailmanExtensions.Templates |> to(accept(:sos_email, fn(_) -> "html content"  end))
       allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
 
-      SosEmail.execute
+      result = SosEmail.execute
 
+      expect result |> (to(be(nil)))
       expect MailmanExtensions.Mailer |> (to_not(accepted :deliver))
       expect MailmanExtensions.Templates |> (to_not(accepted :sos_email))
     end
