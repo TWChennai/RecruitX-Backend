@@ -67,7 +67,7 @@ defmodule RecruitxBackend.SosEmailSpec do
       %{subject: subject, to: to_addresses, html: [interview]} = SosEmail.execute
 
      expect MailmanExtensions.Mailer |> to(accept(:deliver))
-     expect subject |> to(eql("[RecruitX] SOS Signup Reminder"))
+     expect subject |> to(eql("[RecruitX] Signup Reminder - Urgent"))
      expect to_addresses |> to(eql(["WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES"]))
      expect interview.candidate.name |> to(eql(candidate.first_name <> " " <> candidate.last_name))
      expect interview.candidate.role |> to(eql(role.name))
