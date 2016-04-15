@@ -24,7 +24,7 @@ defmodule RecruitxBackend.SosEmail do
     Interview.interviews_with_insufficient_panelists
     |> preload([:interview_type, candidate: [:role,:skills]])
     |> order_by(asc: :start_time)
-    |> Interview.within_date_range(Date.now, Date.now |> Date.shift(days: 2))
+    |> Interview.within_date_range(Date.now, Date.beginning_of_day(Date.now) |> Date.shift(days: 2))
     |> select([i], {i, fragment("( select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
     |> Repo.all
   end
