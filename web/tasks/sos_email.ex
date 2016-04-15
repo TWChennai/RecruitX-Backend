@@ -34,5 +34,6 @@ defmodule RecruitxBackend.SosEmail do
       %{candidate: interview.candidate |> Candidate.format, count_of_panelists_required: count_of_panelists_required}
       |> Map.merge(interview |> Interview.format("%d/%m/%y %H:%M"))
     end)
+    |> Enum.sort_by(fn (row) -> row.candidate.role end)
   end
 end
