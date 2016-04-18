@@ -95,9 +95,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   describe "get interview sub-query" do
     before do
       Repo.delete_all(Interview)
-      create(:interview, id: 1)
-      create(:interview, id: 2)
-      create(:interview, id: 3)
+      create(:interview, id: 1, start_time: get_start_of_next_week)
+      create(:interview, id: 2, start_time: get_start_of_next_week)
+      create(:interview, id: 3, start_time: get_start_of_next_week)
     end
 
     it "should return interviews with given interview ids and remaining ids in a different list" do
@@ -134,7 +134,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should not return signed up interviews that is not in next 7 days" do
-      create(:interview, id: 4, start_time: Date.now |> Date.shift(days: 10))
+      create(:interview, id: 4, start_time: get_start_of_next_week |> Date.shift(days: 10))
       {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([1])
       [interview1] = insufficient_panelists_query |> Repo.all
       [interview2, interview3] = sufficient_panelists_query |> Repo.all
@@ -147,7 +147,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
 
   describe "execute weekly signup reminder" do
     it "should call MailmanExtensions deliver with correct arguments" do
-      create(:interview)
+      create(:interview, start_time: get_start_of_next_week)
       email = %{
         subject: "[RecruitX] Signup Reminder",
         to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
