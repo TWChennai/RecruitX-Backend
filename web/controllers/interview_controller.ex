@@ -22,7 +22,7 @@ defmodule RecruitxBackend.InterviewController do
   def index(conn, %{"candidate_id" => candidate_id}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{candidate_id: candidate_id}, Interview)
-                  # TODO: Shouldn't this be ordered?
+                  |> Interview.default_order
                   |> Repo.all
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
