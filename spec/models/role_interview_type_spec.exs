@@ -10,13 +10,19 @@ defmodule RecruitxBackend.RoleInterviewTypeSpec do
   let :interview_type, do: create(:interview_type)
 
   let :valid_attrs, do: fields_for(:role_interview_type, role_id: role.id, interview_type_id: interview_type.id)
+  let :valid_attrs_with_optional, do: fields_for(:role_interview_type, role_id: role.id, interview_type_id: interview_type.id, optional: true)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
     subject do: RoleInterviewType.changeset(%RoleInterviewType{}, valid_attrs)
 
     it do: should be_valid
+
+    subject do: RoleInterviewType.changeset(%RoleInterviewType{}, valid_attrs_with_optional)
+
+    it do: should be_valid
   end
+
 
   context "invalid changeset" do
     subject do: RoleInterviewType.changeset(%RoleInterviewType{}, invalid_attrs)

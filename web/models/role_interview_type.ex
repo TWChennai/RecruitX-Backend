@@ -5,6 +5,7 @@ defmodule RecruitxBackend.RoleInterviewType do
   alias RecruitxBackend.InterviewType
 
   schema "role_interview_types" do
+    field :optional, :boolean, default: false
     belongs_to :role, Role
     belongs_to :interview_type, InterviewType
 
@@ -12,7 +13,7 @@ defmodule RecruitxBackend.RoleInterviewType do
   end
 
   @required_fields ~w(role_id interview_type_id)
-  @optional_fields ~w()
+  @optional_fields ~w(optional)
 
   def changeset(model, params \\ :empty) do
     model
@@ -22,4 +23,3 @@ defmodule RecruitxBackend.RoleInterviewType do
     |> assoc_constraint(:interview_type)
   end
 end
-

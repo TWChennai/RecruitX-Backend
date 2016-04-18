@@ -74,7 +74,8 @@ defmodule RecruitxBackend.SosEmailSpec do
      expect interview.candidate.experience |> to(eql("1.0"))
      expect interview.name |> to(eql(interview_type.name))
      expect interview.date |> to(eql("01/01/11 18:00"))
-     expect interview.candidate.skills |> to(eql("test skill1, test skill2"))
+     expect interview.candidate.skills |> to(have("test skill1"))
+     expect interview.candidate.skills |> to(have("test skill2"))
      expect interview.count_of_panelists_required |> to(eql(interview_type.max_sign_up_limit))
     end
   end

@@ -3,7 +3,8 @@ defmodule RecruitxBackend.RoleInterviewTypeView do
 
   def render("role_interview_type.json", %{role_interview_type: role_interview_type}) do
     %{
-      id: role_interview_type.interview_type_id
+      id: role_interview_type.interview_type_id,
+      optional: role_interview_type.optional
     }
   end
 end

@@ -191,8 +191,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
     defp assertInsertedSkillIdsFor(inserted_candidate, skill_ids) do
-      candidate_skills = get_candidate_skill_ids_for(inserted_candidate)
-      unique_skill_ids = Enum.uniq(skill_ids)
+      candidate_skills = inserted_candidate |> get_candidate_skill_ids_for |> Enum.sort
+      unique_skill_ids = skill_ids |> Enum.uniq |> Enum.sort
       expect(candidate_skills) |> to(be(unique_skill_ids))
     end
 
