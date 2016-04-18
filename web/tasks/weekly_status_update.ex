@@ -12,7 +12,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
   @previous_week PreviousWeek.get
 
   def execute do
-    query = Interview |> Interview.now_or_in_previous_five_days |> preload([:interview_panelist, :interview_status, :interview_type])
+    query = Interview |> Interview.working_days_in_current_week |> preload([:interview_panelist, :interview_status, :interview_type])
     candidates_weekly_status = Candidate
                                 |> preload([:role, interviews: ^query])
                                 |> order_by(asc: :role_id)

@@ -18,6 +18,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
   alias Timex.DateFormat
+  alias RecruitxBackend.PreviousWeek
 
   import Ecto.Query
 
@@ -39,16 +40,15 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w(interview_status_id)
 
-  def now_or_in_next_seven_days(query) do
-    start_of_today = Date.beginning_of_day(Date.now)
-    seven_days_from_now = start_of_today |> Date.shift(days: 7)
-    within_date_range(query, start_of_today, seven_days_from_now)
+  def working_days_in_next_week(query) do
+    start_of_next_week = Date.now |> Date.end_of_week
+    end_of_next_week = start_of_next_week |> Date.shift(days: 5)
+    within_date_range(query, start_of_next_week, end_of_next_week)
   end
 
-  def now_or_in_previous_five_days(query) do
-    start_of_today = Date.beginning_of_day(Date.now)
-    five_days_ago = start_of_today |> Date.shift(days: -5)
-    within_date_range(query, five_days_ago, start_of_today)
+  def working_days_in_current_week(query) do
+    %{starting: starting, ending: ending} =  PreviousWeek.get
+    within_date_range(query, starting, ending)
   end
 
   def default_order(query) do
