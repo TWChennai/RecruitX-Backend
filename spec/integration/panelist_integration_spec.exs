@@ -13,6 +13,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
+  alias RecruitxBackend.MailHelper
   alias Timex.Date
   alias Decimal, as: D
 
@@ -288,33 +289,33 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
 
     it "should send email to signed up panelist" do
-      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html: "html content"}
-      allow MailmanExtensions.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html_body: "html content"}
+      allow Swoosh.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       response = delete conn_with_dummy_authorization(), "/remove_panelists/#{interview_panelist.id}"
 
       response |> should(have_http_status(:no_content))
       expect(response.resp_body) |> to(be(""))
       expect(Repo.get(InterviewPanelist, interview_panelist.id)) |> to(be(nil))
-      expect MailmanExtensions.Templates |> to(accepted :panelist_removal_notification)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :panelist_removal_notification)
+      expect MailHelper |> to(accepted :deliver, [email])
     end
 
     it "should send email to other panelist who signed up" do
       interview_panelist2 = create(:interview_panelist, interview_id: interview.id)
-      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist2.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html: "html content"}
+      email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist2.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html_body: "html content"}
 
-      allow MailmanExtensions.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:panelist_removal_notification, fn(_, _, _, _, _) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       response = delete conn_with_dummy_authorization(), "/remove_panelists/#{interview_panelist.id}"
 
       response |> should(have_http_status(:no_content))
       expect(response.resp_body) |> to(be(""))
       expect(Repo.get(InterviewPanelist, interview_panelist.id)) |> to(be(nil))
-      expect MailmanExtensions.Templates |> to(accepted :panelist_removal_notification)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :panelist_removal_notification)
+      expect MailHelper |> to(accepted :deliver, [email])
     end
   end
 

@@ -1,8 +1,8 @@
 defmodule RecruitxBackend.WeeklyStatusUpdate do
   import Ecto.Query
 
-  alias MailmanExtensions.Mailer
-  alias MailmanExtensions.Templates
+  alias RecruitxBackend.MailHelper
+  alias Swoosh.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.PreviousWeek
@@ -24,10 +24,11 @@ defmodule RecruitxBackend.WeeklyStatusUpdate do
     {:ok, to_date} = previous_week.ending |> DateFormat.format("{D}/{M}/{YY}")
     email_content = if candidates != [], do: Templates.weekly_status_update(start_date, to_date, candidates, summary),
                     else: Templates.weekly_status_update_default(start_date, to_date)
-    Mailer.deliver(%{
+
+    MailHelper.deliver(%{
       subject: "[RecruitX] Weekly Status Update",
       to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-      html: email_content
+      html_body: email_content
     })
   end
 

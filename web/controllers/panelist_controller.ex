@@ -4,8 +4,8 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.Candidate
-  alias MailmanExtensions.Templates
-  alias MailmanExtensions.Mailer
+  alias Swoosh.Templates
+  alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
   alias Timex.Date
   alias Timex.Timezone
@@ -58,10 +58,10 @@ defmodule RecruitxBackend.PanelistController do
   end
 
   defp send_mail_with_content(panelist_login_name, email_content) do
-    Mailer.deliver(%{
+    MailHelper.deliver(%{
       subject: "[RecruitX] Change in interview panel",
       to: [panelist_login_name <> System.get_env("EMAIL_POSTFIX")],
-      html: email_content
+      html_body: email_content
     })
   end
 end

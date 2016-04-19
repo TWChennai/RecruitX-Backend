@@ -4,18 +4,18 @@ defmodule RecruitxBackend.SosEmail do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Candidate
-  alias MailmanExtensions.Mailer
-  alias MailmanExtensions.Templates
+  alias RecruitxBackend.MailHelper
+  alias Swoosh.Templates
   alias Timex.Date
 
   def execute do
     interviews_with_insufficient_panelists = get_interviews_with_insufficient_panelists |> construct_view_data
 
     if interviews_with_insufficient_panelists != [] do
-      Mailer.deliver %{
+      MailHelper.deliver %{
         subject: "[RecruitX] Signup Reminder - Urgent",
         to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-        html: interviews_with_insufficient_panelists |> Templates.sos_email
+        html_body: interviews_with_insufficient_panelists |> Templates.sos_email
       }
     end
   end

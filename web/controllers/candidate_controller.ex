@@ -9,8 +9,8 @@ defmodule RecruitxBackend.CandidateController do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.PipelineStatus
-  alias MailmanExtensions.Templates
-  alias MailmanExtensions.Mailer
+  alias Swoosh.Templates
+  alias RecruitxBackend.MailHelper
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -119,10 +119,10 @@ defmodule RecruitxBackend.CandidateController do
     candidate = Candidate.get_candidate_by_id(id) |> Repo.one
     email_content = Templates.consolidated_feedback(candidate)
 
-    Mailer.deliver(%{
+    MailHelper.deliver(%{
       subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}",
       to: System.get_env("CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-      html: email_content
+      html_body: email_content
     })
   end
 

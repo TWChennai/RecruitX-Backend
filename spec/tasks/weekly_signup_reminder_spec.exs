@@ -6,6 +6,8 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   alias RecruitxBackend.Skill
   alias RecruitxBackend.WeeklySignupReminder
   alias Timex.Date
+  alias RecruitxBackend.Repo
+
 
   describe "get candidates and interviews" do
     before do
@@ -146,36 +148,32 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   end
 
   describe "execute weekly signup reminder" do
-    it "should call MailmanExtensions deliver with correct arguments" do
+
+    it "should call Swoosh deliver with correct arguments" do
       create(:interview, start_time: get_start_of_next_week)
-      email = %{
-        subject: "[RecruitX] Signup Reminder",
-        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-        html: "html content"
-      }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      RecruitxBackend.MailHelper.default_mail
+
+      allow Swoosh.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
+      allow RecruitxBackend.MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklySignupReminder.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_signup_reminder)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :weekly_signup_reminder)
+      expect RecruitxBackend.MailHelper |> to(accepted :deliver )
     end
 
     it "should not call MailmanExtensions deliver if there are no interviews" do
       Repo.delete_all(Interview)
-      email = %{
-        subject: "[RecruitX] Signup Reminder",
-        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-        html: "html content"
-      }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+
+      RecruitxBackend.MailHelper.default_mail
+
+      allow Swoosh.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
+      allow RecruitxBackend.MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklySignupReminder.execute
 
-      expect MailmanExtensions.Templates |> (to_not(accepted :weekly_signup_reminder))
-      expect MailmanExtensions.Mailer |> (to_not(accepted :deliver, [email]))
+      expect Swoosh.Templates |> (to_not(accepted :weekly_signup_reminder))
+      expect RecruitxBackend.MailHelper |> (to_not(accepted :deliver))
     end
 
     it "should be called every week on friday at 3.0 UTC" do

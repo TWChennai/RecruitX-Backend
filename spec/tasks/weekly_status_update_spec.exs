@@ -6,6 +6,7 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.WeeklyStatusUpdate
+  alias RecruitxBackend.MailHelper
   alias Timex.Date
   alias Timex.DateFormat
   alias RecruitxBackend.PreviousWeek
@@ -70,11 +71,11 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
         candidates_rejected: 0,
         interviews_count: 1
       }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content" end))
+      allow Swoosh.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content" end))
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update,[from_date, to_date, candidates, summary])
+      expect Swoosh.Templates |> to(accepted :weekly_status_update,[from_date, to_date, candidates, summary])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
@@ -82,15 +83,15 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       email = %{
           subject: "[RecruitX] Weekly Status Update",
           to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-          html: "html content"
+          html_body: "html content"
       }
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :weekly_status_update)
+      expect MailHelper |> to(accepted :deliver, [email])
     end
 
     it "should send a default mail if there are no interview in previous week" do
@@ -100,18 +101,18 @@ defmodule RecruitxBackend.WeeklyStatusUpdateSpec do
       email = %{
           subject: "[RecruitX] Weekly Status Update",
           to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-          html: "html content"
+          html_body: "html content"
       }
 
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update_default, fn(_, _) -> "html content"  end))
-      allow MailmanExtensions.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:weekly_status_update_default, fn(_, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:weekly_status_update, fn(_, _, _, _) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       WeeklyStatusUpdate.execute
 
-      expect MailmanExtensions.Templates |> to(accepted :weekly_status_update_default)
-      expect MailmanExtensions.Templates |> to_not(accepted :weekly_status_update)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :weekly_status_update_default)
+      expect Swoosh.Templates |> to_not(accepted :weekly_status_update)
+      expect MailHelper |> to(accepted :deliver, [email])
     end
 
     it "should be called every week on saturday at 6.0am UTC" do

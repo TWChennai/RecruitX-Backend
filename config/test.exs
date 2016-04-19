@@ -18,3 +18,6 @@ config :recruitx_backend, RecruitxBackend.Repo,
   database: "recruitx_backend_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :mailer, RecruitxBackend.Mailer,
+    adapter: Swoosh.Adapters.Local

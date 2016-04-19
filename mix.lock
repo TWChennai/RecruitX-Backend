@@ -47,7 +47,7 @@
   "phoenix_ecto": {:hex, :phoenix_ecto, "2.0.1"},
   "phoenix_live_reload": {:hex, :phoenix_live_reload, "1.0.3"},
   "plug": {:hex, :plug, "1.1.2"},
-  "poison": {:hex, :poison, "1.5.2"},
+  "poison": {:hex, :poison, "2.1.0"},
   "poolboy": {:hex, :poolboy, "1.5.1"},
   "postgrex": {:hex, :postgrex, "0.11.1"},
   "providers": {:hex, :providers, "1.4.1"},
@@ -57,6 +57,7 @@
   "scrivener": {:hex, :scrivener, "1.1.2"},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.0"},
   "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
+  "swoosh": {:hex, :swoosh, "0.1.0"},
   "timex": {:hex, :timex, "1.0.2"},
   "timex_ecto": {:hex, :timex_ecto, "0.9.0"},
   "tzdata": {:hex, :tzdata, "0.5.6"}}

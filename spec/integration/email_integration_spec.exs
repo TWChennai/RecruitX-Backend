@@ -2,7 +2,6 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.WeeklySignupReminder
 
   alias RecruitxBackend.WeeklySignupReminder
-  alias Mailman.TestServer
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Skill
   alias Timex.DateFormat
@@ -22,17 +21,19 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
     end
 
     it "should send interview signup details as email" do
-      Task.await(WeeklySignupReminder.execute)
-      [delivery] = TestServer.deliveries
+      email = WeeklySignupReminder.execute
 
-      expect(delivery) |> to_not(be([]))
-      expect(delivery) |> to(have("From: no-reply-recruitx@thoughtworks.com"))
-      expect(delivery) |> to(have("To: Chennai <chennai@thoughtworks.com>"))
-      expect(delivery) |> to(have("Subject: [RecruitX] Signup Reminder"))
-      expect(delivery) |> to(have(candidate.first_name <> " " <> candidate.last_name))
-      expect(delivery) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
-      expect(delivery) |> to(have("Special Skill, Other Skill"))
-      expect(delivery) |> to(have("Round 1 on " <> DateFormat.format!(get_start_of_next_week, "%b-%d", :strftime) ))
+      mail_box = Swoosh.InMemoryMailbox.all |> List.first
+
+      expect(mail_box) |> to(be(email))
+      expect(mail_box) |> to_not(be([]))
+      expect(mail_box.to) |> to(be([{"",System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES")}]))
+      expect(mail_box.subject) |> to(have("[RecruitX] Signup Reminder"))
+      expect(mail_box.html_body) |> to(have(candidate.first_name <> " " <> candidate.last_name))
+      mail_content = mail_box.html_body
+      expect(mail_content) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
+      expect(mail_content) |> to(have("Special Skill, Other Skill"))
+      expect(mail_content) |> to(have("Round 1 on " <> DateFormat.format!(get_start_of_next_week, "%b-%d", :strftime) ))
     end
   end
 end

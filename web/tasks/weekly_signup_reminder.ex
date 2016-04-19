@@ -1,13 +1,14 @@
 defmodule RecruitxBackend.WeeklySignupReminder do
   import Ecto.Query
 
-  alias MailmanExtensions.Mailer
-  alias MailmanExtensions.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
+  alias Swoosh.Templates
+  alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Repo
 
   def execute do
+
     interview_ids = Interview.interviews_with_insufficient_panelists
     |> select([i], i.id)
     |> Repo.all
@@ -24,11 +25,12 @@ defmodule RecruitxBackend.WeeklySignupReminder do
 
     if candidates_with_insufficient_signups != [] or candidates_with_sufficient_signups != [] do
       email_content = Templates.weekly_signup_reminder(candidates_with_insufficient_signups, candidates_with_sufficient_signups)
-      Mailer.deliver(%{
-        subject: "[RecruitX] Signup Reminder",
-        to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
-        html: email_content
-      })
+
+      MailHelper.deliver(%{
+       subject: "[RecruitX] Signup Reminder",
+       to: System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+       html_body: email_content
+     })
     end
   end
 

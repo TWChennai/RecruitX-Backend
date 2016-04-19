@@ -32,7 +32,7 @@ defmodule RecruitxBackend.Mixfile do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
-                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :mailman, :eiconv, :quantum]]
+                    :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
   end
 
   # Specifies which paths to compile per environment.
@@ -59,10 +59,6 @@ defmodule RecruitxBackend.Mixfile do
      {:timex_ecto, "~> 0.9.0"},
      {:scrivener, "~> 1.1"},
      {:gettext, "~> 0.10.0"},
-     # TODO: Get dependency from Hex once the bug is fixed / pull request is merged
-     {:mailman, github: "arunvelsriram/mailman"},
-     # TODO: Package not available through Hex. Find a way to manage the version
-     {:eiconv, github: "zotonic/eiconv"},   # Note: Introduced for mailman
      {:quantum, ">= 1.7.0"},
      {:phoenix_live_reload, "~> 1.0.3", only: :dev},
      {:credo, "~> 0.3.10", only: :test, app: false},
@@ -71,6 +67,8 @@ defmodule RecruitxBackend.Mixfile do
      {:excoveralls, "~> 0.5.1", only: :test, app: false},
      {:ex_machina, "~> 0.6.1", only: :test, app: false},
      {:faker, "~> 0.6.0", only: :test, app: false},
+     {:swoosh, "~> 0.1.0"},
+     {:poison, "~> 2.1.0", override: true},
     ]
   end
 

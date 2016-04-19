@@ -5,6 +5,7 @@ defmodule RecruitxBackend.SosEmailSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.MailHelper
   alias Timex.Date
 
   describe "execute" do
@@ -14,14 +15,14 @@ defmodule RecruitxBackend.SosEmailSpec do
       interview = create(:interview)
       Repo.insert(%InterviewPanelist{panelist_login_name: "test1", interview_id: interview.id})
       Repo.insert(%InterviewPanelist{panelist_login_name: "test2", interview_id: interview.id})
-      allow MailmanExtensions.Templates |> to(accept(:sos_email, fn(_) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:sos_email, fn(_) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       result = SosEmail.execute
 
       expect result |> (to(be(nil)))
-      expect MailmanExtensions.Mailer |> (to_not(accepted :deliver))
-      expect MailmanExtensions.Templates |> (to_not(accepted :sos_email))
+      expect MailHelper |> (to_not(accepted :deliver))
+      expect Swoosh.Templates |> (to_not(accepted :sos_email))
     end
 
     it "should send an email with the formatted data ordered by start time within the next 48 hours only" do
@@ -30,10 +31,10 @@ defmodule RecruitxBackend.SosEmailSpec do
       allow Timex.Date |> to(accept(:now, fn()-> Date.set(Date.epoch, [date: {2010, 12, 31}]) end))
       create(:interview, start_time: Date.set(Date.epoch, [datetime: {{2011,1,1}, {12,30,0}}]))
       create(:interview, start_time: Date.set(Date.epoch, [date: {2011, 3, 1}]))
-      allow MailmanExtensions.Templates |> to(accept(:sos_email, &(&1)))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, &(&1)))
+      allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
+      allow MailHelper |> to(accept(:deliver, &(&1)))
 
-      %{html: [interview1]} = SosEmail.execute
+      %{html_body: [interview1]} = SosEmail.execute
 
       expect interview1.date |> to(eql("01/01/11 18:00"))
     end
@@ -43,10 +44,10 @@ defmodule RecruitxBackend.SosEmailSpec do
       Repo.delete_all InterviewPanelist
       interview = create(:interview, start_time: Date.now |> Date.shift(days: 1))
       Repo.insert(%InterviewPanelist{panelist_login_name: "test", interview_id: interview.id})
-      allow MailmanExtensions.Templates |> to(accept(:sos_email, &(&1)))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, &(&1)))
+      allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
+      allow MailHelper |> to(accept(:deliver, &(&1)))
 
-      %{html: [%{count_of_panelists_required: count_of_panelists_required}]} = SosEmail.execute
+      %{html_body: [%{count_of_panelists_required: count_of_panelists_required}]} = SosEmail.execute
 
       expect(count_of_panelists_required) |> to(be(1))
     end
@@ -60,13 +61,13 @@ defmodule RecruitxBackend.SosEmailSpec do
       create(:candidate_skill, skill_id: create(:skill, name: "test skill2").id, candidate_id: candidate.id)
       interview_type = create(:interview_type)
       create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: Date.set(Date.epoch, [datetime: {{2011,1,1}, {12,30,0}}]))
-      allow MailmanExtensions.Templates |> to(accept(:sos_email, &(&1)))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, &(&1)))
+      allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
+      allow MailHelper |> to(accept(:deliver, &(&1)))
       allow System |> to(accept(:get_env, &(&1)))
 
-      %{subject: subject, to: to_addresses, html: [interview]} = SosEmail.execute
+      %{subject: subject, to: to_addresses, html_body: [interview]} = SosEmail.execute
 
-     expect MailmanExtensions.Mailer |> to(accept(:deliver))
+     expect MailHelper |> to(accept(:deliver))
      expect subject |> to(eql("[RecruitX] Signup Reminder - Urgent"))
      expect to_addresses |> to(eql(["WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES"]))
      expect interview.candidate.name |> to(eql(candidate.first_name <> " " <> candidate.last_name))

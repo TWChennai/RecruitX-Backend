@@ -9,6 +9,7 @@ defmodule RecruitxBackend.CandidateControllerSpec do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.MailHelper
 
   before do: Repo.delete_all(Candidate)
 
@@ -243,28 +244,28 @@ defmodule RecruitxBackend.CandidateControllerSpec do
     before do
       create(:interview, candidate_id: candidate.id)
     end
-    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: System.get_env("CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES") |> String.split, html: "html content"}
+    let :email, do: %{subject: "[RecruitX] Consolidated Feedback - #{candidate.first_name} #{candidate.last_name}", to: System.get_env("CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES") |> String.split, html_body: "html content"}
 
     it "should not send email when the pipeline is not closed" do
-      allow MailmanExtensions.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       in_progress_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
       action(:update, %{"id" => candidate.id, "candidate" => %{"pipeline_status_id" => in_progress_pipeline_status_id}})
 
-      expect MailmanExtensions.Templates |> to_not(accepted :consolidated_feedback)
-      expect MailmanExtensions.Mailer |> to_not(accepted :deliver, [email])
+      expect Swoosh.Templates |> to_not(accepted :consolidated_feedback)
+      expect MailHelper |> to_not(accepted :deliver, [email])
     end
 
     it "should send email when the pipeline is closed" do
-      allow MailmanExtensions.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
-      allow MailmanExtensions.Mailer |> to(accept(:deliver, fn(_) -> "" end))
+      allow Swoosh.Templates |> to(accept(:consolidated_feedback, fn(_) -> "html content"  end))
+      allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
       action(:update, %{"id" => candidate.id, "candidate" => %{"pipeline_status_id" => closed_pipeline_status_id}})
 
-      expect MailmanExtensions.Templates |> to(accepted :consolidated_feedback)
-      expect MailmanExtensions.Mailer |> to(accepted :deliver, [email])
+      expect Swoosh.Templates |> to(accepted :consolidated_feedback)
+      expect MailHelper |> to(accepted :deliver, [email])
     end
   end
 end
