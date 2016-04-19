@@ -46,6 +46,12 @@ defmodule RecruitxBackend.Interview do
     within_date_range(query, start_of_next_week, end_of_next_week)
   end
 
+  def now_or_in_next_seven_days(query) do
+    start_of_today = Date.beginning_of_day(Date.now)
+    seven_days_from_now = start_of_today |> Date.shift(days: 7)
+    within_date_range(query, start_of_today, seven_days_from_now)
+  end
+
   def working_days_in_current_week(query) do
     %{starting: starting, ending: ending} =  PreviousWeek.get
     within_date_range(query, starting, ending)
