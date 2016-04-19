@@ -12,7 +12,7 @@ defmodule RecruitxBackend.InterviewController do
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data
-                  |> Interview.working_days_in_next_week
+                  |> Interview.now_or_in_next_seven_days
                   |> Interview.default_order
                   |> Repo.all
     interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role)

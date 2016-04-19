@@ -819,6 +819,19 @@ defmodule RecruitxBackend.InterviewSpec do
   context "get the interviews in the next 7 days" do
     it "should return the interview from the next 7 days" do
       Repo.delete_all(Interview)
+      create(:interview, id: 900, start_time: Date.now |> Date.shift(days: +8))
+      create(:interview, id: 901, start_time: Date.now |> Date.shift(days: -6))
+      create(:interview, id: 902, start_time: Date.now |> Date.shift(days: +1))
+
+      actual_result = Interview |> Interview.now_or_in_next_seven_days |> Repo.one
+
+      expect(actual_result.id) |> to(be(902))
+    end
+  end
+
+  context "get the interviews in the next week" do
+    it "should return the interview from the next week" do
+      Repo.delete_all(Interview)
       create(:interview, id: 900, start_time: Date.now |> Date.end_of_week |> Date.shift(days: +8))
       create(:interview, id: 901, start_time: Date.now |> Date.end_of_week|> Date.shift(days: -8))
       create(:interview, id: 902, start_time: Date.now |> Date.end_of_week|> Date.shift(days: +1))
