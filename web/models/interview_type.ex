@@ -50,7 +50,7 @@ defmodule RecruitxBackend.InterviewType do
   def get_ids_of_min_priority_round do
     (from it in __MODULE__,
       select: it.id,
-      where: fragment("? = (select it.priority from interview_types it order by it.priority limit 1)", it.priority))
+      where: fragment("? = (select it.priority from interview_types it, role_interview_types rit where it.id = rit.interview_type_id and rit.optional=false order by it.priority limit 1)", it.priority))
       |> Repo.all
   end
 
