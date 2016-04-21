@@ -80,4 +80,21 @@ defmodule RecruitxBackend.RoleSpec do
       expect(result.name) |> to(eql(result.name))
     end
   end
+
+  context "is_ba_or_pm" do
+    it "should return true if role is ba" do
+      ba_role_id = Role.retrieve_by_name(Role.ba).id
+      expect(Role.is_ba_or_pm(ba_role_id)) |> to(be(true))
+    end
+
+    it "should return true if role is pm" do
+      pm_role_id = Role.retrieve_by_name(Role.pm).id
+      expect(Role.is_ba_or_pm(pm_role_id)) |> to(be(true))
+    end
+
+    it "should return false if role is not pm or ba" do
+      other_role_id = create(:role).id
+      expect(Role.is_ba_or_pm(other_role_id)) |> to(be(false))
+    end
+  end
 end

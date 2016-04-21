@@ -35,4 +35,6 @@ defmodule RecruitxBackend.Role do
   end
 
   def retrieve_by_name(name), do: (from r in __MODULE__, where: r.name == ^name) |> Repo.one
+
+  def is_ba_or_pm(role_id), do: role_id == retrieve_by_name(ba).id or role_id == retrieve_by_name(pm).id
 end

@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.InterviewTypeRelativeEvaluator do
 
   alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
 
   def evaluate(sign_up_evaluation_status, interview_type_specfic_criteria, panelist_login_name, panelist_role, interview) do
@@ -23,7 +24,7 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluator do
   defp is_eligible_based_on_role(sign_up_evaluation_status, interview_type_specfic_criteria, panelist_role, interview) do
     interview = Repo.preload interview, :candidate
     if !is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
-    and (panelist_role |> is_nil or panelist_role.id != interview.candidate.role_id), do:
+    and (panelist_role |> is_nil or !(Role.is_ba_or_pm(panelist_role.id) and Role.is_ba_or_pm(interview.candidate.role_id)) and panelist_role.id != interview.candidate.role_id), do:
       sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this interview"})
     sign_up_evaluation_status
   end

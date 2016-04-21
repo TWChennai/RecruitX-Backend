@@ -12,6 +12,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.SignUpEvaluator
@@ -180,19 +181,20 @@ defmodule RecruitxBackend.Interview do
     role = sign_up_data_container.panelist_role
     interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
     Enum.reduce(interviews, [], fn(interview, acc) ->
-      if __MODULE__.is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria),do: acc = acc ++ [__MODULE__.put_sign_up_status(sign_up_data_container, interview)]
+      if is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria),do: acc = acc ++ [put_sign_up_status(sign_up_data_container, interview)]
       acc
     end)
   end
 
-  def is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria) do
+  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria) do
     (InterviewTypeRelativeEvaluator.is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
       and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
     or panelist_role == nil
     or interview.candidate.role_id == panelist_role.id
+    or (Role.is_ba_or_pm(interview.candidate.role_id) and Role.is_ba_or_pm(panelist_role.id))
   end
 
-  def put_sign_up_status(sign_up_data_container, interview) do
+  defp put_sign_up_status(sign_up_data_container, interview) do
     sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
     interview = Map.put(interview, :signup_error, "")
     if !sign_up_evaluation_status.valid? do
