@@ -19,8 +19,8 @@ defmodule RecruitxBackend.JigsawController do
     user_details = case id do
       "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
       "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
-      "subha7755" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.ba)}
-      "kausalyamani92" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.pm)}
+      "subham" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.ba)}
+      "kausalym" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.pm)}
       "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role}
       "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role}
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
