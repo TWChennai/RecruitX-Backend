@@ -204,6 +204,34 @@ defmodule RecruitxBackend.Interview do
     Map.put(interview, :signup, sign_up_evaluation_status.valid?)
   end
 
+  defp get_max_and_min_priority do
+    (from it in InterviewType,
+    select: {max(it.priority), min(it.priority)}) |> Repo.one
+  end
+
+  defp get_previous_interview(_candidate_id, priority, min_priority) when priority < min_priority, do: nil
+
+  defp get_previous_interview(candidate_id, priority, min_priority) do
+    interview = get_interview(candidate_id, priority)
+    case {interview, priority} do
+      {nil, ^min_priority} -> nil
+      {nil, _} -> get_previous_interview(candidate_id, priority - 1, min_priority)
+      _ -> interview
+    end
+  end
+
+  defp get_next_interview(_candidate_id, priority, max_priority) when priority > max_priority, do: nil
+
+  defp get_next_interview(candidate_id, priority, max_priority) do
+    interview = get_interview(candidate_id, priority)
+    case {interview, priority} do
+      {nil, ^max_priority} -> nil
+      {nil, _} -> get_next_interview(candidate_id, priority + 1, max_priority)
+      _ -> interview
+    end
+  end
+
+
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def validate_with_other_rounds(existing_changeset, interview_type \\ :empty) do
     if existing_changeset.valid? do
@@ -212,8 +240,9 @@ defmodule RecruitxBackend.Interview do
       candidate_id = Changeset.get_field(existing_changeset, :candidate_id)
       interview_id = Changeset.get_field(existing_changeset, :id)
       current_priority = get_current_priority(existing_changeset, interview_type)
-      previous_interview = get_interview(candidate_id, current_priority - 1)
-      next_interview = get_interview(candidate_id, current_priority + 1)
+      {max_priority, min_priority} = get_max_and_min_priority
+      previous_interview = get_previous_interview(candidate_id, current_priority - 1, min_priority)
+      next_interview = get_next_interview(candidate_id, current_priority + 1, max_priority)
       interview_with_same_priority = case interview_id do
         nil -> get_interview(candidate_id, current_priority)
         _ -> get_interview(candidate_id, current_priority, interview_id)

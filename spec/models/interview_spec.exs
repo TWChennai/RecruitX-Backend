@@ -508,7 +508,7 @@ defmodule RecruitxBackend.InterviewSpec do
   describe "validation for updating the interview schedule" do
     let :tomorrow, do: Date.now() |> Date.shift(days: 1)
     let :candidate, do: create(:candidate)
-    let :code_pairing_interview_type, do: create(:interview_type, priority: 1, name: "CP")
+    let :code_pairing_interview_type, do: create(:interview_type, priority: 0, name: "CP")
     let :technical_one_interview_type, do: create(:interview_type, priority: 2, name: "T1")
     let :technical_two_interview_type, do: create(:interview_type, priority: 3, name: "T2")
     let :leadership_interview_type, do: create(:interview_type, priority: 4, name: "LD")
