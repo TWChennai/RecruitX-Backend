@@ -3,7 +3,6 @@ defmodule RecruitxBackend.InterviewTypeSpec do
 
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Repo
 
   let :valid_attrs, do: fields_for(:interview_type, priority: trunc(:rand.uniform * 10))
@@ -128,55 +127,6 @@ defmodule RecruitxBackend.InterviewTypeSpec do
       interviews = InterviewType |> InterviewType.default_order |> Repo.all
 
       expect(interviews) |> to(eq([interview_with_priority_1, interview_with_priority_2_id_1, interview_with_priority_2_id_2]))
-    end
-  end
-
-  context "get_ids_of_min_priority_round" do
-    before do: Repo.delete_all(Interview)
-    before do: Repo.delete_all(InterviewType)
-
-    it "should give interview_type with minimum priority" do
-      Repo.delete_all InterviewType
-      role = create(:role)
-      interview_with_priority_1 = create(:interview_type, priority: 1)
-      interview_with_priority_2 = create(:interview_type, priority: 2)
-      create(:interview_type, priority: 3)
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview_with_priority_1.id, role_id: role.id, optional: false}))
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview_with_priority_2.id, role_id: role.id, optional: false}))
-
-      [minimum_interview_id] = InterviewType.get_ids_of_min_priority_round
-
-      expect(minimum_interview_id) |> to(eq(interview_with_priority_1.id))
-    end
-
-    it "should give interview_type with minimum priority and not optional" do
-      Repo.delete_all InterviewType
-      role = create(:role)
-      interview_with_priority_1 = create(:interview_type, priority: 1)
-      interview_with_priority_2 = create(:interview_type, priority: 2)
-      create(:interview_type, priority: 3)
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview_with_priority_1.id, role_id: role.id, optional: true}))
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview_with_priority_2.id, role_id: role.id, optional: false}))
-
-      [minimum_interview_id] = InterviewType.get_ids_of_min_priority_round
-
-      expect(minimum_interview_id) |> to(eq(interview_with_priority_2.id))
-    end
-
-    it "should give interview_types with minimum priority when there are multiple interviews" do
-      Repo.delete_all InterviewType
-      role = create(:role)
-      interview1_with_priority_1 = create(:interview_type, priority: 1)
-      interview2_with_priority_1 = create(:interview_type, priority: 1)
-      create(:interview_type, priority: 2)
-      create(:interview_type, priority: 3)
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview1_with_priority_1.id, role_id: role.id, optional: false}))
-      Repo.insert(RoleInterviewType.changeset(%RoleInterviewType{}, %{interview_type_id: interview2_with_priority_1.id, role_id: role.id, optional: false}))
-
-      [minimum_interview_id1, minimum_interview_id2] = InterviewType.get_ids_of_min_priority_round
-
-      expect(minimum_interview_id1) |> to(eq(interview1_with_priority_1.id))
-      expect(minimum_interview_id2) |> to(eq(interview2_with_priority_1.id))
     end
   end
 

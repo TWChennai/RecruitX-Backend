@@ -346,6 +346,12 @@ defmodule RecruitxBackend.Interview do
     |> Repo.one
   end
 
+  def get_first_interview_id_for_all_candidates do
+    (from i in __MODULE__,
+    where: i.id in fragment("select i.id from interviews i where i.candidate_id=? order by i.start_time limit 1", i.candidate_id), select: i.id)
+    |> Repo.all
+  end
+
   def get_last_interview_status_for(current_candidate, last_interviews_data) do
     total_no_of_interview_types = Enum.count(RoleInterviewType |> where([i], ^current_candidate.role_id == i.role_id)|> Repo.all)
     if Candidate.is_pipeline_closed(current_candidate) do

@@ -47,13 +47,6 @@ defmodule RecruitxBackend.InterviewType do
     from i in query, order_by: [asc: i.priority, asc: i.id]
   end
 
-  def get_ids_of_min_priority_round do
-    (from it in __MODULE__,
-      select: it.id,
-      where: fragment("? = (select it.priority from interview_types it, role_interview_types rit where it.id = rit.interview_type_id and rit.optional=false order by it.priority limit 1)", it.priority))
-      |> Repo.all
-  end
-
   def get_sign_up_limits,
     do: (from it in __MODULE__, select: {it.id, it.max_sign_up_limit}) |> Repo.all
 
