@@ -40,6 +40,6 @@ defmodule RecruitxBackend.SignUpEvaluator do
     %SignUpEvaluationStatus{}
     |> InterviewTypeRelativeEvaluator.evaluate(sign_up_data_container.interview_type_specfic_criteria, sign_up_data_container.panelist_login_name, sign_up_data_container.panelist_role, interview)
     |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
-    |> ExperienceMatrixRelativeEvaluator.evaluate(sign_up_data_container.experience_eligibility_criteria, interview)
+    |> ExperienceMatrixRelativeEvaluator.evaluate(sign_up_data_container, interview)
   end
 end

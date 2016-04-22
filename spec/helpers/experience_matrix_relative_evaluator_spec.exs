@@ -194,9 +194,9 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       expect(eligiblity.satisfied_criteria) |> to(be(@upper_bound))
     end
 
-    it "should return true when the candidate's role is not filtered based on panelist experience" do
+    it "should return true when the panelist's role is not filtered based on panelist experience" do
       allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
-      eligibility = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(D.new(5), nil), create(:interview))
+      eligibility = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(D.new(5), create(:role)), create(:interview))
 
       expect(eligibility.valid?) |> to(be_true)
       expect(eligibility.satisfied_criteria) |> to(be(@lower_bound))
@@ -204,11 +204,13 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
   end
 
   defp populate_experience_eligibility_data(panelist_experience, panelist_role) do
-    %ExperienceEligibilityData{panelist_experience: panelist_experience,
-      max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
-      interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
-      experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role)),
-      role_ids_with_filter: ExperienceMatrix.get_role_ids_with_filter
+    %{experience_eligibility_criteria: %ExperienceEligibilityData{panelist_experience: panelist_experience,
+          max_experience_with_filter: panelist_role |> ExperienceMatrix.get_max_experience_with_filter,
+          interview_types_with_filter: ExperienceMatrix.get_interview_types_with_filter,
+          experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role)),
+          role_ids_with_filter: ExperienceMatrix.get_role_ids_with_filter
+        },
+      panelist_role: panelist_role
     }
   end
 end

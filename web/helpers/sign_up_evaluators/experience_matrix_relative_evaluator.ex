@@ -9,25 +9,24 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   import Ecto.Query, only: [from: 2, where: 2]
 
-  def evaluate(sign_up_evaluation_status, experience_eligibility_criteria, interview) do
+  def evaluate(sign_up_evaluation_status, %{experience_eligibility_criteria: experience_eligibility_criteria, panelist_role: panelist_role}, interview) do
     interview = Repo.preload interview, :candidate
     sign_up_evaluation_status
-    |> is_eligible_without_LB_and_UB_filters(interview.candidate, interview.interview_type_id, experience_eligibility_criteria)
+    |> is_eligible_without_LB_and_UB_filters(interview.interview_type_id, experience_eligibility_criteria, panelist_role)
     |> is_eligible_with_LB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
     |> is_eligible_with_UB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
     |> find_the_best_fit_criteria(interview.id)
   end
 
-  defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, candidate, interview_type_id,  experience_eligibility_criteria) do
-    candidate = Repo.preload candidate, :role
-    result = !Enum.member?(experience_eligibility_criteria.role_ids_with_filter, candidate.role_id)
+  defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, interview_type_id,  experience_eligibility_criteria, panelist_role) do
+    result = !Enum.member?(experience_eligibility_criteria.role_ids_with_filter, panelist_role.id)
               or to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
               or !Enum.member?(experience_eligibility_criteria.interview_types_with_filter, interview_type_id)
     if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
     sign_up_evaluation_status
   end
 
-  defp is_eligible_without_LB_and_UB_filters(%{valid?: false} = sign_up_evaluation_status, _candidate_experience, _interview_type_id,  _experience_eligibility_criteria), do: sign_up_evaluation_status
+  defp is_eligible_without_LB_and_UB_filters(%{valid?: false} = sign_up_evaluation_status, _interview_type_id,  _experience_eligibility_criteria, _panelist_role), do: sign_up_evaluation_status
 
   defp is_eligible_with_LB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
     result = Enum.any?(experience_matrix_filters, fn({eligible_candidate_lower_experience, _eligible_candidate_upper_experience, eligible_interview_type_id}) ->interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_lower_experience)
