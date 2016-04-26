@@ -24,18 +24,17 @@ defmodule RecruitxBackend.StatusUpdate do
 
   defp execute(%{starting: starting, ending: ending} = time_range, period_name) do
     query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type])
-    candidates_weekly_status = Candidate
+    candidates_status = Candidate
                                 |> preload([:role, interviews: ^query])
                                 |> order_by(asc: :role_id)
                                 |> Repo.all
 
-    candidates = candidates_weekly_status
+    candidates = candidates_status
                   |> filter_out_candidates_without_interviews
                   |> construct_view_data
-    # previous_week = TimeRange.get_previous_week
     summary = candidates |> construct_summary_data(time_range)
-    {:ok, start_date} = time_range.starting |> DateFormat.format("{D}/{M}/{YY}")
-    {:ok, to_date} = time_range.ending |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, start_date} = starting |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, to_date} = ending |> DateFormat.format("{D}/{M}/{YY}")
     email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary),
                     else: Templates.status_update_default(start_date, to_date)
 
@@ -55,19 +54,19 @@ defmodule RecruitxBackend.StatusUpdate do
     end)
   end
 
-  defp construct_summary_data(candidates, previous_week) do
-    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(previous_week)
+  defp construct_summary_data(candidates, date_range) do
+    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(date_range)
     %{
       candidates_appeared: Enum.count(candidates),
       interviews_count: candidates |> get_total_no_of_interviews,
       candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress,
       candidates_pursued: Enum.count(candidates_pursued),
-      candidates_rejected: get_total_no_of_rejects(candidates_rejected, previous_week)
+      candidates_rejected: get_total_no_of_rejects(candidates_rejected, date_range)
     }
   end
 
-  defp get_total_no_of_rejects(candidates_rejected, previous_week) do
-    Candidate.get_no_of_pass_candidates_within_range(previous_week) + Enum.count(candidates_rejected)
+  defp get_total_no_of_rejects(candidates_rejected, date_range) do
+    Candidate.get_no_of_pass_candidates_within_range(date_range) + Enum.count(candidates_rejected)
   end
 
   defp get_total_no_of_interviews(candidates) do
@@ -76,7 +75,7 @@ defmodule RecruitxBackend.StatusUpdate do
     end)
   end
 
-  def filter_out_candidates_without_interviews(candidates_weekly_status) do
-    Enum.filter(candidates_weekly_status, fn(candidate)-> candidate.interviews != []  end)
+  def filter_out_candidates_without_interviews(candidates_status) do
+    Enum.filter(candidates_status, fn(candidate)-> candidate.interviews != []  end)
   end
 end

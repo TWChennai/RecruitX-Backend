@@ -129,7 +129,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       Repo.delete_all Candidate
       Repo.delete_all Interview
 
-      interview = create(:interview, interview_type_id: 1, start_time: get_start_of_previous_month)
+      interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
       candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
@@ -158,7 +158,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
-      create(:interview, interview_type_id: 1, start_time: get_start_of_previous_month)
+      create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
       email = %{
           subject: "[RecruitX] Monthly Status Update",
           to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -208,7 +208,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       Repo.delete_all Candidate
       Repo.delete_all Interview
 
-      interview = create(:interview, interview_type_id: 1, start_time: get_start_of_previous_quarter)
+      interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
       candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
@@ -237,7 +237,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
-      create(:interview, interview_type_id: 1, start_time: get_start_of_previous_quarter)
+      create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
       email = %{
           subject: "[RecruitX] Quarterly Status Update",
           to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
