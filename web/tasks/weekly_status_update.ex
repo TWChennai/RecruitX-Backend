@@ -1,42 +1,32 @@
-defmodule RecruitxBackend.StatusUpdate do
+defmodule RecruitxBackend.WeeklyStatusUpdate do
   import Ecto.Query
 
   alias RecruitxBackend.MailHelper
   alias Swoosh.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.PreviousWeek
   alias RecruitxBackend.Repo
   alias Timex.DateFormat
-  alias Timex.Date
 
-  def execute_weekly do
-    execute(TimeRange.get_previous_week, "Weekly")
-  end
-
-  def execute_monthly do
-    execute(TimeRange.get_previous_month, "Monthly")
-  end
-
-  defp execute(%{starting: starting, ending: ending} = time_range, period_name) do
-    query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type])
+  def execute do
+    query = Interview |> Interview.working_days_in_current_week |> preload([:interview_panelist, :interview_status, :interview_type])
     candidates_weekly_status = Candidate
                                 |> preload([:role, interviews: ^query])
                                 |> order_by(asc: :role_id)
                                 |> Repo.all
-
     candidates = candidates_weekly_status
                   |> filter_out_candidates_without_interviews
                   |> construct_view_data
-    # previous_week = TimeRange.get_previous_week
-    summary = candidates |> construct_summary_data(time_range)
-    {:ok, start_date} = time_range.starting |> DateFormat.format("{D}/{M}/{YY}")
-    {:ok, to_date} = time_range.ending |> DateFormat.format("{D}/{M}/{YY}")
-    email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary),
-                    else: Templates.status_update_default(start_date, to_date)
+    previous_week = PreviousWeek.get
+    summary = candidates |> construct_summary_data(previous_week)
+    {:ok, start_date} = previous_week.starting |> DateFormat.format("{D}/{M}/{YY}")
+    {:ok, to_date} = previous_week.ending |> DateFormat.format("{D}/{M}/{YY}")
+    email_content = if candidates != [], do: Templates.weekly_status_update(start_date, to_date, candidates, summary),
+                    else: Templates.weekly_status_update_default(start_date, to_date)
 
     MailHelper.deliver(%{
-      subject: "[RecruitX] "<> period_name <>" Status Update",
+      subject: "[RecruitX] Weekly Status Update",
       to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
       html_body: email_content
     })

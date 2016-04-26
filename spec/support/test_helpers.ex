@@ -16,9 +16,6 @@ defmodule RecruitxBackend.TestHelpers do
   def get_start_of_current_week,
   do: Date.now |> Date.beginning_of_week |> Date.shift(mins: 1)
 
-  def get_start_of_previous_month,
-  do: Date.now |> Date.beginning_of_month |> Date.shift(days: -2)
-
   def get_start_of_next_week,
   do: Date.now |> Date.end_of_week |> Date.shift(mins: 1)
 end

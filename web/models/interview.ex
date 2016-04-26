@@ -19,7 +19,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
   alias Timex.DateFormat
-  alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.PreviousWeek
 
   import Ecto.Query
 
@@ -54,7 +54,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def working_days_in_current_week(query) do
-    %{starting: starting, ending: ending} =  TimeRange.get_previous_week
+    %{starting: starting, ending: ending} =  PreviousWeek.get
     within_date_range(query, starting, ending)
   end
 
