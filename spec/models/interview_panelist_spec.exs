@@ -179,10 +179,10 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
         create(:interview_panelist, interview_id: interview1.id, panelist_login_name: "test")
         create(:interview_panelist, interview_id: interview2.id, panelist_login_name: "test")
 
-        [result1, result2] = Repo.all InterviewPanelist.get_interviews_for("test")
+        result = Repo.all InterviewPanelist.get_interviews_for("test")
 
-        expect(result1) |> to(be({interview1.candidate_id, interview1.start_time}))
-        expect(result2) |> to(be({interview2.candidate_id, interview2.start_time}))
+        result |> should(have({interview1.candidate_id, interview1.start_time}))
+        result |> should(have({interview2.candidate_id, interview2.start_time}))
       end
 
       it "should not return interviews who were not interviewed by panelist" do
