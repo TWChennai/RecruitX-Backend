@@ -1,5 +1,5 @@
 <p>Hi all,</p>
-<p>Here is a quick update on the weekly recruitment drive that happened over the week of "<%=start_date%>" to "<%=to_date%>" </p>
+<p>Here is a quick update on the recruitment drive that happened over the period of "<%=start_date%>" to "<%=to_date%>" </p>
 <h4>Summary</h4>
 <ol>
   <li>No. of Candidates Appeared : <%=summary.candidates_appeared%></li>
