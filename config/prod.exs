@@ -67,7 +67,7 @@ config :recruitx_backend, RecruitxBackend.Repo,
   url: System.get_env("DATABASE_URL"),
   pool_size: 20
 
-config :mailer, RecruitxBackend.Mailer,
+config :recruitx_backend, RecruitxBackend.Mailer,
   adapter: Swoosh.Adapters.SMTP,
   username: System.get_env("SMTP_USERNAME"),
   password: System.get_env("SMTP_PASSWORD"),

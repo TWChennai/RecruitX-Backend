@@ -19,5 +19,5 @@ config :recruitx_backend, RecruitxBackend.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
-config :mailer, RecruitxBackend.Mailer,
+config :recruitx_backend, RecruitxBackend.Mailer,
     adapter: Swoosh.Adapters.Local

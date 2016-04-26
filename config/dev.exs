@@ -39,5 +39,5 @@ config :recruitx_backend, RecruitxBackend.Repo,
   hostname: "localhost",
   pool_size: 10
 
-config :mailer, RecruitxBackend.Mailer,
+config :recruitx_backend, RecruitxBackend.Mailer,
     adapter: Swoosh.Adapters.Local
