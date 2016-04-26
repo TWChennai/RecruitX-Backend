@@ -47,6 +47,22 @@ config :quantum, cron: [
   monthly_status_update: [
     schedule: "30 0 1 * *",
     task: "RecruitxBackend.StatusUpdate.execute_monthly",
+  ],
+  jan_status_update: [
+    schedule: "30 0 1 1 *",
+    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
+  ],
+  april_status_update: [
+    schedule: "30 0 1 4 *",
+    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
+  ],
+  july_status_update: [
+    schedule: "30 0 1 7 *",
+    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
+  ],
+  oct_status_update: [
+    schedule: "30 0 1 10 *",
+    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
   ]
 ]
 

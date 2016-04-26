@@ -18,6 +18,10 @@ defmodule RecruitxBackend.StatusUpdate do
     execute(TimeRange.get_previous_month, "Monthly")
   end
 
+  def execute_quarterly do
+   execute(TimeRange.get_previous_quarter, "Quarterly")
+  end
+
   defp execute(%{starting: starting, ending: ending} = time_range, period_name) do
     query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type])
     candidates_weekly_status = Candidate
