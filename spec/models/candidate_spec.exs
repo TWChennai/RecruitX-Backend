@@ -8,12 +8,12 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Skill
-  alias RecruitxBackend.PreviousWeek
+  alias RecruitxBackend.TimeRange
   alias Timex.Date
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
-  let :previous_week, do: PreviousWeek.get
+  let :previous_week, do: TimeRange.get_previous_week
 
   context "valid changeset" do
     subject do: Candidate.changeset(%Candidate{}, valid_attrs)

@@ -1,0 +1,5 @@
+<p>Hi all,</p>
+<p>No Interviews were scheduled in the period (<%=start_date%> to <%=to_date%>). </p>
+<br />
+<strong>Thanks</strong><br />
+RecruitX Team
