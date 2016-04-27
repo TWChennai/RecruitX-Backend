@@ -24,9 +24,9 @@ defmodule RecruitxBackend.CandidateController do
   def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = candidate}) when skill_ids != [] and interview_rounds != [] do
       {status, result_of_db_transaction} = Repo.transaction fn ->
         try do
-          {_, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.insert
-          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.insert
-          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.insert
+          {_, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.validate_and(Repo.custom_insert)
+          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.validate_and(Repo.custom_insert)
           candidate |> Repo.preload(:candidate_skills)
         catch {_, result_of_db_transaction} ->
           Repo.rollback(result_of_db_transaction)

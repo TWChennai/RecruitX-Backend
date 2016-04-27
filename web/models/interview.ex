@@ -298,7 +298,7 @@ defmodule RecruitxBackend.Interview do
   def update_status(id, status_id) do
     interview = id |> retrieve_interview
     if !is_nil(interview) do
-      [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.update
+      [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
       if is_pass(status_id) do
         Repo.transaction fn ->
           delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)

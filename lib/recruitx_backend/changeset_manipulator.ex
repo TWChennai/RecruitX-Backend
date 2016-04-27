@@ -1,18 +1,11 @@
 defmodule RecruitxBackend.ChangesetManipulator do
 
   alias RecruitxBackend.ChangesetErrorParser
-  alias RecruitxBackend.Repo
 
-  def insert(changesets) do
+  def validate_and(changesets, insert_or_update) do
     changesets
     |> check_changesets_validity
-    |> manipulate_changesets(changesets, &(Repo.insert(&1)))
-  end
-
-  def update(changesets) do
-    changesets
-    |> check_changesets_validity
-    |> manipulate_changesets(changesets, &(Repo.update(&1)))
+    |> manipulate_changesets(changesets, insert_or_update)
   end
 
   defp manipulate_changesets(true, changesets, db_operation) do
