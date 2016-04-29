@@ -11,18 +11,18 @@ defmodule RecruitxBackend.StatusUpdate do
   alias Timex.Date
 
   def execute_weekly do
-    execute(TimeRange.get_previous_week, "Weekly")
+    execute(TimeRange.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
   end
 
   def execute_monthly do
-    execute(TimeRange.get_previous_month, "Monthly")
+    execute(TimeRange.get_previous_month, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
   end
 
   def execute_quarterly do
-   execute(TimeRange.get_previous_quarter, "Quarterly")
+   execute(TimeRange.get_previous_quarter, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
   end
 
-  defp execute(%{starting: starting, ending: ending} = time_range, period_name) do
+  defp execute(%{starting: starting, ending: ending} = time_range, period_name, recepient) do
     query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type])
     candidates_status = Candidate
                                 |> preload([:role, interviews: ^query])
@@ -40,7 +40,7 @@ defmodule RecruitxBackend.StatusUpdate do
 
     MailHelper.deliver(%{
       subject: "[RecruitX] "<> period_name <>" Status Update",
-      to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+      to: recepient |> String.split,
       html_body: email_content
     })
   end

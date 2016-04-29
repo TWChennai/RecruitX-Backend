@@ -161,7 +161,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
       email = %{
           subject: "[RecruitX] Monthly Status Update",
-          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+          to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
       allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
@@ -186,7 +186,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: Date.now )
       email = %{
           subject: "[RecruitX] Monthly Status Update",
-          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+          to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
 
@@ -240,7 +240,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
       email = %{
           subject: "[RecruitX] Quarterly Status Update",
-          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+          to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
       allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
@@ -286,7 +286,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       create(:interview, interview_type_id: 1, start_time: Date.now )
       email = %{
           subject: "[RecruitX] Quarterly Status Update",
-          to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
+          to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
 
