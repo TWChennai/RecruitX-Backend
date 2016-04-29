@@ -159,7 +159,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
-      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b", :strftime)
+      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b %Y", :strftime)
       email = %{
           subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
           to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -184,7 +184,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     it "should send a default mail if there are no interview in previous month" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
-      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b", :strftime)
+      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b %Y", :strftime)
+
       create(:interview, interview_type_id: 1, start_time: Date.now )
       email = %{
           subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
@@ -240,7 +241,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
-      subject_suffix = " - Q" <> to_string(div(TimeRange.get_previous_quarter.starting.month + 2, 4) + 1)
+      time = TimeRange.get_previous_quarter
+      subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
       email = %{
           subject: "[RecruitX] Quarterly Status Update" <> subject_suffix,
           to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -287,7 +289,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       Repo.delete_all Candidate
       Repo.delete_all Interview
       create(:interview, interview_type_id: 1, start_time: Date.now )
-      subject_suffix = " - Q" <> to_string(div(TimeRange.get_previous_quarter.starting.month + 2, 4) + 1)
+      time = TimeRange.get_previous_quarter
+      subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
+      
       email = %{
           subject: "[RecruitX] Quarterly Status Update" <> subject_suffix,
           to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,

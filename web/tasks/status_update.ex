@@ -16,13 +16,13 @@ defmodule RecruitxBackend.StatusUpdate do
 
   def execute_monthly do
     time = TimeRange.get_previous_month
-    {:ok, subject_suffix } = DateFormat.format(time.starting, " - %b", :strftime)
+    {:ok, subject_suffix } = DateFormat.format(time.starting, " - %b %Y", :strftime)
     execute(time, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
   def execute_quarterly do
     time = TimeRange.get_previous_quarter
-    subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1)
+    subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
     execute(time, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
