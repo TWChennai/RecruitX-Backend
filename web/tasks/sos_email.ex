@@ -25,7 +25,9 @@ defmodule RecruitxBackend.SosEmail do
     |> preload([:interview_type, candidate: [:role,:skills]])
     |> order_by(asc: :start_time)
     |> Interview.within_date_range(Date.now, Date.beginning_of_day(Date.now) |> Date.shift(days: 2))
-    |> select([i], {i, fragment("( select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
+    # TODO: Try to move away from prepared statements/fragments, and instead use first-class functions defined by Ecto
+    # This will make upgrades much easier in the future.
+    |> select([i], {i, fragment("(select (select max_sign_up_limit from interview_types where id = ?) - (select count(interview_id) from interview_panelists where interview_id = ?) as no_of_signups_needed)", i.interview_type_id, i.id)})
     |> Repo.all
   end
 

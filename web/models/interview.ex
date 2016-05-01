@@ -111,6 +111,8 @@ defmodule RecruitxBackend.Interview do
     __MODULE__
     |> join(:left, [i], ip in assoc(i, :interview_panelist))
     |> group_by([i], i.id)
+    # TODO: Try to move away from prepared statements/fragments, and instead use first-class functions defined by Ecto
+    # This will make upgrades much easier in the future.
     |> having([i], count(i.id) < fragment("(select max_sign_up_limit from interview_types where id = ?)", i.interview_type_id) or not(i.id in fragment("(select interview_id from interview_panelists where interview_id = ?)", i.id)))
   end
 
@@ -347,6 +349,8 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_first_interview_id_for_all_candidates do
+    # TODO: Try to move away from prepared statements/fragments, and instead use first-class functions defined by Ecto
+    # This will make upgrades much easier in the future.
     (from i in __MODULE__,
     where: i.id in fragment("select i.id from interviews i where i.candidate_id=? order by i.start_time limit 1", i.candidate_id), select: i.id)
     |> Repo.all
