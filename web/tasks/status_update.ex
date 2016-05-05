@@ -7,6 +7,7 @@ defmodule RecruitxBackend.StatusUpdate do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.TimeRange
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Role
   alias Timex.DateFormat
   alias Timex.Date
 
@@ -36,7 +37,8 @@ defmodule RecruitxBackend.StatusUpdate do
     candidates = candidates_status
                   |> filter_out_candidates_without_interviews
                   |> construct_view_data
-    summary = candidates |> construct_summary_data(time_range)
+    summary = Role.get_all_roles()
+      |> Enum.reduce(%{}, fn role, acc -> Map.put(acc, role.name, construct_summary_data(Enum.filter(candidates, fn x -> x.role == role.name end), time_range, role.id)) end)
     {:ok, start_date} = starting |> DateFormat.format("{D}/{M}/{YY}")
     {:ok, to_date} = ending |> DateFormat.format("{D}/{M}/{YY}")
     email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary, exclude_details),
@@ -58,19 +60,19 @@ defmodule RecruitxBackend.StatusUpdate do
     end)
   end
 
-  defp construct_summary_data(candidates, date_range) do
-    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(date_range)
+  defp construct_summary_data(candidates, date_range, role_id) do
+    {candidates_pursued, candidates_rejected} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(date_range, role_id)
     %{
       candidates_appeared: Enum.count(candidates),
       interviews_count: candidates |> get_total_no_of_interviews,
-      candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress,
+      candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress(role_id),
       candidates_pursued: Enum.count(candidates_pursued),
-      candidates_rejected: get_total_no_of_rejects(candidates_rejected, date_range)
+      candidates_rejected: get_total_no_of_rejects(candidates_rejected, date_range, role_id)
     }
   end
 
-  defp get_total_no_of_rejects(candidates_rejected, date_range) do
-    Candidate.get_no_of_pass_candidates_within_range(date_range) + Enum.count(candidates_rejected)
+  defp get_total_no_of_rejects(candidates_rejected, date_range, role_id) do
+    Candidate.get_no_of_pass_candidates_within_range(date_range, role_id) + Enum.count(candidates_rejected)
   end
 
   defp get_total_no_of_interviews(candidates) do

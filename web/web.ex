@@ -23,7 +23,7 @@ defmodule RecruitxBackend.Web do
 
       import Ecto
       import Ecto.Changeset
-      import Ecto.Query, only: [from: 1, from: 2, where: 2, preload: 3]
+      import Ecto.Query, only: [from: 1, from: 2, where: 2, where: 3, preload: 3]
     end
   end
 

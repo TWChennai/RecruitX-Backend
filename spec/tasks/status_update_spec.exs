@@ -7,6 +7,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.StatusUpdate
   alias RecruitxBackend.MailHelper
+  alias RecruitxBackend.Role
   alias Timex.Date
   alias Timex.DateFormat
   alias RecruitxBackend.TimeRange
@@ -47,6 +48,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute weekly status update" do
 
     it "should filter previous weeks interviews and construct email" do
+      Repo.delete_all Role
       Repo.delete_all Candidate
       Repo.delete_all Interview
 
@@ -65,12 +67,16 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidates = candidates_weekly_status
       |> StatusUpdate.filter_out_candidates_without_interviews
       |> StatusUpdate.construct_view_data
-      summary = %{candidates_appeared: 1,
+
+      candidate_role = (from r in Role, join: c in assoc(r, :candidates), where: c.id == ^interview.candidate_id) |> Repo.one
+
+      summary = %{candidate_role.name => %{
+        candidates_appeared: 1,
         candidates_in_progress: 1,
         candidates_pursued: 0,
         candidates_rejected: 0,
         interviews_count: 1
-      }
+      }}
       allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_weekly
@@ -126,6 +132,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute monthly status update" do
 
     it "should filter previous months interviews and construct email" do
+      Repo.delete_all Role
       Repo.delete_all Candidate
       Repo.delete_all Interview
 
@@ -144,12 +151,15 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidates = candidates_weekly_status
       |> StatusUpdate.filter_out_candidates_without_interviews
       |> StatusUpdate.construct_view_data
-      summary = %{candidates_appeared: 1,
+
+      candidate_role = (from r in Role, join: c in assoc(r, :candidates), where: c.id == ^interview.candidate_id) |> Repo.one
+
+      summary = %{candidate_role.name => %{candidates_appeared: 1,
         candidates_in_progress: 1,
         candidates_pursued: 0,
         candidates_rejected: 0,
         interviews_count: 1
-      }
+      }}
       allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_monthly
@@ -208,6 +218,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute quarterly status update" do
 
     it "should filter previous quarters interviews and construct email" do
+      Repo.delete_all Role
       Repo.delete_all Candidate
       Repo.delete_all Interview
 
@@ -226,12 +237,15 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidates = candidates_weekly_status
       |> StatusUpdate.filter_out_candidates_without_interviews
       |> StatusUpdate.construct_view_data
-      summary = %{candidates_appeared: 1,
+
+      candidate_role = (from r in Role, join: c in assoc(r, :candidates), where: c.id == ^interview.candidate_id) |> Repo.one
+
+      summary = %{candidate_role.name => %{candidates_appeared: 1,
         candidates_in_progress: 1,
         candidates_pursued: 0,
         candidates_rejected: 0,
         interviews_count: 1
-      }
+      }}
       allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_quarterly

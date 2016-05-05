@@ -1,13 +1,20 @@
 <p>Hi all,</p>
 <p>Here is a quick update on the recruitment drive that happened over the period of "<%=start_date%>" to "<%=to_date%>" </p>
 <h4>Summary</h4>
-<ol>
-  <li>No. of Candidates Appeared : <%=summary.candidates_appeared%></li>
-  <li>No. of Interviews : <%=summary.interviews_count%></li>
-  <li>No. of Candidates Pursued after LD round : <%=summary.candidates_pursued%></li>
-  <li>No. of Candidates Rejected: <%=summary.candidates_rejected%></li>
-  <li>No. of Candidates In Progress (till date) : <%=summary.candidates_in_progress%></li>
-</ol>
+
+  <%= Enum.map(summary, fn({role, role_wise_summary})->  %>
+  <%= unless role_wise_summary.candidates_appeared == 0 and role_wise_summary.candidates_in_progress == 0 do %>
+    <ol>
+    <h4>Role: <%= role%></h4>
+    <li>No. of Candidates Appeared : <%=role_wise_summary.candidates_appeared%></li>
+    <li>No. of Interviews : <%=role_wise_summary.interviews_count%></li>
+    <li>No. of Candidates Pursued after LD round : <%=role_wise_summary.candidates_pursued%></li>
+    <li>No. of Candidates Rejected: <%=role_wise_summary.candidates_rejected%></li>
+    <li>No. of Candidates In Progress (till date) : <%=role_wise_summary.candidates_in_progress%></li>
+    </ol>
+    <% end%>
+  <% end)%>
+
 <br />
 <%= unless exclude_details do %>
 <h4> Details </h4>

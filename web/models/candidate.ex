@@ -57,9 +57,10 @@ defmodule RecruitxBackend.Candidate do
     from c in query, where: c.pipeline_closure_time >= ^start_date and c.pipeline_closure_time <= ^end_date
   end
 
-  def get_candidates_pursued_and_rejected_after_pipeline_closure_separately(%{starting: start_date, ending: end_date}) do
+  def get_candidates_pursued_and_rejected_after_pipeline_closure_separately(%{starting: start_date, ending: end_date}, role_id) do
     pipeline_closed_candidates = __MODULE__
                                   |> pipeline_closure_within_range(start_date, end_date)
+                                  |> where([c], c.role_id == ^role_id)
                                   |> Repo.all
 
     pursue_interview_status_id = (InterviewStatus.pursue |> InterviewStatus.retrieve_by_name).id
@@ -73,9 +74,12 @@ defmodule RecruitxBackend.Candidate do
       end)
   end
 
-  def get_no_of_pass_candidates_within_range(%{starting: start_date, ending: end_date}) do
+  def get_no_of_pass_candidates_within_range(%{starting: start_date, ending: end_date}, role_id) do
     pass_status_id = (PipelineStatus.retrieve_by_name(PipelineStatus.pass)).id
-    candidates_passed = (from c in __MODULE__, where: c.pipeline_status_id == ^pass_status_id) |> Repo.all
+    candidates_passed = (from c in __MODULE__,
+                        where: c.pipeline_status_id == ^pass_status_id and
+                        c.role_id == ^role_id)
+                          |> Repo.all
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
 
     Enum.count(candidates_passed, fn(candidate) ->
@@ -141,10 +145,11 @@ defmodule RecruitxBackend.Candidate do
     Enum.map(candidate.interviews, &(Interview.format(&1)))
   end
 
-  def get_total_no_of_candidates_in_progress do
+  def get_total_no_of_candidates_in_progress(role_id) do
     (from c in __MODULE__,
     join: p in assoc(c, :pipeline_status),
-    where: p.name == ^PipelineStatus.in_progress,
+    where: p.name == ^PipelineStatus.in_progress and
+    c.role_id == ^role_id,
     select: count(c.id))
       |> Repo.one
   end
