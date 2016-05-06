@@ -91,4 +91,8 @@ defmodule RecruitxBackend.InterviewPanelist do
     map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
     {Map.keys(map_result), Map.values(map_result)}
   end
+
+  def get_email_address(panelist_login_name) do
+    panelist_login_name <> System.get_env("EMAIL_POSTFIX")
+  end
 end

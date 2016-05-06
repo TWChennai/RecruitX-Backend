@@ -1,0 +1,8 @@
+<p>Hi,</p>
+  <p>
+    The recruitment team had to cancel
+     the <b><%= interview_name %></b> interview of candidate <b> <%= candidate_first_name %> <%= candidate_last_name %></b> on <b><%= interview_date %></b>.
+  </p>
+<br />
+<strong>Thanks</strong><br />
+RecruitX

@@ -20,6 +20,7 @@ defmodule RecruitxBackend.Interview do
   alias Timex.Date
   alias Timex.DateFormat
   alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.InterviewCancellationNotification
 
   import Ecto.Query
 
@@ -316,9 +317,11 @@ defmodule RecruitxBackend.Interview do
   end
 
   def delete_successive_interviews_and_panelists(candidate_id, start_time) do
-    (from i in __MODULE__,
-      where: i.candidate_id == ^candidate_id,
-      where: (i.start_time > ^start_time)) |> Repo.delete_all
+    interviews_to_delete_query = from i in __MODULE__,
+    where: i.candidate_id == ^candidate_id,
+    where: (i.start_time > ^start_time)
+    interviews_to_delete_query |> InterviewCancellationNotification.execute
+    interviews_to_delete_query |> Repo.delete_all
   end
 
   defp retrieve_interview(id) do

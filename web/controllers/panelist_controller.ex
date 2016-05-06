@@ -60,7 +60,7 @@ defmodule RecruitxBackend.PanelistController do
   defp send_mail_with_content(panelist_login_name, email_content) do
     MailHelper.deliver(%{
       subject: "[RecruitX] Change in interview panel",
-      to: [panelist_login_name <> System.get_env("EMAIL_POSTFIX")],
+      to: [panelist_login_name |> InterviewPanelist.get_email_address],
       html_body: email_content
     })
   end

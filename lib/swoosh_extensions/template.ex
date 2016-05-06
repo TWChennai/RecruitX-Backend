@@ -6,4 +6,5 @@ defmodule Swoosh.Templates do
   EEx.function_from_file(:def, :consolidated_feedback, "web/templates/mail/consolidated_feedback.html.eex", [:candidate])
   EEx.function_from_file(:def, :sos_email, "web/templates/mail/sos_email.html.eex", [:interviews_with_insufficient_panelists])
   EEx.function_from_file(:def, :panelist_removal_notification, "web/templates/mail/panelist_removal_notification.html.eex", [:panliest_removed, :candidate_first_name, :candidate_last_name, :interview_name, :interview_date])
+  EEx.function_from_file(:def, :interview_cancellation_notification, "web/templates/mail/interview_cancellation_notification.html.eex", [:candidate_first_name, :candidate_last_name, :interview_name, :interview_date])
 end
