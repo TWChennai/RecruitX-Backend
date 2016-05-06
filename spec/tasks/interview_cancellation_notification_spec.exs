@@ -39,7 +39,7 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
 
       allow MailHelper |> to(accept(:deliver, fn(%{subject: subject, to: to_addresses, html_body: {
         candidate_first_name, candidate_last_name, interview_name, interview_time }}) ->
-          expect subject |> to(eql("[RecruitX] Interview Cancellation"))
+          expect subject |> to(eql("[RecruitX] roundone on 01/01/11 18:00 is cancelled"))
           expect to_addresses |> to(eql(["test@x.com"]))
           expect candidate_first_name |> to(eql("testing"))
           expect candidate_last_name |> to(eql("last"))

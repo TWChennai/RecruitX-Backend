@@ -21,16 +21,18 @@ defmodule RecruitxBackend.InterviewCancellationNotification do
   def deliver_mail_for_cancelled_interview_rounds([]), do: :ok
 
   def deliver_mail_for_cancelled_interview_rounds([{interview_round, interview_panelist} | rest]) do
+    formatted_date = interview_round.start_time
+    |> Date.from
+    |> Timezone.convert("Asia/Kolkata")
+    |> DateFormat.format!("%d/%m/%y %H:%M", :strftime)
+
     MailHelper.deliver %{
-      subject: "[RecruitX] Interview Cancellation",
+      subject: "[RecruitX] " <> interview_round.interview_type.name <> " on " <> formatted_date <> " is cancelled",
       to: [interview_panelist.panelist_login_name |> InterviewPanelist.get_email_address],
       html_body: Templates.interview_cancellation_notification(interview_round.candidate.first_name,
         interview_round.candidate.last_name,
         interview_round.interview_type.name,
-        interview_round.start_time
-        |> Date.from
-        |> Timezone.convert("Asia/Kolkata")
-        |> DateFormat.format!("%d/%m/%y %H:%M", :strftime))
+        formatted_date)
     }
     deliver_mail_for_cancelled_interview_rounds(rest)
   end
