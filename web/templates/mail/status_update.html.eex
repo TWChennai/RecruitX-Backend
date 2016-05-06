@@ -11,70 +11,67 @@
     <li>No. of Candidates Pursued after LD round : <%=role_wise_summary.candidates_pursued%></li>
     <li>No. of Candidates Rejected: <%=role_wise_summary.candidates_rejected%></li>
     <li>No. of Candidates In Progress (till date) : <%=role_wise_summary.candidates_in_progress%></li>
-    </ol>
-    <% end%>
-  <% end)%>
-
-<br />
-<%= unless exclude_details do %>
-<h4> Details </h4>
-  <table cellpadding="10" style="border-collapse: collapse;">
-    <thead>
-    <tr>
-      <th rowspan=2 style="border: 1px solid #000;">Candidate</th>
-      <th rowspan=2 style="border: 1px solid #000;">Role</th>
-      <th colspan=4 scope="colgroup" style="border: 1px solid #000;">Interviews</th>
-    </tr>
-    <tr>
-      <th style="padding: 0px;">
-        <table style="width:100%; margin: 0px; border-collapse: collapse;">
-          <th width="25%" style="border: 1px solid #000;">Round</th>
-          <th width="25%" style="border: 1px solid #000;">Date</th>
-          <th width="25%" style="border: 1px solid #000;">Panelists</th>
-          <th width="25%" style="border: 1px solid #000;">Results</th>
-        </table>
-      </th>
-    </tr>
-    </thead>
-    <tbody>
-    <%= for candidate <- candidates do %>
-      <tr>
-        <td style="border: 1px solid #000;">
-          <%= candidate.name %>
-        </td>
-        <td style="border: 1px solid #000;">
-          <%= candidate.role %>
-        </td>
-        <td style="padding: 0px; border: 1px solid #000;">
-          <table cellpadding="10" style="width:100%; margin: 0px; border-collapse: collapse;">
-            <%= for interview <- candidate.interviews do %>
+    <%= unless exclude_details do %>
+      <h4> Details </h4>
+        <table cellpadding="10" style="border-collapse: collapse;">
+          <thead>
+          <tr>
+            <th rowspan=2 style="border: 1px solid #000;">Candidate</th>
+            <th rowspan=2 style="border: 1px solid #000;">Role</th>
+            <th colspan=4 scope="colgroup" style="border: 1px solid #000;">Interviews</th>
+          </tr>
+          <tr>
+            <th style="padding: 0px;">
+              <table style="width:100%; margin: 0px; border-collapse: collapse;">
+                <th width="25%" style="border: 1px solid #000;">Round</th>
+                <th width="25%" style="border: 1px solid #000;">Date</th>
+                <th width="25%" style="border: 1px solid #000;">Panelists</th>
+                <th width="25%" style="border: 1px solid #000;">Results</th>
+              </table>
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          <%= for candidate <- role_wise_summary.candidates do %>
             <tr>
-              <td width="25%" style="border: 1px solid #000; border-left: 0;">
-               <%= interview.name %>
+              <td style="border: 1px solid #000;">
+                <%= candidate.name %>
               </td>
-              <td width="25%" style="border: 1px solid #000;">
-               <%= interview.date %>
+              <td style="border: 1px solid #000;">
+                <%= candidate.role %>
               </td>
-              <td width="25%" style="border: 1px solid #000;">
-                <%= if interview.panelists != "" do
-                  interview.panelists
-                else
-                  'N/A'
-                end %>
-              </td>
-              <td width="25%" style="border: 1px solid #000; border-right: 0;">
-               <%= interview.result %>
-              </td>
-            </tr>
-            <% end %>
+              <td style="padding: 0px; border: 1px solid #000;">
+                <table cellpadding="10" style="width:100%; margin: 0px; border-collapse: collapse;">
+                  <%= for interview <- candidate.interviews do %>
+                  <tr>
+                    <td width="25%" style="border: 1px solid #000; border-left: 0;">
+                     <%= interview.name %>
+                    </td>
+                    <td width="25%" style="border: 1px solid #000;">
+                     <%= interview.date %>
+                    </td>
+                    <td width="25%" style="border: 1px solid #000;">
+                      <%= if interview.panelists != "" do
+                        interview.panelists
+                      else
+                        'N/A'
+                      end %>
+                    </td>
+                    <td width="25%" style="border: 1px solid #000; border-right: 0;">
+                     <%= interview.result %>
+                    </td>
+                  </tr>
+                  <% end %>
+              </table>
+            </td>
+          </tr>
+          <% end %>
+          </tbody>
         </table>
-      </td>
-    </tr>
-    <% end %>
-    </tbody>
-  </table>
-<% end %>
-
+      <% end %>
+    <% end%>
+  </ol>
+  <% end)%>
 <br />
 <strong>Thanks</strong><br />
 RecruitX Team

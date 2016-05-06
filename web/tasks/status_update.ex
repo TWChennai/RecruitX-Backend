@@ -41,7 +41,7 @@ defmodule RecruitxBackend.StatusUpdate do
       |> Enum.reduce(%{}, fn role, acc -> Map.put(acc, role.name, construct_summary_data(Enum.filter(candidates, fn x -> x.role == role.name end), time_range, role.id)) end)
     {:ok, start_date} = starting |> DateFormat.format("{D}/{M}/{YY}")
     {:ok, to_date} = ending |> DateFormat.format("{D}/{M}/{YY}")
-    email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary, exclude_details),
+    email_content = if candidates != [], do: Templates.status_update(start_date, to_date, summary, exclude_details),
                     else: Templates.status_update_default(start_date, to_date)
 
     MailHelper.deliver(%{
@@ -67,7 +67,8 @@ defmodule RecruitxBackend.StatusUpdate do
       interviews_count: candidates |> get_total_no_of_interviews,
       candidates_in_progress: Candidate.get_total_no_of_candidates_in_progress(role_id),
       candidates_pursued: Enum.count(candidates_pursued),
-      candidates_rejected: get_total_no_of_rejects(candidates_rejected, date_range, role_id)
+      candidates_rejected: get_total_no_of_rejects(candidates_rejected, date_range, role_id),
+      candidates: candidates
     }
   end
 
