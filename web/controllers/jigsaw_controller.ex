@@ -17,12 +17,12 @@ defmodule RecruitxBackend.JigsawController do
     other_role = Role.retrieve_by_name(Role.other)
     recruiter_role = Map.merge(other_role, %{name: "Specialist"})
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev)}
-      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa)}
-      "subham" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.ba)}
-      "kausalym" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.pm)}
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role}
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false}
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false}
+      "subham" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.ba), is_super_user: true}
+      "kausalym" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.pm), is_super_user: false}
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false}
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false}
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         case response.body do
           "" -> %{is_recruiter: @invalid_user, calculated_hire_date: Date.now, past_experience: 0}
@@ -35,9 +35,16 @@ defmodule RecruitxBackend.JigsawController do
                                   tw_experience_in_month = tw_experience |> year_to_month
                                   calculated_hire_date = Date.now
                                                         |> Date.shift(months: -tw_experience_in_month)
+
+                                  is_super_user = false
+                                  case role_name do
+                                    @office_princinple -> is_super_user = true
+                                  end
+
                                   case department_name do
-                                    @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role}
-                                    _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role}
+                                    @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user}
+
+                                    _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user}
                                   end
                   {:error, reason} -> %{is_recruiter: reason, calculated_hire_date: Date.now, past_experience: 0, role: other_role}
                 end   # end of Parser stmt
