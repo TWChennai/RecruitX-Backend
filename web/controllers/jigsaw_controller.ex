@@ -6,6 +6,7 @@ defmodule RecruitxBackend.JigsawController do
   alias RecruitxBackend.Role
 
   @recruitment_department "People Recruiting"
+  @office_princinple "Off Prin"
   @invalid_user "not a valid user"
   @jigsaw_url System.get_env("JIGSAW_URL")
   @token System.get_env("JIGSAW_TOKEN")
@@ -19,7 +20,7 @@ defmodule RecruitxBackend.JigsawController do
     user_details = case id do
       "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false}
       "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false}
-      "subham" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.ba), is_super_user: true}
+      "subham" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.office_principal), is_super_user: true}
       "kausalym" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.pm), is_super_user: false}
       "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false}
       "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false}
