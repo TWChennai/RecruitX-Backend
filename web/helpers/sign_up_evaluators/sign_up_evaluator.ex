@@ -12,6 +12,8 @@ defmodule RecruitxBackend.SignUpEvaluator do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
 
+  @office_principal Role.office_principal
+
   def populate_sign_up_data_container(panelist_login_name, panelist_experience, panelist_role) do
     {candidate_ids_interviewed, my_previous_sign_up_start_times} = InterviewPanelist.get_candidate_ids_and_start_times_interviewed_by(panelist_login_name)
     signup_counts = InterviewPanelist.get_interview_type_based_count_of_sign_ups |> Repo.all
@@ -34,6 +36,11 @@ defmodule RecruitxBackend.SignUpEvaluator do
       experience_matrix_filters: (ExperienceMatrix.filter(panelist_experience, panelist_role)),
       role_ids_with_filter: ExperienceMatrix.get_role_ids_with_filter
     }
+  end
+
+  def evaluate(%{ panelist_role: %{name: @office_principal}} = sign_up_data_container , interview) do
+    %SignUpEvaluationStatus{}
+    |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
   end
 
   def evaluate(sign_up_data_container, interview) do

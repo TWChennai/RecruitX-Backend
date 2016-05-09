@@ -195,6 +195,7 @@ defmodule RecruitxBackend.Interview do
     or panelist_role == nil
     or interview.candidate.role_id == panelist_role.id
     or (Role.is_ba_or_pm(interview.candidate.role_id) and Role.is_ba_or_pm(panelist_role.id))
+    or panelist_role.name == Role.office_principal
   end
 
   defp put_sign_up_status(sign_up_data_container, interview) do
