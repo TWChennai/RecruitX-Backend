@@ -14,6 +14,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.Slot
   alias RecruitxBackend.RoleInterviewType
   alias Timex.Date
   alias Timex.DateFormat
@@ -81,6 +82,16 @@ defmodule RecruitxBackend.Factory do
       experience: Decimal.new(1.23),
       role_id: create(:role).id,
       pipeline_status_id: create(:pipeline_status).id
+    }
+  end
+
+  def factory(:slot) do
+    random_time = getRandomDateTime
+    %Slot{
+      role_id: create(:role).id,
+      start_time: random_time,
+      end_time: random_time |> Date.shift(hours: 1),
+      interview_type_id: create(:interview_type).id,
     }
   end
 
