@@ -5,24 +5,24 @@ defmodule RecruitxBackend.StatusUpdate do
   alias Swoosh.Templates
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.Timer
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias Timex.DateFormat
   alias Timex.Date
 
   def execute_weekly do
-    execute(TimeRange.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
+    execute(Timer.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
   end
 
   def execute_monthly do
-    time = TimeRange.get_previous_month
+    time = Timer.get_previous_month
     {:ok, subject_suffix } = DateFormat.format(time.starting, " - %b %Y", :strftime)
     execute(time, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
   def execute_quarterly do
-    time = TimeRange.get_previous_quarter
+    time = Timer.get_previous_quarter
     subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
     execute(time, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end

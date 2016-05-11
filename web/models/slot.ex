@@ -3,7 +3,7 @@ defmodule RecruitxBackend.Slot do
 
   alias RecruitxBackend.Role
   alias RecruitxBackend.InterviewType
-  alias Timex.Date
+  alias RecruitxBackend.Timer
 
   @duration_of_interview 1
 
@@ -23,15 +23,9 @@ defmodule RecruitxBackend.Slot do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> calculate_end_time
+    |> Timer.is_in_future(:start_time)
+    |> Timer.should_less_than_a_month(:start_time)
+    |> Timer.add_end_time(@duration_of_interview)
   end
 
-  defp calculate_end_time(existing_changeset) do
-    incoming_start_time = existing_changeset |> get_field(:start_time)
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
-      min_valid_end_time = incoming_start_time |> Date.shift(hours: @duration_of_interview)
-      existing_changeset = existing_changeset |> put_change(:end_time, min_valid_end_time)
-    end
-    existing_changeset
-  end
 end

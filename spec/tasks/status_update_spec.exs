@@ -10,7 +10,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   alias RecruitxBackend.Role
   alias Timex.Date
   alias Timex.DateFormat
-  alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.Timer
 
   describe "filter out candidates without interviews" do
 
@@ -56,7 +56,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
       candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
-      %{starting: start_date, ending: end_date} = TimeRange.get_previous_week
+      %{starting: start_date, ending: end_date} = Timer.get_previous_week
       {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
 
@@ -141,7 +141,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
       candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
-      %{starting: start_date, ending: end_date} = TimeRange.get_previous_month
+      %{starting: start_date, ending: end_date} = Timer.get_previous_month
       {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
 
@@ -171,7 +171,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
-      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b %Y", :strftime)
+      {:ok, subject_suffix } = DateFormat.format(Timer.get_previous_month.starting, " - %b %Y", :strftime)
       email = %{
           subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
           to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -196,7 +196,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     it "should send a default mail if there are no interview in previous month" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
-      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b %Y", :strftime)
+      {:ok, subject_suffix } = DateFormat.format(Timer.get_previous_month.starting, " - %b %Y", :strftime)
 
       create(:interview, interview_type_id: 1, start_time: Date.now )
       email = %{
@@ -228,7 +228,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
       candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
-      %{starting: start_date, ending: end_date} = TimeRange.get_previous_quarter
+      %{starting: start_date, ending: end_date} = Timer.get_previous_quarter
       {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
       {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
 
@@ -258,7 +258,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
-      time = TimeRange.get_previous_quarter
+      time = Timer.get_previous_quarter
       subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
       email = %{
           subject: "[RecruitX] Quarterly Status Update" <> subject_suffix,
@@ -306,7 +306,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       Repo.delete_all Candidate
       Repo.delete_all Interview
       create(:interview, interview_type_id: 1, start_time: Date.now )
-      time = TimeRange.get_previous_quarter
+      time = Timer.get_previous_quarter
       subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
 
       email = %{

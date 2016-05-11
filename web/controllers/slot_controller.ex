@@ -24,8 +24,14 @@ defmodule RecruitxBackend.SlotController do
   end
 
   defp create_multiple_slots(conn, changeset, count) do
-    Repo.insert(changeset)
-    create_multiple_slots(conn, changeset, count - 1)
+    case Repo.insert(changeset) do
+      {:ok, _slot} ->
+        create_multiple_slots(conn, changeset, count - 1)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
+    end
   end
 
 end

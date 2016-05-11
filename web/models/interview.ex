@@ -19,7 +19,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.TimexHelper
   alias Timex.Date
   alias Timex.DateFormat
-  alias RecruitxBackend.TimeRange
+  alias RecruitxBackend.Timer
   alias RecruitxBackend.InterviewCancellationNotification
 
   import Ecto.Query
@@ -55,7 +55,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def working_days_in_current_week(query) do
-    %{starting: starting, ending: ending} =  TimeRange.get_previous_week
+    %{starting: starting, ending: ending} =  Timer.get_previous_week
     within_date_range(query, starting, ending)
   end
 
@@ -125,9 +125,9 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:candidate)
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
-    |> is_in_future(:start_time)
-    |> should_less_than_a_month(:start_time)
-    |> calculate_end_time
+    |> Timer.is_in_future(:start_time)
+    |> Timer.should_less_than_a_month(:start_time)
+    |> Timer.add_end_time(@duration_of_interview)
   end
 
   def get_interviews_ordered_by_start_time do
@@ -138,36 +138,6 @@ defmodule RecruitxBackend.Interview do
 
   def within_date_range(query, start_time, end_time) do
     from i in query, where: i.start_time >= ^start_time and i.start_time <= ^end_time
-  end
-
-  #TODO: When end_time is sent from UI, validations on end time to be done
-  defp calculate_end_time(existing_changeset) do
-    incoming_start_time = existing_changeset |> get_field(:start_time)
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
-      min_valid_end_time = incoming_start_time |> Date.shift(hours: @duration_of_interview)
-      existing_changeset = existing_changeset |> put_change(:end_time, min_valid_end_time)
-    end
-    existing_changeset
-  end
-
-  def is_in_future(existing_changeset, field) do
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
-      new_start_time = Changeset.get_field(existing_changeset, field)
-      current_time = (Date.now |> Date.shift(mins: -5))
-      valid = TimexHelper.compare(new_start_time, current_time)
-      if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be in the future")
-    end
-    existing_changeset
-  end
-
-  def should_less_than_a_month(existing_changeset, field) do
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
-      new_start_time = Changeset.get_field(existing_changeset, field)
-      current_time_after_a_month = Date.now |> Date.shift(months: 1)
-      valid = TimexHelper.compare(current_time_after_a_month, new_start_time)
-      if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, field, "should be less than a month")
-    end
-    existing_changeset
   end
 
   defp validate_single_update_of_status(existing_changeset) do
