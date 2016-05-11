@@ -24,7 +24,7 @@ defmodule RecruitxBackend.Slot do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> Timer.is_in_future(:start_time)
-    |> Timer.should_less_than_a_month(:start_time)
+    |> Timer.is_less_than_a_month(:start_time)
     |> Timer.add_end_time(@duration_of_interview)
   end
 

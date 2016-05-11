@@ -126,7 +126,7 @@ defmodule RecruitxBackend.Interview do
     |> assoc_constraint(:interview_type)
     |> assoc_constraint(:interview_status)
     |> Timer.is_in_future(:start_time)
-    |> Timer.should_less_than_a_month(:start_time)
+    |> Timer.is_less_than_a_month(:start_time)
     |> Timer.add_end_time(@duration_of_interview)
   end
 
