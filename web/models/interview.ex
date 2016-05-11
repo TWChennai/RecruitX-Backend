@@ -48,23 +48,23 @@ defmodule RecruitxBackend.Interview do
     within_date_range(query, start_of_next_week, end_of_next_week)
   end
 
-  def now_or_in_next_seven_days(query) do
+  def now_or_in_next_seven_days(model) do
     start_of_today = Date.beginning_of_day(Date.now)
     seven_days_from_now = start_of_today |> Date.shift(days: 7)
-    within_date_range(query, start_of_today, seven_days_from_now)
+    within_date_range(model, start_of_today, seven_days_from_now)
   end
 
-  def working_days_in_current_week(query) do
+  def working_days_in_current_week(model) do
     %{starting: starting, ending: ending} =  Timer.get_previous_week
-    within_date_range(query, starting, ending)
+    within_date_range(model, starting, ending)
   end
 
-  def default_order(query) do
-    from i in query, order_by: [asc: i.start_time, asc: i.id]
+  def default_order(model) do
+    from i in model, order_by: [asc: i.start_time, asc: i.id]
   end
 
-  def descending_order(query) do
-    from i in query, order_by: [desc: i.start_time, asc: i.id]
+  def descending_order(model) do
+    from i in model, order_by: [desc: i.start_time, asc: i.id]
   end
 
   def get_interviews_with_associated_data do
@@ -136,8 +136,8 @@ defmodule RecruitxBackend.Interview do
     order_by: [i.start_time]
   end
 
-  def within_date_range(query, start_time, end_time) do
-    from i in query, where: i.start_time >= ^start_time and i.start_time <= ^end_time
+  def within_date_range(model, start_time, end_time) do
+    from i in model, where: i.start_time >= ^start_time and i.start_time <= ^end_time
   end
 
   defp validate_single_update_of_status(existing_changeset) do
