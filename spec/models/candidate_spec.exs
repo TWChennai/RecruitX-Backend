@@ -501,4 +501,64 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(candidates_count) |> to(be(0))
     end
   end
+
+  context "get_candidates_scheduled_for_date_and_interview_round" do
+    before do
+      Repo.delete_all(Interview)
+    end
+
+    let :interview_type, do: create(:interview_type, priority: 2)
+
+    it "should return empty array when there are no interviews" do
+      result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week, interview_type.id) |> Repo.all
+
+      expect(result) |> to(be([]))
+    end
+
+    it "should return empty array when there are no interviews with lesser priority on the day" do
+      create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 2).id)
+      result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week, interview_type.id) |> Repo.all
+
+      expect(result) |> to(be([]))
+    end
+
+    it "should return empty array when there are no interviews on the day" do
+      create(:interview, start_time: get_start_of_next_week |> Date.shift(days: 1) , interview_type_id: create(:interview_type, priority: 1).id)
+      create(:interview, start_time: get_start_of_next_week |> Date.shift(days: -1) , interview_type_id: create(:interview_type, priority: 1).id)
+      result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week, interview_type.id) |> Repo.all
+
+      expect(result) |> to(be([]))
+    end
+
+    it "should return empty array when there is an interviews on the day with lesser priority" do
+      interview = create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id)
+
+      [result] = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week |> Date.shift(hours: 5), interview_type.id) |> Repo.all
+
+      expect([result]) |> to_not(be([]))
+      expect(result.id) |> to(be(interview.candidate_id))
+    end
+  end
+
+  context "get_unique_skills_formatted" do
+    before do
+      Repo.delete_all(Candidate)
+    end
+
+    it "should concat all skills of given candidates" do
+      candidate1 = create(:candidate)
+      candidate2 = create(:candidate)
+      candidate_excluded = create(:candidate)
+      create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate1.id)
+      create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate1.id)
+      create(:candidate_skill, skill_id: create(:skill, name: "Skill 3").id, candidate_id: candidate_excluded.id)
+
+      result = Candidate.get_unique_skills_formatted([candidate1.id, candidate2.id])
+
+      expect(result) |> to(be("Skill 1/Skill 2"))
+      expect(result) |> to_not(have("Skill 3"))
+    end
+  end
+
+
 end

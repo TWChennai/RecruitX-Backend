@@ -126,6 +126,27 @@ defmodule RecruitxBackend.Candidate do
       select: c
   end
 
+  def get_candidates_scheduled_for_date_and_interview_round(slot_time, interview_type_id) do
+    beginning_of_slotted_day = slot_time |> Date.beginning_of_day
+    interview_round = InterviewType |> Repo.get(interview_type_id)
+    (from i in Interview ,
+      join: it in assoc(i, :interview_type),
+      join: c in assoc(i, :candidate),
+      where: it.priority < ^interview_round.priority and i.start_time < ^slot_time and i.start_time > ^beginning_of_slotted_day,
+      select: c)
+  end
+
+  def get_unique_skills_formatted(candidate_ids) do
+    (from c in __MODULE__,
+    where: c.id in ^candidate_ids,
+    distinct: true,
+    join: cs in assoc(c, :candidate_skills),
+    join: s in assoc(cs, :skill), select: s.name)
+    |> Repo.all
+    |> Enum.reduce("", fn(skill, acc)-> acc<>"/"<>skill end)
+    |>String.lstrip(?/)
+  end
+
   def is_pipeline_closed(candidate) do
     closed_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
     candidate.pipeline_status_id == closed_id
