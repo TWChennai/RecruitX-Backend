@@ -4,7 +4,7 @@ defmodule RecruitxBackend.InterviewType do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
 
-  @panelists_for_leadership ["ppanelist", "vsiva", "sasikalm", "tchandra", "govinds"]
+  @panelists_for_leadership ["ppanelist", "vsiva", "sasikalm", "tchandra", "govinds", "mahadevk"]
 
   @panelists_for_p3 ["ppanelistp", "vsingh", "pkundu", "prabirp", "siddadel", "srijays", "virapant"]
 
