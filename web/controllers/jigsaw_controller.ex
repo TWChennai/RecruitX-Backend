@@ -37,9 +37,10 @@ defmodule RecruitxBackend.JigsawController do
                                   calculated_hire_date = Date.now
                                                         |> Date.shift(months: -tw_experience_in_month)
 
-                                  is_super_user = false
-                                  case role_name do
-                                    @office_princinple -> is_super_user = true
+
+                                  is_super_user = case role_name do
+                                    @office_princinple -> true
+                                    _ -> false
                                   end
 
                                   case department_name do
