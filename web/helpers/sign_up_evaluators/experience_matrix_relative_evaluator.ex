@@ -3,19 +3,27 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.SlotPanelist
 
   @lower_bound "LB"
   @upper_bound "UB"
 
   import Ecto.Query, only: [from: 2, where: 2]
 
-  def evaluate(sign_up_evaluation_status, %{experience_eligibility_criteria: experience_eligibility_criteria, panelist_role: panelist_role}, interview) do
-    interview = Repo.preload interview, :candidate
+  def evaluate(sign_up_evaluation_status, %{experience_eligibility_criteria: experience_eligibility_criteria, panelist_role: panelist_role}, interview, is_slot) do
+    experience  = calculate_experience(interview, is_slot)
     sign_up_evaluation_status
     |> is_eligible_without_LB_and_UB_filters(interview.interview_type_id, experience_eligibility_criteria, panelist_role)
-    |> is_eligible_with_LB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
-    |> is_eligible_with_UB_filters(experience_eligibility_criteria.experience_matrix_filters, interview.candidate.experience, interview.interview_type_id)
-    |> find_the_best_fit_criteria(interview.id)
+    |> is_eligible_with_LB_filters(experience_eligibility_criteria.experience_matrix_filters, experience, interview.interview_type_id)
+    |> is_eligible_with_UB_filters(experience_eligibility_criteria.experience_matrix_filters, experience, interview.interview_type_id)
+    |> find_the_best_fit_criteria(interview.id, is_slot)
+  end
+
+  defp calculate_experience(slot, true), do: slot.average_experience
+
+  defp calculate_experience(interview, false) do
+    interview = Repo.preload interview, :candidate
+    interview.candidate.experience
   end
 
   defp is_eligible_without_LB_and_UB_filters(%{valid?: true} = sign_up_evaluation_status, interview_type_id,  experience_eligibility_criteria, panelist_role) do
@@ -49,12 +57,16 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   defp is_eligible_with_UB_filters(sign_up_evaluation_status, _experience_matrix_filters, _candidate_experience, _interview_type_id), do: sign_up_evaluation_status
 
-  defp find_the_best_fit_criteria(%{valid?: true} = sign_up_evaluation_status, interview_id) do
-    existing_satisfied_criteria = (from i in InterviewPanelist, select: i.satisfied_criteria, where: i.interview_id == ^interview_id) |> Repo.one
+  defp get_existing_satisfied_criteria(interview_id , true), do: (from i in SlotPanelist, select: i.satisfied_criteria, where: i.slot_id == ^interview_id)
+
+  defp get_existing_satisfied_criteria(interview_id , false), do: (from i in InterviewPanelist, select: i.satisfied_criteria, where: i.interview_id == ^interview_id)
+
+  defp find_the_best_fit_criteria(%{valid?: true} = sign_up_evaluation_status, interview_id , is_slot) do
+    existing_satisfied_criteria = get_existing_satisfied_criteria(interview_id, is_slot) |> Repo.one
     sign_up_evaluation_status |> update_best_satisfied_criteria(sign_up_evaluation_status.satisfied_criteria, sign_up_evaluation_status.satisfied_criteria == existing_satisfied_criteria)
   end
 
-  defp find_the_best_fit_criteria(%{valid?: false} = sign_up_evaluation_status, _interview_id), do: sign_up_evaluation_status
+  defp find_the_best_fit_criteria(%{valid?: false} = sign_up_evaluation_status, _interview_id, _is_slot), do: sign_up_evaluation_status
 
   defp update_best_satisfied_criteria(sign_up_evaluation_status, @lower_bound, _) do
     sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)

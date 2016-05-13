@@ -17,6 +17,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.SignUpEvaluator
   alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.Panel
   alias Timex.Date
   alias Timex.DateFormat
   alias RecruitxBackend.Timer
@@ -45,22 +46,12 @@ defmodule RecruitxBackend.Interview do
   def working_days_in_next_week(query) do
     start_of_next_week = Date.now |> Date.end_of_week
     end_of_next_week = start_of_next_week |> Date.shift(days: 5)
-    within_date_range(query, start_of_next_week, end_of_next_week)
-  end
-
-  def now_or_in_next_seven_days(model) do
-    start_of_today = Date.beginning_of_day(Date.now)
-    seven_days_from_now = start_of_today |> Date.shift(days: 7)
-    within_date_range(model, start_of_today, seven_days_from_now)
+    Panel.within_date_range(query, start_of_next_week, end_of_next_week)
   end
 
   def working_days_in_current_week(model) do
     %{starting: starting, ending: ending} =  Timer.get_previous_week
-    within_date_range(model, starting, ending)
-  end
-
-  def default_order(model) do
-    from i in model, order_by: [asc: i.start_time, asc: i.id]
+    Panel.within_date_range(model, starting, ending)
   end
 
   def descending_order(model) do
@@ -136,10 +127,6 @@ defmodule RecruitxBackend.Interview do
     order_by: [i.start_time]
   end
 
-  def within_date_range(model, start_time, end_time) do
-    from i in model, where: i.start_time >= ^start_time and i.start_time <= ^end_time
-  end
-
   defp validate_single_update_of_status(existing_changeset) do
     id = get_field(existing_changeset, :id)
     if !is_nil(id) and is_nil(existing_changeset.errors[:interview_status_id]) do
@@ -149,24 +136,37 @@ defmodule RecruitxBackend.Interview do
     existing_changeset
   end
 
-  def add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role) do
-    sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role)
-    role = sign_up_data_container.panelist_role
+  def add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role) do
+    sign_up_data_container_for_interviews = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, false)
+    sign_up_data_container_for_slots = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, true)
+
+    role = sign_up_data_container_for_interviews.panelist_role
+
     interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
     Enum.reduce(interviews, [], fn(interview, acc) ->
-      if is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria),do: acc = acc ++ [put_sign_up_status(sign_up_data_container, interview)]
+      if is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria, false),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview)]
+      acc
+    end)
+    ++
+    Enum.reduce(slots, [], fn(slot, acc) ->
+      if is_visible(role, panelist_login_name, slot, interview_type_specfic_criteria, true),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot)]
       acc
     end)
   end
 
-  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria) do
+  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, is_slot) do
+    role_id = get_role_id_for_interview_or_slot(interview, is_slot)
     (InterviewTypeRelativeEvaluator.is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
       and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
     or panelist_role == nil
-    or interview.candidate.role_id == panelist_role.id
+    or role_id == panelist_role.id
     or (Role.is_ba_or_pm(interview.candidate.role_id) and Role.is_ba_or_pm(panelist_role.id))
     or panelist_role.name == Role.office_principal
   end
+
+  defp get_role_id_for_interview_or_slot(interview, false), do: interview.candidate.role_id
+
+  defp get_role_id_for_interview_or_slot(slot, true), do: slot.role_id
 
   defp put_sign_up_status(sign_up_data_container, interview) do
     sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)

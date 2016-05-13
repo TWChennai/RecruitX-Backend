@@ -7,9 +7,9 @@ defmodule RecruitxBackend.StatusUpdate do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Timer
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Panel
   alias RecruitxBackend.Role
   alias Timex.DateFormat
-  alias Timex.Date
 
   def execute_weekly do
     execute(Timer.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
@@ -27,8 +27,8 @@ defmodule RecruitxBackend.StatusUpdate do
     execute(time, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
-  defp execute(%{starting: starting, ending: ending} = time_range, period_name, recepient, exclude_details \\ false, subject_suffix \\ "") do
-    query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type]) |> order_by(asc: :interview_type_id)
+  defp execute(%{starting: starting, ending: ending} = time_range, period_name, recepient, exclude_details, subject_suffix \\ "") do
+    query = Interview |> Panel.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type]) |> order_by(asc: :interview_type_id)
     candidates_status = Candidate
                                 |> preload([:role, interviews: ^query])
                                 |> order_by(asc: :role_id)

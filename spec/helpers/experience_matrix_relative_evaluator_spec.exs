@@ -13,7 +13,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
   @empty ""
 
   context "evaluate" do
-    it "should return true if experience is greater than maximum experience with filter" do
+    it "should return true if experience is greater than maximum experience with filter (for interview)" do
       Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(2)
@@ -22,7 +22,19 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id, candidate_id: candidate.id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
+
+      expect(eligiblity.valid?) |> to(be_true)
+      expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
+    end
+
+    it "should return true if experience is greater than maximum experience with filter (for slot)" do
+      Repo.delete_all ExperienceMatrix
+      create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
+      panelist_experience = D.new(2)
+      role = create(:role)
+      slot = create(:slot, role_id: role.id)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), slot, true)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -37,7 +49,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -52,7 +64,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id)
       role = create(:role)
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -67,7 +79,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id)
       role = create(:role)
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -83,7 +95,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id)
       role = create(:role)
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -98,7 +110,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
       candidate = create(:candidate, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_create_1.interview_type_id)
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_false)
       expect(eligiblity.satisfied_criteria) |> to(be(@empty))
@@ -113,7 +125,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_create_1.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -128,7 +140,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@lower_bound))
@@ -144,7 +156,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix_panelist_is_not_eligible_for.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_false)
       expect(eligiblity.satisfied_criteria) |> to(be(@empty))
@@ -160,7 +172,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: candidate_experience, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(panelist_experience, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_false)
       expect(eligiblity.satisfied_criteria) |> to(be(@empty))
@@ -174,7 +186,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@upper_bound))
@@ -188,7 +200,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
       candidate = create(:candidate, experience: experience_matrix.candidate_experience_upper_bound, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id, interview_type_id: experience_matrix.interview_type_id)
 
-      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview)
+      eligiblity = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(experience_matrix.panelist_experience_lower_bound, role), interview, false)
 
       expect(eligiblity.valid?) |> to(be_true)
       expect(eligiblity.satisfied_criteria) |> to(be(@upper_bound))
@@ -196,7 +208,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
 
     it "should return true when the panelist's role is not filtered based on panelist experience" do
       allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
-      eligibility = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(D.new(5), create(:role)), create(:interview))
+      eligibility = ExperienceMatrixRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, populate_experience_eligibility_data(D.new(5), create(:role)), create(:interview), false)
 
       expect(eligibility.valid?) |> to(be_true)
       expect(eligibility.satisfied_criteria) |> to(be(@lower_bound))

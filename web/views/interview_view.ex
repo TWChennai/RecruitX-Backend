@@ -42,7 +42,7 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
-  def render("interview_with_signup.json", %{interview: interview}) do
+  def render("interview_with_signup.json", %{interview: %{candidate: _} = interview}) do
     %{
       id: interview.id,
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
@@ -52,6 +52,19 @@ defmodule RecruitxBackend.InterviewView do
       signup: interview.signup,
       signup_error: interview.signup_error,
       panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
+    }
+  end
+
+  def render("interview_with_signup.json", %{interview: slot}) do
+    %{
+      id: slot.id,
+      status_id: nil,
+      start_time: DateFormat.format!(slot.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      interview_type_id: slot.interview_type_id,
+      candidate: render_one(slot, CandidateView, "dummy_candidate.json"),
+      signup: slot.signup,
+      signup_error: slot.signup_error,
+      panelists: render_many(slot.slot_panelists, InterviewPanelistView, "interview_panelist.json")
     }
   end
 

@@ -9,5 +9,6 @@ defmodule RecruitxBackend.SignUpDataContainer do
     interview_type_based_sign_up_limits: [],
     experience_eligibility_criteria: %ExperienceEligibilityData{},
     interview_type_specfic_criteria: %{},
-    panelist_role: nil
+    panelist_role: nil,
+    slot: false
 end

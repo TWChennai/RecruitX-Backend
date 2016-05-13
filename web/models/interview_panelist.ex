@@ -4,6 +4,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Panel
   alias RecruitxBackend.SignUpEvaluator
 
   schema "interview_panelists" do
@@ -13,13 +14,6 @@ defmodule RecruitxBackend.InterviewPanelist do
     belongs_to :interview, Interview
 
     timestamps
-  end
-
-  def get_interviews_for(panelist_login_name) do
-    from ip in __MODULE__,
-      where: ip.panelist_login_name == ^panelist_login_name,
-      join: i in assoc(ip, :interview),
-      select: {i.candidate_id, i.start_time}
   end
 
   def get_interview_type_based_count_of_sign_ups do
@@ -44,20 +38,12 @@ defmodule RecruitxBackend.InterviewPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
-    |> validate_panelist_experience(params["panelist_experience"])
-    |> validate_panelist_role(params["panelist_role"])
+    |> Panel.validate_panelist_experience(params["panelist_experience"])
+    |> Panel.validate_panelist_role(params["panelist_role"])
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")
   end
-
-  defp validate_panelist_experience(%{valid?: true} = existing_changeset, nil), do: add_error(existing_changeset, :panelist_experience, "can't be blank")
-
-  defp validate_panelist_experience(existing_changeset, _), do: existing_changeset
-
-  defp validate_panelist_role(%{valid?: true} = existing_changeset, nil), do: add_error(existing_changeset, :panelist_role, "can't be blank")
-
-  defp validate_panelist_role(existing_changeset, _), do: existing_changeset
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
   defp validate_sign_up_for_interview(existing_changeset, params) do
@@ -86,10 +72,12 @@ defmodule RecruitxBackend.InterviewPanelist do
     end)
   end
 
-  def get_candidate_ids_and_start_times_interviewed_by(panelist_login_name) do
-    query_result = get_interviews_for(panelist_login_name) |> Repo.all
-    map_result = Enum.reduce(query_result, %{},fn(x,acc) ->  Map.merge(acc,%{elem(x,0) => elem(x,1)}) end)
-    {Map.keys(map_result), Map.values(map_result)}
+  def get_candidate_ids_interviewed_by(panelist_login_name) do
+    (from ip in __MODULE__,
+    where: ip.panelist_login_name == ^panelist_login_name,
+    join: i in assoc(ip, :interview),
+    select: i.candidate_id)
+    |> Repo.all
   end
 
   def get_email_address(panelist_login_name) do

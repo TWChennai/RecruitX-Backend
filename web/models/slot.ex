@@ -6,7 +6,7 @@ defmodule RecruitxBackend.Slot do
   alias RecruitxBackend.Timer
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
-  alias Timex.Date
+  alias RecruitxBackend.SlotPanelist
   alias Ecto.Changeset
 
   @duration_of_interview 1
@@ -21,6 +21,8 @@ defmodule RecruitxBackend.Slot do
 
     belongs_to :role, Role
     belongs_to :interview_type, InterviewType
+
+    has_many :slot_panelists, SlotPanelist
   end
 
   @required_fields ~w(role_id interview_type_id start_time)

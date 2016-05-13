@@ -29,6 +29,7 @@ defmodule RecruitxBackend.Router do
     resources "/pipeline_statuses", PipelineStatusController, only: [:index]
     resources "/sos_email", SosEmailController, only: [:index]
     resources "/slots", SlotController, only: [:create]
+    resources "/slot_panelists", SlotPanelistController, only: [:create]
   end
 
   if Mix.env == :dev do

@@ -3,11 +3,9 @@ defmodule RecruitxBackend.SlotSpec do
 
   alias RecruitxBackend.Slot
   alias RecruitxBackend.Interview
-  alias Timex.Date
-  alias Timex.DateFormat
 
   let :valid_attrs, do: %{
-                  "start_time" => get_start_of_next_week |> Date.shift(hours: 5) |> DateFormat.format!("%Y-%m-%d %H:%M:%S", :strftime),
+                  "start_time" => get_start_of_next_week |> Timex.Date.shift(hours: 5) |> Timex.DateFormat.format!("%Y-%m-%d %H:%M:%S", :strftime),
                   "role_id" => create(:role).id,
                   "interview_type_id" => create(:interview_type, priority: 2).id,
                   "count" => 1

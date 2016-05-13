@@ -15,6 +15,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Slot
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.RoleInterviewType
   alias Timex.Date
   alias Timex.DateFormat
@@ -106,6 +107,13 @@ defmodule RecruitxBackend.Factory do
     %InterviewPanelist{
       panelist_login_name: sanitize_name(Faker.Name.first_name),   # TODO: Find a way to specify from a list of known langugages
       interview_id: create(:interview).id
+    }
+  end
+
+  def factory(:slot_panelist) do
+    %SlotPanelist{
+      panelist_login_name: sanitize_name(Faker.Name.first_name),   # TODO: Find a way to specify from a list of known langugages
+      slot_id: create(:slot).id
     }
   end
 

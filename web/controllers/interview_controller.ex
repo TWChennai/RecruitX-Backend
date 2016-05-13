@@ -4,25 +4,31 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.Slot
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.QueryFilter
+  alias RecruitxBackend.Panel
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data
-                  |> Interview.now_or_in_next_seven_days
-                  |> Interview.default_order
+                  |> Panel.now_or_in_next_seven_days
+                  |> Panel.default_order
                   |> Repo.all
-    interviews_with_signup_status = Interview.add_signup_eligibity_for(interviews, panelist_login_name, panelist_experience, panelist_role)
-    conn |> render("index.json", interviews_with_signup: interviews_with_signup_status)
+    slots = Slot |> preload(:slot_panelists)
+                  |> Panel.now_or_in_next_seven_days
+                  |> Panel.default_order
+                  |> Repo.all
+    interviews_and_slots_with_signup_status = Interview.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
+    conn |> render("index.json", interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
   def index(conn, %{"candidate_id" => candidate_id}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> QueryFilter.filter(%{candidate_id: candidate_id}, Interview)
-                  |> Interview.default_order
+                  |> Panel.default_order
                   |> Repo.all
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
