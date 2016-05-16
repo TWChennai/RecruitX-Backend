@@ -1,11 +1,15 @@
 defmodule RecruitxBackend.SlotView do
   use RecruitxBackend.Web, :view
 
+  alias Timex.DateFormat
+
   def render("show.json", %{slot: slot}) do
     %{
       role_id: slot.role_id,
       interview_type_id: slot.interview_type_id,
-      start_time: slot.start_time
+      start_time: DateFormat.format!(slot.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      skills: slot.skills,
+      experience: slot.average_experience
     }
   end
 end

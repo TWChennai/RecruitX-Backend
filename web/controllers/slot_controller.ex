@@ -34,4 +34,15 @@ defmodule RecruitxBackend.SlotController do
     end
   end
 
+  def show(conn, %{"id" => id}) do
+    slot = Slot |> Repo.get(id)
+    case slot do
+      nil -> conn
+            |> put_status(:not_found)
+            |> render(ErrorView, "404.json")
+      _ -> conn
+          |> put_status(:created)
+          |> render("show.json", slot: slot)
+    end
+  end
 end
