@@ -41,7 +41,6 @@ defmodule RecruitxBackend.SlotController do
             |> put_status(:not_found)
             |> render(ErrorView, "404.json")
       _ -> conn
-          |> put_status(:created)
           |> render("show.json", slot: slot)
     end
   end
