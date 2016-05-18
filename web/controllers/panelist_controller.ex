@@ -54,6 +54,11 @@ defmodule RecruitxBackend.PanelistController do
     send_resp(conn, :no_content, "")
   end
 
+  def delete(%{path_info: ["decline_slot", _]} = conn, %{"id" => id}) do
+    Repo.delete_all(from i in SlotPanelist, where: i.id == ^id)
+    send_resp(conn, :no_content, "")
+  end
+
   defp send_notification_to_panelist(id) do
     {candidate_first_name, candidate_last_name, interview_name, panelist_login_name, start_time} =
       (from c in Candidate, join: i in assoc(c, :interviews), join: ip in assoc(i, :interview_panelist), join: it in assoc(i, :interview_type), where: ip.id == ^id, select: {c.first_name, c.last_name, it.name, ip.panelist_login_name, i.start_time}) |> Repo.one

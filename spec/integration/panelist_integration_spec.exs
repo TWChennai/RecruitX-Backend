@@ -300,7 +300,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
   end
 
-  describe "delete" do
+  describe "delete interview panelist" do
     it "should delete the interview panelist of a id" do
       interview_panelist = create(:interview_panelist)
 
@@ -309,6 +309,18 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response |> should(have_http_status(:no_content))
       expect(response.resp_body) |> to(be(""))
       expect(Repo.get(InterviewPanelist, interview_panelist.id)) |> to(be(nil))
+    end
+  end
+
+  describe "delete slot panelist" do
+    it "should delete the slot panelist of a id" do
+      slot_panelist = create(:slot_panelist)
+
+      response = delete conn_with_dummy_authorization(), "/decline_slot/#{slot_panelist.id}"
+
+      response |> should(have_http_status(:no_content))
+      expect(response.resp_body) |> to(be(""))
+      expect(Repo.get(SlotPanelist, slot_panelist.id)) |> to(be(nil))
     end
   end
 
@@ -348,7 +360,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect MailHelper |> to(accepted :deliver, [email])
     end
   end
-
 
   defp getInterviewPanelistWithName(name) do
     InterviewPanelist |> QueryFilter.filter(%{panelist_login_name: name}, InterviewPanelist) |> Repo.one
