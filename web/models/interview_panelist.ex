@@ -83,4 +83,11 @@ defmodule RecruitxBackend.InterviewPanelist do
   def get_email_address(panelist_login_name) do
     panelist_login_name <> System.get_env("EMAIL_POSTFIX")
   end
+
+  def get_interviews_signed_up_by(panelist_login_name) do
+    (from i in Interview,
+      join: ip in assoc(i, :interview_panelist),
+      where: ip.panelist_login_name == ^panelist_login_name,
+      preload: [:interview_panelist, candidate: :candidate_skills])
+  end
 end

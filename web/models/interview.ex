@@ -54,10 +54,6 @@ defmodule RecruitxBackend.Interview do
     Panel.within_date_range(model, starting, ending)
   end
 
-  def descending_order(model) do
-    from i in model, order_by: [desc: i.start_time, asc: i.id]
-  end
-
   def get_interviews_with_associated_data do
     (from i in __MODULE__,
       preload: [:interview_panelist, candidate: :candidate_skills],

@@ -68,7 +68,7 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
-  def render("interview.json", %{interview: interview}) do
+  def render("interview.json", %{interview: %{candidate: _} = interview}) do
     %{
       id: interview.id,
       start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
@@ -77,6 +77,18 @@ defmodule RecruitxBackend.InterviewView do
       status_id: interview.interview_status_id,
       last_interview_status: interview.last_interview_status,
       panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
+    }
+  end
+
+  def render("interview.json", %{interview: slot}) do
+    %{
+      id: slot.id,
+      start_time: DateFormat.format!(slot.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      interview_type_id: slot.interview_type_id,
+      candidate: render_one(slot, CandidateView, "dummy_candidate.json"),
+      status_id: nil,
+      last_interview_status: nil,
+      panelists: render_many(slot.slot_panelists, InterviewPanelistView, "interview_panelist.json")
     }
   end
 

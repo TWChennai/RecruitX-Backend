@@ -6,6 +6,7 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Slot
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Panel
@@ -33,13 +34,29 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json", interviews_for_candidate: interviews)
   end
 
-  def index(conn, %{"panelist_name" => panelist_name, "page" => page}) do
-    interview_id_for_panelist = (from ip in InterviewPanelist, select: ip.interview_id)
-                                  |> QueryFilter.filter(%{panelist_login_name: panelist_name}, InterviewPanelist)
+  def index(conn, %{"panelist_name" => panelist_name, "page" => page}) when page == "1" or page == nil do
+    interviews = InterviewPanelist.get_interviews_signed_up_by(panelist_name)
+                  |> Panel.descending_order
+                  |> Repo.paginate(page: page)
+    last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
+    interview_entries = Enum.map(interviews.entries, fn(interview) ->
+      Map.put(interview, :last_interview_status, Interview.get_last_interview_status_for(interview.candidate, last_interviews_data))
+    end)
+    slot_id_for_panelist = (from ip in SlotPanelist, select: ip.slot_id)
+                                  |> QueryFilter.filter(%{panelist_login_name: panelist_name}, SlotPanelist)
                                   |> Repo.all
-    interviews = Interview.get_interviews_with_associated_data
-                  |> QueryFilter.filter(%{id: interview_id_for_panelist}, Interview)
-                  |> Interview.descending_order
+    slots = Slot
+            |> preload(:slot_panelists)
+            |> QueryFilter.filter(%{id: slot_id_for_panelist}, Slot)
+            |> Panel.descending_order
+            |> Repo.all
+    interviews = Map.put(interviews, :entries, slots ++ interview_entries)
+    conn |> render("index.json", interviews: interviews)
+  end
+
+  def index(conn, %{"panelist_name" => panelist_name, "page" => page}) do
+    interviews = InterviewPanelist.get_interviews_signed_up_by(panelist_name)
+                  |> Panel.descending_order
                   |> Repo.paginate(page: page)
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
     interview_entries = Enum.map(interviews.entries, fn(interview) ->

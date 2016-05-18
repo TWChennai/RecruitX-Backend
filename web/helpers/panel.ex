@@ -43,4 +43,7 @@ defmodule RecruitxBackend.Panel do
     from i in model, order_by: [asc: i.start_time, asc: i.id]
   end
 
+  def descending_order(model) do
+    from i in model, order_by: [desc: i.start_time, asc: i.id]
+  end
 end

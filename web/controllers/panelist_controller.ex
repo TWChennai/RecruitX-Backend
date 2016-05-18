@@ -2,6 +2,7 @@ defmodule RecruitxBackend.PanelistController do
   use RecruitxBackend.Web, :controller
 
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.Candidate
   alias Swoosh.Templates
@@ -13,15 +14,31 @@ defmodule RecruitxBackend.PanelistController do
   def create(conn, %{"interview_panelist" => post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
-      {:ok, panelist} ->
+      {:ok, interview_panelist} ->
         conn
         |> put_status(:created)
-        |> put_resp_header("location", panelist_path(conn, :show, panelist))
-        |> render("panelist.json", panelist: panelist)
+        |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))
+        |> render("panelist.json", interview_panelist: interview_panelist)
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
         |> render(ChangesetView, "error.json", changeset: changeset)
+    end
+  end
+
+  def create(conn, %{"slot_panelist" => slot_panelist_params}) do
+    slot_panelist_changeset = SlotPanelist.changeset(%SlotPanelist{}, slot_panelist_params)
+
+    case Repo.insert(slot_panelist_changeset) do
+      {:ok, slot_panelist} ->
+        conn
+        |> put_status(:created)
+        |> put_resp_header("location", panelist_path(conn, :show, slot_panelist))
+        |> render("panelist.json", slot_panelist: slot_panelist)
+      {:error, changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
     end
   end
 

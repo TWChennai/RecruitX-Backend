@@ -208,37 +208,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
   end
 
-  context "desc_order" do
-    before do: Repo.delete_all(Interview)
-    it "should sort by descending order of start time" do
-      now = Date.now
-      interview_with_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1))
-      interview_with_start_date2 = create(:interview, start_time: now |> Date.shift(days: 3))
-      interview_with_start_date3 = create(:interview, start_time: now |> Date.shift(days: -2))
-      interview_with_start_date4 = create(:interview, start_time: now |> Date.shift(days: -5))
-
-      [interview1, interview2, interview3, interview4] = Interview |> Interview.descending_order |> Repo.all
-
-      expect(interview1.start_time) |> to(eq(interview_with_start_date2.start_time))
-      expect(interview2.start_time) |> to(eq(interview_with_start_date1.start_time))
-      expect(interview3.start_time) |> to(eq(interview_with_start_date3.start_time))
-      expect(interview4.start_time) |> to(eq(interview_with_start_date4.start_time))
-    end
-
-    it "should tie-break on id for the same start time" do
-      now = Date.now
-      interview_with_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1), id: 1)
-      interview_with_same_start_date1 = create(:interview, start_time: now |> Date.shift(days: 1), id: interview_with_start_date1.id + 1)
-      interview_with_start_date2 = create(:interview, start_time: now |> Date.shift(days: 2))
-
-      [interview1, interview2, interview3] = Interview |> Interview.descending_order |> Repo.all
-
-      expect(interview1.start_time) |> to(eq(interview_with_start_date2.start_time))
-      expect(interview2.start_time) |> to(eq(interview_with_same_start_date1.start_time))
-      expect(interview3.start_time) |> to(eq(interview_with_start_date1.start_time))
-    end
-  end
-
   describe "get_interviews_with_associated_data" do
     it "should return interviews of candidates" do
       Repo.delete_all(InterviewPanelist)

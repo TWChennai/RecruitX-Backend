@@ -8,11 +8,24 @@ defmodule RecruitxBackend.PanelistControllerSpec do
   describe "create" do
     let :interview_panelist, do: create(:interview_panelist)
 
-    context "valid params" do
+    context "valid params for interview_panelist" do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, interview_panelist} end))
 
       it "should return 201 and be successful" do
         conn = action(:create, %{"interview_panelist" => post_parameters})
+
+        conn |> should(be_successful)
+        conn |> should(have_http_status(:created))
+      end
+    end
+
+    context "valid params for slot_panelist" do
+      let :slot_panelist, do: create(:slot_panelist)
+
+      before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, slot_panelist} end))
+
+      it "should return 201 and be successful" do
+        conn = action(:create, %{"slot_panelist" => post_parameters})
 
         conn |> should(be_successful)
         conn |> should(have_http_status(:created))

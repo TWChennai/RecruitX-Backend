@@ -8,6 +8,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Candidate
@@ -21,7 +22,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   let :role, do: create(:role)
 
   describe "create" do
-    it "should insert valid data in db and return location path in a success response" do
+    it "should insert valid interveiw panelist details in db and return location path in a success response" do
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -35,6 +36,21 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(inserted_panelist.panelist_login_name) |> to(eql(interview_panelist_params.panelist_login_name))
       expect(inserted_panelist.interview_id) |> to(eql(interview_panelist_params.interview_id))
       expect(inserted_panelist.satisfied_criteria) |> to(eql(@lower_bound))
+    end
+
+    it "should insert valid slot panelist details in db and return location path in a success response" do
+      role = create(:role)
+      slot = create(:slot, role_id: role.id)
+      slot_panelist_params = fields_for(:slot_panelist, slot_id: slot.id)
+      slot_panelist_params = Map.merge(slot_panelist_params, %{panelist_experience: 2, panelist_role: role.name})
+      response = post conn_with_dummy_authorization(), "/panelists", %{"slot_panelist" => slot_panelist_params}
+
+      expect(response.status) |> to(be(201))
+      inserted_slot = getSlotPanelistWithName(slot_panelist_params.panelist_login_name)
+      List.keyfind(response.resp_headers, "location", 0) |> should(be({"location", "/panelists/#{inserted_slot.id}"}))
+      expect(inserted_slot.panelist_login_name) |> to(eql(slot_panelist_params.panelist_login_name))
+      expect(inserted_slot.slot_id) |> to(eql(slot_panelist_params.slot_id))
+      expect(inserted_slot.satisfied_criteria) |> to(eql(@lower_bound))
     end
 
     it "should respond with errors when trying to sign up for the same interview more than once" do
@@ -51,6 +67,20 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response |> should(have_http_status(:unprocessable_entity))
       parsed_response = response.resp_body |> Poison.Parser.parse!
       expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You have already signed up an interview for this candidate"]}}))
+    end
+
+    it "should respond with errors when trying to sign up for the same slot more than once" do
+      role = create(:role)
+      slot = create(:slot, role_id: role.id)
+      slot_panelist_params = fields_for(:slot_panelist, slot_id: slot.id)
+      slot_panelist_params = Map.merge(slot_panelist_params, %{panelist_experience: 2, panelist_role: role.name})
+
+      post conn_with_dummy_authorization(), "/panelists", %{"slot_panelist" => slot_panelist_params}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"slot_panelist" => slot_panelist_params}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You are already signed up for another interview within 2 hours"]}}))
     end
 
 
@@ -322,5 +352,9 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   defp getInterviewPanelistWithName(name) do
     InterviewPanelist |> QueryFilter.filter(%{panelist_login_name: name}, InterviewPanelist) |> Repo.one
+  end
+
+  defp getSlotPanelistWithName(name) do
+    SlotPanelist |> QueryFilter.filter(%{panelist_login_name: name}, SlotPanelist) |> Repo.one
   end
 end

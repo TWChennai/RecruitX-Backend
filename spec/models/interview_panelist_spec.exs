@@ -161,5 +161,19 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
         expect(type_id) |> to(eql(interview.interview_type_id))
       end
     end
+
+    context "get_interviews_signed_up_by" do
+      it "should give the interviews for the requested panelist" do
+        panelist_login_name = "recruitx"
+        interview_panelist = create(:interview_panelist, panelist_login_name: panelist_login_name)
+        preloaded_interview = Interview
+                                |> preload([:interview_panelist, candidate: :candidate_skills])
+                                |> Repo.get(interview_panelist.interview_id)
+
+        response = InterviewPanelist.get_interviews_signed_up_by(panelist_login_name) |> Repo.all
+
+        expect(response) |> to(be([preloaded_interview]))
+      end
+    end
   end
 end
