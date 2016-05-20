@@ -22,7 +22,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
-    interviews_and_slots_with_signup_status = Interview.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
+    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
     conn |> render("index.json", interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 

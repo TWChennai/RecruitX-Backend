@@ -132,48 +132,6 @@ defmodule RecruitxBackend.Interview do
     existing_changeset
   end
 
-  def add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role) do
-    sign_up_data_container_for_interviews = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, false)
-    sign_up_data_container_for_slots = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, true)
-
-    role = sign_up_data_container_for_interviews.panelist_role
-
-    interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
-    Enum.reduce(interviews, [], fn(interview, acc) ->
-      if is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria, false),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview)]
-      acc
-    end)
-    ++
-    Enum.reduce(slots, [], fn(slot, acc) ->
-      if is_visible(role, panelist_login_name, slot, interview_type_specfic_criteria, true),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot)]
-      acc
-    end)
-  end
-
-  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, is_slot) do
-    role_id = get_role_id_for_interview_or_slot(interview, is_slot)
-    (InterviewTypeRelativeEvaluator.is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
-      and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
-    or panelist_role == nil
-    or role_id == panelist_role.id
-    or (Role.is_ba_or_pm(interview.candidate.role_id) and Role.is_ba_or_pm(panelist_role.id))
-    or panelist_role.name == Role.office_principal
-  end
-
-  defp get_role_id_for_interview_or_slot(interview, false), do: interview.candidate.role_id
-
-  defp get_role_id_for_interview_or_slot(slot, true), do: slot.role_id
-
-  defp put_sign_up_status(sign_up_data_container, interview) do
-    sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
-    interview = Map.put(interview, :signup_error, "")
-    if !sign_up_evaluation_status.valid? do
-      {_, error} = sign_up_evaluation_status.errors |> List.first
-      interview = Map.put(interview, :signup_error, error)
-    end
-    Map.put(interview, :signup, sign_up_evaluation_status.valid?)
-  end
-
   defp get_max_and_min_priority do
     (from it in InterviewType,
     select: {max(it.priority), min(it.priority)}) |> Repo.one
