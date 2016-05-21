@@ -24,8 +24,6 @@ defmodule RecruitxBackend.SlotPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
-    |> Panel.validate_panelist_experience(params["panelist_experience"])
-    |> Panel.validate_panelist_role(params["panelist_role"])
     |> validate_sign_up_for_slot(params)
     |> unique_constraint(:panelist_login_name, name: :slot_panelist_login_name_index, message: "You have already signed up for this slot")
     |> assoc_constraint(:slot, message: "Slot does not exist")

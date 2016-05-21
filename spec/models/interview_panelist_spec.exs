@@ -70,20 +70,6 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       expect(changeset) |> to(have_errors([interview_id: "can't be blank"]))
     end
 
-    it "should be invalid when panelist_experience is nil" do
-      with_nil_id = Map.merge(valid_attrs, %{panelist_experience: nil, panelist_role: role.name})
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_nil_id)
-
-      expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
-    end
-
-    it "should be invalid when panelist_experience is not present" do
-      with_nil_id = Map.delete(valid_attrs, :panelist_experience)
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, with_nil_id)
-
-      expect(changeset) |> to(have_errors([panelist_experience: "can't be blank"]))
-    end
-
     it "should be invalid when sign up evaluation is invalid" do
       invalid = %SignUpEvaluationStatus{valid?: false, errors: [error: "errors"]}
       allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  invalid end))
@@ -104,7 +90,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
     end
 
     it "should allow same panelist to be added more than once for a different interview" do
-      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, valid_attrs)
+      changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
       Repo.insert(changeset)
       signed_up_interview = Interview |> Repo.get(valid_attrs.interview_id)
       new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))

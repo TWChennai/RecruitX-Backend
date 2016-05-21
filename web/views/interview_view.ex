@@ -35,13 +35,6 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
-  def render("missing_param_error.json", %{param: param}) do
-    %{
-      field: param,
-      reason: "missing/empty required parameter"
-    }
-  end
-
   def render("interview_with_signup.json", %{interview: %{candidate: _} = interview}) do
     %{
       id: interview.id,

@@ -6,7 +6,6 @@ defmodule PanelSpec do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Panel
   alias RecruitxBackend.SlotPanelist
-  alias Ecto.Changeset
   alias Timex.Date
 
   describe "methods" do
@@ -52,60 +51,6 @@ defmodule PanelSpec do
         actual_result = Interview |> Panel.now_or_in_next_seven_days |> Repo.one
 
         expect(actual_result.id) |> to(be(902))
-      end
-    end
-
-    context "validate_panelist_experience" do
-      let :valid_params, do: fields_for(:interview_panelist)
-      it "should not add error if incoming changeset has error" do
-        invalid_changeset = Changeset.cast(%InterviewPanelist{}, Map.delete(valid_params, :panelist_login_name), ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_experience(invalid_changeset, nil)
-
-        expect(validity) |> to(be(false))
-        expect(errors) |> to(be([panelist_login_name: "can't be blank"]))
-      end
-
-      it "should not add error if incoming changeset has no error and panelist_experience is not there" do
-        invalid_changeset = Changeset.cast(%InterviewPanelist{}, valid_params, ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_experience(invalid_changeset, nil)
-
-        expect(validity) |> to(be(false))
-        expect(errors) |> to(be([panelist_experience: "can't be blank"]))
-      end
-
-      it "should not add error if incoming changeset has no error and panelist_login_name is panelist_experience is there" do
-        invalid_changeset = Changeset.cast(%InterviewPanelist{}, valid_params, ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_experience(invalid_changeset, 1)
-
-        expect(validity) |> to(be(true))
-        expect(errors) |> to(be([]))
-      end
-    end
-
-    context "validate_panelist_role" do
-      let :valid_params, do: fields_for(:interview_panelist)
-      it "should not add error if incoming changeset has error" do
-        invalid_changeset = Changeset.cast(%InterviewPanelist{}, Map.delete(valid_params, :panelist_login_name), ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_role(invalid_changeset, nil)
-
-        expect(validity) |> to(be(false))
-        expect(errors) |> to(be([panelist_login_name: "can't be blank"]))
-      end
-
-      it "should not add error if incoming changeset has no error and panelist_experience is not there" do
-        valid_changeset = Changeset.cast(%InterviewPanelist{}, valid_params, ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_role(valid_changeset, nil)
-
-        expect(validity) |> to(be(false))
-        expect(errors) |> to(be([panelist_role: "can't be blank"]))
-      end
-
-      it "should not add error if incoming changeset has no error and panelist_login_name is panelist_experience is there" do
-        invalid_changeset = Changeset.cast(%InterviewPanelist{}, valid_params, ~w(panelist_login_name interview_id), ~w())
-        %{valid?: validity, errors: errors} = Panel.validate_panelist_role(invalid_changeset, 1)
-
-        expect(validity) |> to(be(true))
-        expect(errors) |> to(be([]))
       end
     end
 

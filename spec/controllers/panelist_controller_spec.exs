@@ -3,7 +3,7 @@ defmodule RecruitxBackend.PanelistControllerSpec do
 
   alias RecruitxBackend.InterviewPanelist
 
-  let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{panelist_experience: 2}))
+  let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{"panelist_experience" => 2, "panelist_role" => "Dev"}))
 
   describe "create" do
     let :interview_panelist, do: create(:interview_panelist)

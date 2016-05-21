@@ -10,14 +10,6 @@ defmodule RecruitxBackend.Panel do
   alias Ecto.Changeset
   import Ecto.Query
 
-  def validate_panelist_experience(%{valid?: true} = existing_changeset, nil), do: Changeset.add_error(existing_changeset, :panelist_experience, "can't be blank")
-
-  def validate_panelist_experience(existing_changeset, _), do: existing_changeset
-
-  def validate_panelist_role(%{valid?: true} = existing_changeset, nil), do: Changeset.add_error(existing_changeset, :panelist_role, "can't be blank")
-
-  def validate_panelist_role(existing_changeset, _), do: existing_changeset
-
   def get_start_times_interviewed_by(panelist_login_name) do
     ((from ip in InterviewPanelist,
       where: ip.panelist_login_name == ^panelist_login_name,

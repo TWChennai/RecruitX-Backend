@@ -1,3 +1,4 @@
+
 defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
@@ -38,8 +39,6 @@ defmodule RecruitxBackend.InterviewPanelist do
     model
     |> cast(params, @required_fields, @optional_fields)
     |> validate_format(:panelist_login_name, AppConstants.name_format)
-    |> Panel.validate_panelist_experience(params["panelist_experience"])
-    |> Panel.validate_panelist_role(params["panelist_role"])
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
     |> assoc_constraint(:interview, message: "Interview does not exist")

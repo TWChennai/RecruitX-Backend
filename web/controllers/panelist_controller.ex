@@ -11,7 +11,7 @@ defmodule RecruitxBackend.PanelistController do
   alias Timex.Date
   alias Timex.Timezone
 
-  def create(conn, %{"interview_panelist" => post_params}) do
+  def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
@@ -26,10 +26,13 @@ defmodule RecruitxBackend.PanelistController do
     end
   end
 
-  def create(conn, %{"slot_panelist" => slot_panelist_params}) do
-    slot_panelist_changeset = SlotPanelist.changeset(%SlotPanelist{}, slot_panelist_params)
+  def create(conn, %{"interview_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role")
 
-    case Repo.insert(slot_panelist_changeset) do
+
+  def create(conn, %{"slot_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = slot_panelist_params}) do
+    changeset = SlotPanelist.changeset(%SlotPanelist{}, slot_panelist_params)
+
+    case Repo.insert(changeset) do
       {:ok, slot_panelist} ->
         conn
         |> put_status(:created)
@@ -41,6 +44,8 @@ defmodule RecruitxBackend.PanelistController do
         |> render(RecruitxBackend.ChangesetView, "error.json", changeset: changeset)
     end
   end
+
+  # def create(conn, %{"slot_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role")
 
   def delete(%{path_info: ["panelists", _]} = conn, %{"id" => id}) do
     Repo.delete_all(from i in InterviewPanelist, where: i.id == ^id)
