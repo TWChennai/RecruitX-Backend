@@ -45,7 +45,7 @@ defmodule RecruitxBackend.PanelistController do
     end
   end
 
-  # def create(conn, %{"slot_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role")
+  def create(conn, %{"slot_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role")
 
   def delete(%{path_info: ["panelists", _]} = conn, %{"id" => id}) do
     Repo.delete_all(from i in InterviewPanelist, where: i.id == ^id)

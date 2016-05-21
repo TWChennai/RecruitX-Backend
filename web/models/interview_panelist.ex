@@ -1,4 +1,3 @@
-
 defmodule RecruitxBackend.InterviewPanelist do
   use RecruitxBackend.Web, :model
 
