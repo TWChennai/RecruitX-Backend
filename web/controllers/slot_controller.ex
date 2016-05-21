@@ -44,4 +44,17 @@ defmodule RecruitxBackend.SlotController do
           |> render("show.json", slot: slot)
     end
   end
+
+  def index(conn, %{"interview_type_id" => interview_type_id, "previous_rounds_start_time" => previous_rounds_start_time, "role_id" => role_id}) do
+    previous_rounds_end_time = previous_rounds_start_time
+                                |> DateFormat.parse!("%Y-%m-%dT%H:%M:%SZ", :strftime)
+                                |> Date.shift(hours: 1)
+    slots = (from s in Slot,
+            where: s.interview_type_id == ^interview_type_id and
+            s.role_id == ^role_id and
+            s.start_time >= ^previous_rounds_end_time)
+            |> Repo.all
+    conn |> render("index.json", slots: slots)
+  end
+
 end
