@@ -5,6 +5,7 @@ defmodule RecruitxBackend.Panel do
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias Timex.Date
   alias Ecto.Changeset
@@ -64,7 +65,7 @@ defmodule RecruitxBackend.Panel do
       and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
     or panelist_role == nil
     or role_id == panelist_role.id
-    or (Role.is_ba_or_pm(interview.candidate.role_id) and Role.is_ba_or_pm(panelist_role.id))
+    or (Role.is_ba_or_pm(role_id) and Role.is_ba_or_pm(panelist_role.id))
     or panelist_role.name == Role.office_principal
   end
 
