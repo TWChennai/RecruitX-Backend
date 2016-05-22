@@ -63,4 +63,11 @@ defmodule RecruitxBackend.SlotPanelist do
     end)
   end
 
+  def get_panelists_and_satisfied_criteria(slot_id) do
+    (from sp in __MODULE__,
+    where: sp.slot_id == ^slot_id,
+    select: {sp.panelist_login_name, sp.satisfied_criteria})
+      |> Repo.all
+  end
+
 end

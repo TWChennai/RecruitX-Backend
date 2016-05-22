@@ -2,6 +2,7 @@ defmodule RecruitxBackend.ChangesetManipulator do
 
   alias RecruitxBackend.ChangesetErrorParser
 
+  def validate_and([], _insert_or_update), do: []
   def validate_and(changesets, insert_or_update) do
     changesets
     |> check_changesets_validity
