@@ -126,13 +126,13 @@ defmodule RecruitxBackend.Candidate do
       select: c
   end
 
-  def get_candidates_scheduled_for_date_and_interview_round(slot_time, interview_type_id) do
+  def get_candidates_scheduled_for_date_and_interview_round(slot_time, interview_type_id, role_id) do
     beginning_of_slotted_day = slot_time |> Date.beginning_of_day
     interview_round = InterviewType |> Repo.get(interview_type_id)
     (from i in Interview ,
       join: it in assoc(i, :interview_type),
       join: c in assoc(i, :candidate),
-      where: it.priority < ^interview_round.priority and i.start_time < ^slot_time and i.start_time > ^beginning_of_slotted_day,
+      where: it.priority < ^interview_round.priority and i.start_time < ^slot_time and i.start_time > ^beginning_of_slotted_day and c.role_id == ^role_id,
       select: c)
   end
 

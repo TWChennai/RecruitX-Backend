@@ -50,7 +50,8 @@ defmodule RecruitxBackend.Slot do
     if is_nil(existing_changeset.errors) or Enum.empty?(existing_changeset.errors) do
       start_time = Changeset.get_field(existing_changeset, :start_time)
       interview_type_id = Changeset.get_field(existing_changeset, :interview_type_id)
-      candidates = Candidate.get_candidates_scheduled_for_date_and_interview_round(start_time, interview_type_id) |> Repo.all
+      role_id = Changeset.get_field(existing_changeset, :role_id)
+      candidates = Candidate.get_candidates_scheduled_for_date_and_interview_round(start_time, interview_type_id, role_id) |> Repo.all
       candidate_ids = Enum.map(candidates, &(&1.id))
       if !Enum.empty? candidates do
         existing_changeset = existing_changeset |> Changeset.put_change(:skills, Candidate.get_unique_skills_formatted(candidate_ids))

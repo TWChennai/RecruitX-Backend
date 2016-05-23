@@ -6,11 +6,12 @@ defmodule SlotIntegrationSpec do
   alias Timex.DateFormat
   alias RecruitxBackend.Slot
 
-  let :post_parameters, do: convertKeysFromAtomsToStrings(fields_for(:slot))
+  let :candidate, do: create(:candidate)
+  let :post_parameters, do: convertKeysFromAtomsToStrings(fields_for(:slot, role_id: candidate.role_id))
 
   describe "create" do
     it "should return 201 and be successful" do
-      create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id)
+      create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id, candidate_id: candidate.id)
       number_of_slots_before = (from s in Slot, select: count(s.id)) |> Repo.one
       post_parameters = Map.put(post_parameters, "start_time", get_start_of_next_week |> Date.shift(hours: 5))
       conn = action(:create, %{"slot" => Map.merge(convertKeysFromAtomsToStrings(%{count: 2}), post_parameters)})
