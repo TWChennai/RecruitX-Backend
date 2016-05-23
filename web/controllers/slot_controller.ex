@@ -6,6 +6,7 @@ defmodule RecruitxBackend.SlotController do
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONError
   alias Ecto.Changeset
   alias Timex.Date
@@ -91,11 +92,18 @@ defmodule RecruitxBackend.SlotController do
     previous_rounds_end_time = previous_rounds_start_time
                                 |> DateFormat.parse!("%Y-%m-%dT%H:%M:%SZ", :strftime)
                                 |> Date.shift(hours: 1)
-    slots = (from s in Slot,
+    slots = if (interview_type_id == InterviewType.retrieve_by_name(InterviewType.p3).id |> Integer.to_string or interview_type_id == InterviewType.retrieve_by_name(InterviewType.leadership).id |> Integer.to_string) do
+      (from s in Slot,
+            where: s.interview_type_id == ^interview_type_id and
+            s.start_time >= ^previous_rounds_end_time)
+            |> Repo.all
+    else
+      (from s in Slot,
             where: s.interview_type_id == ^interview_type_id and
             s.role_id == ^role_id and
             s.start_time >= ^previous_rounds_end_time)
             |> Repo.all
+    end
     conn |> render("index.json", slots: slots)
   end
 
