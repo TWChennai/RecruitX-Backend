@@ -7,6 +7,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.InterviewStatus
+  alias RecruitxBackend.Skill
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias Timex.Date
@@ -137,12 +138,21 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_unique_skills_formatted(candidate_ids) do
-    (from c in __MODULE__,
+    (((from c in __MODULE__,
     where: c.id in ^candidate_ids,
     distinct: true,
     join: cs in assoc(c, :candidate_skills),
-    join: s in assoc(cs, :skill), select: s.name)
-    |> Repo.all
+    join: s in assoc(cs, :skill),
+    where: s.id != ^Skill.other_skill_id,
+    select: s.name)
+    |> Repo.all)
+    ++
+    ((from c in __MODULE__,
+    where: c.id in ^candidate_ids,
+    distinct: true,
+    where: not(is_nil(c.other_skills)),
+    select: c.other_skills)
+    |> Repo.all))
     |> Enum.reduce("", fn(skill, acc)-> acc<>"/"<>skill end)
     |>String.lstrip(?/)
   end
