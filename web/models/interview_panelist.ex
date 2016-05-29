@@ -4,7 +4,6 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.Panel
   alias RecruitxBackend.SignUpEvaluator
 
   schema "interview_panelists" do
@@ -76,10 +75,6 @@ defmodule RecruitxBackend.InterviewPanelist do
     join: i in assoc(ip, :interview),
     select: i.candidate_id)
     |> Repo.all
-  end
-
-  def get_email_address(panelist_login_name) do
-    panelist_login_name <> System.get_env("EMAIL_POSTFIX")
   end
 
   def get_interviews_signed_up_by(panelist_login_name) do

@@ -78,4 +78,8 @@ defmodule RecruitxBackend.Panel do
     end
     Map.put(panel, :signup, sign_up_evaluation_status.valid?)
   end
+
+  def get_email_address(panelist_login_name) do
+    panelist_login_name <> System.get_env("EMAIL_POSTFIX")
+  end
 end

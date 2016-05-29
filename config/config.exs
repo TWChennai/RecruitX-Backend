@@ -36,6 +36,10 @@ config :ex_aws,
   secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
 
 config :quantum, cron: [
+  remove_unused_slots: [
+    schedule: "@daily",
+    task: "RecruitxBackend.Slot.delete_unused_slots"
+  ],
   weekly_signup_reminder: [
     schedule: "30 11 * * 5",
     task: "RecruitxBackend.WeeklySignupReminder.execute"

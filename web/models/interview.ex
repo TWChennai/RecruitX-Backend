@@ -10,12 +10,9 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.SignUpEvaluator
   alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.Panel
   alias Timex.Date

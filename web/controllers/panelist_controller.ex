@@ -2,6 +2,7 @@ defmodule RecruitxBackend.PanelistController do
   use RecruitxBackend.Web, :controller
 
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Panel
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.Candidate
@@ -87,7 +88,7 @@ defmodule RecruitxBackend.PanelistController do
   defp send_mail_with_content(panelist_login_name, email_content) do
     MailHelper.deliver(%{
       subject: "[RecruitX] Change in interview panel",
-      to: [panelist_login_name |> InterviewPanelist.get_email_address],
+      to: [panelist_login_name |> Panel.get_email_address],
       html_body: email_content
     })
   end

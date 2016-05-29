@@ -2,7 +2,6 @@ defmodule RecruitxBackend.SlotPanelist do
   use RecruitxBackend.Web, :model
 
   alias RecruitxBackend.Slot
-  alias RecruitxBackend.Panel
   alias RecruitxBackend.Repo
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.SignUpEvaluator

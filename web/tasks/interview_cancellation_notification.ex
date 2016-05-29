@@ -1,7 +1,7 @@
 defmodule RecruitxBackend.InterviewCancellationNotification do
   import Ecto.Query, only: [preload: 2, from: 2, select: 3]
 
-  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Panel
   alias RecruitxBackend.Repo
   alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
@@ -28,7 +28,7 @@ defmodule RecruitxBackend.InterviewCancellationNotification do
 
     MailHelper.deliver %{
       subject: "[RecruitX] " <> interview_round.interview_type.name <> " on " <> formatted_date <> " is cancelled",
-      to: [interview_panelist.panelist_login_name |> InterviewPanelist.get_email_address],
+      to: [interview_panelist.panelist_login_name |> Panel.get_email_address],
       html_body: Templates.interview_cancellation_notification(interview_round.candidate.first_name,
         interview_round.candidate.last_name,
         interview_round.interview_type.name,

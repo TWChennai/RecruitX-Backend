@@ -7,6 +7,8 @@ defmodule RecruitxBackend.Slot do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SlotPanelist
+  alias RecruitxBackend.SlotCancellationNotification
+  alias Timex.Date
   alias Ecto.Changeset
 
   @duration_of_interview 1
@@ -64,5 +66,13 @@ defmodule RecruitxBackend.Slot do
   defp calculate_average_experience(candidates) do
     sum_experience = Enum.reduce(candidates, Decimal.new(0), fn(candidate, acc)-> Decimal.add(acc, candidate.experience) end)
     Decimal.div(sum_experience , Decimal.new(Enum.count(candidates)))
+  end
+
+  def delete_unused_slots do
+    current_time = Date.now |> Date.beginning_of_day
+    past_slot_ids_query = (from s in __MODULE__,
+    where: s.start_time < ^current_time)
+    past_slot_ids_query |> SlotCancellationNotification.execute
+    past_slot_ids_query |> Repo.delete_all
   end
 end

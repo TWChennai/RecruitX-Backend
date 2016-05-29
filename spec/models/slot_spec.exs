@@ -2,7 +2,9 @@ defmodule RecruitxBackend.SlotSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Slot
 
   alias RecruitxBackend.Slot
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Interview
+  alias Timex.Date
 
   let :experience, do: Decimal.new(1.0)
   let :candidate, do: create(:candidate, experience: experience)
@@ -53,6 +55,46 @@ defmodule RecruitxBackend.SlotSpec do
       changeset = Slot.changeset(%Slot{}, valid_attrs)
       expect(changeset.changes.skills) |> to(be("Skill 1/Skill 2"))
       expect(changeset.changes.average_experience) |> to(be(experience))
+    end
+  end
+
+  context "delete_unused_slots" do
+    it "should not delete anything if there are no past slots" do
+      Repo.delete_all(Slot)
+      create(:slot, start_time: Date.now |> Date.shift(days: 1))
+      slot_count_before = (from s in Slot, select: count(s.id)) |> Repo.one
+
+      Slot.delete_unused_slots
+      slot_count_after = (from s in Slot, select: count(s.id)) |> Repo.one
+
+      expect(slot_count_after) |> to(be(slot_count_before))
+    end
+
+    it "should delete only slots if there are past slots and no signups" do
+      Repo.delete_all(Slot)
+      create(:slot, start_time: Date.now |> Date.shift(days: -1))
+      slot_count_before = (from s in Slot, select: count(s.id)) |> Repo.one
+
+      Slot.delete_unused_slots
+      slot_count_after = (from s in Slot, select: count(s.id)) |> Repo.one
+
+      expect(slot_count_after) |> to(be(slot_count_before - 1))
+    end
+
+    it "should delete slots and slot_panelists if there are past slots and signups" do
+      Repo.delete_all(Slot)
+      Repo.delete_all(SlotPanelist)
+      slot = create(:slot, start_time: Date.now |> Date.shift(days: -1))
+      create(:slot_panelist, slot_id: slot.id)
+      slot_count_before = (from s in Slot, select: count(s.id)) |> Repo.one
+      slot_panelist_count_before = (from sp in SlotPanelist, select: count(sp.id)) |> Repo.one
+
+      Slot.delete_unused_slots
+      slot_count_after = (from s in Slot, select: count(s.id)) |> Repo.one
+      slot_panelist_count_after = (from sp in SlotPanelist, select: count(sp.id)) |> Repo.one
+
+      expect(slot_count_after) |> to(be(slot_count_before - 1))
+      expect(slot_panelist_count_after) |> to(be(slot_panelist_count_before - 1))
     end
   end
 end

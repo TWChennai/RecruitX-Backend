@@ -1,0 +1,7 @@
+<p>Hi,</p>
+  <p>
+    The "<b><%= interview_type_name %></b>" slot on "<b><%= slot_date %></b>" is automatically deleted as it is expired.
+  </p>
+<br />
+<strong>Thanks</strong><br />
+RecruitX
