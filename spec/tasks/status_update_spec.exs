@@ -48,9 +48,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute weekly status update" do
 
     it "should filter previous weeks interviews and construct email" do
-      Repo.delete_all Role
-      Repo.delete_all Candidate
       Repo.delete_all Interview
+      Repo.delete_all Candidate
+      Repo.delete_all Role
 
       interview = create(:interview, interview_type_id: 1, start_time: get_start_of_current_week )
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
@@ -133,9 +133,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute monthly status update" do
 
     it "should filter previous months interviews and construct email" do
-      Repo.delete_all Role
-      Repo.delete_all Candidate
       Repo.delete_all Interview
+      Repo.delete_all Candidate
+      Repo.delete_all Role
 
       interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
@@ -220,9 +220,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   describe "execute quarterly status update" do
 
     it "should filter previous quarters interviews and construct email" do
-      Repo.delete_all Role
-      Repo.delete_all Candidate
       Repo.delete_all Interview
+      Repo.delete_all Candidate
+      Repo.delete_all Role
 
       interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
       candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
