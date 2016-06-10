@@ -33,7 +33,7 @@ defmodule RecruitxBackend.Web do
 
       alias RecruitxBackend.Repo
       import Ecto
-      import Ecto.Query, only: [from: 1, from: 2, preload: 2]
+      import Ecto.Query, only: [from: 1, from: 2, preload: 2, order_by: 2]
 
       import RecruitxBackend.Router.Helpers
     end
