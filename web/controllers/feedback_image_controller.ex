@@ -24,6 +24,19 @@ defmodule RecruitxBackend.FeedbackImageController do
     conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
+  def create(conn, %{"interview_id" => id, "status_id" => status_id}) do
+      Interview.update_status(id, String.to_integer(status_id))
+      conn
+      |> put_status(:created)
+      |> json("Thanks for submitting feedback!")
+  end
+
+  def create(conn, %{}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> render(ErrorView, "bad_request.json", %{error: %{status_id: ["missing/empty required key"]}})
+  end
+
   def show(conn, %{"id" => id}) do
     feedback_image = FeedbackImage |> Repo.get(id)
     case feedback_image do

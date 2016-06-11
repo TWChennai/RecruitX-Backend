@@ -11,6 +11,20 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
   alias RecruitxBackend.Avatar
 
   describe "create" do
+    it "should update status only if there is no feedback images" do
+      interview = create(:interview)
+      interview_status = create(:interview_status)
+      allow Avatar |> to(accept(:store, fn(_) -> {:ok, "file_name"} end))
+
+      conn = post conn_with_dummy_authorization(), "/interviews/#{interview.id}/feedback_images", %{"status_id" => "#{interview_status.id}"}
+
+      conn |> should(have_http_status(201))
+      expect(conn.resp_body) |> to(be("\"Thanks for submitting feedback!\""))
+      updated_interview = Interview |> Repo.get(interview.id)
+      expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
+      expect(Avatar) |> to_not(accepted :store)
+    end
+
     it "should update status and feedback images" do
       file_to_upload = %Plug.Upload{path: "image1"}
       allow Avatar |> to(accept(:store, fn(_) -> {:ok, "file_name"} end))
@@ -75,6 +89,18 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       expect(updated_interview.interview_status_id) |> to(be(nil))
       feedback_images = (from f in FeedbackImage, where: f.interview_id == ^interview.id) |> Repo.all
       expect(feedback_images) |> to(be([]))
+    end
+
+    it "should throw error if status id is not there in request" do
+      interview = create(:interview)
+
+      response = post conn_with_dummy_authorization(), "/interviews/#{interview.id}/feedback_images", %{}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expectedNameErrorReason =  %{"errors" => %{"status_id" => ["missing/empty required key"]}}
+      expect(parsed_response) |> to(be(expectedNameErrorReason))
+      expect(interview.interview_status_id) |> to(be(nil))
     end
   end
 end
