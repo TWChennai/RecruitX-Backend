@@ -753,16 +753,16 @@ defmodule RecruitxBackend.InterviewSpec do
     end
   end
 
-  context "get the interviews in the next week" do
+  context "get the tuesday to friday of a week" do
     it "should return the interview from the next week" do
       Repo.delete_all(Interview)
-      create(:interview, id: 900, start_time: Date.now |> Date.end_of_week |> Date.shift(days: +8))
-      create(:interview, id: 901, start_time: Date.now |> Date.end_of_week|> Date.shift(days: -8))
-      create(:interview, id: 902, start_time: Date.now |> Date.end_of_week|> Date.shift(days: +1))
+      create(:interview, id: 900, start_time: get_start_of_current_week |> Date.shift(days: +3))
+      create(:interview, id: 901, start_time: get_start_of_current_week |> Date.shift(days: -8))
+      create(:interview, id: 902, start_time: get_start_of_current_week |> Date.shift(days: +6))
 
-      actual_result = Interview |> Interview.working_days_in_next_week |> Repo.one
+      actual_result = Interview |> Interview.tuesday_to_friday_of_the_current_week |> Repo.one
 
-      expect(actual_result.id) |> to(be(902))
+      expect(actual_result.id) |> to(be(900))
     end
   end
 end
