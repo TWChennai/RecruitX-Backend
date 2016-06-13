@@ -12,6 +12,8 @@ defmodule RecruitxBackend.Router do
   end
 
   scope "/", RecruitxBackend do
+    pipe_through :browser
+    get "/webApp", PageController, :index
     pipe_through :api
 
     resources "/roles", RoleController, only: [:index]

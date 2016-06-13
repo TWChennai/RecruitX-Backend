@@ -62,6 +62,7 @@ defmodule RecruitxBackend.Mixfile do
       {:json, "~> 0.3.3"},
       {:phoenix, "1.1.6"},
       {:phoenix_ecto, "2.0.2"},
+      {:phoenix_html, "~> 2.4"},
       {:phoenix_live_reload, "~> 1.0.3", only: :dev},
       {:plug, "~> 1.0"},
       {:poison, "~> 2.1.0", override: true},
