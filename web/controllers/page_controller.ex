@@ -1,12 +1,13 @@
 defmodule RecruitxBackend.PageController do
   use RecruitxBackend.Web, :controller
 
-alias RecruitxBackend.Candidate
+alias RecruitxBackend.Interview
+alias RecruitxBackend.Panel
 
   def index(conn, _params) do
-    candidates =  candidates = Candidate.get_candidates_in_fifo_order
-              |> Repo.all
+    interviews = Interview.get_interviews_with_associated_data
+                              |> Repo.all
 
-    render(conn, "index.html", candidates: candidates)
+    render(conn, "index.html", interviews: interviews)
   end
 end

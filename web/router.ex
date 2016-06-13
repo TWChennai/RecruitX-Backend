@@ -11,6 +11,7 @@ defmodule RecruitxBackend.Router do
     plug :accepts, ["json"]
   end
 
+  # TODO: Do not pollute the 'api' namespace with the html web output
   scope "/", RecruitxBackend do
     pipe_through :browser
     get "/webApp", PageController, :index
