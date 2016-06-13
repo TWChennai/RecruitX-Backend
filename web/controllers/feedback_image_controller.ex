@@ -25,10 +25,10 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   def create(conn, %{"interview_id" => id, "status_id" => status_id}) do
-      Interview.update_status(id, String.to_integer(status_id))
-      conn
-      |> put_status(:created)
-      |> json("Thanks for submitting feedback!")
+    Interview.update_status(id, String.to_integer(status_id))
+    conn
+    |> put_status(:created)
+    |> json("Thanks for submitting feedback!")
   end
 
   def create(conn, %{}) do

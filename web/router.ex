@@ -2,9 +2,9 @@ defmodule RecruitxBackend.Router do
   use RecruitxBackend.Web, :router
 
   pipeline :browser do
-      plug :accepts, ~w(html)
-      plug :fetch_session
-    end
+    plug :accepts, ~w(html)
+    plug :fetch_session
+  end
 
   pipeline :api  do
     plug RecruitxBackend.ApiKeyAuthenticator

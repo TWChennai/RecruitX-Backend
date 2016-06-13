@@ -84,7 +84,7 @@ defmodule RecruitxBackend.Candidate do
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
 
     Enum.count(candidates_passed, fn(candidate) ->
-      Enum.any?(last_interviews_data, fn (last_interview)->
+      Enum.any?(last_interviews_data, fn (last_interview) ->
         [candidate_id, max_start_time, _] = last_interview
         pass_interview_start_time = Date.from(max_start_time)
         candidate_id == candidate.id &&
@@ -153,8 +153,8 @@ defmodule RecruitxBackend.Candidate do
     where: not(is_nil(c.other_skills)),
     select: c.other_skills)
     |> Repo.all))
-    |> Enum.reduce("", fn(skill, acc)-> acc<>"/"<>skill end)
-    |>String.lstrip(?/)
+    |> Enum.reduce("", fn(skill, acc) -> acc <> "/" <> skill end)
+    |> String.lstrip(?/)
   end
 
   def is_pipeline_closed(candidate) do

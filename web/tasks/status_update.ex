@@ -17,7 +17,7 @@ defmodule RecruitxBackend.StatusUpdate do
 
   def execute_monthly do
     time = Timer.get_previous_month
-    {:ok, subject_suffix } = DateFormat.format(time.starting, " - %b %Y", :strftime)
+    {:ok, subject_suffix} = DateFormat.format(time.starting, " - %b %Y", :strftime)
     execute(time, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
@@ -45,7 +45,7 @@ defmodule RecruitxBackend.StatusUpdate do
                     else: Templates.status_update_default(start_date, to_date)
 
     MailHelper.deliver(%{
-      subject: "[RecruitX] "<> period_name <>" Status Update" <> subject_suffix,
+      subject: "[RecruitX] " <> period_name <> " Status Update" <> subject_suffix,
       to: recepient |> String.split,
       html_body: email_content
     })
@@ -83,6 +83,6 @@ defmodule RecruitxBackend.StatusUpdate do
   end
 
   def filter_out_candidates_without_interviews(candidates_status) do
-    Enum.filter(candidates_status, fn(candidate)-> candidate.interviews != []  end)
+    Enum.filter(candidates_status, fn(candidate) -> candidate.interviews != []  end)
   end
 end

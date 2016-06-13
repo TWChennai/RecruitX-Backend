@@ -282,9 +282,9 @@ defmodule RecruitxBackend.Interview do
   end
 
   def get_last_interview_status_for(current_candidate, last_interviews_data) do
-    total_no_of_interview_types = Enum.count(RoleInterviewType |> where([i], ^current_candidate.role_id == i.role_id)|> Repo.all)
+    total_no_of_interview_types = Enum.count(RoleInterviewType |> where([i], ^current_candidate.role_id == i.role_id) |> Repo.all)
     if Candidate.is_pipeline_closed(current_candidate) do
-      result = Enum.filter(last_interviews_data, fn([candidate_id, _, _])-> current_candidate.id == candidate_id end)
+      result = Enum.filter(last_interviews_data, fn([candidate_id, _, _]) -> current_candidate.id == candidate_id end)
       case result do
         [[candidate_id, last_interview_start_time, number_of_interviews]] ->
           status_id = (from i in __MODULE__,

@@ -64,7 +64,7 @@ defmodule RecruitxBackend.Slot do
   end
 
   defp calculate_average_experience(candidates) do
-    sum_experience = Enum.reduce(candidates, Decimal.new(0), fn(candidate, acc)-> Decimal.add(acc, candidate.experience) end)
+    sum_experience = Enum.reduce(candidates, Decimal.new(0), fn(candidate, acc) -> Decimal.add(acc, candidate.experience) end)
     Decimal.div(sum_experience , Decimal.new(Enum.count(candidates)))
   end
 
