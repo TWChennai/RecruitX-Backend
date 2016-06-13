@@ -17,7 +17,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       Repo.delete_all(Interview)
       create(:candidate_skill, skill_id: skill.id, candidate_id: candidate.id)
       create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
-      create(:interview, interview_type_id: interview_type.id, start_time: get_start_of_next_week, candidate_id: candidate.id)
+      create(:interview, interview_type_id: interview_type.id, start_time: get_start_of_current_week |> Timex.Date.shift(days: 2), candidate_id: candidate.id)
     end
 
     it "should send interview signup details as email" do
@@ -33,7 +33,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       mail_content = mail_box.html_body
       expect(mail_content) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
       expect(mail_content) |> to(have("Special Skill, Other Skill"))
-      expect(mail_content) |> to(have("Round 1 on " <> DateFormat.format!(get_start_of_next_week, "%b-%d", :strftime) ))
+      expect(mail_content) |> to(have("Round 1 on " <> DateFormat.format!(get_start_of_current_week |> Timex.Date.shift(days: 2), "%b-%d", :strftime) ))
     end
   end
 end

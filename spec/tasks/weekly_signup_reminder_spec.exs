@@ -97,9 +97,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   describe "get interview sub-query" do
     before do
       Repo.delete_all(Interview)
-      create(:interview, id: 1, start_time: get_start_of_next_week)
-      create(:interview, id: 2, start_time: get_start_of_next_week)
-      create(:interview, id: 3, start_time: get_start_of_next_week)
+      create(:interview, id: 1, start_time: get_start_of_current_week |> Date.shift(days: 2))
+      create(:interview, id: 2, start_time: get_start_of_current_week |> Date.shift(days: 2))
+      create(:interview, id: 3, start_time: get_start_of_current_week |> Date.shift(days: 2))
     end
 
     it "should return interviews with given interview ids and remaining ids in a different list" do
@@ -150,7 +150,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   describe "execute weekly signup reminder" do
 
     it "should call Swoosh deliver with correct arguments" do
-      create(:interview, start_time: get_start_of_next_week)
+      create(:interview, start_time: get_start_of_current_week |> Date.shift(days: 2))
       RecruitxBackend.MailHelper.default_mail
 
       allow Swoosh.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))
@@ -179,7 +179,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should be called every week on friday at 3.0 UTC" do
       job = Quantum.find_job(:weekly_signup_reminder)
 
-      expect(job.schedule) |> to(be("30 11 * * 5"))
+      expect(job.schedule) |> to(be("00 17 * * 1"))
       expect(job.task) |> to(be({"RecruitxBackend.WeeklySignupReminder", "execute"}))
     end
   end

@@ -41,7 +41,7 @@ config :quantum, cron: [
     task: "RecruitxBackend.Slot.delete_unused_slots"
   ],
   weekly_signup_reminder: [
-    schedule: "30 11 * * 5",
+    schedule: "00 17 * * 1",
     task: "RecruitxBackend.WeeklySignupReminder.execute"
   ],
   weekly_status_update: [

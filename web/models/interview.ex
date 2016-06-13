@@ -40,10 +40,10 @@ defmodule RecruitxBackend.Interview do
   @required_fields ~w(candidate_id interview_type_id start_time)
   @optional_fields ~w(interview_status_id)
 
-  def working_days_in_next_week(query) do
-    start_of_next_week = Date.now |> Date.end_of_week
-    end_of_next_week = start_of_next_week |> Date.shift(days: 5)
-    Panel.within_date_range(query, start_of_next_week, end_of_next_week)
+  def tuesday_to_friday_of_the_current_week(query) do
+    start_of_tuesday = Date.now |> Date.beginning_of_week(:mon) |> Date.shift(days: 1)
+    end_of_friday = start_of_tuesday |> Date.shift(days: 4)
+    Panel.within_date_range(query, start_of_tuesday, end_of_friday)
   end
 
   def working_days_in_current_week(model) do
