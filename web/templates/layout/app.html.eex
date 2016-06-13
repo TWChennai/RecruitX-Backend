@@ -23,8 +23,20 @@
     <ul id="candidates" style="list-style: none;">
       <%= for interview <- @interviews do %>
         <li>
-          <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
-            <%= "#{interview.candidate.first_name} #{interview.candidate.last_name}"%>
+          <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;padding-bottom: 68px;">
+            <div class="col-sm-3">
+              <%= "#{interview.candidate.first_name} #{interview.candidate.last_name}"%>
+            </div>
+            <div class="col-sm-3">
+              <%= "#{interview.start_time.day}/#{interview.start_time.month}/#{interview.start_time.year}"%>
+            </div>
+            <div class="col-sm-3">
+              <%= "#{interview.start_time.hour}:#{interview.start_time.minute}"%>
+            </div>
+            <div class="col-sm-3">
+              Interview Type
+              <!-- TODO: load interview type -->
+            </div>
           </div>
           <button type="button" class="btn btn-primary">signup</button>
         </li>
