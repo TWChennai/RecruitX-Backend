@@ -35,7 +35,7 @@
             </div>
             <div class="col-sm-3">
               Interview Type
-              <!-- TODO: load interview type -->
+              <%= "#{interview.interview_type.name}"%>
             </div>
           </div>
           <button type="button" class="btn btn-primary">signup</button>
