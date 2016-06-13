@@ -6,7 +6,7 @@ alias RecruitxBackend.Panel
 
   def index(conn, _params) do
     interviews = Interview.get_interviews_with_associated_data
-                              |> preload(:interview_type)
+                              |> preload([:interview_type, candidate: :role])
                               |> Repo.all
 
     render(conn, "index.html", interviews: interviews)

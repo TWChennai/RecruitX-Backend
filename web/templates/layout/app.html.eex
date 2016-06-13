@@ -23,22 +23,30 @@
     <ul id="candidates" style="list-style: none;">
       <%= for interview <- @interviews do %>
         <li>
-          <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;padding-bottom: 68px;">
+          <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
             <div class="col-sm-3">
               <%= "#{interview.candidate.first_name} #{interview.candidate.last_name}"%>
             </div>
-            <div class="col-sm-3">
-              <%= "#{interview.start_time.day}/#{interview.start_time.month}/#{interview.start_time.year}"%>
+            <div class="col-sm-1">
+              <%= "#{interview.candidate.role.name}"%>
             </div>
-            <div class="col-sm-3">
-              <%= "#{interview.start_time.hour}:#{interview.start_time.minute}"%>
+            <div class="col-sm-1">
+              <%= "#{interview.candidate.experience} yrs"%>
             </div>
-            <div class="col-sm-3">
-              Interview Type
+            <div class="col-sm-2">
+              <%= "#{interview.candidate.other_skills} "%>
+            </div>
+            <div class="col-sm-2">
               <%= "#{interview.interview_type.name}"%>
             </div>
+            <div class="col-sm-1">
+              <%= "#{interview.start_time.day}/#{interview.start_time.month}/#{interview.start_time.year}"%>
+            </div>
+            <div class="col-sm-1">
+              <%= "#{interview.start_time.hour}:#{interview.start_time.minute}"%>
+            </div>
+            <button type="button" class="btn btn-primary">signup</button>
           </div>
-          <button type="button" class="btn btn-primary">signup</button>
         </li>
         <% end %>
     </ul>
