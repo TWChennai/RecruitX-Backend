@@ -21,7 +21,7 @@
       <%= render @view_module, @view_template, assigns %>
     </main>
     <ul id="candidates" style="list-style: none;">
-      <%= for interview <- @interviews do %>
+      <%= for interview <- @interviews_with_signup do %>
         <li>
           <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
             <div class="col-sm-3">

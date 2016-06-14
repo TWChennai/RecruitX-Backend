@@ -15,6 +15,7 @@ defmodule RecruitxBackend.InterviewController do
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data
+                  |> preload([:interview_type, candidate: :role])
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
@@ -23,7 +24,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.default_order
                   |> Repo.all
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
-    conn |> render("index.json", interviews_with_signup: interviews_and_slots_with_signup_status)
+    conn |> render(:index , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
   def index(conn, %{"candidate_id" => candidate_id}) do
