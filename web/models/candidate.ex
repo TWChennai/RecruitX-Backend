@@ -189,6 +189,10 @@ defmodule RecruitxBackend.Candidate do
     Enum.map(candidate.interviews, &(Interview.format_with_result_and_panelist(&1)))
   end
 
+  def get_full_name(candidate) do
+    candidate.first_name <> " " <> candidate.last_name
+  end
+
   def get_rounded_experience(candidate) do
     experience_as_string = Decimal.to_string(candidate.experience)
     experience_as_float = String.to_float(experience_as_string)

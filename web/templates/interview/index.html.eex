@@ -3,7 +3,7 @@
     <li>
       <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
         <div class="col-sm-3">
-          <%= "#{interview.candidate.first_name} #{interview.candidate.last_name}"%>
+          <%= RecruitxBackend.Candidate.get_full_name(interview.candidate)%>
         </div>
         <div class="col-sm-1">
           <%= "#{interview.candidate.role.name}"%>

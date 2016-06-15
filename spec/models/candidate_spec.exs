@@ -227,6 +227,15 @@ defmodule RecruitxBackend.CandidateSpec do
     end
   end
 
+  context "get formatted name" do
+    it "should concatinate first and last name" do
+      candidate = create(:candidate, first_name: "First", last_name: "Last")
+      formatted_name = Candidate.get_full_name(candidate)
+
+      expect(formatted_name |> to(be("First Last")))
+    end
+  end
+
   context "get formattted skills" do
     let :candidate, do: create(:candidate, other_skills: "Other Skills")
     before do
