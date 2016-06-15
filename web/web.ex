@@ -36,6 +36,7 @@ defmodule RecruitxBackend.Web do
       import Ecto.Query, only: [from: 1, from: 2, preload: 2, order_by: 2]
 
       import RecruitxBackend.Router.Helpers
+      import RecruitxBackend.Gettext
     end
   end
 
@@ -45,6 +46,9 @@ defmodule RecruitxBackend.Web do
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
+
+      # Use all HTML functionality (forms, tags, etc)
+      use Phoenix.HTML
 
       import RecruitxBackend.Router.Helpers
       import RecruitxBackend.ErrorHelpers
@@ -65,6 +69,7 @@ defmodule RecruitxBackend.Web do
       alias RecruitxBackend.Repo
       import Ecto
       import Ecto.Query, only: [from: 1, from: 2]
+      import RecruitxBackend.Gettext
     end
   end
 

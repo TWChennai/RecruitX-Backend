@@ -4,6 +4,9 @@ defmodule RecruitxBackend.Router do
   pipeline :browser do
     plug :accepts, ~w(html)
     plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
   end
 
   pipeline :api  do
@@ -15,8 +18,8 @@ defmodule RecruitxBackend.Router do
     pipe_through :browser
     get "/", InterviewController, :index
   end
-  
-  # TODO: make web "/" and API "/api"
+
+  # TODO: make "web" use the root namespace ("/") and "API" use the "/api" namespace
 
   scope "/", RecruitxBackend do
     pipe_through :api
@@ -41,19 +44,20 @@ defmodule RecruitxBackend.Router do
   end
 
   if Mix.env == :dev do
-  scope "/dev" do
-    pipe_through :browser
+    scope "/dev" do
+      pipe_through :browser
 
-    forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/dev/mailbox"]
+      forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/dev/mailbox"]
+    end
   end
-end
+
   if Mix.env == :test do
-  scope "/test" do
-    pipe_through :browser
+    scope "/test" do
+      pipe_through :browser
 
-    forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/test/mailbox"]
+      forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/test/mailbox"]
+    end
   end
-end
 
   # Other scopes may use custom stacks.
   # scope "/api", RecruitxBackend do

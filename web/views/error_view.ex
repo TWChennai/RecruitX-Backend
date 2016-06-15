@@ -5,8 +5,16 @@ defmodule RecruitxBackend.ErrorView do
     %{error: "Page not found"}
   end
 
+  def render("404.html", _assigns) do
+    "Page not found"
+  end
+
   def render("500.json", _assigns) do
     %{error: "Server internal error"}
+  end
+
+  def render("500.html", _assigns) do
+    "Server internal error"
   end
 
   def render("bad_request.json", %{error: error}) do
@@ -16,7 +24,7 @@ defmodule RecruitxBackend.ErrorView do
   # In case no render clause matches or no
   # template is found, let's render it as 500
   def template_not_found(_template, assigns) do
+    # TODO: Need to handle html format separately
     render "500.json", assigns
   end
-
 end

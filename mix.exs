@@ -6,7 +6,7 @@ defmodule RecruitxBackend.Mixfile do
      version: "1.0.0",
      elixir: "~> 1.2.3",
      elixirc_paths: elixirc_paths(Mix.env),
-     compilers: [:phoenix] ++ Mix.compilers,
+     compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      aliases: aliases,
@@ -31,7 +31,7 @@ defmodule RecruitxBackend.Mixfile do
   def application do
     [mod: {RecruitxBackend, []},
     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
-     applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
+     applications: [:timex, :timex_ecto, :phoenix, :phoenix_html, :cowboy, :logger, :connection,
                     :json, :corsica, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
   end
 
