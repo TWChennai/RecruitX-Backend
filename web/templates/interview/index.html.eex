@@ -12,7 +12,7 @@
           <%= "#{interview.candidate.experience} yrs"%>
         </div>
         <div class="col-sm-2">
-          <%= "#{interview.candidate.other_skills} "%>
+          <%= RecruitxBackend.Candidate.get_formatted_skills(interview.candidate) %>
         </div>
         <div class="col-sm-2">
           <%= "#{interview.interview_type.name}"%>
