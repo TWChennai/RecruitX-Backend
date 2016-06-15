@@ -20,6 +20,7 @@
     <main role="main">
       <%= render @view_module, @view_template, assigns %>
     </main>
+    <!-- TODO: Move this into the interviews view template (this is the "global" (or common) layout file) -->
     <ul id="candidates" style="list-style: none;">
       <%= for interview <- @interviews_with_signup do %>
         <li>
