@@ -1,0 +1,27 @@
+<li>
+  <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
+    <div class="col-sm-2">
+      <%= RecruitxBackend.Candidate.get_full_name(@interview.candidate)%>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.candidate.role.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.candidate.experience%> y
+    </div>
+    <div class="col-sm-4">
+      <%= RecruitxBackend.Candidate.get_formatted_skills(@interview.candidate) %>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.interview_type.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(@interview.start_time, "%b-%d", :strftime) %>
+    </div>
+    <div class="col-sm-1">
+    </div>
+    <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
+      <a href="/signup" class="btn btn-primary" method= "post" <%= if(!@interview.signup) do %> disabled <% end %>>signup</a>
+    </span>
+  </div>
+</li>

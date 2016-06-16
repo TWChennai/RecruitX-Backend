@@ -7,6 +7,10 @@ defmodule RecruitxBackend.InterviewView do
   alias RecruitxBackend.InterviewView
   alias Timex.DateFormat
 
+  def render("index.html",%{interviews_with_signup: interviews}) do
+    render_many(interviews, InterviewView, "interview_slot.html")
+  end
+
   def render("index.json", %{interviews_with_signup: interviews}) do
     render_many(interviews, InterviewView, "interview_with_signup.json")
   end
@@ -59,6 +63,14 @@ defmodule RecruitxBackend.InterviewView do
       signup_error: slot.signup_error,
       panelists: render_many(slot.slot_panelists, InterviewPanelistView, "interview_panelist.json")
     }
+  end
+
+  def render("interview_slot.html", %{interview: %{candidate: _} = interview}) do
+    render "interview.html", interview: interview
+  end
+
+  def render("interview_slot.html", %{interview: slot}) do
+    render "slot.html", slot: slot
   end
 
   def render("interview.json", %{interview: %{candidate: _} = interview}) do

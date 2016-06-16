@@ -19,7 +19,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
-    slots = Slot |> preload(:slot_panelists)
+    slots = Slot |> preload([:slot_panelists, :role, :interview_type])
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
