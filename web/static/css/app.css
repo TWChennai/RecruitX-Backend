@@ -76,3 +76,7 @@ form.link, form.button {
     border-bottom: 0;
   }
 }
+
+.tooltip-inner {
+    width: 350px;
+}

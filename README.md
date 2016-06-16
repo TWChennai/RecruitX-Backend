@@ -17,12 +17,13 @@ After cloning the git repository, you will need the following pre-requisites
   2. Create, migrate and seed your database with `mix ecto.setup`
   3. Drop, Create, migrate and seed your database with `mix ecto.reset`
   4. Seed the database with `mix run priv/repo/seeds.exs`
-  5. Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-  6. To Run the Phoenix Web App use [http://localhost:4000/web/?panelist_login_name=ppanelistp&panelist_experience=5&panelist_role=Dev] from your browser.
-  7. To run whatever's necessary before committing: `mix commit`
-  8. Run all espec tests with `mix espec --cover`
-  9. Run unit tests with `mix espec --exclude integration`
-  10. Run integration tests with `mix espec spec/integration/*`
+  5. Run `brunch build` to build JS and CSS (Only for Web App)
+  6. Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  7. To Run the Phoenix Web App use [http://localhost:4000/web/?panelist_login_name=ppanelistp&panelist_experience=5&panelist_role=Dev] from your browser.
+  8. To run whatever's necessary before committing: `mix commit`
+  9. Run all espec tests with `mix espec --cover`
+  10. Run unit tests with `mix espec --exclude integration`
+  11. Run integration tests with `mix espec spec/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 

@@ -14,7 +14,7 @@
         <div class="col-sm-2">
           <%= RecruitxBackend.Candidate.get_formatted_skills(interview.candidate) %>
         </div>
-        <div class="col-sm-2">
+        <div class="col-sm-1">
           <%= "#{interview.interview_type.name}"%>
         </div>
         <div class="col-sm-1">
@@ -23,7 +23,9 @@
         <div class="col-sm-1">
           <%= "#{interview.start_time.hour}:#{interview.start_time.minute}"%>
         </div>
-        <button type="button" class="btn btn-primary">signup</button>
+        <span data-toggle="tooltip" title='<%= interview.signup_error %>' >
+          <a href="#" class="btn btn-primary" <%= if(!interview.signup) do %> disabled <% end %>>signup</a>
+        </span>
       </div>
     </li>
     <% end %>
