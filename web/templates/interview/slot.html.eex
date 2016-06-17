@@ -1,5 +1,5 @@
-<li>
-  <div class="jumbotron" class="row" style="margin-bottom: 10px;margin-top: 10px;">
+<div>
+  <div class="jumbotron row" style="margin-bottom: 5px;margin-top: 5px;">
     <div class="col-sm-2">
       ??? ???
     </div>
@@ -9,7 +9,7 @@
     <div class="col-sm-1">
       <%= @slot.average_experience%> y
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-3">
       <%= @slot.skills %>
     </div>
     <div class="col-sm-1">
@@ -19,9 +19,12 @@
       <%= DateFormat.format!(@slot.start_time, "%b-%d", :strftime) %>
     </div>
     <div class="col-sm-1">
+      <%= DateFormat.format!(@slot.start_time,"{h12}:{0m} {am}") %>
     </div>
-    <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
-      <a href="/signup" class="btn btn-primary" method= "post" <%= if(!@slot.signup) do %> disabled <% end %>>signup</a>
-    </span>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
+        <a class="btn btn-primary" method= "post" <%= if(!@slot.signup) do %> disabled  href="#" <% else %>href="/signup"<% end %>>signup</a>
+      </span>
+    </div>
   </div>
-</li>
+</div>
