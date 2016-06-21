@@ -7,7 +7,7 @@ defmodule RecruitxBackend.InterviewView do
   alias RecruitxBackend.InterviewView
   alias Timex.DateFormat
 
-  def render("index.html",%{interviews_with_signup: interviews}) do
+  def render("index.html", %{interviews_with_signup: interviews}) do
     render_many(interviews, InterviewView, "interview_slot.html")
   end
 
