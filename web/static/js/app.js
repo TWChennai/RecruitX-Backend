@@ -19,6 +19,7 @@ import "phoenix_html"
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-$(document).ready(function(){
-   $('[data-toggle="tooltip"]').tooltip();
-});
+// TODO: make this tooltip work for interview Page
+// $(document).ready(function(){
+//    $('[data-toggle="tooltip"]').tooltip();
+// });

@@ -1,0 +1,23 @@
+<div id="okta-login-container"></div>
+
+<script type="text/javascript">
+  var baseUrl = '<%= @okta_preview %>';
+  var oktaSignIn = new OktaSignIn({ baseUrl: baseUrl });
+  // TODO: make this redirection simpler
+  oktaSignIn.session.exists(function (exists) {
+  if (exists) {
+    window.location="http://localhost:4000/web/?panelist_login_name=ppanelistp&panelist_experience=5&panelist_role=Dev";
+    return;
+  }
+  // Show the sign-in widget
+  oktaSignIn.renderEl(
+    { el: '#okta-login-container' },
+    function (res) {
+      if (res.status === 'SUCCESS') {
+        console.log('User successfully authenticated %o',res.user);
+        res.session.setCookieAndRedirect("http://localhost:4000/web/?panelist_login_name="+res.user.profile.login+"&panelist_experience=5&panelist_role=Dev"); }
+    }
+  );
+});
+
+</script>
