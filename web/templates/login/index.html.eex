@@ -1,21 +1,38 @@
 <div id="okta-login-container"></div>
-
+<!-- TODO: Add page specific js and test it-->
 <script type="text/javascript">
   var baseUrl = '<%= @okta_preview %>';
-  var oktaSignIn = new OktaSignIn({ baseUrl: baseUrl });
+  var oktaSignIn = new OktaSignIn({
+    baseUrl: baseUrl
+  });
   // TODO: make this redirection simpler
-  oktaSignIn.session.get(function (res) {
-  if (res.status !== 'INACTIVE') {
-    window.location="http://localhost:4000/web/?panelist_login_name="+res.user.profile+"&panelist_experience=5&panelist_role=Dev";
-    return;
-  }
-  // Show the sign-in widget
-  oktaSignIn.renderEl(
-    { el: '#okta-login-container' },
-    function (res) {
-      if (res.status === 'SUCCESS') {
-        res.session.setCookieAndRedirect("http://localhost:4000/web/?panelist_login_name="+res.user.profile.login+"&panelist_experience=5&panelist_role=Dev"); }
+  oktaSignIn.session.get(function(res) {
+    if (res.status !== 'INACTIVE') {
+      window.location = "http://localhost:4000/web/?panelist_login_name=" + res.user.profile + "&panelist_experience=5&panelist_role=Dev";
+      return;
     }
-  );
-});
+    // Show the sign-in widget
+    oktaSignIn.renderEl({
+        el: '#okta-login-container'
+      },
+      function(res) {
+        if (res.status === 'SUCCESS') {
+          var user = (res.user.profile.login).split("@")[0];
+          // TODO: use user name & this is a poorman's implementation needs refactor
+          var jigsawUrl = {
+            url: '/is_recruiter/' + user,
+            headers: {
+              authorization: '<%= @api_key %>'
+            }
+          };
+          $.get(jigsawUrl, function(response) {
+            document.cookie = "panelist_role=" + response.role.name + ";";
+            document.cookie = "calculated_hire_date=" + response.calculated_hire_date + ";";
+            document.cookie = "username=" + user + ";";
+            res.session.setCookieAndRedirect("http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=" + response.role.name);
+          })
+        }
+      }
+    );
+  });
 </script>
