@@ -5,21 +5,17 @@
   var oktaSignIn = new OktaSignIn({ baseUrl: baseUrl });
   // TODO: make this redirection simpler
   oktaSignIn.session.get(function (res) {
-    var userName = res.user.profile.login;
-    console.log(res.user.profile);
-    var appUrl = "http://localhost:4000/web/?panelist_login_name="+userName+ "&panelist_experience=5&panelist_role=Dev";
-    if (res.status !== 'INACTIVE') {
-      // window.location= appUrl;
-      return;
+  if (res.status !== 'INACTIVE') {
+    window.location="http://localhost:4000/web/?panelist_login_name="+res.user.profile+"&panelist_experience=5&panelist_role=Dev";
+    return;
+  }
+  // Show the sign-in widget
+  oktaSignIn.renderEl(
+    { el: '#okta-login-container' },
+    function (res) {
+      if (res.status === 'SUCCESS') {
+        res.session.setCookieAndRedirect("http://localhost:4000/web/?panelist_login_name="+res.user.profile.login+"&panelist_experience=5&panelist_role=Dev"); }
     }
-    // Show the sign-in widget
-    oktaSignIn.renderEl(
-      { el: '#okta-login-container' },
-      function (res) {
-        if (res.status === 'SUCCESS') {
-          res.session.setCookieAndRedirect(appUrl); }
-      }
-    );
+  );
 });
-
 </script>
