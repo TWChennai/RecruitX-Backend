@@ -5,32 +5,42 @@
   var oktaSignIn = new OktaSignIn({
     baseUrl: baseUrl
   });
-  // TODO: make this redirection simpler
+  var setCookieAndRedirect = function(user) {
+    alert("entering set cookies")
+    var jigsawUrl = {
+      url: '/is_recruiter/' + user,
+      headers: {
+        authorization: '<%= @api_key %>'
+      }
+    };
+    // TODO: use jquery cookies instead
+    $.get(jigsawUrl, function(response) {
+      document.cookie = "panelist_role=" + response.role.name + ";";
+      document.cookie = "calculated_hire_date=" + response.calculated_hire_date + ";";
+      document.cookie = "username=" + user + ";";
+      // TODO: make this redirection simpler
+      window.location = "http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=Dev";
+    })
+  }
+  //TODO: poorman's implementation please Refactor
   oktaSignIn.session.get(function(res) {
+    alert(res.status);
     if (res.status !== 'INACTIVE') {
-      window.location = "http://localhost:4000/web/?panelist_login_name=" + res.user.profile + "&panelist_experience=5&panelist_role=Dev";
+      var user = (res.user.profile.login).split("@")[0];
+      if (document.cookie.indexOf("username") >= 0) {
+        window.location = "http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=Dev";
+        return;
+      }
+      setCookieAndRedirect(user)
       return;
     }
-    // Show the sign-in widget
     oktaSignIn.renderEl({
         el: '#okta-login-container'
       },
       function(res) {
         if (res.status === 'SUCCESS') {
           var user = (res.user.profile.login).split("@")[0];
-          // TODO: use user name & this is a poorman's implementation needs refactor
-          var jigsawUrl = {
-            url: '/is_recruiter/' + user,
-            headers: {
-              authorization: '<%= @api_key %>'
-            }
-          };
-          $.get(jigsawUrl, function(response) {
-            document.cookie = "panelist_role=" + response.role.name + ";";
-            document.cookie = "calculated_hire_date=" + response.calculated_hire_date + ";";
-            document.cookie = "username=" + user + ";";
-            res.session.setCookieAndRedirect("http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=" + response.role.name);
-          })
+          setCookieAndRedirect(user);
         }
       }
     );
