@@ -19,7 +19,7 @@
       document.cookie = "calculated_hire_date=" + response.calculated_hire_date + ";";
       document.cookie = "username=" + user + ";";
       // TODO: make this redirection simpler
-      window.location = "http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=Dev";
+      window.location = "http://localhost:4000/web/";
     })
   }
   //TODO: poorman's implementation please Refactor
@@ -28,7 +28,7 @@
     if (res.status !== 'INACTIVE') {
       var user = (res.user.profile.login).split("@")[0];
       if (document.cookie.indexOf("username") >= 0) {
-        window.location = "http://localhost:4000/web/?panelist_login_name=" + user + "&panelist_experience=5&panelist_role=Dev";
+        window.location = "http://localhost:4000/web/";
         return;
       }
       setCookieAndRedirect(user)

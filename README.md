@@ -19,13 +19,18 @@ After cloning the git repository, you will need the following pre-requisites
   4. Seed the database with `mix run priv/repo/seeds.exs`
   5. Run `brunch build` to build JS and CSS (Only for Web App)
   6. Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-  7. To Run the Phoenix Web App use [http://localhost:4000/web/?panelist_login_name=ppanelistp&panelist_experience=5&panelist_role=Dev] from your browser.
+  7. To Run the Phoenix Web App refer to #### Run Web App
   8. To run whatever's necessary before committing: `mix commit`
   9. Run all espec tests with `mix espec --cover`
   10. Run unit tests with `mix espec --exclude integration`
   11. Run integration tests with `mix espec spec/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+
+#### Run Web App
+  1. Set up the OKTA_PREVIEW environment to your okta preview (with TW account)
+  2. Add a new app - SWA, give login url as http://localhost:4000/login
+  3. Click on the app open it to run it
 
 ## Learn more
 
