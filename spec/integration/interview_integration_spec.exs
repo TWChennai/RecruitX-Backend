@@ -109,4 +109,12 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       expect(result_interview.last_interview_status) |> to(be(pass_id))
     end
   end
+  describe "index_web" do
+    it "should redirect to login when there is no cookies" do
+      response = get conn_with_dummy_authorization(), "/web/"
+
+      expect(response.status) |> to(be(302))
+      expect(response.path_info) |> to(be(["web"]))
+    end
+  end
 end
