@@ -16,7 +16,7 @@ defmodule RecruitxBackend.Router do
 
   scope "/web", RecruitxBackend do
     pipe_through :browser
-    get "/", InterviewController, :index
+    get "/", InterviewController, :show
     get "/login", LoginController, :index
   end
 
