@@ -14,11 +14,10 @@
       };
       // TODO: use jquery cookies instead
       $.get(jigsawUrl, function(response) {
-        document.cookie = "panelist_role=" + response.role.name + ";";
-        document.cookie = "calculated_hire_date=" + response.calculated_hire_date + ";";
-        document.cookie = "username=" + user + ";";
-        // TODO: make this redirection simpler
-        window.location = "http://localhost:4000/web/";
+        $.cookie("panelist_role", response.role.name);
+        $.cookie("calculated_hire_date", response.calculated_hire_date);
+        $.cookie("username", user);
+        window.location = "/web/";
       })
     }
     //TODO: poorman's implementation please Refactor
@@ -26,7 +25,7 @@
     if (res.status !== 'INACTIVE') {
       var user = (res.user.profile.login).split("@")[0];
       if (document.cookie.indexOf("username") >= 0) {
-        window.location = "http://localhost:4000/web/";
+        window.location = "/web/";
         return;
       }
       setCookieAndRedirect(user)

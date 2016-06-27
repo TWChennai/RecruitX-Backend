@@ -23,7 +23,7 @@
     </div>
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
-        <a class="btn btn-primary" method= "post" <%= if(!@interview.signup) do %> disabled  href="#" <% else %>href="/signup"<% end %>>signup</a>
+        <button class="btn btn-primary" method= "post" <%= if(!@interview.signup) do %> disabled<% else %> onclick=require("web/static/js/app").Interview.interviewSignup(<%= @interview.id%>)<% end %>>signup</button>
       </span>
     </div>
   </div>

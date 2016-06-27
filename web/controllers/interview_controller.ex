@@ -12,7 +12,7 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.Panel
 
   plug :scrub_params, "interview" when action in [:update, :create]
-# Restrict Value of roles to specific values / Make sure u can't edit the url
+
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
@@ -38,7 +38,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
-    panelist_experience = 5
+    panelist_experience = 11
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
     conn |> render("index.html" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
