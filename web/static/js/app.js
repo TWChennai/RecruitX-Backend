@@ -13,6 +13,8 @@
 // to also remove its path from "config.paths.watched".
 import "phoenix_html"
 import  { Interview } from "web/static/js/interview"
+import  { Slot } from "web/static/js/slot"
+
 // Import local files
 //
 // Local files can be imported directly using relative
@@ -25,5 +27,6 @@ import  { Interview } from "web/static/js/interview"
 // });
 
 module.exports = {
-  Interview: Interview
+  Interview: Interview,
+  Slot: Slot
 };

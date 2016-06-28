@@ -1,11 +1,11 @@
-export var Interview = {
+export var Slot = {
   signup: function(id) {
     $.ajax({
       url: "/panelists",
       method: 'POST',
       data: JSON.stringify({
-        "interview_panelist": {
-          "interview_id": id,
+        "slot_panelist": {
+          "slot_id": id,
           "panelist_login_name": $.cookie("username"),
           "panelist_experience": 11,
           "panelist_role": $.cookie("panelist_role")
@@ -15,7 +15,7 @@ export var Interview = {
         window.location = '/web/';
       },
       headers: {
-        "Authorization": '<% @api_key%>',
+        "Authorization": '<%= @api_key %>',
         "Content-Type": "application/json"
       }
     });
