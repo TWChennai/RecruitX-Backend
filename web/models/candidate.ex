@@ -11,6 +11,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   schema "candidates" do
     field :first_name, :string
@@ -87,8 +88,8 @@ defmodule RecruitxBackend.Candidate do
         [candidate_id, max_start_time, _] = last_interview
         pass_interview_start_time = Date.from(max_start_time)
         candidate_id == candidate.id &&
-        RecruitxBackend.TimexHelper.compare(pass_interview_start_time, start_date) &&
-        RecruitxBackend.TimexHelper.compare(end_date, pass_interview_start_time)
+        TimexHelper.compare(pass_interview_start_time, start_date) &&
+        TimexHelper.compare(end_date, pass_interview_start_time)
       end)
     end)
   end
