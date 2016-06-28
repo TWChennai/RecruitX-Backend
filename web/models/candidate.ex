@@ -10,6 +10,7 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.TimexHelper
   alias Timex.Date
 
   schema "candidates" do
@@ -82,14 +83,13 @@ defmodule RecruitxBackend.Candidate do
                         c.role_id == ^role_id)
                           |> Repo.all
     last_interviews_data = Interview.get_candidates_with_all_rounds_completed |> Repo.all
-
     Enum.count(candidates_passed, fn(candidate) ->
       Enum.any?(last_interviews_data, fn (last_interview)->
         [candidate_id, max_start_time, _] = last_interview
         pass_interview_start_time = Date.from(max_start_time)
         candidate_id == candidate.id &&
-        pass_interview_start_time >= start_date  &&
-        pass_interview_start_time <= end_date
+        TimexHelper.compare(pass_interview_start_time, start_date) &&
+        TimexHelper.compare(end_date, pass_interview_start_time)
       end)
     end)
   end
