@@ -29,7 +29,7 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
-  # TODO: Combine the above and below function 
+  # TODO: Combine the above and below function and write tests
   def index_web(conn = %Plug.Conn{cookies: %{"calculated_hire_date" => calculated_hire_date, "panelist_role" => panelist_role, "username" => panelist_login_name}}, _params) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize

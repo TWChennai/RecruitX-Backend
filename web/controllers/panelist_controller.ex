@@ -77,7 +77,7 @@ defmodule RecruitxBackend.PanelistController do
   defp send_notification_to_other_panelist(id) do
     interview_id = Repo.get(InterviewPanelist, id).interview_id
     other_panelist = (from c in Candidate, join: i in assoc(c, :interviews), join: ip in assoc(i, :interview_panelist), join: it in assoc(i, :interview_type), where: ip.id != ^id and ip.interview_id == ^interview_id, select: {c.first_name, c.last_name, it.name, ip.panelist_login_name, i.start_time}) |> Repo.one
-    if(!is_nil(other_panelist)) do
+    if !is_nil(other_panelist) do
       {candidate_first_name, candidate_last_name, interview_name, panelist_login_name, start_time} = other_panelist
       {:ok, interview_date} = Date.from(start_time) |> Timezone.convert("Asia/Kolkata") |> DateFormat.format("%b-%d", :strftime)
       email_content = Templates.panelist_removal_notification(false, candidate_first_name, candidate_last_name, interview_name, interview_date)

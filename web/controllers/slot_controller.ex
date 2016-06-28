@@ -92,7 +92,9 @@ defmodule RecruitxBackend.SlotController do
     previous_rounds_end_time = previous_rounds_start_time
                                 |> DateFormat.parse!("%Y-%m-%dT%H:%M:%SZ", :strftime)
                                 |> Date.shift(hours: 1)
-    slots = if (interview_type_id == InterviewType.retrieve_by_name(InterviewType.p3).id |> Integer.to_string or interview_type_id == InterviewType.retrieve_by_name(InterviewType.leadership).id |> Integer.to_string) do
+    slots = if interview_type_id == InterviewType.retrieve_by_name(InterviewType.p3).id
+              |> Integer.to_string or interview_type_id == InterviewType.retrieve_by_name(InterviewType.leadership).id
+              |> Integer.to_string do
       (from s in Slot,
             where: s.interview_type_id == ^interview_type_id and
             s.start_time >= ^previous_rounds_end_time)
