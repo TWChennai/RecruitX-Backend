@@ -7,7 +7,7 @@
       <%= @slot.role.name %>
     </div>
     <div class="col-sm-1">
-      <%= @slot.average_experience%> y
+      <%= @slot.average_experience%> yrs
     </div>
     <div class="col-sm-3">
       <%= @slot.skills %>
@@ -26,7 +26,7 @@
         <%= if(!@slot.signup) do %>
         <button class="btn btn-primary" disabled>signup</button>
         <% else %>
-        <button class="btn btn-primary" onclick=require("web/static/js/app").Slot.signup(<%= @slot.id%>)>signup</button>
+        <button class="btn btn-primary" onclick=require("web/static/js/app").Slot.signup('<%= @slot.id %>','<%= @api_key %>') >signup</button>
         <% end %>
       </span>
     </div>

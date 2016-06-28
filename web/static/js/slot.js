@@ -1,5 +1,5 @@
 export var Slot = {
-  signup: function(id) {
+  signup: function(id, api_key) {
     $.ajax({
       url: "/panelists",
       method: 'POST',
@@ -15,7 +15,7 @@ export var Slot = {
         window.location = '/web/';
       },
       headers: {
-        "Authorization": '<%= @api_key %>',
+        "Authorization": api_key,
         "Content-Type": "application/json"
       }
     });

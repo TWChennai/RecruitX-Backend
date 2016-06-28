@@ -11,6 +11,8 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Panel
 
+  @api_key System.get_env("API_KEY")
+
   plug :scrub_params, "interview" when action in [:update, :create]
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
@@ -27,7 +29,7 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
-  # TODO: Combine the above and below function and write tests
+  # TODO: Combine the above and below function 
   def index_web(conn = %Plug.Conn{cookies: %{"calculated_hire_date" => calculated_hire_date, "panelist_role" => panelist_role, "username" => panelist_login_name}}, _params) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
@@ -40,7 +42,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Repo.all
     panelist_experience = 11
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
-    conn |> render("index.html" , interviews_with_signup: interviews_and_slots_with_signup_status)
+    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, api_key: @api_key)
   end
 
   def index_web(conn, _params) do

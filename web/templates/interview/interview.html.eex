@@ -7,7 +7,7 @@
       <%= @interview.candidate.role.name %>
     </div>
     <div class="col-sm-1">
-      <%= @interview.candidate.experience%> y
+      <%= @interview.candidate.experience%> yrs
     </div>
     <div class="col-sm-3">
       <%= RecruitxBackend.Candidate.get_formatted_skills(@interview.candidate) %>
@@ -26,7 +26,8 @@
         <%= if(!@interview.signup) do %>
         <button class="btn btn-primary" disabled>signup</button>
         <% else %>
-        <button class="btn btn-primary" onclick=require("web/static/js/app").Interview.signup(<%= @interview.id%>)>signup</button>
+        <!--TODO: api_key should not be exposed -->
+        <button class="btn btn-primary" onclick=require("web/static/js/app").Interview.signup('<%= @interview.id %>','<%= @api_key %>') >signup</button>
         <% end %>
       </span>
     </div>

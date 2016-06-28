@@ -12,7 +12,6 @@
           authorization: '<%= @api_key %>'
         }
       };
-      // TODO: use jquery cookies instead
       $.get(jigsawUrl, function(response) {
         $.cookie("panelist_role", response.role.name);
         $.cookie("calculated_hire_date", response.calculated_hire_date);
@@ -20,7 +19,6 @@
         window.location = "/web/";
       })
     }
-    //TODO: poorman's implementation please Refactor
   oktaSignIn.session.get(function(res) {
     if (res.status !== 'INACTIVE') {
       var user = (res.user.profile.login).split("@")[0];
