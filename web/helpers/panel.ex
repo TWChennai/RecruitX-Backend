@@ -8,7 +8,6 @@ defmodule RecruitxBackend.Panel do
   alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
   alias Timex.Date
-  alias Ecto.Changeset
   import Ecto.Query
 
   def get_start_times_interviewed_by(panelist_login_name) do
