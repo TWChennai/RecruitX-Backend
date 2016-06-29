@@ -87,7 +87,7 @@ defmodule RecruitxBackend.Mixfile do
       "ecto.seed": "run priv/repo/seeds.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      commit: ["deps.get --only #{Mix.env}", "coveralls.html", "credo -i duplicatedcode --strict"]
+      commit: ["deps.get --only #{Mix.env}", "coveralls.html", "credo --strict"]
     ]
   end
 end
