@@ -6,18 +6,8 @@
     baseUrl: baseUrl
   });
   var setCookieAndRedirect = function(user) {
-      var jigsawUrl = {
-        url: '/is_recruiter/' + user,
-        headers: {
-          authorization: '<%= @api_key %>'
-        }
-      };
-      $.get(jigsawUrl, function(response) {
-        $.cookie("panelist_role", response.role.name);
-        $.cookie("calculated_hire_date", response.calculated_hire_date);
         $.cookie("username", user);
-        window.location = "/web/";
-      })
+        // window.location = "/web/login";
     }
   oktaSignIn.session.get(function(res) {
     if (res.status !== 'INACTIVE') {
@@ -35,6 +25,7 @@
       function(res) {
         if (res.status === 'SUCCESS') {
           var user = (res.user.profile.login).split("@")[0];
+          console.log(oktaSignIn.session)
           setCookieAndRedirect(user);
         }
       }

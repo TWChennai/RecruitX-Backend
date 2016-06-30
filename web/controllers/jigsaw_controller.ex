@@ -14,6 +14,11 @@ defmodule RecruitxBackend.JigsawController do
   # TODO: Use of dummy data (for dev/testing) in production-deployable code. Use some kind of interfaces to separate out the implementations
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def show(conn, %{"id" => id}) do
+    %{user_details: user_details} = get_jigsaw_data(id)
+    conn |> render("show.json", user_details: user_details)
+  end
+
+  def get_jigsaw_data(id) do
     {experience, id} = parse_experience(id)
     other_role = Role.retrieve_by_name(Role.other)
     recruiter_role = Map.merge(other_role, %{name: "Specialist"})
@@ -50,8 +55,7 @@ defmodule RecruitxBackend.JigsawController do
                 end   # end of Parser stmt
         end   # end of response.body case stmt
     end   # end of user_details case stmt
-
-    conn |> render("show.json", user_details: user_details)
+    %{user_details: user_details}
   end
 
   defp parse_experience(id) do
