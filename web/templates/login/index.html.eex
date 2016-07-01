@@ -5,18 +5,13 @@
   var oktaSignIn = new OktaSignIn({
     baseUrl: baseUrl
   });
-  var setCookieAndRedirect = function(user) {
-        $.cookie("username", user);
-        // window.location = "/web/login";
-    }
-  oktaSignIn.session.get(function(res) {
-    if (res.status !== 'INACTIVE') {
-      var user = (res.user.profile.login).split("@")[0];
-      if (document.cookie.indexOf("username") >= 0) {
-        window.location = "/web/";
-        return;
-      }
-      setCookieAndRedirect(user)
+  oktaSignIn.session.exists(function(exists) {
+    if (exists) {
+      oktaSignIn.session.get(function(res) {
+          var user = (res.user.profile.login).split("@")[0];
+          $.cookie("username", user);
+          window.location = '/web/login/';
+      });
       return;
     }
     oktaSignIn.renderEl({
@@ -25,8 +20,8 @@
       function(res) {
         if (res.status === 'SUCCESS') {
           var user = (res.user.profile.login).split("@")[0];
-          console.log(oktaSignIn.session)
-          setCookieAndRedirect(user);
+          $.cookie("username", user);
+          res.session.setCookieAndRedirect('<%=@api_url%>'+'/web/login/');
         }
       }
     );
