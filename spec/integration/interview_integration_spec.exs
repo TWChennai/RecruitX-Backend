@@ -121,6 +121,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       conn = Plug.Conn.put_resp_cookie(conn, "calculated_hire_date", "dummy_date")
       conn = Plug.Conn.put_resp_cookie(conn, "panelist_role", "Dev")
       conn = Plug.Conn.put_resp_cookie(conn, "username", "dummy_user")
+      conn = Plug.Conn.put_resp_cookie(conn, "okta_session_id", "dummy_id")
 
       response = get conn, "/web/"
 

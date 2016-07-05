@@ -1,5 +1,4 @@
 <div id="okta-login-container"></div>
-<!-- TODO: Add page specific js and test it-->
 
 <script type="text/javascript">
   var baseUrl = '<%= @okta_preview %>';
