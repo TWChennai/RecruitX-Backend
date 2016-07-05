@@ -12,7 +12,7 @@ export var Slot = {
         }
       }),
       success: function(response) {
-        window.location = '/web/';
+        window.location = '/homepage';
       },
       headers: {
         "Authorization": api_key,
