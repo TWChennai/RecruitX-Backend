@@ -4,15 +4,15 @@ export var Interview = {
       url: "/panelists",
       method: 'POST',
       data: JSON.stringify({
-        "interview_panelist": {
-          "interview_id": id,
-          "panelist_login_name": $.cookie("username"),
-          "panelist_experience": 11,
-          "panelist_role": $.cookie("panelist_role")
-        }
-      }),
+       "interview_panelist": {
+         "interview_id": id,
+         "panelist_login_name": $.cookie("username"),
+         "panelist_experience": "11",
+         "panelist_role": "Dev"
+       }
+     }),
       success: function(response) {
-        window.location = '/web/';
+        window.location = '/homepage';
       },
       headers: {
         "Authorization": api_key,
