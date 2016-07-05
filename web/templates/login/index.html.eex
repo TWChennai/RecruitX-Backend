@@ -1,5 +1,6 @@
 <div id="okta-login-container"></div>
 <!-- TODO: Add page specific js and test it-->
+
 <script type="text/javascript">
   var baseUrl = '<%= @okta_preview %>';
   var oktaSignIn = new OktaSignIn({
@@ -10,20 +11,11 @@
       oktaSignIn.session.get(function(res) {
           var user = (res.user.profile.login).split("@")[0];
           $.cookie("username", user);
-          window.location = '/web/login/';
+          $.cookie("okta_session_id", res.session.id);
+          window.location = '/web/login';
       });
       return;
     }
-    oktaSignIn.renderEl({
-        el: '#okta-login-container'
-      },
-      function(res) {
-        if (res.status === 'SUCCESS') {
-          var user = (res.user.profile.login).split("@")[0];
-          $.cookie("username", user);
-          res.session.setCookieAndRedirect('<%=@api_url%>'+'/web/login/');
-        }
-      }
-    );
+     window.location = baseUrl;
   });
 </script>

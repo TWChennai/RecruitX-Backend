@@ -12,6 +12,7 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.Panel
 
   @api_key System.get_env("API_KEY")
+  @okta_preview System.get_env("OKTA_PREVIEW")
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
@@ -31,6 +32,9 @@ defmodule RecruitxBackend.InterviewController do
 
   # TODO: Combine the above and below function and write tests
   def index_web(conn = %Plug.Conn{cookies: %{"calculated_hire_date" => _calculated_hire_date, "panelist_role" => panelist_role, "username" => panelist_login_name}}, _params) do
+    session_token = conn.cookies["okta_session_id"]
+    response = HTTPotion.get(@okta_preview <> "/api/v1/sessions/" <> session_token, [headers: ["Authorization": "SSWS 00eWkLyIh_kFM3KrczlykDmN8xm1d5eT38wpYT_4Rz"]])
+    IO.inspect response
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
                   |> Panel.now_or_in_next_seven_days
