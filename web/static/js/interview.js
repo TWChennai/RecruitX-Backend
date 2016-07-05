@@ -8,7 +8,7 @@ export var Interview = {
          "interview_id": id,
          "panelist_login_name": $.cookie("username"),
          "panelist_experience": "11",
-         "panelist_role": "Dev"
+         "panelist_role": $.cookie("panelist_role")
        }
      }),
       success: function(response) {
