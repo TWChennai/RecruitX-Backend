@@ -11,7 +11,7 @@
           var user = (res.user.profile.login).split("@")[0];
           $.cookie("username", user);
           $.cookie("okta_session_id", res.session.id);
-          window.location = '/web/login';
+          window.location = '/homepage';
       });
       return;
     }

@@ -9,15 +9,28 @@ defmodule RecruitxBackend.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :secure do
+    plug RecruitxBackend.OktaSessionValidator
+    plug :accepts, ~w(html)
+    plug :fetch_session
+    plug :fetch_flash
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api  do
     plug RecruitxBackend.ApiKeyAuthenticator
     plug :accepts, ["json"]
   end
 
-  scope "/web", RecruitxBackend do
-    pipe_through :browser
+  scope "/homepage", RecruitxBackend do
+    pipe_through :secure
     get "/", InterviewController, :index_web
-    get "/login", LoginController, :index
+  end
+
+  scope "/login", RecruitxBackend do
+    pipe_through :browser
+    get "/", LoginController, :index
   end
 
   # TODO: make "web" use the root namespace ("/") and "API" use the "/api" namespace
