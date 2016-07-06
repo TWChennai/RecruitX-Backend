@@ -9,7 +9,7 @@ export var Slot = {
           "slot_panelist": {
             "slot_id": id,
             "panelist_login_name": $.cookie("username"),
-            "panelist_experience": 11,
+            "panelist_experience": panelist_experience,
             "panelist_role": $.cookie("panelist_role")
           }
         }),
