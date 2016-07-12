@@ -19,7 +19,7 @@
       <%= DateFormat.format!(@slot.start_time, "%b-%d", :strftime) %>
     </div>
     <div class="col-sm-1">
-      <%= DateFormat.format!(@slot.start_time,"{h12}:{0m} {am}") %>
+      <%= DateFormat.format!(@slot.start_time |> Date.local,"{h12}:{0m} {am}") %>
     </div>
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
