@@ -8,13 +8,23 @@
   oktaSignIn.session.exists(function(exists) {
     if (exists) {
       oktaSignIn.session.get(function(res) {
-          var user = (res.user.profile.login).split("@")[0];
-          $.cookie("username", user);
-          $.cookie("okta_session_id", res.session.id);
-          window.location = '/homepage';
+        var user = (res.user.profile.login).split("@")[0];
+        $.cookie("username", user);
+        $.cookie("okta_session_id", res.session.id);
+        window.location = '/homepage';
       });
       return;
     }
-     window.location = baseUrl;
+    oktaSignIn.renderEl({
+        el: '#okta-login-container'
+      },
+      function(res) {
+        if (res.status === 'SUCCESS') {
+          var user = (res.user.profile.login).split("@")[0];
+          $.cookie("username", user);
+          res.session.setCookieAndRedirect('<%=@api_url%>' + '/login');
+        }
+      }
+    );
   });
 </script>
