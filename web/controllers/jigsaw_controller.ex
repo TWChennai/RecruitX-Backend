@@ -12,12 +12,12 @@ defmodule RecruitxBackend.JigsawController do
   @token System.get_env("JIGSAW_TOKEN")
 
   # TODO: Use of dummy data (for dev/testing) in production-deployable code. Use some kind of interfaces to separate out the implementations
-  @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def show(conn, %{"id" => id}) do
     %{user_details: user_details} = get_jigsaw_data(id)
     conn |> render("show.json", user_details: user_details)
   end
 
+  @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def get_jigsaw_data(id) do
     {experience, id} = parse_experience(id)
     other_role = Role.retrieve_by_name(Role.other)
