@@ -17,6 +17,7 @@ defmodule RecruitxBackend.OktaSessionValidator do
     conn = fetch_cookies(conn)
     session_id = conn.cookies["okta_session_id"]
     username = conn.cookies["username"]
+
     if !session_id || !username do
       conn |> Controller.redirect(to: "/login") |> halt
     else
