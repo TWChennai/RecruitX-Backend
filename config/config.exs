@@ -37,7 +37,7 @@ config :ex_aws,
 
 config :quantum, cron: [
   weekly_signup_reminder: [
-    schedule: "30 11 * * 1",
+    schedule: "30 02 * * 2",
     task: "RecruitxBackend.WeeklySignupReminder.execute"
   ],
   weekly_status_update: [
