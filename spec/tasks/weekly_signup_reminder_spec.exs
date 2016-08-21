@@ -8,34 +8,43 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   alias Timex.Date
   alias RecruitxBackend.Repo
 
+  let :role, do: create(:role, name: "Role Name")
+  let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
+  let :interview_type, do: create(:interview_type)
+  let :interview, do: create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id)
 
   describe "get candidates and interviews" do
     before do
       Repo.delete_all(Interview)
     end
 
-    let :interview, do: create(:interview)
+    it "should return candidates of the given role with interviews based on sub query" do
+      another_role = create(:role, name: "Another Role Name")
+      candidate_of_another_role = create(:candidate, role_id: another_role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
+      interview_for_another_role = create(:interview, candidate_id: candidate_of_another_role.id, interview_type_id: interview_type.id)
 
-    it "should return candidates with interviews based on sub query" do
       expected_candidate_id = interview.candidate_id
-      [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id))
+      [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id), role.id)
 
       expect(candidate.id) |> to(be(expected_candidate_id))
     end
 
+    it "should return candidates of the given role with interviews based on sub query" do
+      expected_candidate_id = interview.candidate_id
+      invalid_role_id = 0
+      candidates = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id), invalid_role_id)
+
+      expect(candidates) |> to(be([]))
+    end
+
     it "should return empty array when sub query returns empty result" do
-      result = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id != ^interview.id))
+      result = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where([i], i.id != ^interview.id), role.id)
 
       expect(result) |> to(be([]))
     end
   end
 
   describe "construct view data and returns it as a map" do
-    let :role, do: create(:role, name: "Role Name")
-    let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
-    let :interview_type, do: create(:interview_type)
-    let :interview, do: create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id)
-
     before do
       create(:candidate_skill, skill_id: create(:skill, name: "Skill 1").id, candidate_id: candidate.id)
       create(:candidate_skill, skill_id: create(:skill, name: "Skill 2").id, candidate_id: candidate.id)
@@ -45,7 +54,8 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       candidates = WeeklySignupReminder.get_candidates_and_interviews(
         Interview
         |> where(id: ^interview.id)
-        |> preload([:interview_type])
+        |> preload([:interview_type]),
+        role.id
       )
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates)
 
@@ -58,7 +68,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       candidates_and_interviews = Interview
         |> where(id: ^interview.id)
         |> preload([:interview_type])
-        |> WeeklySignupReminder.get_candidates_and_interviews
+        |> WeeklySignupReminder.get_candidates_and_interviews(role.id)
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
       [ actual_interview | _ ] = actual_data.interviews
@@ -71,7 +81,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       candidates_and_interviews = Interview
         |> where(id: ^interview.id)
         |> preload([:interview_type])
-        |> WeeklySignupReminder.get_candidates_and_interviews
+        |> WeeklySignupReminder.get_candidates_and_interviews(role.id)
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
 
@@ -84,7 +94,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       candidates_and_interviews = Interview
         |> where(id: ^interview.id)
         |> preload([:interview_type])
-        |> WeeklySignupReminder.get_candidates_and_interviews
+        |> WeeklySignupReminder.get_candidates_and_interviews(role.id)
 
       [ actual_data | _ ] = WeeklySignupReminder.construct_view_data(candidates_and_interviews)
 
