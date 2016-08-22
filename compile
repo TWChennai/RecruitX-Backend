@@ -1,2 +1,2 @@
 # brunch build --production
-mix phoenix.digest
+# mix phoenix.digest
