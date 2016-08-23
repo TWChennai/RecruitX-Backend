@@ -1,5 +1,5 @@
 <p>Hi all,</p>
-<p>Here are the interviews scheduled for the next week:</p>
+<p>Here are the interviews scheduled for the this week:</p>
 
 <%= unless Enum.empty?(candidates_with_insufficient_signups) do %>
 <h4>Interviews that need signups</h4>
