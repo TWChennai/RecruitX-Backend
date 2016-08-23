@@ -7,6 +7,8 @@ defmodule RecruitxBackend.JigsawController do
 
   @recruitment_department "People Recruiting"
   @office_princinple "Off Prin"
+  @operations "Operations"
+  @people "People"
   @invalid_user "not a valid user"
   @jigsaw_url System.get_env("JIGSAW_URL")
   @token System.get_env("JIGSAW_TOKEN")
@@ -43,6 +45,8 @@ defmodule RecruitxBackend.JigsawController do
 
                                   is_super_user = case role_name do
                                     @office_princinple -> true
+                                    @operations -> true
+                                    @people -> true
                                     _ -> false
                                   end
 
