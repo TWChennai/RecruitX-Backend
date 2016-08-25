@@ -31,6 +31,7 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.default_order
                   |> Repo.all
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
+                                                |> Enum.sort(fn (first, _second) -> first.signup end)
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
