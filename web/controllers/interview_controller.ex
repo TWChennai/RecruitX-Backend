@@ -5,6 +5,7 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Slot
+  alias RecruitxBackend.Role
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.InterviewType
@@ -30,7 +31,8 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.now_or_in_next_seven_days
                   |> Panel.default_order
                   |> Repo.all
-    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
+    retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
+    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
                                                 |> Enum.sort(fn (first, _second) -> first.signup end)
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
@@ -47,7 +49,8 @@ defmodule RecruitxBackend.InterviewController do
                   |> Panel.default_order
                   |> Repo.all
     panelist_experience = Date.diff((calculated_hire_date |> DateFormat.parse!("%Y-%m-%d", :strftime)), Date.now, :years)
-    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, panelist_role)
+    retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
+    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
     conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, api_key: @api_key)
   end
 

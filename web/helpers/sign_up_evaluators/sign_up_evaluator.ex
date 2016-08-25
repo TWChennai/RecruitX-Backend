@@ -20,14 +20,13 @@ defmodule RecruitxBackend.SignUpEvaluator do
     candidate_ids_interviewed = InterviewPanelist.get_candidate_ids_interviewed_by(panelist_login_name)
     my_previous_sign_up_start_times = Panel.get_start_times_interviewed_by(panelist_login_name)
     signup_counts = get_signup_counts(is_slot)
-    retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
     %SignUpDataContainer{panelist_login_name: panelist_login_name,
     candidate_ids_interviewed: candidate_ids_interviewed,
     my_previous_sign_up_start_times: my_previous_sign_up_start_times,
     signup_counts: signup_counts,
-    experience_eligibility_criteria: populate_experience_eligiblity_criteria(panelist_experience, retrieved_panelist_role),
+    experience_eligibility_criteria: populate_experience_eligiblity_criteria(panelist_experience, panelist_role),
     interview_type_specfic_criteria: InterviewType.get_type_specific_panelists,
-    panelist_role: retrieved_panelist_role,
+    panelist_role: panelist_role,
     interview_type_based_sign_up_limits: InterviewType.get_sign_up_limits,
     slot: is_slot
     }

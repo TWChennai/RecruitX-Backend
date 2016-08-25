@@ -46,27 +46,29 @@ defmodule RecruitxBackend.Panel do
     sign_up_data_container_for_interviews = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, false)
     sign_up_data_container_for_slots = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, true)
 
-    role = sign_up_data_container_for_interviews.panelist_role
-
     interview_type_specfic_criteria = InterviewType.get_type_specific_panelists
+    ba_or_pm = [Role.ba_role_id, Role.pm_role_id]
     interviews_with_signup_eligibility = Enum.reduce(interviews, [], fn(interview, acc) ->
-      if is_visible(role, panelist_login_name, interview, interview_type_specfic_criteria, interview.candidate.role_id),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview)]
+      if is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, interview.candidate.role_id, ba_or_pm),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview)]
       acc
     end)
     Enum.reduce(slots, interviews_with_signup_eligibility, fn(slot, acc) ->
-      if is_visible(role, panelist_login_name, slot, interview_type_specfic_criteria, slot.role_id),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot)]
+      if is_visible(panelist_role, panelist_login_name, slot, interview_type_specfic_criteria, slot.role_id, ba_or_pm),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot)]
       acc
     end)
   end
 
-  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, role_id) do
+  @lint [{Credo.Check.Refactor.FunctionArity, false}]
+  defp is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, role_id, ba_or_pm) do
     (InterviewTypeRelativeEvaluator.is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
       and InterviewTypeRelativeEvaluator.is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name))
     or panelist_role == nil
     or role_id == panelist_role.id
-    or (Role.is_ba_or_pm(role_id) and Role.is_ba_or_pm(panelist_role.id))
+    or (is_ba_or_pm(role_id, ba_or_pm) and is_ba_or_pm(panelist_role.id, ba_or_pm))
     or panelist_role.name == Role.office_principal
   end
+
+  defp is_ba_or_pm(role_id, ba_and_pm_list), do: Enum.any?(ba_and_pm_list, &(&1 == role_id))
 
   defp put_sign_up_status(sign_up_data_container, panel) do
     sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, panel)

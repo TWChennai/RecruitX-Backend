@@ -3,6 +3,7 @@ defmodule RecruitxBackend.SlotPanelist do
 
   alias RecruitxBackend.Slot
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Role
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.SignUpEvaluator
 
@@ -44,7 +45,8 @@ defmodule RecruitxBackend.SlotPanelist do
     if existing_changeset.valid? do
       slot = (Slot) |> Repo.get(slot_id)
       if !is_nil(slot) do
-        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), panelist_role, true)
+        retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
+        sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), retrieved_panelist_role, true)
         sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, slot)
         existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
       end
