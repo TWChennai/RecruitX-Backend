@@ -27,8 +27,8 @@ defmodule RecruitxBackend.OktaSessionValidator do
         conn = Conn.put_resp_cookie(conn, "calculated_hire_date", hire_date, http_only: false)
         conn = Conn.put_resp_cookie(conn, "panelist_role", user_details.role.name, http_only: false)
       end
-      response = HTTPotion.get(@okta_preview <> "/api/v1/sessions/" <> session_id, [headers: ["Authorization": @okta_api_key]])
-      if response.status_code == 200, do: conn, else: conn |> Controller.redirect(to: "/login")
+
+      if session_id && username, do: conn, else: conn |> Controller.redirect(to: "/login")
     end
   end
 end
