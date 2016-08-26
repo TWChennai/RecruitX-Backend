@@ -1,0 +1,12 @@
+---
+users:
+  - name: recruitxdevs
+    sudoer: yes
+    keys:
+      - "{{ lookup('file', 'keys/arunvelsriram.pub') }}"
+
+  - name: deployer
+    sudoer: yes
+    keys:
+      - "{{ lookup('file', 'keys/arunvelsriram.pub') }}"
+

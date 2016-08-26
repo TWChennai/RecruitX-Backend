@@ -128,3 +128,7 @@ fabric.properties
 
 # Data directory
 data
+
+.vault_pass.txt
+.vagrant
+*.retry
