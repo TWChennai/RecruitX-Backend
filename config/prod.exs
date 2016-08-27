@@ -15,7 +15,7 @@ config :recruitx_backend, RecruitxBackend.Endpoint,
   http: [port: {:system, "PORT"}],
   url: [scheme: "https", host: {:system, "DOMAIN_NAME"}, port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  cache_static_manifest: "priv/static/manifest.json",
+  # cache_static_manifest: "priv/static/manifest.json",
   path_to_store_images: "./uploaded_images",
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
