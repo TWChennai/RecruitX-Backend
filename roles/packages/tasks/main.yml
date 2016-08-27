@@ -1,6 +1,7 @@
 ---
 - name: Add nginx pkg repo
   apt_repository: repo="ppa:nginx/stable"
+  become: yes
 
 - name: Install system packages
   apt: name="{{ item }}" update_cache=yes state=present
@@ -29,3 +30,12 @@
     - vim
     - python-pip
     - build-essential
+  become: yes
+
+# - include: nodejs.yml
+
+# - include: erlang.yml
+
+# - include: elixir.yml
+
+# - include: postgres.yml
