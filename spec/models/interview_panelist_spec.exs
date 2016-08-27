@@ -13,7 +13,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   let :role, do: create(:role)
 
   before do: Repo.delete_all(Interview)
-  before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  %SignUpEvaluationStatus{satisfied_criteria: "LB"} end))
+  before do: allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _, _) ->  %SignUpEvaluationStatus{satisfied_criteria: "LB"} end))
 
   context "valid changeset" do
     subject do: InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
@@ -72,7 +72,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
 
     it "should be invalid when sign up evaluation is invalid" do
       invalid = %SignUpEvaluationStatus{valid?: false, errors: [error: "errors"]}
-      allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _) ->  invalid end))
+      allow SignUpEvaluator |> to(accept(:evaluate, fn(_, _, _) ->  invalid end))
 
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
 

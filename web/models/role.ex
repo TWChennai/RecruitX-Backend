@@ -37,9 +37,12 @@ defmodule RecruitxBackend.Role do
 
   def retrieve_by_name(name), do: (from r in __MODULE__, where: r.name == ^name) |> Repo.one
 
-  def is_ba_or_pm(role_id), do: role_id == retrieve_by_name(ba).id or role_id == retrieve_by_name(pm).id
-  def ba_role_id, do: retrieve_by_name(ba).id
-  def pm_role_id, do: retrieve_by_name(pm).id
+  def is_ba_or_pm(role_id, ba_and_pm), do: Enum.any?(ba_and_pm, &(&1 == role_id))
+
+  def ba_and_pm_list, do: [ba_role_id, pm_role_id]
 
   def get_all_roles, do: (from r in __MODULE__, where: r.name != ^other) |> Repo.all
+
+  defp ba_role_id, do: retrieve_by_name(ba).id
+  defp pm_role_id, do: retrieve_by_name(pm).id
 end

@@ -54,7 +54,7 @@ defmodule RecruitxBackend.InterviewPanelist do
       if !is_nil(interview) do
         retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), retrieved_panelist_role)
-        sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview)
+        sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview, Role.ba_and_pm_list)
         existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
       end
     end
