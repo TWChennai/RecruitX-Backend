@@ -32,7 +32,7 @@
     - build-essential
   become: yes
 
-# - include: nodejs.yml
+- include: nodejs.yml
 
 # - include: erlang.yml
 
