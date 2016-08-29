@@ -14,6 +14,7 @@
 import "phoenix_html"
 import  { Interview } from "web/static/js/interview"
 import  { Slot } from "web/static/js/slot"
+import { Entry } from "web/static/js/entry"
 
 // Import local files
 //
@@ -28,5 +29,6 @@ import  { Slot } from "web/static/js/slot"
 
 module.exports = {
   Interview: Interview,
-  Slot: Slot
+  Slot: Slot,
+  Entry: Entry
 };
