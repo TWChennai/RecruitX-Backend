@@ -66,7 +66,7 @@ defmodule RecruitxBackend.Panel do
     or panelist_role == nil
     or role_id == panelist_role.id
     or (Role.is_ba_or_pm(role_id) and Role.is_ba_or_pm(panelist_role.id))
-    or panelist_role.name == Role.office_principal
+    or panelist_role.name == Role.ops
   end
 
   defp put_sign_up_status(sign_up_data_container, panel) do
