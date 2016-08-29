@@ -12,6 +12,7 @@ defmodule RecruitxBackend.Role do
   def ba, do: "BA"
   def pm, do: "PM"
   def office_principal, do: "Off Prin"
+  def ops, do: "Ops"
   def other, do: "Other"
 
   schema "roles" do

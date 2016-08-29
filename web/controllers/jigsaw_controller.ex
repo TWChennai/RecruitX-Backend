@@ -6,9 +6,11 @@ defmodule RecruitxBackend.JigsawController do
   alias RecruitxBackend.Role
 
   @recruitment_department "People Recruiting"
-  @office_princinple "Off Prin"
-  @operations "Operations"
+  @office_princinple Role.office_principal
+  @ops Role.ops
+  @psm "Mgr"
   @people "People"
+  @specialist "Specialist"
   @invalid_user "not a valid user"
   @jigsaw_url System.get_env("JIGSAW_URL")
   @token System.get_env("JIGSAW_TOKEN")
@@ -45,10 +47,15 @@ defmodule RecruitxBackend.JigsawController do
 
                                   is_super_user = case role_name do
                                     @office_princinple -> true
-                                    @operations -> true
-                                    @people -> true
+                                    @psm -> true
+                                    @specialist -> case department_name do
+                                      @people -> true #PC
+                                      _ -> false
+                                    end
                                     _ -> false
                                   end
+
+                                  if is_super_user, do: role = Role.retrieve_by_name(@ops)
 
                                   case department_name do
                                     @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user}

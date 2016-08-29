@@ -14,7 +14,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
   alias RecruitxBackend.Role
   alias RecruitxBackend.Panel
 
-  @office_principal Role.office_principal
+  @ops Role.ops
 
   def populate_sign_up_data_container(panelist_login_name, panelist_experience, panelist_role, is_slot \\ false) do
     candidate_ids_interviewed = InterviewPanelist.get_candidate_ids_interviewed_by(panelist_login_name)
@@ -45,7 +45,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
     }
   end
 
-  def evaluate(%{panelist_role: %{name: @office_principal}} = sign_up_data_container , interview) do
+  def evaluate(%{panelist_role: %{name: @ops}} = sign_up_data_container , interview, ba_or_pm) do
     %SignUpEvaluationStatus{}
     |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
   end
