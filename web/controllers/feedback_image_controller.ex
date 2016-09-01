@@ -13,13 +13,12 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
-      try do
-        Interview.update_status(id, String.to_integer(status_id))
-        store_image_and_generate_changesets(data, id) |> ChangesetManipulator.validate_and(Repo.custom_insert)
-        "Thanks for submitting feedback!"
-      catch {_, result_of_db_transaction} ->
-        Repo.rollback(result_of_db_transaction)
-      end
+        {transaction_status, result_of_db_transaction} = Interview.update_status(id, String.to_integer(status_id))
+        if transaction_status, do: {transaction_status, result_of_db_transaction} = store_image_and_generate_changesets(data, id) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+        case transaction_status do
+          true -> "Thanks for submitting feedback!"
+          false -> Repo.rollback(result_of_db_transaction)
+        end
     end
     conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end

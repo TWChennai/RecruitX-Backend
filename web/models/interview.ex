@@ -14,6 +14,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Panel
   alias Timex.Date
   alias Timex.DateFormat
@@ -222,14 +223,17 @@ defmodule RecruitxBackend.Interview do
 
   def update_status(id, status_id) do
     interview = id |> retrieve_interview
-    if !is_nil(interview) do
-      [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
-      if is_pass(status_id) do
+    if is_nil(interview) do
+      {false, [%JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}]}
+    else
+      {status, result} = [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
+      if status && is_pass(status_id) do
         Repo.transaction fn ->
           delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
           Candidate.updateCandidateStatusAsPass(interview.candidate_id)
         end
       end
+      {status, result}
     end
   end
 

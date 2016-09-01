@@ -23,17 +23,18 @@ defmodule RecruitxBackend.CandidateController do
   end
 
   def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = candidate}) when skill_ids != [] and interview_rounds != [] do
-      {status, result_of_db_transaction} = Repo.transaction fn ->
-        try do
-          {_, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.validate_and(Repo.custom_insert)
-          candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.validate_and(Repo.custom_insert)
-          candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+      {transaction_status, result_of_db_transaction} = Repo.transaction fn ->
+          {transaction_status, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.validate_and(Repo.custom_insert)
+          if transaction_status do
+            if transaction_status, do: {transaction_status, result} = insertSkills(candidate, skill_ids)
+            if transaction_status, do: {transaction_status, result} = insertInterviews(candidate, interview_rounds)
+            unless transaction_status, do: Repo.rollback(result)
           candidate |> Repo.preload(:candidate_skills)
-        catch {_, result_of_db_transaction} ->
-          Repo.rollback(result_of_db_transaction)
+          else
+            Repo.rollback(candidate)
+          end
         end
-      end
-      conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
+      conn |> sendResponseBasedOnResult(:create, transaction_status, result_of_db_transaction)
   end
 
   def create(conn, %{"candidate" => %{"skill_ids" => skill_ids}}) when skill_ids != [] do
@@ -78,14 +79,6 @@ defmodule RecruitxBackend.CandidateController do
     end
   end
 
-  defp generateCandidateSkillChangesets(_candidate, []), do: []
-
-  defp generateCandidateSkillChangesets(candidate, [head | tail]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: head}) | generateCandidateSkillChangesets(candidate, tail)]
-
-  defp generateCandidateInterviewRoundChangesets(_candidate, []), do: []
-
-  defp generateCandidateInterviewRoundChangesets(candidate, [head | tail]), do: [Interview.changeset(%Interview{}, %{candidate_id: candidate.id, interview_type_id: head["interview_type_id"], start_time: head["start_time"]}) | generateCandidateInterviewRoundChangesets(candidate, tail)]
-
   def update(conn, %{"id" => id, "candidate" => candidate_params}) do
     candidate = Candidate |> Repo.get(id)
     case candidate do
@@ -126,6 +119,18 @@ defmodule RecruitxBackend.CandidateController do
       html_body: email_content
     })
   end
+
+  defp insertSkills(candidate, skill_ids), do: candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+
+  defp insertInterviews(candidate, interview_rounds), do: candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+
+  defp generateCandidateSkillChangesets(_candidate, []), do: []
+
+  defp generateCandidateSkillChangesets(candidate, [head | tail]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: head}) | generateCandidateSkillChangesets(candidate, tail)]
+
+  defp generateCandidateInterviewRoundChangesets(_candidate, []), do: []
+
+  defp generateCandidateInterviewRoundChangesets(candidate, [head | tail]), do: [Interview.changeset(%Interview{}, %{candidate_id: candidate.id, interview_type_id: head["interview_type_id"], start_time: head["start_time"]}) | generateCandidateInterviewRoundChangesets(candidate, tail)]
 
   #
   # def delete(conn, %{"id" => id}) do

@@ -70,7 +70,6 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       conn |> should(have_http_status(:unprocessable_entity))
       expectedErrorReason = %JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}
       expect(conn.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
-      expect Avatar |> to(accepted :store)
     end
 
     it "should not update status and feedback images when file name is invalid" do
@@ -89,6 +88,7 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
       expect(updated_interview.interview_status_id) |> to(be(nil))
       feedback_images = (from f in FeedbackImage, where: f.interview_id == ^interview.id) |> Repo.all
       expect(feedback_images) |> to(be([]))
+      expect Avatar |> to(accepted :store)
     end
 
     it "should throw error if status id is not there in request" do

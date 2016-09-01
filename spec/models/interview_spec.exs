@@ -280,18 +280,18 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_status = create(:interview_status)
       Interview.update_status(interview.id, interview_status.id)
 
-      update = fn ->  Interview.update_status(interview.id, 0) end
+      update = Interview.update_status(interview.id, 0)
 
-      expected_error = {:changeset_error, [%JSONErrorReason{field_name: :interview_status, reason: "Feedback has already been entered"}]}
-      expect update |> to(throw_term expected_error)
+      expected_error = {false, [%JSONErrorReason{field_name: :interview_status, reason: "Feedback has already been entered"}]}
+      expect update |> to(be(expected_error))
     end
 
     it "should not update interview when status is invalid" do
       interview = create(:interview)
-      update = fn ->  Interview.update_status(interview.id, 0) end
-      expected_error = {:error, [%JSONErrorReason{field_name: :interview_status, reason: "does not exist"}]}
+      update = Interview.update_status(interview.id, 0)
+      expected_error = {false, [%JSONErrorReason{field_name: :interview_status, reason: "does not exist"}]}
 
-      expect update |> to(throw_term expected_error)
+      expect update |> to(be(expected_error))
     end
 
     it "should update status and not delete other interviews,panelists for a candidate when status is not Pass" do

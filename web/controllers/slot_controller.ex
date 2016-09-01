@@ -19,17 +19,17 @@ defmodule RecruitxBackend.SlotController do
     interview_changeset = Interview.changeset(%Interview{}, %{candidate_id: candidate_id, interview_type_id: interview_type_id, start_time: start_time})
     signup_panelists_and_satisfied_criteria_for_slot = SlotPanelist.get_panelists_and_satisfied_criteria(slot_id)
     {status, result_of_db_transaction} = Repo.transaction fn ->
-      try do
-        {_, interview} = [interview_changeset] |> ChangesetManipulator.validate_and(Repo.custom_insert)
-        generateInterviewPanelistChangesets(interview.id, signup_panelists_and_satisfied_criteria_for_slot) |> ChangesetManipulator.validate_and(Repo.custom_insert)
-        Repo.delete_all(from i in Slot, where: i.id == ^slot_id)
-        Repo.delete_all(from i in SlotPanelist, where: i.slot_id == ^slot_id)
-        interview
-      catch {_, result_of_db_transaction} ->
-        Repo.rollback(result_of_db_transaction)
+        {status, interview} = [interview_changeset] |> ChangesetManipulator.validate_and(Repo.custom_insert)
+        if status do
+          generateInterviewPanelistChangesets(interview.id, signup_panelists_and_satisfied_criteria_for_slot) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+          Repo.delete_all(from i in Slot, where: i.id == ^slot_id)
+          Repo.delete_all(from i in SlotPanelist, where: i.slot_id == ^slot_id)
+          interview
+        else
+          Repo.rollback(interview)
       end
     end
-      conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
+    conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
   def create(conn, %{"slot" => %{"count" => count} = slot_params}) do
