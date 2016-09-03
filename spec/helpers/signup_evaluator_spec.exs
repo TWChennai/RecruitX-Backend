@@ -1,5 +1,5 @@
 defmodule RecruitxBackend.SignUpEvaluatorSpec do
-  use ESpec.Phoenix, model: RecruitxBackend.InterviewRelativeEvaluator
+  use ESpec.Phoenix, model: RecruitxBackend.SignUpEvaluator
 
   alias Decimal
   alias RecruitxBackend.Interview

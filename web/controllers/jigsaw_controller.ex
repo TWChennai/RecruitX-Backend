@@ -6,7 +6,7 @@ defmodule RecruitxBackend.JigsawController do
   alias RecruitxBackend.Role
 
   @recruitment_department "People Recruiting"
-  @office_princinple Role.office_principal
+  @office_princinpal Role.office_principal
   @ops Role.ops
   @psm "Mgr"
   @people "People"
@@ -23,14 +23,14 @@ defmodule RecruitxBackend.JigsawController do
 
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def get_jigsaw_data(id) do
-    {experience, id} = parse_experience(id)
+    {experience, id} = parse_experience(id) #for_uat
     other_role = Role.retrieve_by_name(Role.other)
     recruiter_role = Map.merge(other_role, %{name: "Specialist"})
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false}
-      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false}
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false}
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false}
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false} #for_uat
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false} #for_uat
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
       _  -> response = HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
         case response.body do
           "" -> %{is_recruiter: @invalid_user, calculated_hire_date: Date.now, past_experience: 0}
@@ -44,9 +44,8 @@ defmodule RecruitxBackend.JigsawController do
                                   calculated_hire_date = Date.now
                                                         |> Date.shift(months: -tw_experience_in_month)
 
-
                                   is_super_user = case role_name do
-                                    @office_princinple -> true
+                                    @office_princinpal -> true
                                     @psm -> true
                                     @specialist -> case department_name do
                                       @people -> true #PC
