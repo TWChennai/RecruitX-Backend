@@ -23,7 +23,7 @@ defmodule RecruitxBackend.SignUpEvaluatorSpec do
 
   describe "evaluate" do
     it "should not call rolewise and experience matrix evaluator when the panelist role is OPs" do
-      ops_role = create(:role, name: Role.ops)
+      ops_role = Role.retrieve_by_name(Role.ops)
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container("test", Decimal.new(1), ops_role)
 
       SignUpEvaluator.evaluate(sign_up_data_container, interview, [])
