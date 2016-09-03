@@ -45,7 +45,7 @@ defmodule RecruitxBackend.SignUpEvaluator do
     }
   end
 
-  def evaluate(%{panelist_role: %{name: @ops}} = sign_up_data_container , interview, ba_or_pm) do
+  def evaluate(%{panelist_role: %{name: @ops}} = sign_up_data_container , interview, _ba_or_pm) do
     %SignUpEvaluationStatus{}
     |> InterviewRelativeEvaluator.evaluate(sign_up_data_container, interview)
   end
