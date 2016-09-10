@@ -24,17 +24,17 @@
     </div>
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
+        <%= RecruitxBackend.Panel.format_names(@slot.slot_panelists) %>
+      </span>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
         <%= if(!@slot.signup) do %>
         --
         <% else %>
         Pending Signup
         <% end %>
       </span>
-    </div>
-    <div class="col-sm-1">
-      <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
-        <%= RecruitxBackend.Panel.format_names(@slot.slot_panelists) %>
-      </span>
-    </div>
+    </div>    
   </div>
 </div>
