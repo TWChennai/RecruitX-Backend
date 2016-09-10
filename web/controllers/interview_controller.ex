@@ -14,12 +14,13 @@ defmodule RecruitxBackend.InterviewController do
   alias Timex.Date
   alias Timex.DateFormat
 
-
   @api_key System.get_env("API_KEY")
   @okta_preview System.get_env("OKTA_PREVIEW")
   @okta_api_key System.get_env("OKTA_API_KEY")
 
   plug :scrub_params, "interview" when action in [:update, :create]
+
+  def default(%{request_path: "/"} = conn, _), do: redirect conn, to: "/all_interviews"
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data

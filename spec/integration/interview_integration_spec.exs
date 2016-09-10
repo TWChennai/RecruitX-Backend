@@ -14,6 +14,13 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
+  describe "default redirect" do
+    it "should redirect / to view all interviews" do
+      response = get conn_with_dummy_authorization(), "/"
+      expect(response.resp_body) |> to(have("/all_interviews"))
+    end
+  end
+
   describe "index" do
     before do: Repo.delete_all(Candidate)
 

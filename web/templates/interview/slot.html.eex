@@ -1,3 +1,4 @@
+<%= use Timex %>
 <div>
   <div class="jumbotron row" style="margin-bottom: 5px;margin-top: 5px;">
     <div class="col-sm-2">
@@ -20,6 +21,11 @@
     </div>
     <div class="col-sm-1">
       <%= DateFormat.format!(@slot.start_time |> Date.local,"{h12}:{0m} {am}") %>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
+        <%= RecruitxBackend.Panel.format_names(@slot.slot_panelists) %>
+      </span>
     </div>
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
