@@ -113,10 +113,10 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     # before do: allow Repo |> to(accept(:all, fn(_) -> interview_status end))
     before do: allow RecruitxBackend.OktaSessionValidator |> to(accept(:call, fn(conn, _args) -> conn end))
     it "should redirect to login when there is no cookies" do
-      response = get conn_with_dummy_authorization(), "/homepage"
+      response = get conn_with_dummy_authorization(), "/my_interviews"
 
       expect(response.status) |> to(be(302))
-      expect(response.path_info) |> to(be(["homepage"]))
+      expect(response.path_info) |> to(be(["my_interviews"]))
     end
 
     it "should not redirect to the login if there is cookie" do
@@ -125,10 +125,10 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       conn = Plug.Conn.put_resp_cookie(conn, "username", "dummy_user")
       conn = Plug.Conn.put_resp_cookie(conn, "okta_session_id", "dummy_id")
 
-      response = get conn, "/homepage"
+      response = get conn, "/my_interviews"
 
       expect(response.status) |> to(be(200))
-      expect(response.path_info) |> to(be(["homepage"]))
+      expect(response.path_info) |> to(be(["my_interviews"]))
     end
   end
 end

@@ -14,13 +14,13 @@ defmodule RecruitxBackend.LoginController do
       conn = Conn.put_resp_cookie(conn, "username", username, http_only: false)
       conn = Conn.put_resp_cookie(conn, "calculated_hire_date", hire_date, http_only: false)
       conn = Conn.put_resp_cookie(conn, "panelist_role", user_details.role.name, http_only: false)
-      conn |> redirect(to: "/homepage")
+      conn |> redirect(to: "/my_interviews")
     else
-      conn |> render("index.html",error: "Invalid Username!")
+      conn |> render("index.html",error: "Invalid Username!", not_login: false)
     end
   end
 
   def index(conn, _params) do
-    conn |> render("index.html",error: "")
+    conn |> render("index.html",error: "", not_login: false)
   end
 end

@@ -14,7 +14,7 @@ export var Slot = {
           }
         }),
         success: function(response) {
-          window.location = '/homepage';
+          window.location = '/my_interviews';
         },
         headers: {
           "Authorization": api_key,
