@@ -9,7 +9,7 @@ defmodule RecruitxBackend.LoginController do
 
   def index(conn, %{"username" => username}) do
     %{user_details: user_details} = JigsawController.get_jigsaw_data(username)
-    if user_details.is_recruiter != @invalid_user do
+    if user_details.error != @invalid_user do
       hire_date = DateFormat.format!(user_details.calculated_hire_date, "%Y-%m-%d", :strftime)
       conn = Conn.put_resp_cookie(conn, "username", username, http_only: false)
       conn = Conn.put_resp_cookie(conn, "calculated_hire_date", hire_date, http_only: false)
