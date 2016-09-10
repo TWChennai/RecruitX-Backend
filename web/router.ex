@@ -18,6 +18,7 @@ defmodule RecruitxBackend.Router do
     pipe_through :browser
     get "/login", LoginController, :index
     get "/my_interviews", InterviewController, :index_web
+    get "/all_interviews", InterviewController, :index_all
   end
 
   # TODO: make "web" use the root namespace ("/") and "API" use the "/api" namespace

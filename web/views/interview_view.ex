@@ -11,6 +11,10 @@ defmodule RecruitxBackend.InterviewView do
     render_many(interviews, InterviewView, "interview_slot.html", api_key: api_key, not_login: not_login)
   end
 
+  def render("index.html", %{interviews_with_signup: interviews, all: all, not_login: not_login}) do
+    render_many(interviews, InterviewView, "all_interview_slot.html", all: all, not_login: not_login)
+  end
+
   def render("index.json", %{interviews_with_signup: interviews}) do
     render_many(interviews, InterviewView, "interview_with_signup.json")
   end
@@ -71,6 +75,14 @@ defmodule RecruitxBackend.InterviewView do
 
   def render("interview_slot.html", %{interview: slot, api_key: api_key, not_login: not_login}) do
     render "slot.html", slot: slot, api_key: api_key, not_login: not_login
+  end
+
+  def render("all_interview_slot.html", %{interview: %{candidate: _} = interview, all: all, not_login: not_login}) do
+    render "all_interview.html", interview: interview , all: all, not_login: not_login
+  end
+
+  def render("all_interview_slot.html", %{interview: slot, all: all, not_login: not_login}) do
+    render "all_slot.html", slot: slot, all: all, not_login: not_login
   end
 
   def render("interview.json", %{interview: %{candidate: _} = interview}) do

@@ -1,0 +1,36 @@
+<%= use Timex %>
+<div>
+  <div class="jumbotron row" style="margin-top: 5px; margin-bottom: 5px;">
+    <div class="col-sm-2">
+      <%= RecruitxBackend.Candidate.get_full_name(@interview.candidate)%>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.candidate.role.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.candidate.experience%> yrs
+    </div>
+    <div class="col-sm-3">
+      <%= RecruitxBackend.Candidate.get_formatted_skills(@interview.candidate) %>
+    </div>
+    <div class="col-sm-1">
+      <%= @interview.interview_type.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(@interview.start_time, "%b-%d", :strftime) %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(@interview.start_time |> Date.local,"{h12}:{0m} {am}") %>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
+        <%= if(!@interview.signup) do %>
+        (needs signup)
+        <% else %>
+        <!--TODO: api_key should not be exposed -->
+        --
+        <% end %>
+      </span>
+    </div>
+  </div>
+</div>

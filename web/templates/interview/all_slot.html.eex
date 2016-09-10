@@ -1,0 +1,34 @@
+<div>
+  <div class="jumbotron row" style="margin-bottom: 5px;margin-top: 5px;">
+    <div class="col-sm-2">
+      ??? ???
+    </div>
+    <div class="col-sm-1">
+      <%= @slot.role.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= @slot.average_experience%> yrs
+    </div>
+    <div class="col-sm-3">
+      <%= @slot.skills %>
+    </div>
+    <div class="col-sm-1">
+      <%= @slot.interview_type.name %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(@slot.start_time, "%b-%d", :strftime) %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(@slot.start_time |> Date.local,"{h12}:{0m} {am}") %>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @slot.signup_error %>' >
+        <%= if(!@slot.signup) do %>
+        --
+        <% else %>
+        (needs signup)
+        <% end %>
+      </span>
+    </div>
+  </div>
+</div>

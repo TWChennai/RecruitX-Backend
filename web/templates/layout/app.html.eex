@@ -28,8 +28,8 @@
           </div>
           <div>
           <ul class = "nav navbar-nav">
-            <li><a href = "/all">All Interviews</a></li>
             <li><a href = "/my_interviews">My Interviews</a></li>
+            <li><a href = "/all_interviews/?all=true">All Interviews</a></li>    
           </ul>
         </nav>
       <% end %>
