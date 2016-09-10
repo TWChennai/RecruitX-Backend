@@ -37,7 +37,7 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
-  def index_all(conn, %{"all" => all}) do
+  def index_all(conn, _params) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
                   |> Panel.now_or_in_next_seven_days
@@ -53,7 +53,7 @@ defmodule RecruitxBackend.InterviewController do
                                               "panelist_login_name", max_experience_to_skip_exprience_filter,
                                               op_role_to_skip_role_filter)
                                                 |> Enum.sort(fn (first, second) -> first.signup || !second.signup end)
-    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, all: all, not_login: true)
+    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, all: true, not_login: true)
   end
 
   # TODO: Combine the above and below function and write tests

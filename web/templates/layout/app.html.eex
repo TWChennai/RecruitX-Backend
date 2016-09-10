@@ -29,7 +29,14 @@
           <div>
           <ul class = "nav navbar-nav">
             <li><a href = "/my_interviews">My Interviews</a></li>
-            <li><a href = "/all_interviews/?all=true">All Interviews</a></li>    
+            <li><a href = "/all_interviews/">All Interviews</a></li>
+            <li class="navbar-right"><a href = "/login">
+                  <%= if(@conn.cookies["username"]) do %>
+                    <%= @conn.cookies["username"] %>
+                    <span class="glyphicon glyphicon-pencil"></span>
+                  <% end %>
+                </a>
+            </li>
           </ul>
         </nav>
       <% end %>
