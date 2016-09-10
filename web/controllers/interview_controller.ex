@@ -20,7 +20,7 @@ defmodule RecruitxBackend.InterviewController do
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
-  def default(%{request_path: "/"} = conn, _), do: redirect conn, to: "/all_interviews"
+  def default(conn, _), do: redirect conn, to: "/all_interviews"
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
     interviews = Interview.get_interviews_with_associated_data

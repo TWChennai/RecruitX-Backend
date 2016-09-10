@@ -30,12 +30,14 @@
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
         <%= if(!@interview.signup) do %>
-        --
+          <%= Enum.map(@interview.interview_panelist, fn(x) -> %> 
+            <span class="glyphicon glyphicon-thumbs-up" />
+            <%= end) %>
         <% else %>
         <!--TODO: api_key should not be exposed -->
         Pending Signup
         <% end %>
       </span>
-    </div>  
+    </div>
   </div>
 </div>
