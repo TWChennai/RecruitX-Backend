@@ -28,7 +28,7 @@
         --
         <% else %>
         <!--TODO: api_key should not be exposed -->
-        (need's signup)
+        pending signup
         <% end %>
       </span>
     </div>
