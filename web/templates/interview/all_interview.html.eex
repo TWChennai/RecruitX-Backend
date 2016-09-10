@@ -25,10 +25,10 @@
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
         <%= if(!@interview.signup) do %>
-        (needs signup)
+        --
         <% else %>
         <!--TODO: api_key should not be exposed -->
-        --
+        (need's signup)
         <% end %>
       </span>
     </div>
