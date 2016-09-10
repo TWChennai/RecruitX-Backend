@@ -12,7 +12,6 @@ export var Entry = {
       error_element.innerHTML = "Username Cannot be Empty!";
       return
     }
-    document.cookie = "username=" + username;
-    window.location = '/login/'
+    window.location = '/login/?username='+username
   }
 };
