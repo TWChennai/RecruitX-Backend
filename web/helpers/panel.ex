@@ -81,4 +81,14 @@ defmodule RecruitxBackend.Panel do
   def get_email_address(panelist_login_name) do
     panelist_login_name <> System.get_env("EMAIL_POSTFIX")
   end
+
+  def format_names([]), do: ""
+
+  def format_names(panelists) do
+    Enum.reduce(panelists, "",
+      fn(%{panelist_login_name: panelist_login_name}, accumulator) -> accumulator <> ", " <> panelist_login_name
+      end)
+      |> String.lstrip(?,)
+      |> String.lstrip
+  end
 end

@@ -20,6 +20,8 @@ alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 alias RecruitxBackend.PipelineStatus
+alias RecruitxBackend.Slot
+alias RecruitxBackend.SlotPanelist
 alias Timex.Date
 
 import Ecto.Query, only: [from: 2, where: 2]
@@ -53,6 +55,24 @@ Enum.each(candidates, fn candidate ->
 end)
 
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
+
+for interview_round_number <- 1..:rand.uniform(4) do
+  now = Date.now
+  random_start_time = now |> Date.shift(hours: interview_round_number)
+  interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
+
+  slot = Repo.insert!(%Slot{
+    role_id: Enum.random(roles).id,
+    start_time: random_start_time,
+    end_time: random_start_time |> Date.shift(hours: 1),
+    interview_type_id: interview_type.id,
+  })
+  Repo.insert!(%SlotPanelist{
+    panelist_login_name: Enum.random(panelist_names),
+    slot_id: slot.id
+  })
+end
+
 Enum.each(candidates, fn candidate ->
   now = Date.now
   for interview_round_number <- 1..:rand.uniform(4) do

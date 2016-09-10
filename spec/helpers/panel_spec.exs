@@ -9,6 +9,20 @@ defmodule PanelSpec do
   alias Timex.Date
 
   describe "methods" do
+    context "format panelist names" do
+      it "should return empty string when there are no panelists" do
+        expect Panel.format_names([]) |> to(eq(""))
+      end
+      it "should return comma separated panelist names" do
+        panelist1 = create(:interview_panelist)
+        panelist2 = create(:interview_panelist)
+        expect Panel.format_names([panelist1, panelist2]) |> to(eq(panelist1.panelist_login_name <> ", " <> panelist2.panelist_login_name))
+      end
+      it "should return panelist name without comma for single panelist" do
+        panelist1 = create(:interview_panelist)
+        expect Panel.format_names([panelist1]) |> to(eq(panelist1.panelist_login_name))
+      end
+    end
     context "default_order" do
       before do: Repo.delete_all(Interview)
 

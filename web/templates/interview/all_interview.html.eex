@@ -28,8 +28,13 @@
         --
         <% else %>
         <!--TODO: api_key should not be exposed -->
-        pending signup
+        Pending Signup
         <% end %>
+      </span>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
+        <%= RecruitxBackend.Panel.format_names(@interview.interview_panelist) %>
       </span>
     </div>
   </div>
