@@ -1,16 +1,19 @@
 <div class="container">
 	<div class="row main">
 		<div class="main-login main-center">
-			<form class="form-login col-lg-4 col-sm-offset-3 panel panel-default" onsubmit="return false">
+			<form class="col-lg-5 col-sm-offset-3 panel panel-default" onsubmit="return false">
 				<div class="form-group">
-					<div id="error" class="alert alert-danger">
-						<%= @error %>
-					</div>
+          <h2 class="form-signin-heading">Please Enter Username</h2>
+          <%= if(@error != "") do %>
+  					<div id="error" class="alert alert-danger">
+  						<%= @error %>
+  					</div>
+          <% end %>
 					<label for="name" class="cols-sm-2 control-label">User Name:</label>
 					<div class="cols-sm-10">
 						<div class="input-group">
 							<span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
-							<input type="text" id="username" class="form-control" placeholder="Enter your username">
+							<input type="text" id="username" class="form-control" placeholder="username">
 						</div>
 					</div>
 				</div>
