@@ -50,7 +50,7 @@
                   data-dismiss="modal"
                   onclick=require("web/static/js/app").Slot.cancel()>No</button>
                   <button type="button" class="btn btn-default"
-                  onclick=require("web/static/js/app").Slot.signup('<%= @slot.id %>','<%= @api_key %>')>Yes</button>
+                  onclick=require("web/static/js/app").Slot.signup('<%= @slot.id %>')>Yes</button>
                 </div>
               </div>
             </div>

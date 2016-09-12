@@ -7,12 +7,12 @@ defmodule RecruitxBackend.InterviewView do
   alias RecruitxBackend.InterviewView
   alias Timex.DateFormat
 
-  def render("index.html", %{interviews_with_signup: interviews, api_key: api_key, not_login: not_login}) do
-    render_many(interviews, InterviewView, "interview_slot.html", api_key: api_key, not_login: not_login)
-  end
-
   def render("index.html", %{interviews_with_signup: interviews, all: all, not_login: not_login}) do
     render_many(interviews, InterviewView, "all_interview_slot.html", all: all, not_login: not_login)
+  end
+
+  def render("index.html", %{interviews_with_signup: interviews, not_login: not_login}) do
+    render_many(interviews, InterviewView, "interview_slot.html", not_login: not_login)
   end
 
   def render("index.json", %{interviews_with_signup: interviews}) do
@@ -69,12 +69,12 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
-  def render("interview_slot.html", %{interview: %{candidate: _} = interview, api_key: api_key, not_login: not_login}) do
-    render "interview.html", interview: interview , api_key: api_key, not_login: not_login
+  def render("interview_slot.html", %{interview: %{candidate: _} = interview, not_login: not_login}) do
+    render "interview.html", interview: interview , not_login: not_login
   end
 
-  def render("interview_slot.html", %{interview: slot, api_key: api_key, not_login: not_login}) do
-    render "slot.html", slot: slot, api_key: api_key, not_login: not_login
+  def render("interview_slot.html", %{interview: slot, not_login: not_login}) do
+    render "slot.html", slot: slot, not_login: not_login
   end
 
   def render("all_interview_slot.html", %{interview: %{candidate: _} = interview, all: all, not_login: not_login}) do
