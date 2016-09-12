@@ -72,7 +72,7 @@ defmodule RecruitxBackend.InterviewController do
     retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
                                                 |> Enum.sort(fn (first, second) -> first.signup || !second.signup end)
-    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, not_login: true)
+    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, api_key: @api_key, not_login: true)
   end
 
   def index_web(conn, _params) do

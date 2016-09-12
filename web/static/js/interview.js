@@ -4,7 +4,7 @@ export var Interview = {
     error_element.innerHTML = "";
     error_element.className = "";
   },
-  signup: function(id) {
+  signup: function(id, api_key) {
     var error_element = document.getElementById("signupError");
     var panelist_experience = this.calculate_years_difference(new Date(), new Date($.cookie("calculated_hire_date")));
     $.ajax({
@@ -22,6 +22,7 @@ export var Interview = {
         window.location = '/my_interviews';
       },
       headers: {
+        "Authorization": api_key,
         "Content-Type": "application/json"
       },
       error: function(error) {

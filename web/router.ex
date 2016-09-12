@@ -10,6 +10,7 @@ defmodule RecruitxBackend.Router do
   end
 
   pipeline :api  do
+    plug RecruitxBackend.ApiKeyAuthenticator
     plug :accepts, ["json"]
   end
 
@@ -26,8 +27,23 @@ defmodule RecruitxBackend.Router do
   scope "/", RecruitxBackend do
     pipe_through :api
 
-    resources "/panelists", PanelistController, only: [:create, :show, :delete]
+    resources "/roles", RoleController, only: [:index]
+    resources "/is_recruiter", JigsawController, only: [:show]
+    resources "/skills", SkillController, only: [:index]
     resources "/candidates", CandidateController, only: [:index, :create, :show, :update]
+    resources "/candidates/:candidate_id/interviews", InterviewController, only: [:index]
+    resources "/panelists/:panelist_name/interviews", InterviewController, only: [:index]
+    resources "/interview_types", InterviewTypeController, only: [:index]
+    resources "/interviews", InterviewController, only: [:index, :show, :update, :create]
+    resources "/interviews/:interview_id/feedback_images", FeedbackImageController, only: [:create, :show]
+    resources "/panelists", PanelistController, only: [:create, :show, :delete]
+    resources "/remove_panelists", PanelistController, only: [:delete]
+    resources "/decline_slot", PanelistController, only: [:delete]
+    resources "/interview_statuses", InterviewStatusController, only: [:index]
+    resources "/pipeline_statuses", PipelineStatusController, only: [:index]
+    resources "/sos_email", SosEmailController, only: [:index]
+    resources "/slots", SlotController, only: [:create, :show, :index]
+    resources "/slot_to_interview", SlotController, only: [:create]
   end
 
   if Mix.env == :dev do
