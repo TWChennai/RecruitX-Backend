@@ -65,6 +65,7 @@ for interview_round_number <- 1..:rand.uniform(4) do
     role_id: Enum.random(roles).id,
     start_time: random_start_time,
     end_time: random_start_time |> Date.shift(hours: 1),
+    average_experience: Decimal.new(Enum.random(1..10)),
     interview_type_id: interview_type.id,
   })
   Repo.insert!(%SlotPanelist{
