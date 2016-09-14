@@ -5,6 +5,7 @@ defmodule RecruitxBackend.InterviewView do
   alias RecruitxBackend.FeedbackImageView
   alias RecruitxBackend.InterviewPanelistView
   alias RecruitxBackend.InterviewView
+  alias RecruitxBackend.InterviewTypeView
   alias Timex.DateFormat
 
   def render("index.html", %{interviews_with_signup: interviews, api_key: api_key, not_login: not_login}) do
@@ -17,6 +18,10 @@ defmodule RecruitxBackend.InterviewView do
 
   def render("index.json", %{interviews_with_signup: interviews}) do
     render_many(interviews, InterviewView, "interview_with_signup.json")
+  end
+
+  def render("interviews_preload.json", %{interviews_with_signup: interviews}) do
+    render_many(interviews, InterviewView, "interview_with_signup_preload.json")
   end
 
   def render("index.json", %{interviews_for_candidate: interviews}) do
@@ -56,7 +61,32 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
+  def render("interview_with_signup_preload.json", %{interview: %{candidate: _} = interview}) do
+    %{
+      id: interview.id,
+      start_time: DateFormat.format!(interview.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      interview_type_id: render_one(interview.interview_type, InterviewTypeView, "interview_type.json"),
+      candidate: render_one(interview.candidate, CandidateView, "candidate_with_skills_preload.json"),
+      signup: interview.signup,
+      signup_error: interview.signup_error,
+      panelists: render_many(interview.interview_panelist, InterviewPanelistView, "interview_panelist.json")
+    }
+  end
+
   def render("interview_with_signup.json", %{interview: slot}) do
+    %{
+      id: slot.id,
+      status_id: nil,
+      start_time: DateFormat.format!(slot.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
+      interview_type_id: slot.interview_type_id,
+      candidate: render_one(slot, CandidateView, "dummy_candidate.json"),
+      signup: slot.signup,
+      signup_error: slot.signup_error,
+      panelists: render_many(slot.slot_panelists, InterviewPanelistView, "interview_panelist.json")
+    }
+  end
+
+  def render("interview_with_signup_preload.json", %{interview: slot}) do
     %{
       id: slot.id,
       status_id: nil,

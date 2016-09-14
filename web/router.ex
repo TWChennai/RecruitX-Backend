@@ -26,7 +26,6 @@ defmodule RecruitxBackend.Router do
 
   scope "/", RecruitxBackend do
     pipe_through :api
-
     resources "/roles", RoleController, only: [:index]
     resources "/is_recruiter", JigsawController, only: [:show]
     resources "/skills", SkillController, only: [:index]
