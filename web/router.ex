@@ -14,14 +14,6 @@ defmodule RecruitxBackend.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", RecruitxBackend do
-    pipe_through :browser
-    get "/login", LoginController, :index
-    get "/my_interviews", InterviewController, :index_web
-    get "/all_interviews", InterviewController, :index_all
-    get "/", InterviewController, :default
-  end
-
   # TODO: make "web" use the root namespace ("/") and "API" use the "/api" namespace
 
   scope "/", RecruitxBackend do

@@ -14,13 +14,6 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
-  describe "default redirect" do
-    it "should redirect / to view all interviews" do
-      response = get conn_with_dummy_authorization(), "/"
-      expect(response.resp_body) |> to(have("/all_interviews"))
-    end
-  end
-
   describe "index" do
     before do: Repo.delete_all(Candidate)
 
@@ -114,28 +107,6 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
       expect(result_interview.last_interview_status) |> to(be(pass_id))
-    end
-  end
-  describe "index_web" do
-    # before do: allow Repo |> to(accept(:all, fn(_) -> interview_status end))
-    before do: allow RecruitxBackend.OktaSessionValidator |> to(accept(:call, fn(conn, _args) -> conn end))
-    it "should redirect to login when there is no cookies" do
-      response = get conn_with_dummy_authorization(), "/my_interviews"
-
-      expect(response.status) |> to(be(302))
-      expect(response.path_info) |> to(be(["my_interviews"]))
-    end
-
-    it "should not redirect to the login if there is cookie" do
-      conn = Plug.Conn.put_resp_cookie(conn, "calculated_hire_date", "2015-06-05")
-      conn = Plug.Conn.put_resp_cookie(conn, "panelist_role", "Dev")
-      conn = Plug.Conn.put_resp_cookie(conn, "username", "dummy_user")
-      conn = Plug.Conn.put_resp_cookie(conn, "okta_session_id", "dummy_id")
-
-      response = get conn, "/my_interviews"
-
-      expect(response.status) |> to(be(200))
-      expect(response.path_info) |> to(be(["my_interviews"]))
     end
   end
 end
