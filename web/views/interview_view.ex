@@ -91,8 +91,8 @@ defmodule RecruitxBackend.InterviewView do
       id: slot.id,
       status_id: nil,
       start_time: DateFormat.format!(slot.start_time, "%Y-%m-%dT%H:%M:%SZ", :strftime),
-      interview_type_id: slot.interview_type_id,
-      candidate: render_one(slot, CandidateView, "dummy_candidate.json"),
+      interview_type_id: render_one(slot.interview_type, InterviewTypeView, "interview_type.json"),
+      candidate: render_one(slot, CandidateView, "dummy_candidate_preload.json"),
       signup: slot.signup,
       signup_error: slot.signup_error,
       panelists: render_many(slot.slot_panelists, InterviewPanelistView, "interview_panelist.json")

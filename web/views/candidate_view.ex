@@ -5,6 +5,7 @@ defmodule RecruitxBackend.CandidateView do
   alias RecruitxBackend.CandidateView
   alias RecruitxBackend.RoleView
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Candidate
 
   def render("index.json", %{candidates: candidates}) do
     %{
@@ -39,11 +40,11 @@ defmodule RecruitxBackend.CandidateView do
       id: candidate.id,
       first_name: candidate.first_name,
       last_name: candidate.last_name,
-      role_id: render_one(candidate.role, RoleView, "role_without_skills.json"),
+      role: render_one(candidate.role, RoleView, "role_without_skills.json"),
       other_skills: candidate.other_skills,
       experience: candidate.experience,
       pipeline_status_id: candidate.pipeline_status_id,
-      skills: render_many(candidate.candidate_skills, CandidateSkillView, "candidate_skill_id.json")
+      skills: Candidate.get_formatted_skills(candidate)
     }
   end
 
@@ -53,6 +54,19 @@ defmodule RecruitxBackend.CandidateView do
       first_name: "???",
       last_name: "",
       role_id: role_id,
+      other_skills: skills,
+      experience: experience,
+      pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id,
+      skills: ""
+    }
+  end
+
+  def render("dummy_candidate_preload.json", %{candidate: %{role_id: role_id, skills: skills, average_experience: experience, role: role}}) do
+    %{
+      id: nil,
+      first_name: "???",
+      last_name: "",
+      role: render_one(role, RoleView, "role_without_skills.json"),
       other_skills: skills,
       experience: experience,
       pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id,
