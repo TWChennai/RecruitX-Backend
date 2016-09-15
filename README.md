@@ -74,11 +74,6 @@ export EMAIL_POSTFIX="@company.com"
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
-#### Run Web App
-  1. Set up the OKTA_PREVIEW environment to your okta preview (with TW account)
-  2. Add a new app - SWA, give login url as http://localhost:4000/login
-  3. Click on the app open it to run it
-
 ## Learn more
 
   * Official website: http://www.phoenixframework.org/
