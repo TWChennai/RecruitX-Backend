@@ -11,14 +11,12 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Panel
-  alias Timex.Date
-  alias Timex.DateFormat
 
   @api_key System.get_env("API_KEY")
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
-  def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role, "preload" => preload}) do
+  def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role, "preload" => _preload}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills])
                   |> Panel.now_or_in_next_seven_days
@@ -50,7 +48,7 @@ defmodule RecruitxBackend.InterviewController do
     conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
-  def index(conn, %{"all" => all}) do
+  def index(conn, %{"all" => _all}) do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
                   |> Panel.now_or_in_next_seven_days

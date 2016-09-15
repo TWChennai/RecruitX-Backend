@@ -2,15 +2,11 @@ defmodule RecruitxBackend.SignUpEvaluatorSpec do
   use ESpec.Phoenix, model: RecruitxBackend.SignUpEvaluator
 
   alias Decimal
-  alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewRelativeEvaluator
   alias RecruitxBackend.InterviewTypeRelativeEvaluator
   alias RecruitxBackend.ExperienceMatrixRelativeEvaluator
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
-  alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.SignUpEvaluator
-  alias Timex.Date
 
   let :role, do: create(:role)
   let :interview, do: create(:interview)

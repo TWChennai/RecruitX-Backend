@@ -61,7 +61,7 @@ defmodule RecruitxBackend.CandidateView do
     }
   end
 
-  def render("dummy_candidate_preload.json", %{candidate: %{role_id: role_id, skills: skills, average_experience: experience, role: role}}) do
+  def render("dummy_candidate_preload.json", %{candidate: %{skills: skills, average_experience: experience, role: role}}) do
     %{
       id: nil,
       first_name: "???",

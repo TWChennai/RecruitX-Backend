@@ -11,7 +11,7 @@ defmodule RecruitxBackend.ChangesetManipulator do
 
   defp manipulate_changesets(false, changesets, _, _), do: {false, changesets |> ChangesetErrorParser.to_json}
   defp manipulate_changesets(status, [], _db_operation, result), do: {status, result}
-  defp manipulate_changesets(true, [head | changesets], db_operation, result) do
+  defp manipulate_changesets(true, [head | changesets], db_operation, _result) do
       case db_operation.(head) do
         {:ok, result} -> manipulate_changesets(true, changesets, db_operation, result)
         {:error, result} -> {false, result |> ChangesetErrorParser.to_json}

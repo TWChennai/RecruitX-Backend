@@ -21,7 +21,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     it "should return candidates of the given role with interviews based on sub query" do
       another_role = create(:role, name: "Another Role Name")
       candidate_of_another_role = create(:candidate, role_id: another_role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
-      interview_for_another_role = create(:interview, candidate_id: candidate_of_another_role.id, interview_type_id: interview_type.id)
+      _interview_for_another_role = create(:interview, candidate_id: candidate_of_another_role.id, interview_type_id: interview_type.id)
 
       expected_candidate_id = interview.candidate_id
       [ candidate | _ ] = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id), role.id)
@@ -30,7 +30,6 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should return candidates of the given role with interviews based on sub query" do
-      expected_candidate_id = interview.candidate_id
       invalid_role_id = 0
       candidates = WeeklySignupReminder.get_candidates_and_interviews(Interview |> where(id: ^interview.id), invalid_role_id)
 
