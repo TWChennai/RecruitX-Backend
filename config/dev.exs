@@ -18,11 +18,8 @@ config :recruitx_backend, RecruitxBackend.Endpoint,
   path_to_store_images: "../uploaded_images",
   live_reload: [
     patterns: [
-      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
-      ~r{priv/gettext/.*(po)$},
-      ~r{web/views/.*(ex)$},
-      ~r{web/templates/.*(eex)$}
-    ]
+      ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$}
+        ]
   ]
 
 # Do not include metadata nor timestamps in development logs

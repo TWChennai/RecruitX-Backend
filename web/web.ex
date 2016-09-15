@@ -36,7 +36,6 @@ defmodule RecruitxBackend.Web do
       import Ecto.Query, only: [from: 1, from: 2, preload: 2, order_by: 2]
 
       import RecruitxBackend.Router.Helpers
-      import RecruitxBackend.Gettext
     end
   end
 
@@ -49,7 +48,6 @@ defmodule RecruitxBackend.Web do
 
       import RecruitxBackend.Router.Helpers
       import RecruitxBackend.ErrorHelpers
-      import RecruitxBackend.Gettext
     end
   end
 

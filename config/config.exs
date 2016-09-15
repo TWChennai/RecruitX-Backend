@@ -10,7 +10,7 @@ config :recruitx_backend, RecruitxBackend.Endpoint,
   url: [host: "localhost"],
   root: Path.dirname(__DIR__),
   secret_key_base: "7XiwvpwOfCMr4RfxZjKwUkdIplKq9K01Pve9W4eooXM3v3/60CF4quYDpbiBM2l4",
-  render_errors: [accepts: ~w(html json)],
+  render_errors: [accepts: ~w(json)],
   pubsub: [name: RecruitxBackend.PubSub, adapter: Phoenix.PubSub.PG2],
   http: [compress: true]
 
