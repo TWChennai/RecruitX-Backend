@@ -5,16 +5,8 @@ defmodule RecruitxBackend.ErrorView do
     %{error: "Page not found"}
   end
 
-  def render("404.html", _assigns) do
-    "Page not found"
-  end
-
   def render("500.json", _assigns) do
     %{error: "Server internal error"}
-  end
-
-  def render("500.html", _assigns) do
-    "Server internal error"
   end
 
   def render("bad_request.json", %{error: error}) do
