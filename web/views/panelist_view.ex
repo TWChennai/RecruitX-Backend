@@ -8,6 +8,13 @@ defmodule RecruitxBackend.PanelistView do
     }
   end
 
+  def render("panelist_web.json", %{interview_panelist: interview_panelist}) do
+    %{
+      interview_id: interview_panelist.interview_id,
+      name: interview_panelist.name
+    }
+  end
+
   def render("panelist.json", %{slot_panelist: slot_panelist}) do
     %{
       slot_id: slot_panelist.slot_id,

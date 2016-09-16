@@ -5,12 +5,50 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.Panel
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.ChangesetView
+  alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Candidate
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
   alias Timex.Date
   alias Timex.Timezone
+
+  @api_key System.get_env("API_KEY")
+  @web_api_url System.get_env("WEB_API_URL")
+  
+  def web_signup(conn = %Plug.Conn{cookies: %{"panelist_role" => panelist_role,
+  "username" => panelist_login_name}}, %{"interview_id" => interview_id,
+  "panelist_experience" => panelist_experience}) do
+    post_params =
+    %{ "interview_panelist" =>
+      %{
+        "interview_id" => interview_id,
+        "panelist_login_name" => panelist_login_name,
+        "panelist_experience" => panelist_experience,
+        "panelist_role" => panelist_role
+       }
+    }
+    json_request = Poison.Encoder.encode(post_params, [])
+    response = HTTPotion.post("#{@web_api_url}/panelists",
+    [body: json_request, headers: ["Authorization": @api_key, "Content-Type":
+    "application/json"]])
+    {_, parsed_response} = Poison.Parser.parse(response.body)
+    case response.status_code do
+      201 ->
+        conn
+        |> put_status(:created)
+        |> render("panelist_web.json", interview_panelist: parsed_response |> convertKeysFromStringsToAtoms)
+      _ ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> render(ErrorView, "bad_request.json", %{error: %{signup: ["sign up
+        failed"]}})
+    end
+  end
+
+  def convertKeysFromStringsToAtoms(input) do
+    for {key, val} <- input, into: %{}, do: {String.to_atom(key), val}
+  end
 
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)

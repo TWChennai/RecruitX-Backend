@@ -18,6 +18,7 @@ defmodule RecruitxBackend.Router do
     get "/login", LoginController, :index
     get "/my_interviews", InterviewController, :index_web
     get "/all_interviews", InterviewController, :index_all
+    get "/signup", PanelistController, :web_signup
     get "/", InterviewController, :default
   end
 

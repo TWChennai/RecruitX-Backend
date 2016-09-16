@@ -8,16 +8,8 @@ export var Interview = {
     var error_element = document.getElementById("signupError");
     var panelist_experience = this.calculate_years_difference(new Date(), new Date($.cookie("calculated_hire_date")));
     $.ajax({
-      url: "/panelists",
-      method: 'POST',
-      data: JSON.stringify({
-       "interview_panelist": {
-         "interview_id": id,
-         "panelist_login_name": $.cookie("username"),
-         "panelist_experience": panelist_experience,
-         "panelist_role": $.cookie("panelist_role")
-       }
-     }),
+      url: "/signup?interview_id=" + id + "&panelist_experience=" + panelist_experience,
+      method: 'GET',
       success: function(response) {
         window.location = '/my_interviews';
       },
