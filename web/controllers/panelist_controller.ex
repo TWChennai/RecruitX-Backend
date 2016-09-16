@@ -14,8 +14,8 @@ defmodule RecruitxBackend.PanelistController do
   alias Timex.Timezone
 
   @api_key System.get_env("API_KEY")
-  @web_api_url System.get_env("WEB_API_URL")
-  
+  @api_url System.get_env("API_URL")
+
   def web_signup(conn = %Plug.Conn{cookies: %{"panelist_role" => panelist_role,
   "username" => panelist_login_name}}, %{"interview_id" => interview_id,
   "panelist_experience" => panelist_experience}) do
@@ -29,7 +29,7 @@ defmodule RecruitxBackend.PanelistController do
        }
     }
     json_request = Poison.Encoder.encode(post_params, [])
-    response = HTTPotion.post("#{@web_api_url}/panelists",
+    response = HTTPotion.post("#{@api_url}/panelists",
     [body: json_request, headers: ["Authorization": @api_key, "Content-Type":
     "application/json"]])
     {_, parsed_response} = Poison.Parser.parse(response.body)
