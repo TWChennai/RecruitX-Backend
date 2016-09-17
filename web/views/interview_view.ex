@@ -74,12 +74,8 @@ defmodule RecruitxBackend.InterviewView do
   end
 
 
-  def render("all_interview_slot.html", %{interview: %{candidate: _} = interview, all: all, not_login: not_login}) do
+  def render("all_interview_slot.html", %{interview: interview, all: all, not_login: not_login}) do
     render "all_interview.html", interview: interview , all: all, not_login: not_login
-  end
-
-  def render("all_interview_slot.html", %{interview: slot, all: all, not_login: not_login}) do
-    render "all_slot.html", slot: slot, all: all, not_login: not_login
   end
 
   def render("interview.json", %{interview: %{candidate: _} = interview}) do
