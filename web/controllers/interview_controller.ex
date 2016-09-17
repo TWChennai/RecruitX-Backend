@@ -13,10 +13,10 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.Panel
   alias Timex.Date
   alias Timex.DateFormat
+  alias Poison.Parser
 
   @api_key System.get_env("API_KEY")
-  @okta_preview System.get_env("OKTA_PREVIEW")
-  @okta_api_key System.get_env("OKTA_API_KEY")
+  @api_url System.get_env("API_URL")
 
   plug :scrub_params, "interview" when action in [:update, :create]
 
@@ -59,20 +59,12 @@ defmodule RecruitxBackend.InterviewController do
 
   # TODO: Combine the above and below function and write tests
   def index_web(conn = %Plug.Conn{cookies: %{"calculated_hire_date" => calculated_hire_date, "panelist_role" => panelist_role, "username" => panelist_login_name}}, _params) do
-    interviews = Interview.get_interviews_with_associated_data
-                  |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
-                  |> Panel.now_or_in_next_seven_days
-                  |> Panel.default_order
-                  |> Repo.all
-    slots = Slot |> preload([:slot_panelists, :role, :interview_type])
-                  |> Panel.now_or_in_next_seven_days
-                  |> Panel.default_order
-                  |> Repo.all
-    panelist_experience = Date.diff((calculated_hire_date |> DateFormat.parse!("%Y-%m-%d", :strftime)), Date.now, :years)
-    retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
-    interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
-                                                |> Enum.sort(fn (first, second) -> first.signup || !second.signup end)
-    conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, not_login: true)
+    panelist_experience = to_string(Date.diff((calculated_hire_date |> DateFormat.parse!("%Y-%m-%d", :strftime)), Date.now, :years))
+    url = @api_url <> "/interviews/?panelist_login_name=" <> panelist_login_name <> "&panelist_experience=" <> panelist_experience <> "&panelist_role=" <> panelist_role <> "&preload=true"
+    response = HTTPotion.get(url, [headers: ["Authorization": @api_key]])
+    case response.body |> Parser.parse do
+      {:ok, interviews_and_slots_with_signup_status} -> conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, not_login: true)
+    end
   end
 
   def index_web(conn, _params) do

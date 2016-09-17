@@ -2,34 +2,37 @@
 <div>
   <div class="jumbotron row" style="margin-top: 5px; margin-bottom: 5px;">
     <div class="col-sm-2">
-      <%= RecruitxBackend.Candidate.get_full_name(@interview.candidate)%>
+      <%= @interview["candidate"]["first_name"] <> " "<> @interview["candidate"]["last_name"] %>
     </div>
     <div class="col-sm-1">
-      <%= @interview.candidate.role.name %>
+      <%= @interview["role"]["name"] %>
     </div>
     <div class="col-sm-1">
-      <%= @interview.candidate.experience%> yrs
+      <%= @interview["candidate"]["experience"]%> yrs
     </div>
-    <div class="col-sm-3">
-      <%= RecruitxBackend.Candidate.get_formatted_skills(@interview.candidate) %>
-    </div>
-    <div class="col-sm-1">
-      <%= @interview.interview_type.name %>
+    <div class="col-sm-2">
+      <%= @interview["candidate"]["skills"] %>
     </div>
     <div class="col-sm-1">
-      <%= DateFormat.format!(@interview.start_time, "%b-%d", :strftime) %>
+      <%= @interview["candidate"]["other_skills"] %>
     </div>
     <div class="col-sm-1">
-      <%= DateFormat.format!(@interview.start_time |> Date.local,"{h12}:{0m} {am}") %>
+      <%= @interview["name"] %>
     </div>
     <div class="col-sm-1">
-      <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
-        <%= RecruitxBackend.Panel.format_names(@interview.interview_panelist) %>
+      <%= DateFormat.format!(DateFormat.parse!(@interview["start_time"], "%Y-%m-%dT%H:%M:%SZ", :strftime), "%b-%d", :strftime) %>
+    </div>
+    <div class="col-sm-1">
+      <%= DateFormat.format!(DateFormat.parse!(@interview["start_time"], "%Y-%m-%dT%H:%M:%SZ", :strftime) |> Date.local,"{h12}:{0m} {am}") %>
+    </div>
+    <div class="col-sm-1">
+      <span data-toggle="tooltip" title='<%= @interview["signup_error"] %>' >
+        Panelist
       </span>
     </div>
     <div class="col-sm-1">
-      <span data-toggle="tooltip" title='<%= @interview.signup_error %>' >
-        <%= if(!@interview.signup) do %>
+      <span data-toggle="tooltip" title='<%= @interview["signup_error"] %>' >
+        <%= if(!@interview["signup"]) do %>
           <button class="btn btn-primary" disabled>signup</button>
         <% else %>
         <!--TODO: api_key should not be exposed -->
@@ -50,7 +53,7 @@
                   data-dismiss="modal"
                   onclick=require("web/static/js/app").Interview.cancel()>No</button>
                   <button type="button" class="btn btn-default"
-                  onclick=require("web/static/js/app").Interview.signup('<%= @interview.id
+                  onclick=require("web/static/js/app").Interview.signup('<%= @interview["id"]
                   %>')>Yes</button>
                 </div>
               </div>
