@@ -40,9 +40,18 @@ defmodule RecruitxBackend.InterviewController do
 
   def index_all(conn, _params) do
     url = @api_url <> "/interviews/?all=true"
-    response = HTTPotion.get(url, [headers: ["Authorization": @api_key]])
+    response = get_data_safely(url)
     case response.body |> Parser.parse do
       {:ok, interviews_and_slots_with_signup_status} -> conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, all: true, not_login: true)
+      _ -> conn |> render("error.html", error: "error", not_login: true)
+    end
+  end
+
+  defp get_data_safely(url) do
+    try do
+      response = HTTPotion.get(url, [headers: ["Authorization": @api_key]])
+    rescue
+      _ -> %{body: "error"}
     end
   end
 
@@ -50,9 +59,10 @@ defmodule RecruitxBackend.InterviewController do
   def index_web(conn = %Plug.Conn{cookies: %{"calculated_hire_date" => calculated_hire_date, "panelist_role" => panelist_role, "username" => panelist_login_name}}, _params) do
     panelist_experience = to_string(Date.diff((calculated_hire_date |> DateFormat.parse!("%Y-%m-%d", :strftime)), Date.now, :years))
     url = @api_url <> "/interviews/?panelist_login_name=" <> panelist_login_name <> "&panelist_experience=" <> panelist_experience <> "&panelist_role=" <> panelist_role <> "&preload=true"
-    response = HTTPotion.get(url, [headers: ["Authorization": @api_key]])
+    response = get_data_safely(url)
     case response.body |> Parser.parse do
       {:ok, interviews_and_slots_with_signup_status} -> conn |> render("index.html", interviews_with_signup: interviews_and_slots_with_signup_status, not_login: true)
+      _ -> conn |> render("error.html", error: "error", not_login: true)
     end
   end
 

@@ -7,7 +7,11 @@ defmodule RecruitxBackend.InterviewView do
   alias RecruitxBackend.InterviewView
   alias Timex.DateFormat
 
-  def render("index.html", %{interviews_with_signup: [], all: all, not_login: not_login}) do
+  def render("error.html", %{error: error, not_login: not_login}) do
+    render "error.html", not_login: not_login
+  end
+
+  def render("index.html", %{interviews_with_signup: [], all: _all, not_login: not_login}) do
     render "no_interviews.html", not_login: not_login
   end
 
@@ -80,7 +84,6 @@ defmodule RecruitxBackend.InterviewView do
   def render("interview_slot.html", %{interview: interview, not_login: not_login}) do
     render "interview.html", interview: interview , not_login: not_login
   end
-
 
   def render("all_interview_slot.html", %{interview: interview, all: all, not_login: not_login}) do
     render "all_interview.html", interview: interview , all: all, not_login: not_login
