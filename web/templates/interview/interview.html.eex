@@ -1,7 +1,7 @@
 <%= use Timex %>
 <div>
   <div class="jumbotron row" style="margin-top: 5px; margin-bottom: 5px;">
-    <div class="col-sm-2">
+    <div class="col-sm-1">
       <%= @interview["candidate"]["first_name"] <> " "<> @interview["candidate"]["last_name"] %>
     </div>
     <div class="col-sm-1">
