@@ -16,7 +16,7 @@ defmodule RecruitxBackend.InterviewView do
   end
 
   def render("index.html", %{interviews_with_signup: interviews, all: all, not_login: not_login}) do
-    render_many(interviews, InterviewView, "all_interview_slot.html", all: all, not_login: not_login)
+    render_many(interviews, InterviewView, "all_interviews.html", all: all, not_login: not_login)
   end
 
   def render("index.html", %{interviews_with_signup: [], not_login: not_login}) do
@@ -85,7 +85,7 @@ defmodule RecruitxBackend.InterviewView do
     render "interview.html", interview: interview , not_login: not_login
   end
 
-  def render("all_interview_slot.html", %{interview: interview, all: all, not_login: not_login}) do
+  def render("all_interviews.html", %{interview: interview, all: all, not_login: not_login}) do
     render "all_interview.html", interview: interview , all: all, not_login: not_login
   end
 

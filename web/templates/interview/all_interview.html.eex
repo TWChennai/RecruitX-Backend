@@ -26,14 +26,13 @@
       <%= DateFormat.format!(DateFormat.parse!(@interview["start_time"], "%Y-%m-%dT%H:%M:%SZ", :strftime) |> Date.local,"{h12}:{0m} {am}") %>
     </div>
     <div class="col-sm-1">
-      Panelist
+      <%= Enum.map(@interview["panelists"], fn panelist -> panelist["name"] end) %>
     </div>
     <div class="col-sm-1">
       <span data-toggle="tooltip" title='<%= @interview["signup_error"] %>' >
         <%= if(!@interview["signup"]) do %>
             <span class="glyphicon glyphicon-thumbs-up" />
         <% else %>
-        <!--TODO: api_key should not be exposed -->
         Pending Signup
         <% end %>
       </span>
