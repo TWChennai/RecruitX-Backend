@@ -63,7 +63,13 @@
           </script>
         <% end %>
       </span>
-      <%= Enum.map(@interview["panelists"], fn panelist -> panelist["name"] end) %>
+      <%= if(Enum.count(@interview["panelists"]) == 2) do %>
+      <%= Enum.at(@interview["panelists"], 0)["name"] <> " " <> Enum.at(@interview["panelists"], 1)["name"] %>
+      <%= else %>
+        <%= if(Enum.count(@interview["panelists"]) == 1) do %>
+        <%= Enum.at(@interview["panelists"], 0)["name"] %>
+        <%= end %>
+      <%= end %>
     </div>
   </div>
 </div>

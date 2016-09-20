@@ -27,7 +27,13 @@
       <%= @interview["interview_type_id"]["name"] %>
     </div>
     <div class="col-sm-1">
-      <%= Enum.map(@interview["panelists"], fn panelist -> panelist["name"] end) %>
+      <%= if(Enum.count(@interview["panelists"]) == 2) do %>
+      <%= Enum.at(@interview["panelists"], 0)["name"] <> " " <> Enum.at(@interview["panelists"], 1)["name"] %>
+      <%= else %>
+        <%= if(Enum.count(@interview["panelists"]) == 1) do %>
+        <%= Enum.at(@interview["panelists"], 0)["name"] %>
+        <%= end %>
+      <%= end %>
     </div>
   </div>
 </div>
