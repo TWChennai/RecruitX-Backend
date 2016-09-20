@@ -13,6 +13,7 @@ defmodule RecruitxBackend.CandidateSpec do
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
   let :previous_week, do: RecruitxBackend.Timer.get_previous_week
+  let :closed_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.closed)
 
   context "valid changeset" do
     subject do: Candidate.changeset(%Candidate{}, valid_attrs)
@@ -202,14 +203,30 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return candidates without interviews last in FIFO order" do
       Repo.delete_all(Candidate)
-      candidate_without_interview = create(:candidate)
+      closed_candidate = create(:candidate, pipeline_status_id: closed_pipeline_status.id)
 
       interview = create(:interview, interview_type_id: 1, start_time: Date.now)
       candidate_with_interview_id = interview.candidate_id
 
       [result1, result2] = Candidate.get_candidates_in_fifo_order |> Repo.all
 
-      expect([result1.id, result2.id]) |> to(be([candidate_with_interview_id, candidate_without_interview.id]))
+      expect([result1.id, result2.id]) |> to(be([candidate_with_interview_id, closed_candidate.id]))
+    end
+
+    it "should return candidates in FIFO order and with pipeline_status_id" do
+      Repo.delete_all(Candidate)
+      closed_candidate_interview = create(:interview, interview_type_id: 1, start_time: Date.now)
+      in_progress_candidate_interview_starts_lately = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      in_progress_candidate_interview_starts_quickly = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: -1))
+      Repo.get(Candidate, closed_candidate_interview.candidate_id)
+                      |> Ecto.Changeset.change(pipeline_status_id: closed_pipeline_status.id)
+                      |> Repo.update
+
+      [result1, result2, result3] = Candidate.get_candidates_in_fifo_order |> Repo.all
+
+      expect([result1.id, result2.id, result3.id]) |> to(be([in_progress_candidate_interview_starts_quickly.candidate_id,
+                                                              in_progress_candidate_interview_starts_lately.candidate_id,
+                                                              closed_candidate_interview.candidate_id]))
     end
   end
 
@@ -424,7 +441,6 @@ defmodule RecruitxBackend.CandidateSpec do
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
     let :progress_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
     let :pass_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.pass)
-    let :closed_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.closed)
 
     it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)

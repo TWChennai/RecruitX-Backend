@@ -123,7 +123,7 @@ defmodule RecruitxBackend.Candidate do
     from c in __MODULE__,
       left_join: i in assoc(c, :interviews),
       where: i.id in ^first_interview_id_for_all_candidates or is_nil(i.id),
-      order_by: i.start_time,
+      order_by: [c.pipeline_status_id, i.start_time],
       select: c
   end
 

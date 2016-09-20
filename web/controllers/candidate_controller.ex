@@ -17,7 +17,6 @@ defmodule RecruitxBackend.CandidateController do
 
   def index(conn, params) do
     candidates = Candidate.get_candidates_in_fifo_order
-                 |> order_by(asc: :pipeline_status_id)
                  |> Repo.paginate(params)
     render(conn, "index.json", candidates: candidates)
   end
