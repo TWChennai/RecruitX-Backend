@@ -31,7 +31,6 @@
         <%= if(!@interview["signup"]) do %>
           <button class="btn btn-primary" disabled>signup</button>
         <% else %>
-        <!--TODO: api_key should not be exposed -->
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">signup</button>
           <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
