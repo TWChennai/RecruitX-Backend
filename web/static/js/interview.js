@@ -5,22 +5,25 @@ export var Interview = {
     error_element.className = "";
   },
   signup: function(id) {
-    var error_element = document.getElementById("signupError");
-    var panelist_experience = this.calculate_years_difference(new Date(), new Date($.cookie("calculated_hire_date")));
-    $.ajax({
-      url: "/signup?interview_id=" + id + "&panelist_experience=" + panelist_experience,
-      method: 'GET',
-      success: function(response) {
-        window.location = '/my_interviews';
-      },
-      headers: {
-        "Content-Type": "application/json"
-      },
-      error: function(error) {
-        error_element.innerHTML = "Something went wrong! Please try again later!";
-        error_element.className += "alert alert-danger";
-      },
-    });
+    var conf = confirm("Are you sure you want to sign up for this interview ?")
+    if(conf) {
+      var error_element = document.getElementById("signupError");
+      var panelist_experience = this.calculate_years_difference(new Date(), new Date($.cookie("calculated_hire_date")));
+      $.ajax({
+        url: "/signup?interview_id=" + id + "&panelist_experience=" + panelist_experience,
+        method: 'GET',
+        success: function(response) {
+          window.location = '/my_interviews';
+        },
+        headers: {
+          "Content-Type": "application/json"
+        },
+        error: function(error) {
+          error_element.innerHTML = "Something went wrong! Please try again later!";
+          error_element.className += "alert alert-danger";
+        },
+      });
+    }
   },
   calculate_years_difference: function(date1, date2) {
     return Math.round(Math.abs(date1.getTime() - date2.getTime()) /  (1000 * 3600 * 24 * 365));

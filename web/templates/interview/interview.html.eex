@@ -31,35 +31,8 @@
         <%= if(!@interview["signup"]) do %>
           <button class="btn btn-primary" disabled>signup</button>
         <% else %>
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">signup</button>
-          <div id="myModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Signup</h4>
-                </div>
-                <div class="modal-body">
-                  <p>Are you sure you want to sign up for this interview ?</p>
-                </div>
-                <div id="signupError"></div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default"
-                  data-dismiss="modal"
-                  onclick=require("web/static/js/app").Interview.cancel()>No</button>
-                  <button type="button" class="btn btn-default"
-                  onclick=require("web/static/js/app").Interview.signup('<%= @interview["id"]
-                  %>')>Yes</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <script type="text/javascript">
-            $('#myModal').on('hidden.bs.modal', function (e) {
-              e.preventDefault();
-              require("web/static/js/app").Interview.cancel();
-            });
-          </script>
+          <button type="button" class="btn btn-primary" data-toggle="modal"
+          onclick=require("web/static/js/app").Interview.signup('<%= @interview["id"]%>')>signup</button>
         <% end %>
       </span>
       <%= if(Enum.count(@interview["panelists"]) == 2) do %>
