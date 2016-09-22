@@ -2,6 +2,7 @@ defmodule RecruitxBackend.SlotControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.SlotController
 
   alias Timex.Date
+  alias RecruitxBackend.SlotCancellationNotification
 
   let :post_parameters, do: Map.merge(convertKeysFromAtomsToStrings(%{count: 1}), convertKeysFromAtomsToStrings(fields_for(:slot)))
 
@@ -46,4 +47,19 @@ defmodule RecruitxBackend.SlotControllerSpec do
       end
     end
   end
+
+  describe "delete" do
+    let :created_slot, do: create(:slot)
+
+      before do: allow Repo |> to(accept(:get!, fn(_) -> {:ok, created_slot} end))
+      before do: allow Repo |> to(accept(:delete!, fn(_) -> {:ok, created_slot} end))
+      before do: allow SlotCancellationNotification |> to(accept(:execute, fn(_) -> :ok end))
+      it "should return 200 and be successful" do
+        conn = action(:delete, %{"id" => created_slot.id})
+
+        conn |> should(be_successful)
+        conn |> should(have_http_status(:no_content))
+      end
+  end
+
 end

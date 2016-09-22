@@ -88,6 +88,14 @@ defmodule RecruitxBackend.SlotController do
     end
   end
 
+  def delete(conn, %{"id" => id}) do
+    slot = Slot |> Repo.get!(id)
+    RecruitxBackend.SlotCancellationNotification.execute((from s in Slot, where: s.id == ^id))
+    Repo.delete!(slot)
+
+    send_resp(conn, :no_content, "")
+  end
+
   def index(conn, %{"interview_type_id" => interview_type_id, "previous_rounds_start_time" => previous_rounds_start_time, "role_id" => role_id}) do
     previous_rounds_end_time = previous_rounds_start_time
                                 |> DateFormat.parse!("%Y-%m-%dT%H:%M:%SZ", :strftime)

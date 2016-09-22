@@ -30,7 +30,7 @@ defmodule RecruitxBackend.Router do
     resources "/interview_statuses", InterviewStatusController, only: [:index]
     resources "/pipeline_statuses", PipelineStatusController, only: [:index]
     resources "/sos_email", SosEmailController, only: [:index]
-    resources "/slots", SlotController, only: [:create, :show, :index]
+    resources "/slots", SlotController, only: [:create, :show, :index, :delete]
     resources "/slot_to_interview", SlotController, only: [:create]
   end
 
