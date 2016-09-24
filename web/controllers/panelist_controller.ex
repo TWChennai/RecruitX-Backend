@@ -14,6 +14,13 @@ defmodule RecruitxBackend.PanelistController do
   alias Timex.Date
   alias Timex.Timezone
 
+  def index(conn, _params) do
+     statistics = InterviewPanelist.get_statistics
+      |> Repo.all
+      |> Enum.group_by(&Enum.at(&1, 0))
+    conn |> render("statistics.json", statistics: statistics)
+  end
+
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do

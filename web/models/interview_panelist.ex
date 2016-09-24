@@ -6,6 +6,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.Team
+  alias RecruitxBackend.PanelistDetails
   alias RecruitxBackend.SignUpEvaluator
 
   schema "interview_panelists" do
@@ -87,4 +88,13 @@ defmodule RecruitxBackend.InterviewPanelist do
       where: ip.panelist_login_name == ^panelist_login_name,
       preload: [:interview_panelist, candidate: :candidate_skills])
   end
+
+  def get_statistics do
+    (from ip in __MODULE__,
+      join: t in assoc(ip, :team),
+      join: pd in PanelistDetails, on: ip.panelist_login_name == pd.panelist_login_name,
+      join: r in assoc(pd, :role),
+      group_by: [r.name, ip.panelist_login_name, t.name],
+      select: [t.name, r.name, ip.panelist_login_name, count(ip.panelist_login_name)])
+    end
 end
