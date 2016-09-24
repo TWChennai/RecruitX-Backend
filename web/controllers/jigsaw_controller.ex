@@ -70,7 +70,7 @@ defmodule RecruitxBackend.JigsawController do
     %{user_details: user_details}
   end
 
-  defp get_data_safely(id) do
+  def get_data_safely(id) do
     try do
       HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
     rescue

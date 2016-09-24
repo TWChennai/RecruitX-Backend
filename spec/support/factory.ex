@@ -10,6 +10,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.PanelistDetails
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleSkill
@@ -62,6 +63,15 @@ defmodule RecruitxBackend.Factory do
       name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}"),   # TODO: Find a way to specify from a list of known langugages
       priority: :rand.uniform(4),
       max_sign_up_limit: 2
+    }
+  end
+
+  def factory(:panelist_details) do
+    current_count = Repo.all(from p in PanelistDetails, select: p.role_id) |> Enum.count
+    %PanelistDetails{
+      panelist_login_name: sanitize_name("#{Faker.Name.first_name}"),
+      role_id: create(:role).id,
+      employee_id: (current_count + 1) |> Decimal.new
     }
   end
 

@@ -6,6 +6,7 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.Candidate
+  alias RecruitxBackend.UpdatePanelistDetails
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
@@ -16,6 +17,7 @@ defmodule RecruitxBackend.PanelistController do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
+        interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))

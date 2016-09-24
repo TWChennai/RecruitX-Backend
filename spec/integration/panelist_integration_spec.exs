@@ -18,8 +18,11 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias Timex.Date
   alias Decimal, as: D
 
-  before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
+  let :jigsaw_result, do: %{body: "{\"employeeId\":\"17991\",\"role\":{\"name\":\"Dev\"}}", status_code: 200}
   let :role, do: create(:role)
+
+  before do: allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
+  before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
 
   describe "create" do
     it "should insert valid interveiw panelist details in db and return location path in a success response" do

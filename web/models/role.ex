@@ -44,6 +44,13 @@ defmodule RecruitxBackend.Role do
 
   def get_all_roles, do: (from r in __MODULE__, where: r.name != ^other) |> Repo.all
 
+  def get_role(role_name) do
+    case retrieve_by_name(role_name) do
+        nil -> other |> retrieve_by_name
+        role -> role
+    end
+  end
+
   defp ba_role_id, do: retrieve_by_name(ba).id
   defp pm_role_id, do: retrieve_by_name(pm).id
 end
