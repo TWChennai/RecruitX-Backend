@@ -18,7 +18,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias Timex.Date
   alias Decimal, as: D
 
-  let :jigsaw_result, do: %{body: "{\"employeeId\":\"17991\",\"role\":{\"name\":\"Dev\"}}", status_code: 200}
+  let :jigsaw_result, do: %{body: "{\"employeeId\":\"17991\",\"role\":{\"name\":\"Dev\"},\"project\":{\"name\":\"Recruitx\"}}", status_code: 200}
   let :role, do: create(:role)
 
   before do: allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))

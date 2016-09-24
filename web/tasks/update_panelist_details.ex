@@ -23,7 +23,7 @@ defmodule RecruitxBackend.UpdatePanelistDetails do
         {:ok, %{"employeeId" => employee_id, "role" => %{"name" => role}}} = response.body |> Parser.parse
         PanelistDetails.changeset(%PanelistDetails{},
           %{panelist_login_name: panelist_login_name, employee_id: employee_id, role_id: (role |> Role.get_role).id})
-        |> Repo.insert
+        |> Repo.insert!
       400 -> :do_nothing
     end
   end

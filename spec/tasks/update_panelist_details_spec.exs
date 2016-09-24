@@ -23,12 +23,12 @@ defmodule RecruitxBackend.UpdatePanelistDetailsSpec do
 
     it "should fetch and update panelist details when it is not present" do
       allow Repo |> to(accept(:get, fn(PanelistDetails, "test") -> nil end))
-      allow Repo |> to(accept(:insert, fn(PanelistDetails, _) -> :ok end))
+      allow Repo |> to(accept(:insert!, fn(PanelistDetails, _) -> :ok end))
 
       UpdatePanelistDetails.execute("test")
 
       expect(HTTPotion) |> to(accepted(:get))
-      expect(Repo) |> to(accepted(:insert))
+      expect(Repo) |> to(accepted(:insert!))
     end
   end
 end

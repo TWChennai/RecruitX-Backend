@@ -13,11 +13,12 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.PanelistDetails
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
+  alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotPanelist
-  alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.Team
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -130,6 +131,12 @@ defmodule RecruitxBackend.Factory do
   def factory(:interview_status) do
     %InterviewStatus{
       name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
+    }
+  end
+
+  def factory(:team) do
+    %Team{
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")
     }
   end
 
