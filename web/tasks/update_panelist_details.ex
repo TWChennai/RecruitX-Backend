@@ -17,7 +17,7 @@ defmodule RecruitxBackend.UpdatePanelistDetails do
   end
 
   defp update_panelist_details(panelist_login_name) do
-    response = panelist_login_name |> JigsawController.get_data_safely
+    response = "#{@jigsaw_url}/people/#{panelist_login_name}" |> JigsawController.get_data_safely
     case response.status_code do
       200 ->
         {:ok, %{"employeeId" => employee_id, "role" => %{"name" => role}}} = response.body |> Parser.parse
