@@ -1,6 +1,7 @@
 defmodule RecruitxBackend.PanelistDetails do
   use RecruitxBackend.Web, :model
 
+  alias RecruitxBackend.Role
   @primary_key {:panelist_login_name, :string, []}
   @derive {Phoenix.Param, key: :panelist_login_name}
 

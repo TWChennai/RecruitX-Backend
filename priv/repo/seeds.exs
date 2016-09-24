@@ -16,12 +16,14 @@ alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.Interview
 alias RecruitxBackend.InterviewPanelist
 alias RecruitxBackend.InterviewType
+alias RecruitxBackend.PanelistDetails
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 alias RecruitxBackend.PipelineStatus
 alias RecruitxBackend.Slot
 alias RecruitxBackend.SlotPanelist
+alias RecruitxBackend.Team
 alias Timex.Date
 
 import Ecto.Query, only: [from: 2, where: 2]
@@ -55,6 +57,12 @@ Enum.each(candidates, fn candidate ->
 end)
 
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
+team_names = ["team1", "team2", "team3"]
+Enum.each(team_names, &(Repo.insert(%Team{name: &1})))
+teams = Repo.all(Team)
+Enum.each(panelist_names, fn panelist ->
+  Repo.insert(%PanelistDetails{panelist_login_name: panelist,
+  employee_id: Decimal.new(:rand.uniform(10)), role_id: Enum.random(roles).id}) end)
 
 for interview_round_number <- 1..:rand.uniform(4) do
   now = Date.now
@@ -82,7 +90,7 @@ Enum.each(candidates, fn candidate ->
     interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> Date.shift(hours: 2)})
     for _ <- 1..:rand.uniform(2) do
         try do
-          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
+          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names), team_id: Enum.random(teams).id})
         rescue
           ConstraintError -> {} # ignore the unique constraint violation errors
         end
