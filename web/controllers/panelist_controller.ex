@@ -19,7 +19,8 @@ defmodule RecruitxBackend.PanelistController do
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
         %{employee_id: employee_id} = interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute
-        employee_id |> UpdateTeam.execute(interview_panelist.id)
+        %{id: team_id} = employee_id |> UpdateTeam.execute(interview_panelist.id)
+        Repo.update(InterviewPanelist.changeset(%InterviewPanelist{}, %{team_id: team_id}))
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))

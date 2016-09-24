@@ -13,13 +13,13 @@ defmodule RecruitxBackend.UpdateTeamSpec do
     let :url, do: "#{@jigsaw_url}/assignments?employee_ids[]=#{panelist_details.employee_id}&current_only=true"
 
     before do: allow HTTPotion |> to(accept(:get, fn(url, _) -> assignment end))
-    before do: allow Repo |> to(accept(:insert, fn(_, _) -> :ok end))
+    before do: allow Repo |> to(accept(:insert!, fn(_, _) -> :ok end))
 
     it "should fetch and update team details" do
       UpdateTeam.execute("test", panelist_details.employee_id)
 
       expect(HTTPotion) |> to(accepted(:get))
-      expect(Repo) |> to(accepted(:insert))
+      expect(Repo) |> to(accepted(:insert!))
     end
 
     it "should not update team details if it already exists" do

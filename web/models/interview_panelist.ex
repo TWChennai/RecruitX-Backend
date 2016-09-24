@@ -5,6 +5,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
+  alias RecruitxBackend.Team
   alias RecruitxBackend.SignUpEvaluator
 
   schema "interview_panelists" do
@@ -12,6 +13,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     field :satisfied_criteria, :string
 
     belongs_to :interview, Interview
+    belongs_to :team, Team
 
     timestamps
   end
@@ -32,7 +34,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   @required_fields ~w(panelist_login_name interview_id)
-  @optional_fields ~w()
+  @optional_fields ~w(team_id)
 
   def changeset(model, params) do
     model
