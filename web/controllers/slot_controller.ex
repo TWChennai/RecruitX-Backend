@@ -8,6 +8,7 @@ defmodule RecruitxBackend.SlotController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.SlotCancellationNotification
   alias Ecto.Changeset
   alias Timex.Date
   alias Timex.DateFormat
@@ -90,7 +91,7 @@ defmodule RecruitxBackend.SlotController do
 
   def delete(conn, %{"id" => id}) do
     slot = Slot |> Repo.get!(id)
-    RecruitxBackend.SlotCancellationNotification.execute((from s in Slot, where: s.id == ^id))
+    SlotCancellationNotification.execute((from s in Slot, where: s.id == ^id))
     Repo.delete!(slot)
 
     send_resp(conn, :no_content, "")
