@@ -4,60 +4,72 @@
 After cloning the git repository, you will need the following pre-requisites
   1. Postgres database: Once this is present, create a user with the correct role/permissions using the following psql invocation:
 
-      `create role recruitx login createdb;`
+    `create role recruitx login createdb;`
 
 #### Coding style
   1. Use 2 spaces instead of tabs for all indentation
   2. Run the `credo` hex package to find issues (credo is a static code analyzer)
 
-      `mix credo --strict`
+    `mix credo --strict`
 
 #### Dependencies
-Ensure you have installed erlang 18.2.1 is installed before proceeding further, to check the erlang version exec `erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell`, you should get "18" as the output
+  * Ensure `erlang 18.2.1` is installed before proceeding further. To check the erlang version execute:
+    ```bash
+    erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+    ```
+  You should get "18" as the output. To install `erlang 18.2.1` execute:
+    ```bash
+    brew uninstall --force erlang
+    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/77f353913f1e0edd7ba592308da2aa70e26570e1/Formula/erlang.rb
+    brew pin erlang
+    ```
 
-To install erlang 18.2.1 execute:
+  * Ensure `elixir 1.2.6` is installed before proceeding further. To check the elixir version execute:
+    ```bash
+    elixir -v
+    ```
+  You should get "Elixir 1.2.6" as the output. To install `elixir 1.2.6` execute:
+    ```bash
+    brew uninstall elixir
+    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f47cde4e2b771b4a8d170038a20ca703d20bdf0d/Formula/elixir.rb
+    brew pin elixir
+    ```
 
-```bash
-brew unlink erlang
-brew install https://github.com/Homebrew/homebrew-core/blob/77f353913f1e0edd7ba592308da2aa70e26570e1/Formula/erlang.rb
-```
+  * You have to set following environment variables
+    ```bash
+    export API_KEY="your api key"
+    export AWS_DOWNLOAD_URL="download url"
+    export AWS_BUCKET="recruitx-feedback-image"
 
-You have to set following environment variables
+    export AWS_ACCESS_KEY_ID="AWS_ACCESS_KEY"
+    export AWS_SECRET_ACCESS_KEY="AWS_SECRET_ACCESS"
+    export JIGSAW_URL="JIGSAW_URL"
+    export JIGSAW_TOKEN="JIGSAW_TOKEN"
 
-```rc
-export API_KEY="your api key"
-export AWS_DOWNLOAD_URL="download url"
-export AWS_BUCKET="recruitx-feedback-image"
+    export SMTP_PORT="smtp port"
+    export DEFAULT_FROM_EMAIL_ADDRESS="Your email address"
 
-export AWS_ACCESS_KEY_ID="AWS_ACCESS_KEY"
-export AWS_SECRET_ACCESS_KEY="AWS_SECRET_ACCESS"
-export JIGSAW_URL="JIGSAW_URL"
-export JIGSAW_TOKEN="JIGSAW_TOKEN"
+    ## Space separated list of Email addresses ##
+    export DEFAULT_TO_EMAIL_ADDRESSES="email addresses"
+    export CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES="email addressess"
+    export WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES="email addressess"
+    export WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email addresses"
 
-export SMTP_PORT="smtp port"
-export DEFAULT_FROM_EMAIL_ADDRESS="Your email address"
+    export QR_CODE_URL="QR_CODE_URL"
+    export APK_URL="APK_URL"
+    export LOGO_URL="LOGO_URL"
 
-## Space separated list of Email addresses ##
-export DEFAULT_TO_EMAIL_ADDRESSES="email addresses"
-export CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES="email addressess"
-export WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES="email addressess"
-export WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email addresses"
+    export OKTA_PREVIEW="OKTA_PREVIEW"
+    export OKTA_API_KEY="API_KEY"
 
-export QR_CODE_URL="QR_CODE_URL"
-export APK_URL="APK_URL"
-export LOGO_URL="LOGO_URL"
+    export MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
+    export QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
 
-export OKTA_PREVIEW="OKTA_PREVIEW"
-export OKTA_API_KEY="API_KEY"
+    export MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
+    export QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
 
-export MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
-export QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
-
-export MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
-export QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email address"
-
-export EMAIL_POSTFIX="@company.com"
-```
+    export EMAIL_POSTFIX="@company.com"
+    ```
 
 #### To start your Phoenix app:
   1. Install dependencies with `mix deps.get`
