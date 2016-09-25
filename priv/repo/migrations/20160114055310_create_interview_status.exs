@@ -10,7 +10,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewStatus do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX interview_status_name_index ON interview_status (UPPER(name));"
+    create index(:interview_status, ["UPPER(name)"], unique: true, name: :interview_status_name_index)
 
     flush
 

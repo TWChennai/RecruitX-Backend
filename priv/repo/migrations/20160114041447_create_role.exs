@@ -8,7 +8,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRole do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX roles_name_index ON roles (UPPER(name));"
+    create index(:roles, ["UPPER(name)"], unique: true, name: :roles_name_index)
 
     flush
 

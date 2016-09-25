@@ -8,7 +8,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX skills_name_index ON skills (UPPER(name));"
+    create index(:skills, ["UPPER(name)"], unique: true, name: :skills_name_index)
 
     flush
 

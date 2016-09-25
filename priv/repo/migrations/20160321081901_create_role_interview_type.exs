@@ -15,7 +15,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleInterviewType do
       timestamps
     end
 
-    create unique_index(:role_interview_types, [:role_id, :interview_type_id], name: :role_interview_type_id_index)
+    create index(:role_interview_types, [:role_id, :interview_type_id], unique: true, name: :role_interview_type_id_index)
 
     flush
 

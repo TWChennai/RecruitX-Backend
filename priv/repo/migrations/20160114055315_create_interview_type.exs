@@ -9,7 +9,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewType do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX interview_types_name_index ON interview_types (UPPER(name));"
+    create index(:interview_types, ["UPPER(name)"], unique: true, name: :interview_types_name_index)
 
     flush
 

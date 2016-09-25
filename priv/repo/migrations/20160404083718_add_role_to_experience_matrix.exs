@@ -14,6 +14,6 @@ defmodule RecruitxBackend.Repo.Migrations.AddRoleToExperienceMatrix do
 
     flush
 
-    create unique_index(:experience_matrices, [:panelist_experience_lower_bound, :candidate_experience_lower_bound, :candidate_experience_upper_bound, :interview_type_id, :role_id], name: :experience_matrix_unique_index)
+    create index(:experience_matrices, [:panelist_experience_lower_bound, :candidate_experience_lower_bound, :candidate_experience_upper_bound, :interview_type_id, :role_id], unique: true, name: :experience_matrix_unique_index)
   end
 end
