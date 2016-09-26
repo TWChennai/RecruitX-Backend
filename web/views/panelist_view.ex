@@ -5,6 +5,14 @@ defmodule RecruitxBackend.PanelistView do
     render_many(statistics, __MODULE__, "statistic.json")
   end
 
+  def render("statistic.json", %{panelist: {team, [[_, nil, nil, 0]]}}) do
+    %{
+      team: team,
+      count: 0,
+      signups: []
+    }
+  end
+
   def render("statistic.json", %{panelist: {team, signups}}) do
     %{
       team: team,

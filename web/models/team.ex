@@ -5,12 +5,13 @@ defmodule RecruitxBackend.Team do
 
   schema "teams" do
     field :name, :string
+    field :active, :boolean, default: true
 
     timestamps
   end
 
   @required_fields ~w(name)
-  @optional_fields ~w()
+  @optional_fields ~w(active)
 
   def changeset(model, params \\ :empty) do
     model

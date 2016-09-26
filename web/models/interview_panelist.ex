@@ -91,10 +91,11 @@ defmodule RecruitxBackend.InterviewPanelist do
 
   def get_statistics do
     (from ip in __MODULE__,
-      join: t in assoc(ip, :team),
       join: pd in PanelistDetails, on: ip.panelist_login_name == pd.panelist_login_name,
       join: r in assoc(pd, :role),
+      right_join: t in assoc(ip, :team),
       group_by: [r.name, ip.panelist_login_name, t.name],
+      where: t.active == true,
       select: [t.name, r.name, ip.panelist_login_name, count(ip.panelist_login_name)])
     end
 end
