@@ -9,6 +9,7 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.Slot
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Repo
   alias Timex.Date
@@ -576,9 +577,10 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get_candidates_with_all_rounds_completed" do
+    before do: Repo.delete_all Candidate
+    before do: Repo.delete_all Slot
+    before do: Repo.delete_all InterviewType
     it "should return all candidates who have completed no of rounds with start_time of last interview" do
-      Repo.delete_all Candidate
-      Repo.delete_all InterviewType
       interview1 = create(:interview, start_time: Date.now)
       interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: Date.now |> Date.shift(hours: 1))
 
@@ -590,9 +592,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should return [] when candidate has no interview rounds" do
-      Repo.delete_all Candidate
-      Repo.delete_all InterviewType
-
       create(:candidate)
 
       result = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
@@ -601,11 +600,12 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get_last_interview_status_for" do
-    it "should add status of last interview if pipeline is closed and candidate has finished all rounds" do
-      Repo.delete_all Candidate
-      Repo.delete_all InterviewType
-      Repo.delete_all RoleInterviewType
+    before do: Repo.delete_all Candidate
+    before do: Repo.delete_all Slot
+    before do: Repo.delete_all InterviewType
+    before do: Repo.delete_all RoleInterviewType
 
+    it "should add status of last interview if pipeline is closed and candidate has finished all rounds" do
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
       candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id)
@@ -627,9 +627,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should add status of last interview if pipeline is closed and if that last interview is pass" do
-      Repo.delete_all Candidate
-      Repo.delete_all InterviewType
-
       pass_id = InterviewStatus.retrieve_by_name("Pass").id
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
@@ -650,9 +647,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should not add status of last interview if pipeline is open and candidate has finished all rounds" do
-      Repo.delete_all Candidate
-      Repo.delete_all InterviewType
-
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
       candidate = create(:candidate)

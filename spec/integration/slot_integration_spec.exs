@@ -26,6 +26,7 @@ defmodule SlotIntegrationSpec do
   describe "delete" do
 
     it "should return 200 with successfully slot is deleted" do
+      Repo.delete_all Slot
       created_slot = create(:slot)
       expect((from s in Slot, select: count(s.id)) |> Repo.all) |> to(be([1]))
       conn = action(:delete, %{"id" => created_slot.id})

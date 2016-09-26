@@ -91,6 +91,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
 
     it "should return list of interviews that the panelist has taken with the last interview statuts if pipeline is closed and all rounds are over" do
       Repo.delete_all Candidate
+      Repo.delete_all Slot
       Repo.delete_all InterviewType
       interview_panelist = create(:interview_panelist, panelist_login_name: "test")
       interview = Interview |> Repo.get(interview_panelist.interview_id)
