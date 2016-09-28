@@ -25,9 +25,14 @@ defmodule RecruitxBackend.PanelistController do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
-        %{employee_id: employee_id} = interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute
-        %{id: team_id} = employee_id |> UpdateTeam.execute(interview_panelist.id)
-        Repo.update(InterviewPanelist.changeset(%InterviewPanelist{}, %{team_id: team_id}))
+        case interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute do
+          :error -> :do_nothing
+          %{employee_id: employee_id} ->
+                case employee_id |> UpdateTeam.execute(interview_panelist.id) do
+                  %{id: team_id} -> Repo.update(InterviewPanelist.changeset(Repo.get!(InterviewPanelist, interview_panelist.id), Map.merge(post_params, %{"team_id" => team_id})))
+                  _ -> :do_nothing
+                end
+        end
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))

@@ -84,7 +84,7 @@ Enum.each(candidates, fn candidate ->
     interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> Date.shift(hours: 2)})
     for _ <- 1..:rand.uniform(2) do
         try do
-          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names), team_id: Enum.random(teams).id})
+          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
         rescue
           ConstraintError -> {} # ignore the unique constraint violation errors
         end

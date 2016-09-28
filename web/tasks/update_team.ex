@@ -11,13 +11,15 @@ defmodule RecruitxBackend.UpdateTeam do
     response = "#{@jigsaw_url}/assignments?employee_ids[]=#{employee_id}&current_only=true" |> JigsawController.get_data_safely
     case response.status_code do
       200 ->
-        {:ok, %{"project" => %{"name" => project_name}}} = response.body |> Parser.parse
-        project = project_name |> Team.retrieve_by_name
-        case project do
-          nil -> Team.changeset(%Team{},%{name: project_name}) |> Repo.insert!
-          _ -> project
+        case response.body |> Parser.parse do
+          {:ok, [%{"project" => %{"name" => project_name}}]} -> project = project_name |> Team.retrieve_by_name
+                                                                case project do
+                                                                  nil -> Team.changeset(%Team{},%{name: project_name}) |> Repo.insert!
+                                                                  _ -> project
+                                                                end
+          _ -> :do_nothing
         end
-      400 -> :do_nothing
+      _ -> :do_nothing
     end
   end
 end

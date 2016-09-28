@@ -12,7 +12,7 @@ defmodule RecruitxBackend.UpdatePanelistDetails do
     panelist_details = PanelistDetails |> Repo.get(panelist_login_name)
     case panelist_details do
       nil -> panelist_login_name |> update_panelist_details
-      _ -> :do_nothing
+      _ -> panelist_details
     end
   end
 
@@ -24,7 +24,7 @@ defmodule RecruitxBackend.UpdatePanelistDetails do
         PanelistDetails.changeset(%PanelistDetails{},
           %{panelist_login_name: panelist_login_name, employee_id: employee_id, role_id: (role |> Role.get_role).id})
         |> Repo.insert!
-      400 -> :do_nothing
+      _ -> :error
     end
   end
 end
