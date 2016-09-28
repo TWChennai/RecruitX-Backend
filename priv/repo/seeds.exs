@@ -57,12 +57,6 @@ Enum.each(candidates, fn candidate ->
 end)
 
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
-team_names = ["team1", "team2", "team3"]
-Enum.each(team_names, &(Repo.insert(%Team{name: &1})))
-teams = Repo.all(Team)
-Enum.each(panelist_names, fn panelist ->
-  Repo.insert(%PanelistDetails{panelist_login_name: panelist,
-  employee_id: Decimal.new(:rand.uniform(10)), role_id: Enum.random(roles).id}) end)
 
 for interview_round_number <- 1..:rand.uniform(4) do
   now = Date.now
