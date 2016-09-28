@@ -12,14 +12,19 @@ defmodule RecruitxBackend.UpdateTeam do
     case response.status_code do
       200 ->
         case response.body |> Parser.parse do
-          {:ok, [%{"project" => %{"name" => project_name}}]} -> project = project_name |> Team.retrieve_by_name
-                                                                case project do
-                                                                  nil -> Team.changeset(%Team{},%{name: project_name}) |> Repo.insert!
-                                                                  _ -> project
-                                                                end
+          {:ok, []} -> update("Other Projects")
+          {:ok, [%{"project" => %{"name" => project_name}} | _other_projects]} -> update(project_name)
           _ -> :do_nothing
         end
       _ -> :do_nothing
+    end
+  end
+
+  defp update(project_name) do
+    project = project_name |> Team.retrieve_by_name
+    case project do
+      nil -> Team.changeset(%Team{},%{name: project_name}) |> Repo.insert!
+      _ -> project
     end
   end
 end
