@@ -11,19 +11,23 @@ defmodule RecruitxBackend.StatusUpdate do
   alias Timex.Date
 
   def execute_weekly do
-    execute(TimeRange.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
+    execute(TimeRange.get_previous_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
   end
 
   def execute_monthly do
-    execute(TimeRange.get_previous_month, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
+    time = TimeRange.get_previous_month
+    {:ok, subject_suffix } = DateFormat.format(time.starting, " - %b", :strftime)
+    execute(time, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
   def execute_quarterly do
-   execute(TimeRange.get_previous_quarter, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"))
+    time = TimeRange.get_previous_quarter
+    subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1)
+    execute(time, "Quarterly", System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
-  defp execute(%{starting: starting, ending: ending} = time_range, period_name, recepient) do
-    query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type])
+  defp execute(%{starting: starting, ending: ending} = time_range, period_name, recepient, exclude_details \\ false, subject_suffix \\ "") do
+    query = Interview |> Interview.within_date_range(starting, ending) |> preload([:interview_panelist, :interview_status, :interview_type]) |> order_by(asc: :interview_type_id)
     candidates_status = Candidate
                                 |> preload([:role, interviews: ^query])
                                 |> order_by(asc: :role_id)
@@ -35,11 +39,11 @@ defmodule RecruitxBackend.StatusUpdate do
     summary = candidates |> construct_summary_data(time_range)
     {:ok, start_date} = starting |> DateFormat.format("{D}/{M}/{YY}")
     {:ok, to_date} = ending |> DateFormat.format("{D}/{M}/{YY}")
-    email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary),
+    email_content = if candidates != [], do: Templates.status_update(start_date, to_date, candidates, summary, exclude_details),
                     else: Templates.status_update_default(start_date, to_date)
 
     MailHelper.deliver(%{
-      subject: "[RecruitX] "<> period_name <>" Status Update",
+      subject: "[RecruitX] "<> period_name <>" Status Update" <> subject_suffix,
       to: recepient |> String.split,
       html_body: email_content
     })

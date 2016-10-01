@@ -9,7 +9,7 @@
   <li>No. of Candidates In Progress (till date) : <%=summary.candidates_in_progress%></li>
 </ol>
 <br />
-<%= unless Enum.empty?(candidates) do %>
+<%= unless exclude_details do %>
 <h4> Details </h4>
   <table cellpadding="10" style="border-collapse: collapse;">
     <thead>

@@ -71,11 +71,11 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidates_rejected: 0,
         interviews_count: 1
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content" end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_weekly
 
-      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary])
+      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary, false])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
@@ -85,7 +85,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
           to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content"  end))
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       StatusUpdate.execute_weekly
@@ -105,7 +105,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       }
 
       allow Swoosh.Templates |> to(accept(:status_update_default, fn(_, _) -> "html content"  end))
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content"  end))
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       StatusUpdate.execute_weekly
@@ -150,21 +150,22 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidates_rejected: 0,
         interviews_count: 1
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content" end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_monthly
 
-      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary])
+      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary, true])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
+      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b", :strftime)
       email = %{
-          subject: "[RecruitX] Monthly Status Update",
+          subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
           to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content"  end))
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       StatusUpdate.execute_monthly
@@ -183,9 +184,10 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     it "should send a default mail if there are no interview in previous month" do
       Repo.delete_all Candidate
       Repo.delete_all Interview
+      {:ok, subject_suffix } = DateFormat.format(TimeRange.get_previous_month.starting, " - %b", :strftime)
       create(:interview, interview_type_id: 1, start_time: Date.now )
       email = %{
-          subject: "[RecruitX] Monthly Status Update",
+          subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
           to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
@@ -229,21 +231,22 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidates_rejected: 0,
         interviews_count: 1
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content" end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content" end))
 
       StatusUpdate.execute_quarterly
 
-      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary])
+      expect Swoosh.Templates |> to(accepted :status_update,[from_date, to_date, candidates, summary, true])
     end
 
     it "should call MailmanExtensions deliver with correct arguments" do
       create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
+      subject_suffix = " - Q" <> to_string(div(TimeRange.get_previous_quarter.starting.month + 2, 4) + 1)
       email = %{
-          subject: "[RecruitX] Quarterly Status Update",
+          subject: "[RecruitX] Quarterly Status Update" <> subject_suffix,
           to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content"  end))
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       StatusUpdate.execute_quarterly
@@ -284,14 +287,15 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       Repo.delete_all Candidate
       Repo.delete_all Interview
       create(:interview, interview_type_id: 1, start_time: Date.now )
+      subject_suffix = " - Q" <> to_string(div(TimeRange.get_previous_quarter.starting.month + 2, 4) + 1)
       email = %{
-          subject: "[RecruitX] Quarterly Status Update",
+          subject: "[RecruitX] Quarterly Status Update" <> subject_suffix,
           to: System.get_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
           html_body: "html content"
       }
 
       allow Swoosh.Templates |> to(accept(:status_update_default, fn(_, _) -> "html content"  end))
-      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _) -> "html content"  end))
+      allow Swoosh.Templates |> to(accept(:status_update, fn(_, _, _, _, _) -> "html content"  end))
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       StatusUpdate.execute_quarterly
