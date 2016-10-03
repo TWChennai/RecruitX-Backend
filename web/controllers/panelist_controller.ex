@@ -8,6 +8,7 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.UpdatePanelistDetails
   alias RecruitxBackend.UpdateTeam
+  alias RecruitxBackend.UpdateTeamDetails
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
@@ -21,18 +22,13 @@ defmodule RecruitxBackend.PanelistController do
     conn |> render("statistics.json", statistics: statistics)
   end
 
-  def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = post_params}) do
+  def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _, "panelist_login_name" => panelist_login_name} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
-        case interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute do
-          :error -> :do_nothing
-          %{employee_id: employee_id} ->
-                case employee_id |> UpdateTeam.execute(interview_panelist.id) do
-                  %{id: team_id} -> Repo.update(InterviewPanelist.changeset(Repo.get!(InterviewPanelist, interview_panelist.id), Map.merge(post_params, %{"team_id" => team_id})))
-                  _ -> :do_nothing
-                end
-        end
+        %UpdateTeamDetails{}
+          |> UpdateTeamDetails.changeset(%{"panelist_login_name" => panelist_login_name, "interview_panelist_id" => interview_panelist.id, "processed" => false})
+          |> Repo.insert #soft insert
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))
@@ -44,8 +40,7 @@ defmodule RecruitxBackend.PanelistController do
     end
   end
 
-  def create(conn, %{"interview_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role")
-
+  def create(conn, %{"interview_panelist" => _}), do: conn |> put_status(400) |> render(RecruitxBackend.ChangesetView, "missing_param_error.json", param: "panelist_experience/panelist_role/panelist_login_name")
 
   def create(conn, %{"slot_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _} = slot_panelist_params}) do
     changeset = SlotPanelist.changeset(%SlotPanelist{}, slot_panelist_params)

@@ -37,6 +37,7 @@ defmodule SlotIntegrationSpec do
   end
 
   describe "index" do
+    before do: Repo.delete_all Slot
     let :created_slot, do: create(:slot)
 
     it "should return 200 with no slots when there are no slots" do

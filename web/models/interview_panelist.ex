@@ -47,8 +47,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
-  defp validate_sign_up_for_interview(existing_changeset, %{"team_id" => _params}), do: existing_changeset
-  
+  defp validate_sign_up_for_interview(existing_changeset, %{"team_id" => team_id}) when team_id !=nil, do: existing_changeset
+
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
