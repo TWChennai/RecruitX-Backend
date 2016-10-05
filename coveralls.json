@@ -11,7 +11,7 @@
 
   "coverage_options": {
     "treat_no_relevant_lines_as_covered": true,
-    "minimum_coverage": 76.00
+    "minimum_coverage": 74
   },
 
   "skip_files": [

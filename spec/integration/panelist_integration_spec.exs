@@ -15,6 +15,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Role
   alias RecruitxBackend.MailHelper
+  alias RecruitxBackend.TeamDetailsUpdate
   alias Timex.Date
   alias Decimal, as: D
 
@@ -23,6 +24,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   before do: allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
   before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
+  before do: allow TeamDetailsUpdate |> to(accept(:update, fn() -> true end))
 
   describe "create" do
     it "should insert valid interveiw panelist details in db and return location path in a success response" do

@@ -9,6 +9,7 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.UpdatePanelistDetails
   alias RecruitxBackend.UpdateTeam
   alias RecruitxBackend.UpdateTeamDetails
+  alias RecruitxBackend.TeamDetailsUpdate
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
   alias Timex.DateFormat
@@ -28,7 +29,8 @@ defmodule RecruitxBackend.PanelistController do
       {:ok, interview_panelist} ->
         %UpdateTeamDetails{}
           |> UpdateTeamDetails.changeset(%{"panelist_login_name" => panelist_login_name, "interview_panelist_id" => interview_panelist.id, "processed" => false})
-          |> Repo.insert #soft insert
+          |> Repo.insert! #soft insert
+          |> TeamDetailsUpdate.update
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))

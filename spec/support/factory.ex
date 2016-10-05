@@ -14,6 +14,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.UpdateTeamDetails
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Slot
@@ -131,6 +132,14 @@ defmodule RecruitxBackend.Factory do
   def factory(:interview_status) do
     %InterviewStatus{
       name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
+    }
+  end
+
+  def factory(:update_team_details) do
+    %UpdateTeamDetails{
+      panelist_login_name: sanitize_name("#{Faker.Name.first_name}"),
+      interview_panelist_id: create(:interview_panelist).id,
+      processed: false
     }
   end
 

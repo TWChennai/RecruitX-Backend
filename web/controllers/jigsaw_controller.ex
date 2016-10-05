@@ -70,9 +70,10 @@ defmodule RecruitxBackend.JigsawController do
     %{user_details: user_details}
   end
 
+  @lint [{Credo.Check.Readability.LargeNumbers, false}]
   def get_data_safely(url) do
     try do
-      HTTPotion.get(url, [headers: ["Authorization": @token]])
+      HTTPotion.get(url, [headers: ["Authorization": @token], timeout: 15_000])
     rescue
       HTTPotion.HTTPError -> %{status_code: 408} #timeout
       _ -> %{status_code: 400}
