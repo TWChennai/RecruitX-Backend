@@ -16,14 +16,12 @@ alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.Interview
 alias RecruitxBackend.InterviewPanelist
 alias RecruitxBackend.InterviewType
-alias RecruitxBackend.PanelistDetails
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
 alias RecruitxBackend.PipelineStatus
 alias RecruitxBackend.Slot
 alias RecruitxBackend.SlotPanelist
-alias RecruitxBackend.Team
 alias Timex.Date
 
 import Ecto.Query, only: [from: 2, where: 2]

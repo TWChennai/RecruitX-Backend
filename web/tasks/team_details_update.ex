@@ -24,4 +24,11 @@ defmodule RecruitxBackend.TeamDetailsUpdate do
             end
             end
   end
+
+  def update_in_background(panelist_login_name, interview_panelist_id) do
+    Task.async(fn -> %UpdateTeamDetails{}
+      |> UpdateTeamDetails.changeset(%{"panelist_login_name" => panelist_login_name, "interview_panelist_id" => interview_panelist_id, "processed" => false})
+      |> Repo.insert! #soft insert
+      |> update end)
+  end
 end

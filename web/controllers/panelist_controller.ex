@@ -27,10 +27,7 @@ defmodule RecruitxBackend.PanelistController do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
-        %UpdateTeamDetails{}
-          |> UpdateTeamDetails.changeset(%{"panelist_login_name" => panelist_login_name, "interview_panelist_id" => interview_panelist.id, "processed" => false})
-          |> Repo.insert! #soft insert
-          |> TeamDetailsUpdate.update
+        TeamDetailsUpdate.update_in_background(panelist_login_name, interview_panelist.id)
         conn
         |> put_status(:created)
         |> put_resp_header("location", panelist_path(conn, :show, interview_panelist))

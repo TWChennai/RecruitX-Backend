@@ -2,8 +2,10 @@ defmodule RecruitxBackend.PanelistControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.PanelistController
 
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.TeamDetailsUpdate
 
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{"panelist_experience" => 2, "panelist_role" => "Dev"}))
+  before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
 
   describe "create" do
     let :interview_panelist, do: create(:interview_panelist, panelist_login_name: "test")
