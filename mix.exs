@@ -48,6 +48,7 @@ defmodule RecruitxBackend.Mixfile do
       {:corsica, "~> 0.4.1"},
       {:cowboy, "~> 1.0.4"},
       {:credo, "~> 0.4.5", only: :test, app: false},
+      {:cors_plug, "~> 1.1"},
       {:ecto, "~> 1.1.8"},
       {:ectoo, "~> 0.0.4", only: :test, app: false},
       {:espec_phoenix, "~> 0.2.0", only: :test, app: false},
