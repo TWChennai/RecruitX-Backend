@@ -34,5 +34,6 @@ defmodule RecruitxBackend.Endpoint do
     signing_salt: "huVe6dkn"
 
   plug Corsica, origins: "*"
+  plug CORSPlug
   plug RecruitxBackend.Router
 end
