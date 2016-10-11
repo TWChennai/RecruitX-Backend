@@ -8,6 +8,7 @@ defmodule RecruitxBackend.SlotController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.SlotCancellationNotification
   alias Ecto.Changeset
   alias Timex.Date
   alias Timex.DateFormat
@@ -86,6 +87,14 @@ defmodule RecruitxBackend.SlotController do
       _ -> conn
           |> render("show.json", slot: slot)
     end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    slot = Slot |> Repo.get!(id)
+    SlotCancellationNotification.execute((from s in Slot, where: s.id == ^id))
+    Repo.delete!(slot)
+
+    send_resp(conn, :no_content, "")
   end
 
   def index(conn, %{"interview_type_id" => interview_type_id, "previous_rounds_start_time" => previous_rounds_start_time, "role_id" => role_id}) do

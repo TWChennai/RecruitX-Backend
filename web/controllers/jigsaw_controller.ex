@@ -32,7 +32,7 @@ defmodule RecruitxBackend.JigsawController do
       # "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false} #for_uat
       # "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
       # "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
-      _  -> response = get_data_safely(id)
+      _  -> response = get_data_safely("#{@jigsaw_url}/people/#{id}")
         case response.status_code do
           200 -> case response.body |> Parser.parse do
                       {:ok, %{"department" => %{"name" => department_name}, "role" => %{"name" => role_name}, "twExperience" => tw_experience, "totalExperience" => total_experience}} ->
@@ -70,9 +70,10 @@ defmodule RecruitxBackend.JigsawController do
     %{user_details: user_details}
   end
 
-  defp get_data_safely(id) do
+  @lint [{Credo.Check.Readability.LargeNumbers, false}]
+  def get_data_safely(url) do
     try do
-      HTTPotion.get("#{@jigsaw_url}#{id}", [headers: ["Authorization": @token]])
+      HTTPotion.get(url, [headers: ["Authorization": @token], timeout: 15_000])
     rescue
       HTTPotion.HTTPError -> %{status_code: 408} #timeout
       _ -> %{status_code: 400}

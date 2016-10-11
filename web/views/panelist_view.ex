@@ -1,6 +1,26 @@
 defmodule RecruitxBackend.PanelistView do
   use RecruitxBackend.Web, :view
 
+  def render("statistics.json", %{statistics: statistics}) do
+    render_many(statistics, __MODULE__, "statistic.json")
+  end
+
+  def render("statistic.json", %{panelist: {team, [[_, nil, nil, 0]]}}) do
+    %{
+      team: team,
+      count: 0,
+      signups: []
+    }
+  end
+
+  def render("statistic.json", %{panelist: {team, signups}}) do
+    %{
+      team: team,
+      count: signups |> Enum.count,
+      signups: render_one(signups, RecruitxBackend.SignUpView, "index.json")
+    }
+  end
+
   def render("panelist.json", %{interview_panelist: interview_panelist}) do
     %{
       interview_id: interview_panelist.interview_id,

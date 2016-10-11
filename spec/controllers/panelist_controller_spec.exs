@@ -2,11 +2,16 @@ defmodule RecruitxBackend.PanelistControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.PanelistController
 
   alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.TeamDetailsUpdate
 
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist), %{"panelist_experience" => 2, "panelist_role" => "Dev"}))
+  before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
 
   describe "create" do
-    let :interview_panelist, do: create(:interview_panelist)
+    let :interview_panelist, do: create(:interview_panelist, panelist_login_name: "test")
+    let :employee_id, do: Decimal.new(12334)
+    let :panelist_details, do: create(:panelist_details, panelist_login_name: interview_panelist.panelist_login_name, employee_id: employee_id)
+    let :team, do: create(:team)
 
     context "valid params for interview_panelist" do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, interview_panelist} end))
@@ -45,9 +50,10 @@ defmodule RecruitxBackend.PanelistControllerSpec do
     context "invalid params" do
       it "returns error when panelist_login_name is not given" do
         response = action(:create, %{"interview_panelist" => Map.delete(post_parameters, "panelist_login_name")})
-        response |> should(have_http_status(:unprocessable_entity))
+        response |> should(have_http_status(:bad_request))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expect(parsed_response) |> to(be(%{"errors" => %{"panelist_login_name" => ["can't be blank"]}}))
+        expectedErrorReason =  %{"field" => "panelist_experience/panelist_role/panelist_login_name", "reason" => "missing/empty required parameter"}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when interview_id is not given" do

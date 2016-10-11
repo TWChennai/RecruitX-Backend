@@ -67,6 +67,10 @@ config :quantum, cron: [
   oct_status_update: [
     schedule: "30 0 1 10 *",
     task: "RecruitxBackend.StatusUpdate.execute_quarterly",
+  ],
+  team_details_update: [
+    schedule: "0 * * * *",
+    task: "RecruitxBackend.TeamDetailsUpdate.execute",
   ]
 ]
 

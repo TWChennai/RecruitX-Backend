@@ -70,9 +70,9 @@ defmodule RecruitxBackend.Slot do
 
   def delete_unused_slots do
     current_time = Date.now |> Date.beginning_of_day
-    past_slot_ids_query = (from s in __MODULE__,
+    past_slots_query = (from s in __MODULE__,
     where: s.start_time < ^current_time)
-    past_slot_ids_query |> SlotCancellationNotification.execute
-    past_slot_ids_query |> Repo.delete_all
+    past_slots_query |> SlotCancellationNotification.execute
+    past_slots_query |> Repo.delete_all
   end
 end

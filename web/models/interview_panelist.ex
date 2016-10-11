@@ -5,6 +5,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
+  alias RecruitxBackend.Team
+  alias RecruitxBackend.PanelistDetails
   alias RecruitxBackend.SignUpEvaluator
 
   schema "interview_panelists" do
@@ -12,6 +14,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     field :satisfied_criteria, :string
 
     belongs_to :interview, Interview
+    belongs_to :team, Team
 
     timestamps
   end
@@ -32,7 +35,7 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   @required_fields ~w(panelist_login_name interview_id)
-  @optional_fields ~w()
+  @optional_fields ~w(team_id)
 
   def changeset(model, params) do
     model
@@ -44,6 +47,8 @@ defmodule RecruitxBackend.InterviewPanelist do
   end
 
   #TODO:'You have already signed up for the same interview' constraint error never occurs as it is handled here at changeset level itself
+  defp validate_sign_up_for_interview(existing_changeset, %{"team_id" => team_id}) when team_id != nil, do: existing_changeset
+
   defp validate_sign_up_for_interview(existing_changeset, params) do
     interview_id = get_field(existing_changeset, :interview_id)
     panelist_login_name = get_field(existing_changeset, :panelist_login_name)
@@ -85,4 +90,14 @@ defmodule RecruitxBackend.InterviewPanelist do
       where: ip.panelist_login_name == ^panelist_login_name,
       preload: [:interview_panelist, candidate: :candidate_skills])
   end
+
+  def get_statistics do
+    (from ip in __MODULE__,
+      join: pd in PanelistDetails, on: ip.panelist_login_name == pd.panelist_login_name,
+      join: r in assoc(pd, :role),
+      right_join: t in assoc(ip, :team),
+      group_by: [r.name, ip.panelist_login_name, t.name],
+      where: t.active == true,
+      select: [t.name, r.name, ip.panelist_login_name, count(ip.panelist_login_name)])
+    end
 end
