@@ -33,7 +33,6 @@ defmodule RecruitxBackend.Endpoint do
     key: "_recruitx_backend_key",
     signing_salt: "huVe6dkn"
 
-  plug Corsica, origins: "*"
   plug CORSPlug
   plug RecruitxBackend.Router
 end
