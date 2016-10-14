@@ -6,9 +6,6 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.UpdatePanelistDetails
-  alias RecruitxBackend.UpdateTeam
-  alias RecruitxBackend.UpdateTeamDetails
   alias RecruitxBackend.TeamDetailsUpdate
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
@@ -18,16 +15,13 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.Timer
 
   def index(conn, params) do
-     statistics = params |> get_date_range
-      |> InterviewPanelist.get_statistics
-      |> Repo.all
-      |> Enum.group_by(&Enum.at(&1, 0))
+     statistics = params
+                  |> get_date_range
+                  |> InterviewPanelist.get_statistics
+                  |> Repo.all
+                  |> Enum.group_by(&Enum.at(&1, 0))
     conn |> render("statistics.json", statistics: statistics)
   end
-
-  defp get_date_range(%{"weekly" => "true"}), do: Timer.get_current_week
-
-  defp get_date_range(%{"monthly" => "true"}), do: Timer.get_current_month
 
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _ ,"panelist_experience" => _, "panelist_login_name" => panelist_login_name} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
@@ -109,4 +103,8 @@ defmodule RecruitxBackend.PanelistController do
       html_body: email_content
     })
   end
+
+  defp get_date_range(%{"monthly" => "true"}), do: Timer.get_current_month
+  defp get_date_range(_), do: Timer.get_current_week
+
 end

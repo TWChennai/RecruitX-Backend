@@ -29,7 +29,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
 
   describe "index" do
-    it "should get weekly signups" do
+    it "should get weekly signups by default" do
       Repo.delete_all Interview
       team = create(:team, %{name: "test_team"})
       role = create(:role, %{name: "test_role"})
@@ -38,8 +38,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
         interview_id: interview_within_range.id})
       create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
 
-      response = get conn_with_dummy_authorization(), "/panelists",
-      %{"weekly" => "true"}
+      response = get conn_with_dummy_authorization(), "/panelists"
 
       response |> should(be_successful)
       parsed_response = response.resp_body |> Poison.Parser.parse!
@@ -52,26 +51,45 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     it "should get monthly signups" do
       Repo.delete_all Interview
       team = create(:team, %{name: "test_team", active: true})
+      team1 = create(:team, %{name: "test_team1", active: true})
       role = create(:role, %{name: "test_role"})
-      interview_within_range1 = create(:interview, %{start_time: Date.now})
+      role1 = create(:role, %{name: "test_role1"})
+      interview_within_range1 = create(:interview, %{start_time: Date.now |> Date.beginning_of_month})
+      interview_within_range2 = create(:interview, %{start_time: Date.now |> Date.end_of_month})
+      interview_within_range3 = create(:interview, %{start_time: Date.now})
       interview_out_of_range = create(:interview, %{start_time: Date.now() |> Date.beginning_of_month |>  Date.shift(days: -1)})
 
       create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
       interview_id: interview_within_range1.id})
+      create(:interview_panelist, %{panelist_login_name: "test1", team_id: team.id,
+      interview_id: interview_within_range2.id})
+      create(:interview_panelist, %{panelist_login_name: "test2", team_id: team.id,
+      interview_id: interview_within_range2.id})
+      create(:interview_panelist, %{panelist_login_name: "test2", team_id: team1.id,
+      interview_id: interview_within_range3.id})
       create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
       interview_id: interview_out_of_range.id})
 
       create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
+      create(:panelist_details, %{panelist_login_name: "test1", role_id: role.id})
+      create(:panelist_details, %{panelist_login_name: "test2", role_id: role1.id})
 
       response = get conn_with_dummy_authorization(), "/panelists",
       %{"monthly" => "true"}
 
       response |> should(be_successful)
       parsed_response = response.resp_body |> Poison.Parser.parse!
-      expect(parsed_response) |> to(be([%{
-        "team" => "test_team",
-        "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1}],
-        "count" => 1}]))
+      expect(parsed_response)
+      |> to(be([%{
+                "team" => "test_team",
+                "signups" => [%{"role" => "test_role", "names" => ["test", "test1"],"count" => 2},
+                              %{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
+                "count" => 3},
+                %{
+                  "team" => "test_team1",
+                  "signups" => [%{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
+                  "count" => 1
+                }]))
     end
   end
   describe "create" do
