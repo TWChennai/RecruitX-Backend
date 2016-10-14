@@ -48,7 +48,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def working_days_in_current_week(model) do
-    %{starting: starting, ending: ending} =  Timer.get_previous_week
+    %{starting: starting, ending: ending} =  Timer.get_current_week
     Panel.within_date_range(model, starting, ending)
   end
 

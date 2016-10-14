@@ -25,7 +25,7 @@ defmodule RecruitxBackend.PanelistController do
     conn |> render("statistics.json", statistics: statistics)
   end
 
-  defp get_date_range(%{"weekly" => "true"}), do: Timer.get_previous_week
+  defp get_date_range(%{"weekly" => "true"}), do: Timer.get_current_week
 
   defp get_date_range(%{"monthly" => "true"}), do: Timer.get_current_month
 

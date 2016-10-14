@@ -42,6 +42,14 @@ defmodule RecruitxBackend.TimerSpec do
       end
     end
 
+    context "get_current_week" do
+      it "should return from monday to friday of the current week" do
+        %{starting: starting, ending: ending} = Timer.get_current_week
+        expect(starting) |> to(be(Date.beginning_of_week(Date.now)))
+        expect(ending) |> to(be(Date.end_of_week(Date.now) |> Date.shift(days: -2)))
+      end
+    end
+
     context "is_less_than_a_month" do
       it "should validate and should not add error when incoming changeset's start_time is less than a month" do
         valid_changeset = Changeset.cast(%Interview{}, valid_params, ~w(candidate_id interview_type_id start_time), ~w(interview_status_id))
