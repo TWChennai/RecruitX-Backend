@@ -13,6 +13,10 @@ defmodule RecruitxBackend.Timer do
     %{starting: Date.beginning_of_month(day_from_previous_month), ending: Date.end_of_month(day_from_previous_month)}
   end
 
+  def get_current_month do
+    %{starting: Date.beginning_of_month(Date.now), ending: Date.end_of_month(Date.now)}
+  end
+
   def get_previous_quarter do
     day_from_previous_quarter = Date.now() |> Date.beginning_of_quarter |> Date.shift(days: -1)
     %{starting: Date.beginning_of_quarter(day_from_previous_quarter), ending: Date.end_of_quarter(day_from_previous_quarter)}
@@ -46,5 +50,4 @@ defmodule RecruitxBackend.Timer do
     end
     existing_changeset
   end
-
 end

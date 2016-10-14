@@ -91,10 +91,11 @@ defmodule RecruitxBackend.InterviewPanelist do
       preload: [:interview_panelist, candidate: :candidate_skills])
   end
 
-  def get_statistics do
+  def get_statistics(%{starting: starting, ending: ending}) do
     (from ip in __MODULE__,
       join: pd in PanelistDetails, on: ip.panelist_login_name == pd.panelist_login_name,
       join: r in assoc(pd, :role),
+      join: i in Interview, on: i.start_time > ^starting and i.start_time < ^ending,
       right_join: t in assoc(ip, :team),
       group_by: [r.name, ip.panelist_login_name, t.name],
       where: t.active == true,
