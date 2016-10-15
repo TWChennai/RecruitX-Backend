@@ -42,9 +42,9 @@ defmodule RecruitxBackend.TimerSpec do
       end
     end
 
-    context "get_current_week" do
+    context "get_current_week_weekdays" do
       it "should return from monday to friday of the current week" do
-        %{starting: starting, ending: ending} = Timer.get_current_week
+        %{starting: starting, ending: ending} = Timer.get_current_week_weekdays
         expect(starting) |> to(be(Date.beginning_of_week(Date.now)))
         expect(ending) |> to(be(Date.end_of_week(Date.now) |> Date.shift(days: -2)))
       end

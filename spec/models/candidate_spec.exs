@@ -12,7 +12,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
-  let :current_week, do: RecruitxBackend.Timer.get_current_week
+  let :current_week, do: RecruitxBackend.Timer.get_current_week_weekdays
   let :closed_pipeline_status, do: PipelineStatus.retrieve_by_name(PipelineStatus.closed)
 
   context "valid changeset" do

@@ -62,7 +62,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
-        %{starting: start_date, ending: end_date} = Timer.get_current_week
+        %{starting: start_date, ending: end_date} = Timer.get_current_week_weekdays
         {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
         {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
 

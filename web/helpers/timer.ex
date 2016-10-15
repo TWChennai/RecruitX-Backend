@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Timer do
   alias Timex.Date
   alias Ecto.Changeset
 
-  def get_current_week do
+  def get_current_week_weekdays do
     %{starting: Date.beginning_of_week(Date.now), ending: Date.end_of_week(Date.now) |> Date.shift(days: -2)}
   end
 

@@ -12,7 +12,7 @@ defmodule RecruitxBackend.StatusUpdate do
   alias Timex.DateFormat
 
   def execute_weekly do
-    execute(Timer.get_current_week, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
+    execute(Timer.get_current_week_weekdays, "Weekly", System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), false)
   end
 
   def execute_monthly do
