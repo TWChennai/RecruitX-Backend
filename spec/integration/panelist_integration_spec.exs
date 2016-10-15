@@ -7,13 +7,13 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   @upper_bound "UB"
 
   alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Role
   alias RecruitxBackend.MailHelper
   alias RecruitxBackend.TeamDetailsUpdate
@@ -29,8 +29,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
 
   describe "index" do
+    before do: Repo.delete_all(Interview)
     it "should get weekly signups by default" do
-      Repo.delete_all Interview
       team = create(:team, %{name: "test_team"})
       role = create(:role, %{name: "test_role"})
       interview_within_range = create(:interview, %{start_time: Date.now})
@@ -49,7 +49,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should get monthly signups" do
-      Repo.delete_all Interview
       team = create(:team, %{name: "test_team", active: true})
       team1 = create(:team, %{name: "test_team1", active: true})
       role = create(:role, %{name: "test_role"})
@@ -63,15 +62,13 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       interview_id: interview_within_range1.id})
       create(:interview_panelist, %{panelist_login_name: "test1", team_id: team.id,
       interview_id: interview_within_range2.id})
-      create(:interview_panelist, %{panelist_login_name: "test2", team_id: team.id,
-      interview_id: interview_within_range2.id})
       create(:interview_panelist, %{panelist_login_name: "test2", team_id: team1.id,
       interview_id: interview_within_range3.id})
       create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
       interview_id: interview_out_of_range.id})
 
       create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
-      create(:panelist_details, %{panelist_login_name: "test1", role_id: role.id})
+      create(:panelist_details, %{panelist_login_name: "test1", role_id: role1.id})
       create(:panelist_details, %{panelist_login_name: "test2", role_id: role1.id})
 
       response = get conn_with_dummy_authorization(), "/panelists",
@@ -82,9 +79,9 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(parsed_response)
       |> to(be([%{
                 "team" => "test_team",
-                "signups" => [%{"role" => "test_role", "names" => ["test", "test1"],"count" => 2},
-                              %{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
-                "count" => 3},
+                "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1},
+                              %{"role" => "test_role1", "names" => ["test1"],"count" => 1}],
+                "count" => 2},
                 %{
                   "team" => "test_team1",
                   "signups" => [%{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
@@ -92,6 +89,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
                 }]))
     end
   end
+
   describe "create" do
     it "should insert valid interveiw panelist details in db and return location path in a success response" do
       interview = create(:interview)
