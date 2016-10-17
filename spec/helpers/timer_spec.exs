@@ -2,6 +2,7 @@ defmodule RecruitxBackend.TimerSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Timer
 
   alias RecruitxBackend.Timer
+  alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.Interview
   alias Ecto.Changeset
   alias Timex.Date
@@ -53,8 +54,8 @@ defmodule RecruitxBackend.TimerSpec do
     context "get_current_week" do
       it "should return from monday to sunday of the current week" do
         %{starting: starting, ending: ending} = Timer.get_current_week
-        expect(starting) |> to(be(Date.beginning_of_week(Date.now)))
-        expect(ending) |> to(be(Date.end_of_week(Date.now)))
+        expect(TimexHelper.compare(starting, Date.beginning_of_week(Date.now))) |> to(be_true)
+        expect(TimexHelper.compare(ending, Date.end_of_week(Date.now))) |> to(be_true)
       end
     end
 
