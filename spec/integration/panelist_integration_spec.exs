@@ -182,6 +182,37 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(parsed_response) |> to(be(%{"errors" => %{"signup_count" => ["More than 2 signups are not allowed"]}}))
     end
 
+    it "should respond with errors when trying to sign up for the tech2 interview before satisfing the tech1 interview" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      role = Role |> Repo.get(candidate.role_id)
+
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech2_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["Please signup for Tech1 round as signup is pending for that"]}}))
+    end
+
+    it "should accept when trying to sign up for the tech2 interview after satisfing the tech1 interview" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      role = Role |> Repo.get(candidate.role_id)
+
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech2_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+
+      response |> should(have_http_status(:created))
+    end
+
     it "should accept sign up if experience is above maximum experience with filter" do
       Repo.delete_all ExperienceMatrix
 
