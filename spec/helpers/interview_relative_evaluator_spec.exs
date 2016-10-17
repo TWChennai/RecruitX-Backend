@@ -3,6 +3,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
 
   alias Decimal
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewRelativeEvaluator
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluationStatus
@@ -99,6 +100,53 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       expect(validity) |> to(be_true)
       expect(errors) |> to(be([]))
     end
+  end
+
+  describe "is_tech1_got_sign_up" do
+    it "should be valid if current interview round is not Tech2" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech1_interview = create(:interview, interview_type_id: tech1_round.id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: tech1_interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2), role)
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, tech1_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
+    end
+
+    it "should be invalid if current interview round Tech2 and Tech1 didn't get signups" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: tech2_interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2), role)
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, tech2_interview)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "Please signup for Tech1 round as signup is pending for that"]))
+    end
+
+    it "should be valid if current interview round Tech2 and Tech1 got enough signups" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      create(:interview_panelist, interview_id: tech1_interview.id)
+      create(:interview_panelist, interview_id: tech1_interview.id)
+      interview_panelist = fields_for(:interview_panelist, interview_id: tech2_interview.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_panelist.panelist_login_name, Decimal.new(2), role)
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, tech2_interview)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
+    end
+
   end
 
   describe "has_no_other_interview_within_time_buffer" do

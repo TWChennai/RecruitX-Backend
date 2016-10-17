@@ -58,6 +58,15 @@ defmodule RecruitxBackend.Interview do
       select: i)
   end
 
+  def get_previous_round(candidate_id, current_interview_type_id) do
+    current_interview_type = InterviewType |> Repo.get(current_interview_type_id)
+    (from i in __MODULE__,
+    join: itype in assoc(i, :interview_type),
+    where: i.candidate_id == ^candidate_id and
+    itype.priority == ^(current_interview_type.priority - 1))
+      |> Repo.all
+  end
+
   def get_last_completed_rounds_start_time_for(candidate_id) do
     interview_with_feedback_and_maximum_start_time =
                               (from i in __MODULE__,

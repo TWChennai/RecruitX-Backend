@@ -443,6 +443,30 @@ defmodule RecruitxBackend.InterviewSpec do
 
   end
 
+  describe "get_previous_round" do
+    it "should return previous round of same candidate" do
+      technical_one = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      technical_two = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      technical_one_interview = create(:interview, candidate_id: candidate.id, interview_type_id: technical_one.id)
+      create(:interview, candidate_id: candidate.id, interview_type_id: technical_two.id)
+
+      [actual_value] = Interview.get_previous_round(candidate.id, technical_two.id)
+
+      expect(actual_value) |> to(be(technical_one_interview))
+    end
+
+    it "should return empty if there are no previous interview" do
+      coding = InterviewType.retrieve_by_name(InterviewType.coding)
+      candidate = create(:candidate)
+      coding_interview = create(:interview, candidate_id: candidate.id, interview_type_id: coding.id)
+
+      actual_value = Interview.get_previous_round(candidate.id, coding.id)
+
+      expect(actual_value) |> to(be([]))
+    end
+  end
+
   describe "validation for updating the interview schedule" do
     let :tomorrow, do: Date.now() |> Date.shift(days: 1)
     let :candidate, do: create(:candidate)
