@@ -30,7 +30,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-    # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
+     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
                     :json, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
   end
@@ -74,7 +74,7 @@ defmodule RecruitxBackend.Mixfile do
     ]
   end
 
-  # Aliases are shortcut or tasks specific to the current project.
+  # Aliases are shortcuts or tasks specific to the current project.
   # For example, to create, migrate and run the seeds file at once:
   #
   #     $ mix ecto.setup
