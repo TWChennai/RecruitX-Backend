@@ -30,6 +30,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
   describe "index" do
     before do: Repo.delete_all(Interview)
+    before do: Repo.delete_all(InterviewPanelist)
+
     it "should get weekly signups by default" do
       team = create(:team, %{name: "test_team"})
       role = create(:role, %{name: "test_role"})
@@ -42,10 +44,10 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
       response |> should(be_successful)
       parsed_response = response.resp_body |> Poison.Parser.parse!
-      expect(parsed_response) |> to(be([%{
+      expect(parsed_response) |> to(have(%{
         "team" => "test_team",
         "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1}],
-        "count" => 1}]))
+        "count" => 1}))
     end
 
     it "should get monthly signups" do
@@ -77,16 +79,17 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response |> should(be_successful)
       parsed_response = response.resp_body |> Poison.Parser.parse!
       expect(parsed_response)
-      |> to(be([%{
+      |> to(have(%{
                 "team" => "test_team",
                 "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1},
                               %{"role" => "test_role1", "names" => ["test1"],"count" => 1}],
-                "count" => 2},
-                %{
+                "count" => 2}))
+      expect(parsed_response)
+      |> to(have(%{
                   "team" => "test_team1",
                   "signups" => [%{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
                   "count" => 1
-                }]))
+                }))
     end
   end
 
@@ -151,7 +154,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       parsed_response = response.resp_body |> Poison.Parser.parse!
       expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You are already signed up for another interview within 2 hours"]}}))
     end
-
 
     it "should respond with errors when trying to sign up for the same candidate's different interview" do
       role = create(:role)
