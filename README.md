@@ -30,7 +30,7 @@ After cloning the git repository, you will need the following pre-requisites
     ```
   You should get "Elixir 1.2.6" as the output. To install `elixir 1.2.6` execute:
     ```bash
-    brew uninstall elixir
+    brew uninstall --force elixir
     brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f47cde4e2b771b4a8d170038a20ca703d20bdf0d/Formula/elixir.rb
     brew pin elixir
     ```
