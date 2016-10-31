@@ -54,7 +54,7 @@
         # If you don't want the `setup` and `test` macro calls in ExUnit tests
         # or the `schema` macro in Ecto schemas to trigger DuplicatedCode, just
         # set the `excluded_macros` parameter to `[:schema, :setup, :test]`.
-        {Credo.Check.Design.DuplicatedCode, false},
+        {Credo.Check.Design.DuplicatedCode, excluded_macros: [:schema, :setup, :test]},
 
         # You can also customize the exit_status of each check.
         # If you don't want TODO comments to cause `mix credo` to fail, just
@@ -68,12 +68,13 @@
         {Credo.Check.Readability.ModuleAttributeNames},
         {Credo.Check.Readability.ModuleDoc, false},
         {Credo.Check.Readability.ModuleNames},
+        {Credo.Check.Readability.ParenthesesInCondition},
         {Credo.Check.Readability.PredicateFunctionNames},
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},
         {Credo.Check.Readability.VariableNames},
 
-        {Credo.Check.Refactor.ABCSize, max_size: 42},   # TODO: Need to bring this down
+        {Credo.Check.Refactor.ABCSize},
         # {Credo.Check.Refactor.CaseTrivialMatches}, # deprecated in 0.4.0
         {Credo.Check.Refactor.CondStatements},
         {Credo.Check.Refactor.FunctionArity},
