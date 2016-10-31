@@ -2,9 +2,18 @@
 
 #### To start with the codebase
 After cloning the git repository, you will need the following pre-requisites
-  1. Postgres database: Once this is present, create a user with the correct role/permissions using the following psql invocation:
+  * Install [asdf](https://github.com/asdf-vm/asdf) (the package manager) that will be used to handle multiple versions of erlang and elixir.
+  * Run the following commands to install the versions that are needed for this project
+  ```bash
+  asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git
+  asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
 
-    `create role recruitx login createdb;`
+  asdf install
+  ```
+  * Ensure that you have Postgres installed. Once this is present, create a user with the correct role/permissions using the following psql invocation:
+  ```bash
+  create role recruitx login createdb;
+  ```
 
 #### Coding style
   1. Use 2 spaces instead of tabs for all indentation
