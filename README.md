@@ -7,21 +7,22 @@ After cloning the git repository, you will need the following pre-requisites
   ```bash
   asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git
   asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
-
   asdf install
   ```
   * Ensure that you have Postgres installed. Once this is present, create a user with the correct role/permissions using the following psql invocation:
   ```bash
-  create role recruitx login createdb;
+  psql -U postgres -c "CREATE ROLE \"recruitx\" LOGIN CREATEDB;"
   ```
 
 #### Coding style
-  1. Use 2 spaces instead of tabs for all indentation
-  2. Run the `credo` hex package to find issues (credo is a static code analyzer)
+  * In general, follow these [guidelines](https://elixirnation.io/references/elixir-style-guide-as-implemented-by-credo)
+  * Use 2 spaces instead of tabs for all indentation
+  * Run the `credo` hex package to find issues (credo is a static code analyzer)
+  ```bash
+  mix credo --strict
+  ```
 
-    `mix credo --strict`
-
-#### Dependencies
+#### Dependencies (If you are not using the `asdf` package manager)
   * Ensure `erlang 18.2.1` is installed before proceeding further. To check the erlang version execute:
     ```bash
     erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
@@ -81,17 +82,17 @@ After cloning the git repository, you will need the following pre-requisites
     ```
 
 #### To start your Phoenix app:
-  1. Install dependencies with `mix deps.get`
-  2. Create, migrate and seed your database with `mix ecto.setup`
-  3. Drop, Create, migrate and seed your database with `mix ecto.reset`
-  4. Seed the database with `mix run priv/repo/seeds.exs`
-  5. Run `brunch build` to build JS and CSS (Only for Web App)
-  6. Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-  7. To Run the Phoenix Web App refer to #### Run Web App
-  8. To run whatever's necessary before committing: `mix commit`
-  9. Run all espec tests with `mix espec --cover`
-  10. Run unit tests with `mix espec --exclude integration`
-  11. Run integration tests with `mix espec spec/integration/*`
+  * Install dependencies with `mix deps.get`
+  * Create, migrate and seed your database with `mix ecto.setup`
+  * Drop, Create, migrate and seed your database with `mix ecto.reset`
+  * Seed the database with `mix ecto.seed`
+  * Install Node.js dependencies with `npm install`
+  * Run `brunch build` to build JS and CSS (Only for Web App)
+  * Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+  * To run whatever's necessary before committing: `mix commit`
+  * Run all espec tests with `mix coveralls.html`
+  * Run unit tests with `mix espec --exclude integration`
+  * Run integration tests with `mix espec spec/integration/*`
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
