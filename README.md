@@ -86,21 +86,8 @@ After cloning the git repository, you will need the following pre-requisites
   * Create, migrate and seed your database with `mix ecto.setup`
   * Drop, Create, migrate and seed your database with `mix ecto.reset`
   * Seed the database with `mix ecto.seed`
-  * Install Node.js dependencies with `npm install`
-  * Run `brunch build` to build JS and CSS (Only for Web App)
   * Start Phoenix endpoint with `mix phoenix.server`. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
   * To run whatever's necessary before committing: `mix commit`
   * Run all espec tests with `mix coveralls.html`
   * Run unit tests with `mix espec --exclude integration`
   * Run integration tests with `mix espec spec/integration/*`
-
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
-
-## Learn more
-
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: http://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
-  * JSON API: https://medium.com/@luizvarela1/building-a-phoenix-api-d27902a1450a#.954p7dqx6
