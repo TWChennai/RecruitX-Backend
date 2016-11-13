@@ -8,6 +8,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.Slot
   alias RecruitxBackend.Repo
+  alias Timex.Date
 
   import Ecto.Query, only: [preload: 2]
 
@@ -108,6 +109,24 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true)
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true)
       expect(result_interview.last_interview_status) |> to(be(pass_id))
+    end
+  end
+
+  describe "tech_one_interview_ids_between" do
+    before do: Repo.delete_all(Interview)
+    let :technical_one_id, do: InterviewType.retrieve_by_name(InterviewType.technical_1).id
+
+    it "should give list of tech one interview ids between given two date ranges" do
+      now = Date.now()
+      _non_tech_one = create(:interview, start_time: now |> Date.shift(hours: -2), end_time: now |> Date.shift(hours: -1))
+      interview1 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -2), end_time: now |> Date.shift(hours: -1))
+      interview2 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -1), end_time: now |> Date.shift(hours: -0))
+      interview3 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -3), end_time: now |> Date.shift(hours: -2))
+      _before_start_time = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -4), end_time: now |> Date.shift(hours: -3))
+      _after_end_time = create(:interview, interview_type_id: technical_one_id, start_time: now, end_time: now |> Date.shift(hours: 1))
+
+      interview_ids = Interview.tech_one_interview_ids_between(now |> Date.shift(hours: -3), now)
+      expect(interview_ids) |> to(be([interview1.id, interview2.id, interview3.id]))
     end
   end
 end

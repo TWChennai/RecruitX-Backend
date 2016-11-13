@@ -19,9 +19,9 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
     |> is_tech1_got_enough_sign_up(interview)
   end
 
-  defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, %{interview_type_id: @tech2_interview_type_id} = interview) do
+  defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, %{interview_type_id: @tech2_interview_type_id, candidate_id: candidate_id} = interview) do
     technical_one = InterviewType.retrieve_by_name(InterviewType.technical_1)
-    case Interview.get_previous_round(interview.candidate_id, interview.interview_type_id) do
+    case Interview.get_previous_round(candidate_id, interview.interview_type_id) do
       [] -> sign_up_evaluation_status
       [previous_interview] -> previous_interview_signup_count = InterviewPanelist.get_signup_count_for_interview_id(previous_interview.id) |> Repo.one
                               case previous_interview_signup_count != technical_one.max_sign_up_limit do
@@ -31,7 +31,20 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
     end
   end
 
-  defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, _not_tech2_round), do: sign_up_evaluation_status
+  defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, %{interview_type_id: @tech2_interview_type_id} = slot) do
+    technical_one = InterviewType.retrieve_by_name(InterviewType.technical_1)
+    is_any_tech_one_not_satisfied =
+        Interview.tech_one_interview_ids_between(Date.now(), slot.start_time)
+          |> Enum.any?(fn tech_one_interview_id ->
+            InterviewPanelist.get_signup_count_for_interview_id(tech_one_interview_id)
+              |> Repo.one != technical_one.max_sign_up_limit end)
+    case is_any_tech_one_not_satisfied do
+      true -> sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "Please signup for Tech1 round as signup is pending for that"})
+      false -> sign_up_evaluation_status
+    end
+  end
+
+  defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, _not_tech2_interview), do: sign_up_evaluation_status
 
   defp has_not_interviewed_candidate(%{valid?: false} = sign_up_evaluation_status, _, _, _), do: sign_up_evaluation_status
   defp has_not_interviewed_candidate(sign_up_evaluation_status, _, _, true), do: sign_up_evaluation_status

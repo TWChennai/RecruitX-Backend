@@ -103,6 +103,8 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
   end
 
   describe "is_tech1_got_sign_up" do
+    let :now, do: Date.now()
+
     it "should be valid if current interview round is not Tech2" do
       tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
       tech1_interview = create(:interview, interview_type_id: tech1_round.id)
@@ -147,6 +149,44 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       expect(errors) |> to(be([]))
     end
 
+    it "should be valid if current slot is Tech2 and Tech1 got enough signups" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id,
+                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
+      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> Date.shift(hours: 4))
+      create(:interview_panelist, interview_id: tech1_interview.id)
+      create(:interview_panelist, interview_id: tech1_interview.id)
+      slot_panelist = fields_for(:slot_panelist, interview_id: tech2_slot.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(slot_panelist.panelist_login_name, Decimal.new(2), role, true)
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, tech2_slot)
+
+      expect(validity) |> to(be_true)
+      expect(errors) |> to(be([]))
+    end
+
+    it "should be not valid if current slot is Tech2 and Tech1 haven't got enough signups" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id,
+                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
+      tech1_interview2 = create(:interview, interview_type_id: tech1_round.id,
+                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
+      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> Date.shift(hours: 4))
+      create(:interview_panelist, interview_id: tech1_interview.id)
+      create(:interview_panelist, interview_id: tech1_interview2.id)
+      create(:interview_panelist, interview_id: tech1_interview2.id)
+      slot_panelist = fields_for(:slot_panelist, interview_id: tech2_slot.id)
+      sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(slot_panelist.panelist_login_name, Decimal.new(2), role, true)
+
+      %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, tech2_slot)
+
+      expect(validity) |> to(be_false)
+      expect(errors) |> to(be([signup: "Please signup for Tech1 round as signup is pending for that"]))
+    end
   end
 
   describe "has_no_other_interview_within_time_buffer" do

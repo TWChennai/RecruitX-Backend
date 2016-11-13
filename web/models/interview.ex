@@ -337,6 +337,16 @@ defmodule RecruitxBackend.Interview do
     }
   end
 
+  def tech_one_interview_ids_between(from_time, to_time) do
+    technical_one_id = InterviewType.retrieve_by_name(InterviewType.technical_1).id
+    (from i in __MODULE__,
+      where: i.interview_type_id == ^technical_one_id and
+      i.start_time >= ^from_time and
+      i.end_time <= ^to_time,
+      select: i.id)
+    |> Repo.all
+  end
+
   # TODO: Isn't there a simpler logic to join an array of strings?
   defp get_formatted_interview_panelists(interview) do
     if Enum.empty?(interview.interview_panelist) do
