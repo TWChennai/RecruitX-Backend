@@ -54,7 +54,6 @@ defmodule RecruitxBackend.Mixfile do
       {:ex_aws, "~> 0.4.18"},
       {:ex_machina, "~> 0.6.1", only: :test, app: false},
       {:excoveralls, "~> 0.5.1", only: :test, app: false},
-      {:exrm, "~> 0.19.9"},
       {:faker, "~> 0.6.0", only: :test, app: false},
       {:gettext, "~> 0.11.0"},
       {:httpoison, "~> 0.8.2"},

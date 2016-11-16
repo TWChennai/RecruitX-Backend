@@ -8,7 +8,6 @@ deps
 *.plt
 erl_crash.dump
 ebin
-rel/example_project
 .concrete/DEV_MODE
 .rebar
 
@@ -68,7 +67,6 @@ node_modules/
 erl_crash.dump
 /priv/static/
 /config/prod.secret.exs
-/rel
 
 
 ### Intellij ###
