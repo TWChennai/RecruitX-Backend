@@ -18,6 +18,7 @@ ebin
 /deps
 erl_crash.dump
 *.ez
+rel/
 
 
 ### Node ###
