@@ -10,6 +10,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePanelistDetails do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX panelist_details_index ON panelist_details (UPPER(panelist_login_name), employee_id);"
+    create index(:panelist_details, ["UPPER(panelist_login_name)", "employee_id"], unique: true, name: :panelist_details_index)
   end
 end

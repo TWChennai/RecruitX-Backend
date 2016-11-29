@@ -2,6 +2,7 @@ defmodule RecruitxBackend.TimerSpec do
   use ESpec.Phoenix, model: RecruitxBackend.Timer
 
   alias RecruitxBackend.Timer
+  alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.Interview
   alias Ecto.Changeset
   alias Timex.Date
@@ -39,6 +40,22 @@ defmodule RecruitxBackend.TimerSpec do
         response = Timer.is_in_future(valid_changeset, :start_time)
         expect(response.valid?) |> to(be(false))
         expect(response) |> to(have_errors(start_time: "should be in the future"))
+      end
+    end
+
+    context "get_current_week_weekdays" do
+      it "should return from monday to friday of the current week" do
+        %{starting: starting, ending: ending} = Timer.get_current_week_weekdays
+        expect(starting) |> to(be(Date.beginning_of_week(Date.now)))
+        expect(ending) |> to(be(Date.end_of_week(Date.now) |> Date.shift(days: -2)))
+      end
+    end
+
+    context "get_current_week" do
+      it "should return from monday to sunday of the current week" do
+        %{starting: starting, ending: ending} = Timer.get_current_week
+        expect(TimexHelper.compare(starting, Date.beginning_of_week(Date.now))) |> to(be_true)
+        expect(TimexHelper.compare(ending, Date.end_of_week(Date.now))) |> to(be_true)
       end
     end
 

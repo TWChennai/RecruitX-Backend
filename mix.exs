@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Mixfile do
   def project do
     [app: :recruitx_backend,
      version: "1.0.0",
-     elixir: "~> 1.2.3",
+     elixir: "1.2.6",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -30,7 +30,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-    # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
+     # TODO: Need to verify that we actually need all the below (:connection, :json, :corsica)
      applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection,
                     :json, :phoenix_ecto, :postgrex, :httpotion, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
   end
@@ -46,7 +46,7 @@ defmodule RecruitxBackend.Mixfile do
     [
       {:arc, "~> 0.5.1"},
       {:cowboy, "~> 1.0.4"},
-      {:credo, "~> 0.4.5", only: :test, app: false},
+      {:credo, "~> 0.5.1", only: :test, app: false},
       {:cors_plug, "~> 1.1"},
       {:ecto, "~> 1.1.8"},
       {:ectoo, "~> 0.0.4", only: :test, app: false},
@@ -54,7 +54,6 @@ defmodule RecruitxBackend.Mixfile do
       {:ex_aws, "~> 0.4.18"},
       {:ex_machina, "~> 0.6.1", only: :test, app: false},
       {:excoveralls, "~> 0.5.1", only: :test, app: false},
-      {:exrm, "~> 0.19.9"},
       {:faker, "~> 0.6.0", only: :test, app: false},
       {:gettext, "~> 0.11.0"},
       {:httpoison, "~> 0.8.2"},
@@ -74,7 +73,7 @@ defmodule RecruitxBackend.Mixfile do
     ]
   end
 
-  # Aliases are shortcut or tasks specific to the current project.
+  # Aliases are shortcuts or tasks specific to the current project.
   # For example, to create, migrate and run the seeds file at once:
   #
   #     $ mix ecto.setup

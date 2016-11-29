@@ -201,7 +201,7 @@ defmodule RecruitxBackend.Candidate do
 
   def format(candidate) do
     %{
-      name: candidate.first_name <> " " <> candidate.last_name,
+      name: candidate |> get_full_name,
       role: candidate.role.name,
       experience: candidate |> get_rounded_experience,
       skills: candidate |> get_formatted_skills

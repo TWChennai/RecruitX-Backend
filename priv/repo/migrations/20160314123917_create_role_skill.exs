@@ -12,7 +12,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
       timestamps
     end
 
-    create unique_index(:role_skills, [:role_id, :skill_id], name: :role_skill_id_index)
+    create index(:role_skills, [:role_id, :skill_id], unique: true, name: :role_skill_id_index)
 
     flush
 

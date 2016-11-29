@@ -48,7 +48,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def working_days_in_current_week(model) do
-    %{starting: starting, ending: ending} =  Timer.get_previous_week
+    %{starting: starting, ending: ending} =  Timer.get_current_week_weekdays
     Panel.within_date_range(model, starting, ending)
   end
 
@@ -56,6 +56,15 @@ defmodule RecruitxBackend.Interview do
     (from i in __MODULE__,
       preload: [:interview_panelist, candidate: :candidate_skills],
       select: i)
+  end
+
+  def get_previous_round(candidate_id, current_interview_type_id) do
+    current_interview_type = InterviewType |> Repo.get(current_interview_type_id)
+    (from i in __MODULE__,
+    join: itype in assoc(i, :interview_type),
+    where: i.candidate_id == ^candidate_id and
+    itype.priority == ^(current_interview_type.priority - 1))
+      |> Repo.all
   end
 
   def get_last_completed_rounds_start_time_for(candidate_id) do
@@ -326,6 +335,16 @@ defmodule RecruitxBackend.Interview do
       result: status,
       panelists: get_formatted_interview_panelists(interview)
     }
+  end
+
+  def tech_one_interview_ids_between(from_time, to_time) do
+    technical_one_id = InterviewType.retrieve_by_name(InterviewType.technical_1).id
+    (from i in __MODULE__,
+      where: i.interview_type_id == ^technical_one_id and
+      i.start_time >= ^from_time and
+      i.end_time <= ^to_time,
+      select: i.id)
+    |> Repo.all
   end
 
   # TODO: Isn't there a simpler logic to join an array of strings?

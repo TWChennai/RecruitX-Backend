@@ -9,7 +9,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewPanelist do
       timestamps
     end
 
-    create unique_index(:interview_panelists, [:panelist_login_name, :interview_id], name: :interview_panelist_login_name_index)
+    create index(:interview_panelists, [:panelist_login_name, :interview_id], unique: true, name: :interview_panelist_login_name_index)
     create index(:interview_panelists, [:panelist_login_name])
     create index(:interview_panelists, [:interview_id])
 

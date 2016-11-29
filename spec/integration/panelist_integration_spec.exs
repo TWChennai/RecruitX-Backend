@@ -7,12 +7,13 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   @upper_bound "UB"
 
   alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Repo
   alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.Role
   alias RecruitxBackend.MailHelper
   alias RecruitxBackend.TeamDetailsUpdate
@@ -26,6 +27,71 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update, fn() -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
+
+  describe "index" do
+    before do: Repo.delete_all(Interview)
+    before do: Repo.delete_all(InterviewPanelist)
+
+    it "should get weekly signups by default" do
+      team = create(:team, %{name: "test_team"})
+      role = create(:role, %{name: "test_role"})
+      interview_within_range = create(:interview, %{start_time: Date.now})
+      create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
+        interview_id: interview_within_range.id})
+      create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
+
+      response = get conn_with_dummy_authorization(), "/panelists"
+
+      response |> should(be_successful)
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(have(%{
+        "team" => "test_team",
+        "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1}],
+        "count" => 1}))
+    end
+
+    it "should get monthly signups" do
+      team = create(:team, %{name: "test_team", active: true})
+      team1 = create(:team, %{name: "test_team1", active: true})
+      role = create(:role, %{name: "test_role"})
+      role1 = create(:role, %{name: "test_role1"})
+      interview_within_range1 = create(:interview, %{start_time: Date.now |> Date.beginning_of_month})
+      interview_within_range2 = create(:interview, %{start_time: Date.now |> Date.end_of_month})
+      interview_within_range3 = create(:interview, %{start_time: Date.now})
+      interview_out_of_range = create(:interview, %{start_time: Date.now() |> Date.beginning_of_month |>  Date.shift(days: -1)})
+
+      create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
+      interview_id: interview_within_range1.id})
+      create(:interview_panelist, %{panelist_login_name: "test1", team_id: team.id,
+      interview_id: interview_within_range2.id})
+      create(:interview_panelist, %{panelist_login_name: "test2", team_id: team1.id,
+      interview_id: interview_within_range3.id})
+      create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
+      interview_id: interview_out_of_range.id})
+
+      create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
+      create(:panelist_details, %{panelist_login_name: "test1", role_id: role1.id})
+      create(:panelist_details, %{panelist_login_name: "test2", role_id: role1.id})
+
+      response = get conn_with_dummy_authorization(), "/panelists",
+      %{"monthly" => "true"}
+
+      response |> should(be_successful)
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response)
+      |> to(have(%{
+                "team" => "test_team",
+                "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1},
+                              %{"role" => "test_role1", "names" => ["test1"],"count" => 1}],
+                "count" => 2}))
+      expect(parsed_response)
+      |> to(have(%{
+                  "team" => "test_team1",
+                  "signups" => [%{"role" => "test_role1", "names" => ["test2"],"count" => 1}],
+                  "count" => 1
+                }))
+    end
+  end
 
   describe "create" do
     it "should insert valid interveiw panelist details in db and return location path in a success response" do
@@ -89,7 +155,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["You are already signed up for another interview within 2 hours"]}}))
     end
 
-
     it "should respond with errors when trying to sign up for the same candidate's different interview" do
       role = create(:role)
       candidate = create(:candidate, role_id: role.id)
@@ -117,6 +182,37 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       response |> should(have_http_status(:unprocessable_entity))
       parsed_response = response.resp_body |> Poison.Parser.parse!
       expect(parsed_response) |> to(be(%{"errors" => %{"signup_count" => ["More than 2 signups are not allowed"]}}))
+    end
+
+    it "should respond with errors when trying to sign up for the tech2 interview before satisfing the tech1 interview" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      role = Role |> Repo.get(candidate.role_id)
+
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech2_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+
+      response |> should(have_http_status(:unprocessable_entity))
+      parsed_response = response.resp_body |> Poison.Parser.parse!
+      expect(parsed_response) |> to(be(%{"errors" => %{"signup" => ["Please signup for Tech1 round as signup is pending for that"]}}))
+    end
+
+    it "should accept when trying to sign up for the tech2 interview after satisfing the tech1 interview" do
+      tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
+      tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
+      candidate = create(:candidate)
+      tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id)
+      tech2_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech2_round.id)
+      role = Role |> Repo.get(candidate.role_id)
+
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech1_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+      response = post conn_with_dummy_authorization(), "/panelists", %{"interview_panelist" => convertKeysFromAtomsToStrings(Map.merge(fields_for(:interview_panelist, interview_id: tech2_interview.id), %{panelist_experience: 2, panelist_role: role.name}))}
+
+      response |> should(have_http_status(:created))
     end
 
     it "should accept sign up if experience is above maximum experience with filter" do

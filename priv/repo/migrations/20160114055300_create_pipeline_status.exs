@@ -8,7 +8,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX pipeline_statuses_name_index ON pipeline_statuses (UPPER(name));"
+    create index(:pipeline_statuses, ["UPPER(name)"], unique: true, name: :pipeline_statuses_name_index)
 
     flush
 

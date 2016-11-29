@@ -12,7 +12,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterview do
       timestamps
     end
 
-    create unique_index(:interviews, [:candidate_id, :interview_type_id], name: :candidate_interview_type_id_index)
+    create index(:interviews, [:candidate_id, :interview_type_id], unique: true, name: :candidate_interview_type_id_index)
     create index(:interviews, [:candidate_id])
     create index(:interviews, [:interview_type_id])
   end

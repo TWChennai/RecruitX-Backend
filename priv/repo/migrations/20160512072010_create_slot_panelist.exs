@@ -10,7 +10,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSlotPanelist do
       timestamps
     end
 
-    create unique_index(:slot_panelists, [:panelist_login_name, :slot_id], name: :slot_panelist_login_name_index)
+    create index(:slot_panelists, [:panelist_login_name, :slot_id], unique: true, name: :slot_panelist_login_name_index)
     create index(:slot_panelists, [:panelist_login_name])
     create index(:slot_panelists, [:slot_id])
 

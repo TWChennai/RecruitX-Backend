@@ -9,7 +9,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateFeedbackImage do
       timestamps
     end
 
-    create unique_index(:feedback_images, [:file_name, :interview_id], name: :feedback_file_name_interview_id_unique_index)
-    execute "CREATE UNIQUE INDEX file_name_unique_index ON feedback_images (UPPER(file_name));"
+    create index(:feedback_images, [:file_name, :interview_id], unique: true, name: :feedback_file_name_interview_id_unique_index)
+    create index(:feedback_images, ["UPPER(file_name)"], unique: true, name: :file_name_unique_index)
   end
 end

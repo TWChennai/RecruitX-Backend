@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "phoenix": {
+      "version": "1.1.6",
+      "from": "deps/phoenix",
+      "resolved": "file:deps/phoenix"
+    }
+  }
+}

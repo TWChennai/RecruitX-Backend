@@ -8,6 +8,6 @@ defmodule RecruitxBackend.Repo.Migrations.CreateTeam do
       timestamps
     end
 
-    execute "CREATE UNIQUE INDEX team_name_index ON teams (UPPER(name));"
+    create index(:teams, ["UPPER(name)"], unique: true, name: :team_name_index)
   end
 end
