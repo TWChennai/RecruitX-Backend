@@ -9,6 +9,13 @@ After cloning the git repository, you will need the following pre-requisites
   asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
   asdf install
   ```
+  * asdf might not work as expected when you dont have ~/.tool-versions file. Please create this file and put the installed packages version for things to work
+  the versions of tools installed can be found in .asdf/installs/erlang/18.2.1
+  ```
+  elixir 1.2.6
+  erlang 18.2.1
+  ```
+  
   * Ensure that you have Postgres installed. Once this is present, create a user with the correct role/permissions using the following psql invocation:
   ```bash
   psql -U postgres -c "CREATE ROLE \"recruitx\" LOGIN CREATEDB;"
