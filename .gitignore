@@ -125,3 +125,6 @@ fabric.properties
 
 # Project specific env variables
 .envrc
+
+# Data directory
+data
