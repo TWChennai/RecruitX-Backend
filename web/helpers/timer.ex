@@ -59,7 +59,7 @@ defmodule RecruitxBackend.Timer do
 
 
   def is_less_than_a_month(existing_changeset, field) do
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
+    if is_nil(existing_changeset.errors[field]) and !is_nil(existing_changeset.changes[field]) do
       new_start_time = Changeset.get_field(existing_changeset, field)
       current_time_after_a_month = Date.now |> Date.shift(months: 1)
       valid = TimexHelper.compare(current_time_after_a_month, new_start_time)

@@ -47,8 +47,8 @@ defmodule RecruitxBackend.WeekendDriveSpec do
     end
 
     it "should have an end_date after start date" do
-      weekend_drive_with_start_date_in_the_past = Map.merge(valid_attrs, %{end_date: Date.now |> Date.shift(days: -1)})
-      changeset = WeekendDrive.changeset(%WeekendDrive{}, weekend_drive_with_start_date_in_the_past)
+      weekend_drive_with_end_date_before_start_date = Map.merge(valid_attrs, %{end_date: Date.now |> Date.shift(days: -1)})
+      changeset = WeekendDrive.changeset(%WeekendDrive{}, weekend_drive_with_end_date_before_start_date)
       expect(changeset) |> to_not(be_valid)
       expect(changeset) |> to(have_errors(end_date: "should be after start date"))
     end
