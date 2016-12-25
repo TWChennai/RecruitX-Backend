@@ -36,7 +36,7 @@ defmodule RecruitxBackend.Timer do
   end
 
   def is_in_future(existing_changeset, field) do
-    if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
+    if is_nil(existing_changeset.errors[field]) and !is_nil(existing_changeset.changes[field]) do
       new_start_time = Changeset.get_field(existing_changeset, field)
       current_time = (Date.now |> Date.shift(mins: -5))
       valid = TimexHelper.compare(new_start_time, current_time)
