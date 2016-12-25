@@ -23,6 +23,7 @@ defmodule RecruitxBackend.Role do
     has_many :candidates, Candidate
     has_many :role_skills, RoleSkill
     has_many :role_interview_types, RoleInterviewType
+    has_many :weekend_drives, WeekendDrive
   end
 
   @required_fields ~w(name)

@@ -45,6 +45,19 @@ defmodule RecruitxBackend.Timer do
     existing_changeset
   end
 
+  def is_after(%{valid?: true} = existing_changeset, end_date_field, start_date_field) do
+    if is_nil(existing_changeset.errors[end_date_field]) and !is_nil(existing_changeset.changes[end_date_field]) do
+      start_date = Changeset.get_field(existing_changeset, start_date_field)
+      end_date = Changeset.get_field(existing_changeset, end_date_field)
+      valid = TimexHelper.compare(end_date, start_date)
+      if !valid, do: existing_changeset = Changeset.add_error(existing_changeset, end_date_field, "should be after start date")
+    end
+    existing_changeset
+  end
+
+  def is_after(existing_changeset, _end_date_field, _start_date_field), do: existing_changeset
+
+
   def is_less_than_a_month(existing_changeset, field) do
     if is_nil(existing_changeset.errors[:start_time]) and !is_nil(existing_changeset.changes[:start_time]) do
       new_start_time = Changeset.get_field(existing_changeset, field)
