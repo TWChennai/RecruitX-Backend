@@ -4,7 +4,10 @@
   become: yes
 
 - name: Install system packages
-  apt: name="{{ item }}" update_cache=yes state=present
+  apt:
+    name: '{{ item }}'
+    update_cache: yes
+    state: present
   with_items:
     - gcc
     - g++
@@ -14,6 +17,7 @@
     - git
     - python-dev
     - python-apt
+    - python-pip
     - make
     - automake
     - autoconf
@@ -28,8 +32,18 @@
     - unixodbc-dev
     - monit
     - vim
-    - python-pip
     - build-essential
+  become: yes
+
+- name: Install python packages
+  pip:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - urllib3
+    - pyopenssl
+    - ndg-httpsclient
+    - pyasn1
   become: yes
 
 - include: nodejs.yml
