@@ -36,6 +36,6 @@
 
 - include: erlang.yml
 
-# - include: elixir.yml
+- include: elixir.yml
 
 # - include: postgres.yml
