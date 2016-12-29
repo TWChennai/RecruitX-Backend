@@ -1,5 +1,0 @@
----
-- name: Install elixir {{ elixir_version }}
-  apt:
-    deb: https://packages.erlang-solutions.com/erlang/elixir/FLAVOUR_2_download/elixir_{{ elixir_version }}-1~ubuntu~trusty_i386.deb
-  become: yes

@@ -1,0 +1,42 @@
+---
+- name: Install system packages
+  apt:
+    name: '{{ item }}'
+    update_cache: yes
+    state: present
+  with_items:
+    - gcc
+    - g++
+    - curl
+    - wget
+    - unzip
+    - git
+    - python-dev
+    - python-apt
+    - python-pip
+    - make
+    - automake
+    - autoconf
+    - libreadline-dev
+    - libncurses-dev
+    - libssl-dev
+    - libyaml-dev
+    - libxslt-dev
+    - libffi-dev
+    - libtool
+    - unixodbc-dev
+    - monit
+    - vim
+    - build-essential
+  become: yes
+
+- name: Install python packages
+  pip:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - urllib3
+    - pyopenssl
+    - ndg-httpsclient
+    - pyasn1
+  become: yes

@@ -1,0 +1,37 @@
+---
+- name: Add nginx, nodejs sources
+  apt_repository:
+    repo: '{{ item.repo }}'
+    state: present
+    filename: '{{ item.filename }}'
+  with_items:
+    - { repo: 'deb https://deb.nodesource.com/node_{{ nodejs_version }} trusty main', filename: 'nodesource' }
+    - { repo: 'deb-src https://deb.nodesource.com/node_{{ nodejs_version }} trusty main', filename: 'nodesource' }
+    - { repo: 'ppa:nginx/stable', filename: 'nginx' }
+  become: yes
+
+- name: Add apt signing key for nodejs
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+  become: yes
+
+- name: Install nginx, nodejs
+  apt:
+    name: '{{ item }}'
+    update_cache: yes
+    state: present
+  with_items:
+    - nodejs
+    - nginx
+  become: yes
+
+- name: Install erlang {{ erlang_version }}
+  apt:
+    deb: http://packages.erlang-solutions.com/site/esl/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}~ubuntu~trusty_amd64.deb
+  become: yes
+
+- name: Install elixir {{ elixir_version }}
+  apt:
+    deb: https://packages.erlang-solutions.com/erlang/elixir/FLAVOUR_2_download/elixir_{{ elixir_version }}-1~ubuntu~trusty_i386.deb
+  become: yes

@@ -1,24 +1,32 @@
 ---
 - name: Add users
-  user: name={{ item.name }} state=present
+  user:
+    name: '{{ item.name }}'
+    state: present
   with_items: '{{ users }}'
   become: yes
 
 - name: Add SSH authorized keys
-  authorized_key: user={{ item.0.name }} key="{{ item.1 }}"
+  authorized_key:
+    user: '{{ item.0.name }}'
+    key: '{{ item.1 }}'
   with_subelements:
-    - "{{ users }}"
+    - '{{ users }}'
     - keys
   become: yes
 
 - name: Disable non-sudoers
-  file: path=/etc/sudoers.d/{{ item.name }} state=absent
+  file:
+    path: /etc/sudoers.d/{{ item.name }}
+    state: absent
   when: not item.sudoer
   with_items: '{{ users }}'
   become: yes
 
 - name: Enable sudoers (passwordless)
-  copy: content="{{ item.name }} ALL=NOPASSWD:ALL" dest=/etc/sudoers.d/{{ item.name }}
+  copy:
+    content: '{{ item.name }} ALL=NOPASSWD:ALL'
+    dest: /etc/sudoers.d/{{ item.name }}
   when: item.sudoer
   with_items: '{{ users }}'
   become: yes
