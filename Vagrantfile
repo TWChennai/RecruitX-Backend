@@ -68,7 +68,7 @@ Vagrant.configure(2) do |config|
   # Crack on with ansible provisioning
   config.vm.provision :ansible do |ansible|
     ansible.playbook = 'provision.yml'
-    ansible.vault_password_file = '.vault_pass.txt'
+    ansible.vault_password_file = '~/.vault_pass.txt'
     ansible.verbose = 'vvvv'
     ansible.inventory_path = 'inventory'
   end
