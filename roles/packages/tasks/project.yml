@@ -1,5 +1,5 @@
 ---
-- name: Add nginx, nodejs sources
+- name: Add nginx, nodejs, postgres sources
   apt_repository:
     repo: '{{ item.repo }}'
     state: present
@@ -8,15 +8,19 @@
     - { repo: 'deb https://deb.nodesource.com/node_{{ nodejs_version }} trusty main', filename: 'nodesource' }
     - { repo: 'deb-src https://deb.nodesource.com/node_{{ nodejs_version }} trusty main', filename: 'nodesource' }
     - { repo: 'ppa:nginx/stable', filename: 'nginx' }
+    - { repo: 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main', filename: 'pgdg' }
   become: yes
 
-- name: Add apt signing key for nodejs
+- name: Add apt signing key for nodejs, postgres
   apt_key:
-    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    url: '{{ item.url }}'
     state: present
+  with_items:
+    - { url: 'https://deb.nodesource.com/gpgkey/nodesource.gpg.key' }
+    - { url: 'https://www.postgresql.org/media/keys/ACCC4CF8.asc' }
   become: yes
 
-- name: Install nginx, nodejs
+- name: Install nginx, nodejs, postgres
   apt:
     name: '{{ item }}'
     update_cache: yes
@@ -24,6 +28,7 @@
   with_items:
     - nodejs
     - nginx
+    - postgresql-9.4
   become: yes
 
 - name: Install erlang {{ erlang_version }}
