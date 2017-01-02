@@ -52,5 +52,12 @@ defmodule RecruitxBackend.WeekendDriveSpec do
       expect(changeset) |> to_not(be_valid)
       expect(changeset) |> to(have_errors(end_date: "should be after start date"))
     end
+
+    it "should have role mapped to weekend drive" do
+       weekend_drive_without_role = Map.delete(valid_attrs, :role_id)
+       changeset = WeekendDrive.changeset(%WeekendDrive{}, weekend_drive_without_role)
+       expect(changeset) |> to_not(be_valid)
+       expect(changeset) |> to(have_errors(role_id: "can't be blank"))
+    end
   end
 end

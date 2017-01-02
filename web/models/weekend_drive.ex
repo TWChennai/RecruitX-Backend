@@ -13,12 +13,13 @@ defmodule RecruitxBackend.WeekendDrive do
     timestamps
   end
 
-  @required_fields ~w(start_date end_date no_of_candidates)
+  @required_fields ~w(start_date end_date no_of_candidates role_id)
   @optional_fields ~w(no_of_panelists)
 
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> assoc_constraint(:role)
     |> Timer.is_in_future(:start_date)
     |> Timer.is_after(:end_date, :start_date)
   end
