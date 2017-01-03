@@ -3,7 +3,7 @@ defmodule RecruitxBackend.WeekendDriveView do
   alias Timex.DateFormat
 
   def render("index.json", %{weekend_drives: weekend_drives}) do
-    %{data: render_many(weekend_drives, RecruitxBackend.WeekendDriveView, "weekend_drive.json")}
+     render_many(weekend_drives, RecruitxBackend.WeekendDriveView, "weekend_drive.json")
   end
 
   def render("show.json", %{weekend_drive: weekend_drive}) do

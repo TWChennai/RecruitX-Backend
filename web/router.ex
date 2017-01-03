@@ -35,7 +35,7 @@ defmodule RecruitxBackend.Router do
     resources "/sos_email", SosEmailController, only: [:index]
     resources "/slots", SlotController, only: [:create, :show, :index, :delete]
     resources "/slot_to_interview", SlotController, only: [:create]
-    resources "/weekend_drive", WeekendDriveController, only: [:create]
+    resources "/weekend_drive", WeekendDriveController, only: [:create, :index, :show, :update]
   end
 
   if Mix.env == :dev do
