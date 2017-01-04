@@ -5,6 +5,7 @@ defmodule ESpec.Phoenix.Extend do
       import RecruitxBackend.Factory
       import RecruitxBackend.TestHelpers
       import Ecto.Query, only: [from: 2, where: 2, preload: 2]
+      import ESpec.Phoenix.Assertions.Changeset.Helpers
     end
   end
 
@@ -15,6 +16,8 @@ defmodule ESpec.Phoenix.Extend do
       import RecruitxBackend.Factory
       import RecruitxBackend.TestHelpers
       import Ecto.Query, only: [from: 1, from: 2, where: 2]
+      use ESpec.Phoenix.Controllers.Helpers
+      import ESpec.Phoenix.Assertions.Conn.Helpers
     end
   end
 

@@ -12,7 +12,7 @@ defmodule RecruitxBackend.SosEmailSpec do
     before do: Repo.delete_all(Interview)
 
     it "should not send an email when there all interviews have sufficient signups" do
-      interview = create(:interview)
+      interview = insert(:interview)
       Repo.insert(%InterviewPanelist{panelist_login_name: "test1", interview_id: interview.id})
       Repo.insert(%InterviewPanelist{panelist_login_name: "test2", interview_id: interview.id})
       allow Swoosh.Templates |> to(accept(:sos_email, fn(_) -> "html content"  end))
@@ -26,9 +26,9 @@ defmodule RecruitxBackend.SosEmailSpec do
     end
 
     it "should send an email with the formatted data ordered by start time within the next 48 hours only" do
-      allow Timex.Date |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
-      create(:interview, start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
-      create(:interview, start_time: TimexHelper.from_epoch([date: {2011, 3, 1}]))
+      allow Timex |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
+      insert(:interview, start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
+      insert(:interview, start_time: TimexHelper.from_epoch([date: {2011, 3, 1}]))
       allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
       allow MailHelper |> to(accept(:deliver, &(&1)))
 
@@ -39,7 +39,7 @@ defmodule RecruitxBackend.SosEmailSpec do
 
     it "should send an email with the formatted data when there are interviews with less than required signups" do
       Repo.delete_all InterviewPanelist
-      interview = create(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days))
+      interview = insert(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days))
       Repo.insert(%InterviewPanelist{panelist_login_name: "test", interview_id: interview.id})
       allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
       allow MailHelper |> to(accept(:deliver, &(&1)))
@@ -50,13 +50,13 @@ defmodule RecruitxBackend.SosEmailSpec do
     end
 
     it "should send an email with the formatted data when there are interviews with zero signups" do
-      allow Timex.Date |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
-      role = create(:role)
-      candidate = create(:candidate, role_id: role.id, experience: Decimal.new(1))
-      create(:candidate_skill, skill_id: create(:skill, name: "test skill1").id, candidate_id: candidate.id)
-      create(:candidate_skill, skill_id: create(:skill, name: "test skill2").id, candidate_id: candidate.id)
-      interview_type = create(:interview_type)
-      create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
+      allow Timex |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
+      role = insert(:role)
+      candidate = insert(:candidate, role: role, experience: Decimal.new(1))
+      insert(:candidate_skill, skill: insert(:skill, name: "test skill1"), candidate: candidate)
+      insert(:candidate_skill, skill: insert(:skill, name: "test skill2"), candidate: candidate)
+      interview_type = insert(:interview_type)
+      insert(:interview, candidate: candidate, interview_type: interview_type, start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
       allow Swoosh.Templates |> to(accept(:sos_email, &(&1)))
       allow MailHelper |> to(accept(:deliver, &(&1)))
       allow System |> to(accept(:get_env, &(&1)))

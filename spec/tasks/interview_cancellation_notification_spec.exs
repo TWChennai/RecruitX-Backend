@@ -19,7 +19,7 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
     end
 
     it "should not send mail when the cancelled interviews do not have sign ups" do
-      create(:interview)
+      insert(:interview)
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       Interview |> InterviewCancellationNotification.execute
@@ -28,13 +28,13 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
     end
 
     it "should send mail to the panelist of the cancelled interview" do
-      candidate = create(:candidate, first_name: "testing", last_name: "last")
-      interview_type = create(:interview_type, name: "roundone")
-      interview = create(:interview,
-        candidate_id: candidate.id,
-        interview_type_id: interview_type.id,
+      candidate = insert(:candidate, first_name: "testing", last_name: "last")
+      interview_type = insert(:interview_type, name: "roundone")
+      interview = insert(:interview,
+        candidate: candidate,
+        interview_type: interview_type,
         start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
-      create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
+      insert(:interview_panelist, panelist_login_name: "test", interview: interview)
 
       allow MailHelper |> to(accept(:deliver, fn(%{subject: subject, to: to_addresses, html_body: {
         candidate_first_name, candidate_last_name, interview_name, interview_time }}) ->

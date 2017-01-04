@@ -19,7 +19,7 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
     end
 
     it "should not send mail when the cancelled slots do not have sign ups" do
-      create(:slot)
+      insert(:slot)
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       Slot |> SlotCancellationNotification.execute
@@ -28,11 +28,11 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
     end
 
     it "should send mail to the panelist of the deleted slots" do
-      interview_type = create(:interview_type, name: "roundone")
-      slot = create(:slot,
-        interview_type_id: interview_type.id,
+      interview_type = insert(:interview_type, name: "roundone")
+      slot = insert(:slot,
+        interview_type: interview_type,
         start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
-      create(:slot_panelist, panelist_login_name: "test", slot_id: slot.id)
+      insert(:slot_panelist, panelist_login_name: "test", slot: slot)
 
       allow MailHelper |> to(accept(:deliver, fn(%{subject: subject, to: to_addresses, html_body: {
         interview_name, interview_time }}) ->

@@ -7,15 +7,16 @@ defmodule RecruitxBackend.Team do
     field :name, :string
     field :active, :boolean, default: true
 
-    timestamps
+    timestamps()
   end
 
   @required_fields ~w(name)
   @optional_fields ~w(active)
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> unique_constraint(:name, name: :team_name_index)
   end
 

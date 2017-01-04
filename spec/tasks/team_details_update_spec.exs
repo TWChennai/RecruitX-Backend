@@ -12,10 +12,10 @@ defmodule RecruitxBackend.TeamDetailsUpdateSpec do
       it "should call update the same number of times as unprocessed update team details" do
         allow UpdatePanelistDetails |> to(accept(:execute, fn(_) -> %{employee_id: 123} end))
         allow UpdateTeam |> to(accept(:execute, fn(_, _) -> %{employee_id: 123} end))
-        create(:update_team_details)
-        create(:update_team_details)
-        create(:update_team_details)
-        create(:update_team_details, processed: true)
+        insert(:update_team_details)
+        insert(:update_team_details)
+        insert(:update_team_details)
+        insert(:update_team_details, processed: true)
 
         TeamDetailsUpdate.execute
 

@@ -8,15 +8,16 @@ defmodule RecruitxBackend.FeedbackImage do
 
     belongs_to :interview, Interview
 
-    timestamps
+    timestamps()
   end
 
   @required_fields ~w(file_name interview_id)
   @optional_fields ~w()
 
-  def changeset(model, params) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_length(:file_name, min: 1)
     |> validate_format(:file_name, ~r/^[a-z]+[\sa-z0-9_.-]*$/i)
     |> unique_constraint(:file_name_unique, name: :feedback_file_name_interview_id_unique_index, message: "This file has already been uploaded")

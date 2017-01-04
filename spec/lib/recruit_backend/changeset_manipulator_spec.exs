@@ -8,7 +8,7 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
 
   context "insert" do
     it "should insert a changeset into db" do
-      role = fields_for(:role)
+      role = params_with_assocs(:role)
       changesets = [Role.changeset(%Role{}, role)]
 
       {status, result} = changesets |> ChangesetManipulator.validate_and(Repo.custom_insert)
@@ -28,7 +28,7 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
 
     it "should not insert a changeset into db when there are constraint errors on db insertion" do
       expectedErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
-      candidate = fields_for(:candidate)
+      candidate = params_with_assocs(:candidate)
       changesets = [Candidate.changeset(%Candidate{}, Map.merge(candidate, %{role_id: -1}))]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_insert)
@@ -39,7 +39,7 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
 
   context "update" do
     it "should update changeset into db" do
-      role = create(:role)
+      role = insert(:role)
       changesets = [Role.changeset(role, %{"name": "test"})]
 
       {status, result} = changesets |> ChangesetManipulator.validate_and(Repo.custom_update)
@@ -50,7 +50,7 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
 
     it "should not update a changeset into db when there are changeset errors" do
       expectedErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
-      role = create(:role)
+      role = insert(:role)
       changesets = [Role.changeset(role, %{"name": nil})]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_update)
@@ -60,16 +60,12 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
 
     it "should not update a changeset into db when there are constraint errors on db insertion" do
       expectedErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
-      candidate = create(:candidate)
+      candidate = insert(:candidate)
       changesets = [Candidate.changeset(candidate, %{role_id: -1})]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_update)
 
       expect result |> to(be({false, [expectedErrorReason]}))
     end
-  end
-
-  def get_candidate_count do
-    Ectoo.count(Repo, Candidate)
   end
 end

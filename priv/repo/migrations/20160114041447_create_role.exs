@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRole do
     create table(:roles) do
       add :name, :string, null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:roles, ["UPPER(name)"], unique: true, name: :roles_name_index)

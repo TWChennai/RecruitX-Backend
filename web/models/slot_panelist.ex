@@ -14,15 +14,16 @@ defmodule RecruitxBackend.SlotPanelist do
 
     belongs_to :slot, Slot
 
-    timestamps
+    timestamps()
   end
 
   @required_fields ~w(panelist_login_name slot_id)
   @optional_fields ~w(satisfied_criteria)
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_format(:panelist_login_name, AppConstants.name_format)
     |> validate_sign_up_for_slot(params)
     |> unique_constraint(:panelist_login_name, name: :slot_panelist_login_name_index, message: "You have already signed up for this slot")
@@ -48,10 +49,13 @@ defmodule RecruitxBackend.SlotPanelist do
         retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), retrieved_panelist_role, true)
         sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, slot, Role.ba_and_pm_list)
-        existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
+        existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
+      else
+        existing_changeset
       end
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp update_changeset(existing_changeset, sign_up_evaluation_status, true) do

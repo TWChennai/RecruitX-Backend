@@ -1,5 +1,5 @@
 defmodule RecruitxBackend.SosEmail do
-  import Ecto.Query, only: [preload: 2, order_by: 2, where: 2, select: 3]
+  import Ecto.Query, only: [preload: 2, order_by: 2, select: 3]
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
@@ -10,7 +10,7 @@ defmodule RecruitxBackend.SosEmail do
   alias Swoosh.Templates
 
   def execute do
-    interviews_with_insufficient_panelists = get_interviews_with_insufficient_panelists |> construct_view_data
+    interviews_with_insufficient_panelists = get_interviews_with_insufficient_panelists() |> construct_view_data
 
     if interviews_with_insufficient_panelists != [] do
       MailHelper.deliver %{

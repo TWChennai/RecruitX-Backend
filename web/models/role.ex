@@ -18,7 +18,7 @@ defmodule RecruitxBackend.Role do
   schema "roles" do
     field :name, :string
 
-    timestamps
+    timestamps()
 
     has_many :candidates, Candidate
     has_many :role_skills, RoleSkill
@@ -28,9 +28,10 @@ defmodule RecruitxBackend.Role do
   @required_fields ~w(name)
   @optional_fields ~w()
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:name, AppConstants.name_format)
     |> unique_constraint(:name, name: :roles_name_index)
@@ -40,17 +41,17 @@ defmodule RecruitxBackend.Role do
 
   def is_ba_or_pm(role_id, ba_and_pm), do: Enum.any?(ba_and_pm, &(&1 == role_id))
 
-  def ba_and_pm_list, do: [ba_role_id, pm_role_id]
+  def ba_and_pm_list, do: [ba_role_id(), pm_role_id()]
 
-  def get_all_roles, do: (from r in __MODULE__, where: r.name != ^other) |> Repo.all
+  def get_all_roles, do: (from r in __MODULE__, where: r.name != ^other()) |> Repo.all
 
   def get_role(role_name) do
     case retrieve_by_name(role_name) do
-        nil -> other |> retrieve_by_name
+        nil -> other() |> retrieve_by_name()
         role -> role
     end
   end
 
-  defp ba_role_id, do: retrieve_by_name(ba).id
-  defp pm_role_id, do: retrieve_by_name(pm).id
+  defp ba_role_id, do: retrieve_by_name(ba()).id
+  defp pm_role_id, do: retrieve_by_name(pm()).id
 end

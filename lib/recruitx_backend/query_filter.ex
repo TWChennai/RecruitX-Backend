@@ -23,7 +23,7 @@ defmodule RecruitxBackend.QueryFilter do
       AND role_id in (4, 2)
   """
   def filter(query, filters, model) do
-    import Query, only: [from: 2, where: 2]
+    import Query, only: [from: 2]
 
     Enum.reduce(Map.keys(filters), query, fn(key, acc) ->
       value = Map.get(filters, key)

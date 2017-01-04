@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePipelineStatus do
     create table(:pipeline_statuses) do
       add :name, :string, null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:pipeline_statuses, ["UPPER(name)"], unique: true, name: :pipeline_statuses_name_index)

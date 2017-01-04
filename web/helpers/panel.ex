@@ -48,12 +48,10 @@ defmodule RecruitxBackend.Panel do
     interview_type_specfic_criteria = sign_up_data_container_for_interviews.interview_type_specfic_criteria
     ba_or_pm = Role.ba_and_pm_list
     interviews_with_signup_eligibility = Enum.reduce(interviews, [], fn(interview, acc) ->
-      if is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, interview.candidate.role_id, ba_or_pm),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview, ba_or_pm)]
-      acc
+      if is_visible(panelist_role, panelist_login_name, interview, interview_type_specfic_criteria, interview.candidate.role_id, ba_or_pm), do: acc ++ [put_sign_up_status(sign_up_data_container_for_interviews, interview, ba_or_pm)], else: acc
     end)
     Enum.reduce(slots, interviews_with_signup_eligibility, fn(slot, acc) ->
-      if is_visible(panelist_role, panelist_login_name, slot, interview_type_specfic_criteria, slot.role_id, ba_or_pm),do: acc = acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot, ba_or_pm)]
-      acc
+      if is_visible(panelist_role, panelist_login_name, slot, interview_type_specfic_criteria, slot.role_id, ba_or_pm), do: acc ++ [put_sign_up_status(sign_up_data_container_for_slots, slot, ba_or_pm)], else: acc
     end)
   end
 
@@ -70,9 +68,11 @@ defmodule RecruitxBackend.Panel do
   defp put_sign_up_status(sign_up_data_container, panel, ba_or_pm) do
     sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, panel, ba_or_pm)
     panel = Map.put(panel, :signup_error, "")
-    if !sign_up_evaluation_status.valid? do
+    panel = if !sign_up_evaluation_status.valid? do
       {_, error} = sign_up_evaluation_status.errors |> List.first
-      panel = Map.put(panel, :signup_error, error)
+      Map.put(panel, :signup_error, error)
+    else
+      panel
     end
     Map.put(panel, :signup, sign_up_evaluation_status.valid?)
   end

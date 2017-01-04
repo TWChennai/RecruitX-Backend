@@ -9,7 +9,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleSkill do
       add :role_id, references(:roles, on_delete: :delete_all), null: false
       add :skill_id, references(:skills, on_delete: :delete_all), null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:role_skills, [:role_id, :skill_id], unique: true, name: :role_skill_id_index)

@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateTeam do
     create table(:teams) do
       add :name, :string, null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:teams, ["UPPER(name)"], unique: true, name: :team_name_index)

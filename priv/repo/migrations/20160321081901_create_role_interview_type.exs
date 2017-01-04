@@ -12,7 +12,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateRoleInterviewType do
       add :role_id, references(:roles, on_delete: :delete_all), null: false
       add :interview_type_id, references(:interview_types, on_delete: :delete_all), null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:role_interview_types, [:role_id, :interview_type_id], unique: true, name: :role_interview_type_id_index)

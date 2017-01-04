@@ -8,7 +8,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   @lower_bound "LB"
   @upper_bound "UB"
 
-  import Ecto.Query, only: [from: 2, where: 2]
+  import Ecto.Query, only: [from: 2]
 
   def evaluate(sign_up_evaluation_status, %{experience_eligibility_criteria: experience_eligibility_criteria, panelist_role: panelist_role}, interview, is_slot) do
     experience  = calculate_experience(interview, is_slot)
@@ -30,8 +30,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
     result = !Enum.member?(experience_eligibility_criteria.interview_types_with_filter,       interview_type_id)
               or !Enum.member?(experience_eligibility_criteria.role_ids_with_filter, panelist_role.id)
               or to_float(experience_eligibility_criteria.panelist_experience) > to_float(experience_eligibility_criteria.max_experience_with_filter)
-    if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
-    sign_up_evaluation_status
+    if result, do: sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound), else: sign_up_evaluation_status
   end
 
   defp is_eligible_without_LB_and_UB_filters(%{valid?: false} = sign_up_evaluation_status, _interview_type_id,  _experience_eligibility_criteria, _panelist_role), do: sign_up_evaluation_status
@@ -39,8 +38,7 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
   defp is_eligible_with_LB_filters(%{valid?: true, satisfied_criteria: ""} = sign_up_evaluation_status, experience_matrix_filters, candidate_experience, interview_type_id) do
     result = Enum.any?(experience_matrix_filters, fn({eligible_candidate_lower_experience, _eligible_candidate_upper_experience, eligible_interview_type_id}) -> interview_type_id == eligible_interview_type_id and to_float(candidate_experience) <= to_float(eligible_candidate_lower_experience)
     end)
-    if result, do: sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound)
-    sign_up_evaluation_status
+    if result, do: sign_up_evaluation_status |> SignUpEvaluationStatus.add_satisfied_criteria(@lower_bound), else: sign_up_evaluation_status
   end
 
   defp is_eligible_with_LB_filters(sign_up_evaluation_status, _, _, _), do: sign_up_evaluation_status

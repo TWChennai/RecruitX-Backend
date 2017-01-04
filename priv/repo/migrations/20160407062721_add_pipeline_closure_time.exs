@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.AddPipelineClosureTime do
 
   def change do
     alter table(:candidates) do
-      add :pipeline_closure_time, :datetime
+      add :pipeline_closure_time, :utc_datetime
     end
 
     closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id

@@ -24,7 +24,7 @@ alias RecruitxBackend.Slot
 alias RecruitxBackend.SlotPanelist
 alias RecruitxBackend.TimexHelper
 
-import Ecto.Query, only: [from: 2, where: 2]
+import Ecto.Query, only: [from: 2]
 
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(from r in Role, where: r.name != ^Role.other)
@@ -42,13 +42,13 @@ candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Subha M" => "NodeJS",
           "Vijay A" => "Haskell"}, fn {name_value, other_skills} ->
   [first_name, last_name] = String.split(name_value, " ")
-  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: in_progress.id})
+  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(Enum.random(20..50)/Enum.random(1..7), 2)), other_skills: other_skills, role: Enum.random(roles), pipeline_status: in_progress})
 end)
 
 Enum.each(candidates, fn candidate ->
-  for _ <- 1..:rand.uniform(5) do
+  for _ <- 1..Enum.random(1..5) do
     try do
-      Repo.insert!(%CandidateSkill{candidate_id: candidate.id, skill_id: Enum.random(skills).id})
+      Repo.insert!(%CandidateSkill{candidate: candidate, skill: Enum.random(skills)})
     rescue
       ConstraintError -> {} # ignore the unique constraint violation errors
     end
@@ -57,34 +57,35 @@ end)
 
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
 
-for interview_round_number <- 1..:rand.uniform(4) do
+for interview_round_number <- 1..Enum.random(1..4) do
   now = TimexHelper.utc_now()
   random_start_time = now |> TimexHelper.add(interview_round_number, :hours)
   random_end_time = random_start_time |> TimexHelper.add(1, :hours)
   interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
 
   slot = Repo.insert!(%Slot{
-    role_id: Enum.random(roles).id,
+    role: Enum.random(roles),
     start_time: random_start_time,
     end_time: random_end_time,
     average_experience: Decimal.new(Enum.random(1..10)),
-    interview_type_id: interview_type.id,
+    interview_type: interview_type,
   })
   Repo.insert!(%SlotPanelist{
     panelist_login_name: Enum.random(panelist_names),
-    slot_id: slot.id
+    slot: slot
   })
 end
 
 Enum.each(candidates, fn candidate ->
   now = TimexHelper.utc_now()
-  for interview_round_number <- 1..:rand.uniform(4) do
+  for interview_round_number <- 1..Enum.random(1..4) do
     random_start_time = now |> TimexHelper.add(interview_round_number, :hours)
+    random_end_time = random_start_time |> TimexHelper.add(2, :hours)
     interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
-    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> TimexHelper.add(2, :hours)})
-    for _ <- 1..:rand.uniform(2) do
+    interview = Repo.insert!(%Interview{candidate: candidate, interview_type: interview_type, start_time: random_start_time, end_time: random_end_time})
+    for _ <- 1..Enum.random(1..2) do
         try do
-          Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})
+          Repo.insert!(%InterviewPanelist{interview: interview, panelist_login_name: Enum.random(panelist_names)})
         rescue
           ConstraintError -> {} # ignore the unique constraint violation errors
         end

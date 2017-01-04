@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewStatus do
     create table(:interview_status) do
       add :name, :string, null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:interview_status, ["UPPER(name)"], unique: true, name: :interview_status_name_index)

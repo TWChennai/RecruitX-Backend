@@ -24,6 +24,8 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
+config :recruitx_backend, ecto_repos: [RecruitxBackend.Repo]
+
 config :arc,
   bucket: System.get_env("AWS_BUCKET")
 

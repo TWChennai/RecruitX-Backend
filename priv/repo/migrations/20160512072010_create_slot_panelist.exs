@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSlotPanelist do
       add :slot_id, references(:slots, on_delete: :delete_all), null: false
       add :satisfied_criteria, :string
 
-      timestamps
+      timestamps()
     end
 
     create index(:slot_panelists, [:panelist_login_name, :slot_id], unique: true, name: :slot_panelist_login_name_index)

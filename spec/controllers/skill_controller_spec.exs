@@ -9,16 +9,16 @@ defmodule RecruitxBackend.SkillControllerSpec do
       ]
     end
 
-    before do: allow Repo |> to(accept(:all, fn(_) -> skills end))
+    before do: allow Repo |> to(accept(:all, fn(_) -> skills() end))
     subject do: action :index
 
-    it do: should be_successful
+    it do: should be_successful()
     it do: should have_http_status(:ok)
 
     it "should return the array of skills as a JSON response" do
       response = action(:index)
 
-      expect(response.assigns.skills) |> to(eq(skills))
+      expect(response.assigns.skills) |> to(eq(skills()))
     end
   end
 end

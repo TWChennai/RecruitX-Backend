@@ -19,7 +19,7 @@ defmodule RecruitxBackend.Candidate do
     field :other_skills, :string
     field :pipeline_closure_time, Timex.Ecto.DateTime
 
-    timestamps
+    timestamps()
 
     belongs_to :role, Role
     belongs_to :pipeline_status, PipelineStatus
@@ -31,9 +31,10 @@ defmodule RecruitxBackend.Candidate do
   @required_fields ~w(first_name last_name experience role_id)
   @optional_fields ~w(other_skills pipeline_status_id pipeline_closure_time)
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_length(:first_name, min: 1)
     |> validate_format(:first_name, AppConstants.name_format)
     |> validate_length(:last_name, min: 1)
@@ -49,9 +50,14 @@ defmodule RecruitxBackend.Candidate do
     pipeline_status_id = existing_changeset |> get_field(:pipeline_status_id)
     if !is_nil(pipeline_status_id) do
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
-      if pipeline_status_id == closed_pipeline_status_id, do: existing_changeset = existing_changeset |> put_change(:pipeline_closure_time, TimexHelper.utc_now())
+      if pipeline_status_id == closed_pipeline_status_id do
+        existing_changeset |> put_change(:pipeline_closure_time, TimexHelper.utc_now())
+      else
+        existing_changeset
+      end
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp pipeline_closure_within_range(query, start_date, end_date) do
@@ -85,10 +91,9 @@ defmodule RecruitxBackend.Candidate do
     Enum.count(candidates_passed, fn(candidate) ->
       Enum.any?(last_interviews_data, fn (last_interview) ->
         [candidate_id, max_start_time, _] = last_interview
-        pass_interview_start_time = Timex.Date.from(max_start_time)
         candidate_id == candidate.id &&
-        TimexHelper.compare(pass_interview_start_time, start_date) &&
-        TimexHelper.compare(end_date, pass_interview_start_time)
+        TimexHelper.compare(max_start_time, start_date) &&
+        TimexHelper.compare(end_date, max_start_time)
       end)
     end)
   end
@@ -103,9 +108,10 @@ defmodule RecruitxBackend.Candidate do
     incoming_id = existing_changeset |> get_field(:pipeline_status_id)
     if is_nil(incoming_id) do
       in_progess = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
-      existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess.id)
+      existing_changeset |> put_change(:pipeline_status_id, in_progess.id)
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   def updateCandidateStatusAsPass(id) do
@@ -164,7 +170,7 @@ defmodule RecruitxBackend.Candidate do
   def get_formatted_skills(candidate) do
     (Enum.reduce(candidate.skills, "", fn(skill, accumulator) ->
       skill_name = skill.name
-      if skill_name == "Other", do: skill_name = candidate.other_skills
+      skill_name = if skill_name == "Other", do: candidate.other_skills, else: skill_name
       accumulator <> ", " <> skill_name
     end))
     |> String.lstrip(?,)

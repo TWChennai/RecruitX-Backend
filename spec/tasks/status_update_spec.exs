@@ -56,7 +56,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     describe "execute weekly status update" do
       it "should filter previous weeks interviews and construct email" do
 
-        interview = create(:interview, interview_type_id: 1, start_time: get_start_of_current_week )
+        interview = insert(:interview, start_time: get_start_of_current_week() )
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
@@ -90,7 +90,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should call MailmanExtensions deliver with correct arguments" do
-        create(:interview, interview_type_id: 1, start_time: get_start_of_current_week)
+        insert(:interview, start_time: get_start_of_current_week())
         email = %{
             subject: "[RecruitX] Weekly Status Update",
             to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -106,7 +106,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous week" do
-        create(:interview, interview_type_id: 1, start_time: get_start_of_current_week |> TimexHelper.add(-1, :days))
+        insert(:interview, start_time: get_start_of_current_week() |> TimexHelper.add(-1, :days))
         email = %{
             subject: "[RecruitX] Weekly Status Update",
             to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -133,9 +133,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     end
 
     describe "execute monthly status update" do
-
       it "should filter previous months interviews and construct email" do
-        interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
+        interview = insert(:interview, start_time: get_date_of_previous_month())
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
@@ -168,7 +167,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should call MailmanExtensions deliver with correct arguments" do
-        create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
+        insert(:interview, start_time: get_date_of_previous_month())
         subject_suffix = TimexHelper.format_with_timezone(Timer.get_previous_month.starting, " - %b %Y")
         email = %{
             subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
@@ -194,7 +193,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       it "should send a default mail if there are no interview in previous month" do
         subject_suffix = TimexHelper.format_with_timezone(Timer.get_previous_month.starting, " - %b %Y")
 
-        create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() )
+        insert(:interview, start_time: TimexHelper.utc_now())
         email = %{
             subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
             to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -215,7 +214,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
     describe "execute quarterly status update" do
       it "should filter previous quarters interviews and construct email" do
-        interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
+        interview = insert(:interview, start_time: get_date_of_previous_quarter())
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
@@ -248,7 +247,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should call MailmanExtensions deliver with correct arguments" do
-        create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
+        insert(:interview, start_time: get_date_of_previous_quarter())
         time = Timer.get_previous_quarter
         subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
         email = %{
@@ -294,7 +293,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous month" do
-        create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() )
+        insert(:interview, start_time: TimexHelper.utc_now())
         time = Timer.get_previous_quarter
         subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
 

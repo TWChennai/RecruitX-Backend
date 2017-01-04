@@ -6,7 +6,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewPanelist do
       add :panelist_login_name, :string, null: false
       add :interview_id, references(:interviews, on_delete: :delete_all), null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:interview_panelists, [:panelist_login_name, :interview_id], unique: true, name: :interview_panelist_login_name_index)

@@ -1,15 +1,15 @@
 defmodule RecruitxBackend.TestHelpers do
   alias RecruitxBackend.TimexHelper
 
-  def conn_with_dummy_authorization() do
-    Plug.Conn.put_req_header(Phoenix.ConnTest.conn(), "authorization", System.get_env("API_KEY"))
+  def conn_with_dummy_authorization do
+    Plug.Conn.put_req_header(Phoenix.ConnTest.build_conn(), "authorization", System.get_env("API_KEY"))
   end
 
   def convertKeysFromAtomsToStrings(input) do
     for {key, val} <- input, into: %{}, do: {to_string(key), val}
   end
 
-  def compare_fields( map1, map2, fields) do
+  def compare_fields(map1, map2, fields) do
     Enum.all?(fields, fn(field) -> Map.get(map1, field) == Map.get(map2, field) end)
   end
 

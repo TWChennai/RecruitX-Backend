@@ -13,7 +13,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateCandidate do
       add :role_id, references(:roles)
       add :pipeline_status_id, references(:pipeline_statuses), null: false, default: in_progess_id
 
-      timestamps
+      timestamps()
     end
 
     create index(:candidates, [:role_id])

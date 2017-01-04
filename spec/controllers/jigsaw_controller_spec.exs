@@ -11,28 +11,27 @@ defmodule RecruitxBackend.JigsawControllerSpec do
   @people "People"
   @specialist "Specialist"
 
-  let :panelist_role, do: create(:role)
+  let :panelist_role, do: insert(:role)
   let :hire_date, do: TimexHelper.utc_now() |> TimexHelper.add(-5, :months) |> TimexHelper.format_with_timezone("%Y-%m-%d")
-  let :past_exp, do: 5.34
 
   describe "get_jigsaw_data" do
-
     it "should return details for normal users" do
-      jigsaw_result = %{body: "{\"role\":{\"name\":\"#{panelist_role.name}\"},\"department\":{\"name\":\"PS\"},
-                              \"hireDate\":\"#{hire_date}\",\"totalExperience\":12.84,\"twExperience\":#{past_exp}}", status_code: 200}
+      past_exp = 5.34
+      jigsaw_result = %{body: "{\"role\":{\"name\":\"#{panelist_role().name}\"},\"department\":{\"name\":\"PS\"},
+                              \"hireDate\":\"#{hire_date()}\",\"totalExperience\":12.84,\"twExperience\":#{past_exp}}", status_code: 200}
       allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
       %{user_details: %{is_recruiter: is_recruiter, calculated_hire_date: calculated_hire_date, past_experience: past_experience,
                                   role: role, is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
 
       expect(is_recruiter) |> to(be(false))
       expect(is_super_user) |> to(be(false))
-      expect(role) |> to(be(panelist_role))
+      expect(role) |> to(be(panelist_role()))
       expect(past_experience) |> to(be(Decimal.new(7.5)))
-      expect(calculated_hire_date) |> to(be(TimexHelper.utc_now() |> TimexHelper.add(-round(past_exp * 12), :months)))
+      expect(Timex.diff(calculated_hire_date, TimexHelper.utc_now() |> TimexHelper.add(-round(past_exp * 12), :months), :seconds)) |> to(be(0))
     end
 
     it "should return the is_recruiter true for recruiters" do
-      jigsaw_result = %{body: "{\"role\":{\"name\":\"#{panelist_role.name}\"},\"department\":{\"name\":\"#{@recruitment_department}\"},
+      jigsaw_result = %{body: "{\"role\":{\"name\":\"#{panelist_role().name}\"},\"department\":{\"name\":\"#{@recruitment_department}\"},
                               \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
       allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
       %{user_details: %{is_recruiter: is_recruiter, calculated_hire_date: _calculated_hire_date,

@@ -28,17 +28,21 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluator do
   defp is_eligible_based_on_role(sign_up_evaluation_status, interview_type_specfic_criteria, panelist_role, interview, false, ba_or_pm) do
     interview = Repo.preload interview, :candidate
     if !is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
-    and (panelist_role |> is_nil or !(Role.is_ba_or_pm(panelist_role.id, ba_or_pm) and Role.is_ba_or_pm(interview.candidate.role_id, ba_or_pm)) and panelist_role.id != interview.candidate.role_id), do:
-      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this interview"})
-    sign_up_evaluation_status
+    and (panelist_role |> is_nil or !(Role.is_ba_or_pm(panelist_role.id, ba_or_pm) and Role.is_ba_or_pm(interview.candidate.role_id, ba_or_pm)) and panelist_role.id != interview.candidate.role_id) do
+      sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this interview"})
+    else
+      sign_up_evaluation_status
+    end
   end
 
   @lint [{Credo.Check.Refactor.FunctionArity, false}]
   defp is_eligible_based_on_role(sign_up_evaluation_status, interview_type_specfic_criteria, panelist_role, slot, true, ba_or_pm) do
     if !is_interview_type_with_specific_panelists(slot, interview_type_specfic_criteria)
-    and (panelist_role |> is_nil or !(Role.is_ba_or_pm(panelist_role.id, ba_or_pm) and Role.is_ba_or_pm(slot.role_id, ba_or_pm)) and panelist_role.id != slot.role_id), do:
-      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this slot"})
-    sign_up_evaluation_status
+    and (panelist_role |> is_nil or !(Role.is_ba_or_pm(panelist_role.id, ba_or_pm) and Role.is_ba_or_pm(slot.role_id, ba_or_pm)) and panelist_role.id != slot.role_id) do
+      sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this slot"})
+    else
+      sign_up_evaluation_status
+    end
   end
 
   def is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria), do:

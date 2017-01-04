@@ -8,8 +8,8 @@ defmodule RecruitxBackend.QueryFilterSpec do
   before do: Repo.delete_all(Candidate)
 
   it "should filter fields when their values are passed as arrays" do
-    c1 = create(:candidate)
-    create(:candidate)
+    c1 = insert(:candidate)
+    insert(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{role_id: [c1.role_id]}
@@ -20,7 +20,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
   end
 
   it "should filter fields when their values are not passed as arrays" do
-    c1 = create(:candidate)
+    c1 = insert(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{role_id: c1.role_id}
@@ -31,8 +31,8 @@ defmodule RecruitxBackend.QueryFilterSpec do
   end
 
   it "should filter multiple fields when their values are passed as arrays" do
-    c1 = create(:candidate)
-    c2 = create(:candidate)
+    c1 = insert(:candidate)
+    c2 = insert(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{role_id: [c1.role_id], first_name: [c1.first_name, c2.first_name]}
@@ -43,8 +43,8 @@ defmodule RecruitxBackend.QueryFilterSpec do
   end
 
   it "should filter fields when their values are strings" do
-    c1 = create(:candidate)
-    create(:candidate)
+    c1 = insert(:candidate)
+    insert(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{first_name: [c1.first_name]}
@@ -55,8 +55,8 @@ defmodule RecruitxBackend.QueryFilterSpec do
   end
 
   it "should filter fields with like matches when their values are strings" do
-    c1 = create(:candidate)
-    c2 = create(:candidate, first_name: "#{c1.first_name}extension")
+    c1 = insert(:candidate)
+    c2 = insert(:candidate, first_name: "#{c1.first_name}extension")
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{first_name: ["#{c1.first_name}%"]}
@@ -68,7 +68,7 @@ defmodule RecruitxBackend.QueryFilterSpec do
   end
 
   it "should not modify query when invalid fields are passed" do
-    create(:candidate)
+    insert(:candidate)
     query = Ecto.Query.from c in Candidate
     model = Candidate
     filters = %{dummy: ['a']}

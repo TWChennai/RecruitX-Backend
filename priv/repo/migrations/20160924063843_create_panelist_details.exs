@@ -7,7 +7,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreatePanelistDetails do
       add :employee_id, :decimal, null: false
       add :role_id, references(:roles)
 
-      timestamps
+      timestamps()
     end
 
     create index(:panelist_details, ["UPPER(panelist_login_name)", "employee_id"], unique: true, name: :panelist_details_index)

@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSkill do
     create table(:skills) do
       add :name, :string, null: false
 
-      timestamps
+      timestamps()
     end
 
     create index(:skills, ["UPPER(name)"], unique: true, name: :skills_name_index)

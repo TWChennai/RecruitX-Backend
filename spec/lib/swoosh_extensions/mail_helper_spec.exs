@@ -18,7 +18,7 @@ defmodule  RecruitxBackend.MailHelperSpec do
     it "should return the default email struct" do
       actual_email = MailHelper.default_mail()
 
-      expect(actual_email) |> ESpec.To.to(be(default_email))
+      expect(actual_email) |> ESpec.To.to(be(default_email()))
     end
 
     it "should override the appropriate fields in the default email on passing a non-empty struct" do
@@ -26,7 +26,7 @@ defmodule  RecruitxBackend.MailHelperSpec do
        subject: "Subject",
        to: ["someone@example.com", "abcd@example.com"]
      }
-     expected_email = %{ default_email | subject: email.subject, to: email.to }
+     expected_email = %{ default_email() | subject: email.subject, to: email.to }
      actual_email = MailHelper.override_default(email)
 
      expect(actual_email) |> to(be(expected_email))

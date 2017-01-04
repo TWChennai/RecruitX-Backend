@@ -19,14 +19,15 @@ defmodule RecruitxBackend.Web do
   def model do
     quote do
       use Ecto.Schema
-      use Timex.Ecto.Timestamps
 
+      alias RecruitxBackend.Repo
       import Ecto
       import Ecto.Changeset
       import Ecto.Query, only: [from: 1, from: 2, where: 2, where: 3, preload: 3]
 
-      # def all, do: Repo.all(__MODULE__)
-      # def count, do: (from m in __MODULE__, select: count(m.id)) |> Repo.one
+      def all, do: Repo.all(__MODULE__)
+      def count, do: Repo.aggregate(__MODULE__, :count, :id)
+      def max(key), do: Repo.aggregate(__MODULE__, :max, key) || 0
     end
   end
 
@@ -39,6 +40,7 @@ defmodule RecruitxBackend.Web do
       import Ecto.Query, only: [from: 1, from: 2, preload: 2, order_by: 2]
 
       import RecruitxBackend.Router.Helpers
+      import RecruitxBackend.Gettext
     end
   end
 
@@ -51,6 +53,7 @@ defmodule RecruitxBackend.Web do
 
       import RecruitxBackend.Router.Helpers
       import RecruitxBackend.ErrorHelpers
+      import RecruitxBackend.Gettext
     end
   end
 

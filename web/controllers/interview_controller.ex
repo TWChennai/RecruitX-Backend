@@ -12,8 +12,6 @@ defmodule RecruitxBackend.InterviewController do
   alias RecruitxBackend.QueryFilter
   alias RecruitxBackend.Panel
 
-  @api_key System.get_env("API_KEY")
-
   plug :scrub_params, "interview" when action in [:update, :create]
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role, "preload" => _preload}) do

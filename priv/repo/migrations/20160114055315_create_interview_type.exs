@@ -6,7 +6,7 @@ defmodule RecruitxBackend.Repo.Migrations.CreateInterviewType do
       add :name, :string, null: false
       add :priority, :integer
 
-      timestamps
+      timestamps()
     end
 
     create index(:interview_types, ["UPPER(name)"], unique: true, name: :interview_types_name_index)

@@ -19,7 +19,7 @@ defmodule RecruitxBackend.Slot do
     field :average_experience, :decimal
     field :skills, :string
 
-    timestamps
+    timestamps()
 
     belongs_to :role, Role
     belongs_to :interview_type, InterviewType
@@ -30,9 +30,11 @@ defmodule RecruitxBackend.Slot do
   @required_fields ~w(role_id interview_type_id start_time)
   @optional_fields ~w(end_time average_experience skills)
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
+    params = TimexHelper.add_timezone_if_not_present(params)
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> populate_exp_skill_fields()
     |> has_interview_round_for_slot_creation(:skills)
     |> Timer.is_in_future(:start_time)
@@ -43,9 +45,10 @@ defmodule RecruitxBackend.Slot do
   defp has_interview_round_for_slot_creation(existing_changeset, field) do
     if is_nil(existing_changeset.errors) or Enum.empty?(existing_changeset.errors) do
       skills = Changeset.get_field(existing_changeset, field)
-      if is_nil(skills), do: existing_changeset = Changeset.add_error(existing_changeset, :slots, "No Interviews has been scheduled!")
+      if is_nil(skills), do: Changeset.add_error(existing_changeset, :slots, "No Interviews has been scheduled!"), else: existing_changeset
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp populate_exp_skill_fields(existing_changeset) do
@@ -56,11 +59,14 @@ defmodule RecruitxBackend.Slot do
       candidates = Candidate.get_candidates_scheduled_for_date_and_interview_round(start_time, interview_type_id, role_id) |> Repo.all
       candidate_ids = Enum.map(candidates, &(&1.id))
       if !Enum.empty? candidates do
-        existing_changeset = existing_changeset |> Changeset.put_change(:skills, Candidate.get_unique_skills_formatted(candidate_ids))
-        existing_changeset = existing_changeset |> Changeset.put_change(:average_experience, calculate_average_experience (candidates))
+        existing_changeset |> Changeset.put_change(:skills, Candidate.get_unique_skills_formatted(candidate_ids))
+        |> Changeset.put_change(:average_experience, calculate_average_experience (candidates))
+      else
+        existing_changeset
       end
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp calculate_average_experience(candidates) do

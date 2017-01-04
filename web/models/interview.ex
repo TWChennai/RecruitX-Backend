@@ -29,7 +29,7 @@ defmodule RecruitxBackend.Interview do
     belongs_to :interview_type, InterviewType
     belongs_to :interview_status, InterviewStatus
 
-    timestamps
+    timestamps()
 
     has_many :interview_panelist, InterviewPanelist
     has_many :feedback_images, FeedbackImage
@@ -108,9 +108,11 @@ defmodule RecruitxBackend.Interview do
     |> having([i], count(i.id) < fragment("(select max_sign_up_limit from interview_types where id = ?)", i.interview_type_id) or not(i.id in fragment("(select interview_id from interview_panelists where interview_id = ?)", i.id)))
   end
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
+    params = TimexHelper.add_timezone_if_not_present(params)
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> unique_constraint(:interview_type_id, name: :candidate_interview_type_id_index)
     |> validate_single_update_of_status()
     |> assoc_constraint(:candidate)
@@ -131,9 +133,10 @@ defmodule RecruitxBackend.Interview do
     id = get_field(existing_changeset, :id)
     if !is_nil(id) and is_nil(existing_changeset.errors[:interview_status_id]) do
       interview = id |> retrieve_interview
-      if !is_nil(interview) and !is_nil(interview.interview_status_id), do: existing_changeset = add_error(existing_changeset, :interview_status, "Feedback has already been entered")
+      if !is_nil(interview) and !is_nil(interview.interview_status_id), do: add_error(existing_changeset, :interview_status, "Feedback has already been entered"), else: existing_changeset
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp get_max_and_min_priority do
@@ -163,7 +166,6 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def validate_with_other_rounds(existing_changeset, interview_type \\ :empty) do
     if existing_changeset.valid? do
@@ -172,7 +174,7 @@ defmodule RecruitxBackend.Interview do
       candidate_id = Changeset.get_field(existing_changeset, :candidate_id)
       interview_id = Changeset.get_field(existing_changeset, :id)
       current_priority = get_current_priority(existing_changeset, interview_type)
-      {max_priority, min_priority} = get_max_and_min_priority
+      {max_priority, min_priority} = get_max_and_min_priority()
       previous_interview = get_previous_interview(candidate_id, current_priority - 1, min_priority)
       next_interview = get_next_interview(candidate_id, current_priority + 1, max_priority)
       interview_with_same_priority = case interview_id do
@@ -211,9 +213,10 @@ defmodule RecruitxBackend.Interview do
           (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) && TimexHelper.compare(new_start_time, previous_interview.send_time) && TimexHelper.compare(next_interview.start_time, new_end_time)
       end
 
-      if !result, do: existing_changeset = Changeset.add_error(existing_changeset, :start_time, error_message)
+      if !result, do: Changeset.add_error(existing_changeset, :start_time, error_message), else: existing_changeset
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp get_current_priority(changes, interview_type) do
@@ -302,8 +305,7 @@ defmodule RecruitxBackend.Interview do
           i.candidate_id == ^candidate_id ,
           select: i.interview_status_id)
           |> Repo.one
-          if !is_pass(status_id) and total_no_of_interview_types != number_of_interviews, do: status_id = nil
-          status_id
+          if !is_pass(status_id) and total_no_of_interview_types != number_of_interviews, do: nil, else: status_id
         [] -> nil
       end
     end
@@ -317,8 +319,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   def format_with_result_and_panelist(interview, date_format \\ "%d/%m/%y") do
-    status = "Not Evaluated"
-    if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
+    status = if not(is_nil(interview.interview_status)), do: interview.interview_status.name, else: "Not Evaluated"
     %{
       name: interview.interview_type.name,
       date: TimexHelper.format_with_timezone(interview.start_time, date_format),

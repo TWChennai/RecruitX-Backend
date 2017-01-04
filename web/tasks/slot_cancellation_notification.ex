@@ -1,5 +1,5 @@
 defmodule RecruitxBackend.SlotCancellationNotification do
-  import Ecto.Query, only: [preload: 2, from: 2, select: 3]
+  import Ecto.Query, only: [from: 2]
 
   alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Panel

@@ -10,7 +10,7 @@ defmodule RecruitxBackend.ExperienceMatrix do
     field :candidate_experience_lower_bound, :decimal
     field :candidate_experience_upper_bound, :decimal
 
-    timestamps
+    timestamps()
 
     belongs_to :interview_type, InterviewType
     belongs_to :role, Role
@@ -19,9 +19,10 @@ defmodule RecruitxBackend.ExperienceMatrix do
   @required_fields ~w(panelist_experience_lower_bound candidate_experience_lower_bound candidate_experience_upper_bound interview_type_id role_id)
   @optional_fields ~w()
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_number(:candidate_experience_upper_bound, greater_than_or_equal_to: Decimal.new(0), less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> validate_number(:panelist_experience_lower_bound, greater_than_or_equal_to: Decimal.new(0), less_than: Decimal.new(100), message: "must be in the range 0-100")
     |> assoc_constraint(:interview_type)

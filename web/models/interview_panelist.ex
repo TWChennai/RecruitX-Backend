@@ -16,7 +16,7 @@ defmodule RecruitxBackend.InterviewPanelist do
     belongs_to :interview, Interview
     belongs_to :team, Team
 
-    timestamps
+    timestamps()
   end
 
   def get_interview_type_based_count_of_sign_ups do
@@ -37,9 +37,10 @@ defmodule RecruitxBackend.InterviewPanelist do
   @required_fields ~w(panelist_login_name interview_id)
   @optional_fields ~w(team_id)
 
-  def changeset(model, params) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_format(:panelist_login_name, AppConstants.name_format)
     |> validate_sign_up_for_interview(params)
     |> unique_constraint(:panelist_login_name, name: :interview_panelist_login_name_index, message: "You have already signed up for this interview")
@@ -60,10 +61,13 @@ defmodule RecruitxBackend.InterviewPanelist do
         retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
         sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(panelist_login_name, Decimal.new(panelist_experience), retrieved_panelist_role)
         sign_up_evaluation_status = SignUpEvaluator.evaluate(sign_up_data_container, interview, Role.ba_and_pm_list)
-        existing_changeset = existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
+        existing_changeset |> update_changeset(sign_up_evaluation_status, sign_up_evaluation_status.valid?)
+      else
+        existing_changeset
       end
+    else
+      existing_changeset
     end
-    existing_changeset
   end
 
   defp update_changeset(existing_changeset, sign_up_evaluation_status, true) do

@@ -5,90 +5,85 @@ defmodule RecruitxBackend.CandidateSkillSpec do
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Skill
 
-  let :candidate, do: create(:candidate, other_skills: "other skills")
-  let :skill, do: create(:skill)
-
-  let :valid_attrs, do: fields_for(:candidate_skill, candidate_id: candidate.id, skill_id: skill.id)
+  let :valid_attrs, do: params_with_assocs(:candidate_skill)
   let :invalid_attrs, do: %{}
 
   context "valid changeset" do
-    subject do: CandidateSkill.changeset(%CandidateSkill{}, valid_attrs)
+    subject do: CandidateSkill.changeset(%CandidateSkill{}, valid_attrs())
 
-    it do: should be_valid
+    it do: should be_valid()
   end
 
   context "invalid changeset" do
-    subject do: CandidateSkill.changeset(%CandidateSkill{}, invalid_attrs)
+    subject do: CandidateSkill.changeset(%CandidateSkill{}, invalid_attrs())
 
-    it do: should_not be_valid
-    it do: should have_errors([candidate_id: "can't be blank", skill_id: "can't be blank"])
+    it do: should_not be_valid()
+    it do: should have_errors([candidate_id: {"can't be blank", [validation: :required]}, skill_id: {"can't be blank", [validation: :required]}])
 
     it "when candidate id is nil" do
-      candidate_skill_with_candidate_id_nil = Map.merge(valid_attrs, %{candidate_id: nil})
+      candidate_skill_with_candidate_id_nil = Map.merge(valid_attrs(), %{candidate_id: nil})
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_candidate_id_nil)
 
-      expect(result) |> to(have_errors(candidate_id: "can't be blank"))
+      expect(result) |> to(have_errors(candidate_id: {"can't be blank", [validation: :required]}))
     end
 
     it "when skill id is nil" do
-      candidate_skill_with_skill_id_nil = Map.merge(valid_attrs, %{skill_id: nil})
+      candidate_skill_with_skill_id_nil = Map.merge(valid_attrs(), %{skill_id: nil})
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_skill_id_nil)
 
-      expect(result) |> to(have_errors(skill_id: "can't be blank"))
+      expect(result) |> to(have_errors(skill_id: {"can't be blank", [validation: :required]}))
     end
 
     it "when candidate id is not present" do
-      candidate_skill_with_no_candidate_id = Map.delete(valid_attrs, :candidate_id)
+      candidate_skill_with_no_candidate_id = Map.delete(valid_attrs(), :candidate_id)
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_no_candidate_id)
 
-      expect(result) |> to(have_errors(candidate_id: "can't be blank"))
+      expect(result) |> to(have_errors(candidate_id: {"can't be blank", [validation: :required]}))
     end
 
     it "when skill id is not present" do
-      candidate_skill_with_no_skill_id = Map.delete(valid_attrs, :skill_id)
+      candidate_skill_with_no_skill_id = Map.delete(valid_attrs(), :skill_id)
 
       result = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_no_skill_id)
 
-      expect(result) |> to(have_errors(skill_id: "can't be blank"))
+      expect(result) |> to(have_errors(skill_id: {"can't be blank", [validation: :required]}))
     end
   end
 
   context "foreign key constraint" do
     it "when candidate id not present in candidates table" do
-      # TODO: Not sure why Ectoo.max(Repo, Candidate, :id) is failing - need to investigate
-      current_candidate_count = Ectoo.count(Repo, Candidate)
+      current_candidate_count = Candidate.max(:id)
       candidate_id_not_present = current_candidate_count + 100
-      candidate_skill_with_invalid_candidate_id = Map.merge(valid_attrs, %{candidate_id: candidate_id_not_present})
+      candidate_skill_with_invalid_candidate_id = Map.merge(valid_attrs(), %{candidate_id: candidate_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_candidate_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([candidate: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([candidate: {"does not exist", []}]))
     end
 
     it "when skill id not present in skills table" do
-      # TODO: Not sure why Ectoo.max(Repo, Skill, :id) is failing - need to investigate
-      current_skill_count = Ectoo.count(Repo, Skill)
+      current_skill_count = Skill.max(:id)
       skill_id_not_present = current_skill_count + 100
-      candidate_skill_with_invalid_skill_id = Map.merge(valid_attrs, %{skill_id: skill_id_not_present})
+      candidate_skill_with_invalid_skill_id = Map.merge(valid_attrs(), %{skill_id: skill_id_not_present})
 
       changeset = CandidateSkill.changeset(%CandidateSkill{}, candidate_skill_with_invalid_skill_id)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([skill: "does not exist"]))
+      expect(error_changeset) |> to(have_errors([skill: {"does not exist", []}]))
     end
   end
 
   context "unique_index constraint will fail" do
     it "when same skil is added more than once for a candidate" do
-      changeset = CandidateSkill.changeset(%CandidateSkill{}, valid_attrs)
+      changeset = CandidateSkill.changeset(%CandidateSkill{}, valid_attrs())
       Repo.insert(changeset)
 
       {:error, error_changeset} = Repo.insert(changeset)
-      expect(error_changeset) |> to(have_errors([skill_id: "has already been taken"]))
+      expect(error_changeset) |> to(have_errors([skill_id: {"has already been taken", []}]))
     end
   end
 end

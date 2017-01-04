@@ -9,16 +9,16 @@ defmodule RecruitxBackend.PipelineStatusControllerSpec do
       ]
     end
 
-    before do: allow Repo |> to(accept(:all, fn(_) -> pipeline_statuses end))
+    before do: allow Repo |> to(accept(:all, fn(_) -> pipeline_statuses() end))
     subject do: action :index
 
-    it do: should be_successful
+    it do: should be_successful()
     it do: should have_http_status(:ok)
 
     it "should return the array of pipeline_statuses as a JSON response" do
       response = action(:index)
 
-      expect(response.assigns.pipeline_statuses) |> to(eq(pipeline_statuses))
+      expect(response.assigns.pipeline_statuses) |> to(eq(pipeline_statuses()))
     end
   end
 end

@@ -8,7 +8,7 @@ defmodule RecruitxBackend.PanelistDetails do
   schema "panelist_details" do
     field :employee_id, :decimal
 
-    timestamps
+    timestamps()
 
     belongs_to :role, Role, references: :id
   end
@@ -16,8 +16,9 @@ defmodule RecruitxBackend.PanelistDetails do
   @required_fields ~w(role_id panelist_login_name employee_id)
   @optional_fields ~w()
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
   end
 end

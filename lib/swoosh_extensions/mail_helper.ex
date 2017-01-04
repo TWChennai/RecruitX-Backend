@@ -10,7 +10,7 @@ defmodule RecruitxBackend.MailHelper do
   end
 
   def override_default(email) do
-    Map.merge(default_mail, email)
+    Map.merge(default_mail(), email)
   end
 
   def default_mail do

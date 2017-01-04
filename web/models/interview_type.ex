@@ -13,7 +13,7 @@ defmodule RecruitxBackend.InterviewType do
     field :priority, :integer
     field :max_sign_up_limit, :integer
 
-    timestamps
+    timestamps()
 
     has_many :interviews, Interview
   end
@@ -21,9 +21,10 @@ defmodule RecruitxBackend.InterviewType do
   @required_fields ~w(name max_sign_up_limit)
   @optional_fields ~w(priority)
 
-  def changeset(model, params \\ :empty) do
+  def changeset(model, params \\ %{}) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, @required_fields ++ @optional_fields)
+    |> validate_required(Enum.map(@required_fields, &String.to_atom(&1)))
     |> validate_length(:name, min: 1, max: 255)
     |> validate_format(:name, ~r/^[a-z]+[\sa-z0-9]*$/i)
     |> unique_constraint(:name, name: :interview_types_name_index)
