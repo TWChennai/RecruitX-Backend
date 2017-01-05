@@ -4,11 +4,11 @@
 After cloning the git repository, you will need the following pre-requisites
   * Install [asdf](https://github.com/asdf-vm/asdf) (the package manager) that will be used to handle multiple versions of erlang and elixir.
   * Run the following commands to install the versions that are needed for this project
-  ```bash
-  asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git
-  asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
-  asdf install
-  ```
+```
+asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git
+asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+asdf install
+```
   * asdf might not work as expected when you dont have ~/.tool-versions file. Please create this file and put the installed packages version for things to work
   the versions of tools installed can be found in .asdf/installs/erlang/18.2.1
   ```
