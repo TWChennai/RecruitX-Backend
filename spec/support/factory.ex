@@ -20,7 +20,6 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Team
-  alias RecruitxBackend.WeekendDrive
   alias Timex.Date
   alias Timex.DateFormat
   alias Timex.Ecto.DateTime
@@ -178,15 +177,6 @@ defmodule RecruitxBackend.Factory do
     %RoleInterviewType{
       role_id: create(:role).id,
       interview_type_id: create(:interview_type).id
-    }
-  end
-
-  def factory(:weekend_drive) do
-    %WeekendDrive{
-      role_id: create(:role).id,
-      start_date: Date.now(),
-      end_date: Date.now() |> Date.shift(days: 1),
-      no_of_candidates:  Enum.random(10..20)
     }
   end
 
