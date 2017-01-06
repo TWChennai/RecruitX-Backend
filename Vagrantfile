@@ -7,27 +7,22 @@ class String
     "\e[#{color_code}m#{self}\e[0m"
   end
 
-  def red
-    colorize(31)
+  def green
+    colorize(32)
   end
 end
 
 Vagrant.configure(2) do |config|
   config.vm.box = 'boxesio/trusty64-ansible'
+  config.vm.box_version = '2.3.0.20161011172019'
 
   config.vm.provider 'virtualbox' do |v|
     host = RbConfig::CONFIG['host_os']
 
     # Dynamically alocate system resources
-    cpu = 2
-    if host =~ /darwin/
-      mem = `sysctl -n hw.memsize`.to_i / 1024
-      cpu = `sysctl -n hw.ncpu`.to_i / 4
-    elsif host =~ /linux/
-      mem = `grep 'MemTotal' /proc/meminfo | sed -e 's/MemTotal://' -e 's/ kB//'`.to_i
-    elsif host =~ /mswin|mingw|cygwin/
-      mem = `wmic computersystem Get TotalPhysicalMemory`.split[1].to_i / 1024
-    end
+    mem = `sysctl -n hw.memsize`.to_i / 1024
+    cpu = `sysctl -n hw.ncpu`.to_i / 4
+
     mem = mem / 1024 / 4
 
     # Minimum of 2 cpu, and 2048 meg ram
@@ -65,7 +60,6 @@ Vagrant.configure(2) do |config|
       "--copy-links"
     ]
 
-  # Crack on with ansible provisioning
   config.vm.provision :ansible do |ansible|
     ansible.playbook = 'provision.yml'
     ansible.vault_password_file = '~/.vault_pass.txt'
@@ -75,9 +69,9 @@ Vagrant.configure(2) do |config|
 
   config.trigger.after [:up, :provision] do
     info ""
-    info "Everything is super, super slow when using VirtualBox shared folders, making provision very slow.".red
-    info "As a result, we're copying the files over at boot using rsync, rather than mounting as a share.".red
-    info "This means you will need to run 'vagrant rsync' to get your code level changes available.".red
+    info "Everything is super, super slow when using VirtualBox shared folders, making provision very slow.".green
+    info "As a result, we're copying the files over at boot using rsync, rather than mounting as a share.".green
+    info "This means you will need to run 'vagrant rsync' to get your code level changes available.".green
     info ""
   end
 end
