@@ -33,10 +33,10 @@
 
 - name: Install erlang {{ erlang_version }}
   apt:
-    deb: http://packages.erlang-solutions.com/site/esl/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}~ubuntu~trusty_amd64.deb
+    deb: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_{{ erlang_version }}~ubuntu~trusty_amd64.deb
   become: yes
 
 - name: Install elixir {{ elixir_version }}
   apt:
-    deb: https://packages.erlang-solutions.com/erlang/elixir/FLAVOUR_2_download/elixir_{{ elixir_version }}-1~ubuntu~trusty_i386.deb
+    deb: https://packages.erlang-solutions.com/erlang/elixir/FLAVOUR_2_download/elixir_{{ elixir_version }}~ubuntu~trusty_amd64.deb
   become: yes
