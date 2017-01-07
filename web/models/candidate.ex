@@ -143,7 +143,7 @@ defmodule RecruitxBackend.Candidate do
     distinct: true,
     join: cs in assoc(c, :candidate_skills),
     join: s in assoc(cs, :skill),
-    where: s.id != ^Skill.other_skill_id,
+    where: s.id != ^Skill.other_skill.id,
     select: s.name)
     |> Repo.all)
     ++

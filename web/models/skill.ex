@@ -28,7 +28,7 @@ defmodule RecruitxBackend.Skill do
 
   def retrieve_by_name(name), do: (from s in __MODULE__, where: s.name == ^name) |> Repo.one
 
-  def other_skill_id do
-    retrieve_by_name("Other").id
+  def other_skill do
+    retrieve_by_name("Other")
   end
 end

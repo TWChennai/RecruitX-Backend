@@ -18,7 +18,7 @@ defmodule RecruitxBackend.Repo.Migrations.AddRoleBaPmAndTheirInterviews do
 
     ba_role_id = Role.retrieve_by_name(Role.ba).id
     pm_role_id = Role.retrieve_by_name(Role.pm).id
-    other_skill_id = Skill.other_skill_id
+    other_skill_id = Skill.other_skill.id
     telephonic_interview_id = InterviewType.retrieve_by_name(InterviewType.telephonic).id
 
     Enum.each([ba_role_id, pm_role_id], fn role_id ->

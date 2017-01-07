@@ -271,7 +271,7 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should append other skills for the candidate in the result" do
-      create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
+      create(:candidate_skill, skill_id: Skill.other_skill.id, candidate_id: candidate.id)
       formatted_skills = Candidate
         |> preload([:skills])
         |> Repo.get(candidate.id)

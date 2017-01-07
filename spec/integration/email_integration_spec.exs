@@ -19,7 +19,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       Repo.delete_all(Interview)
       Swoosh.InMemoryMailbox.delete_all()
       create(:candidate_skill, skill_id: skill.id, candidate_id: candidate.id)
-      create(:candidate_skill, skill_id: Skill.other_skill_id, candidate_id: candidate.id)
+      create(:candidate_skill, skill_id: Skill.other_skill.id, candidate_id: candidate.id)
       create(:interview, interview_type_id: interview_type.id, start_time:
       get_start_of_current_week |> Timex.Date.shift(days: 2), candidate_id: candidate.id)
     end
