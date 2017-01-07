@@ -1,18 +1,17 @@
 defmodule RecruitxBackend.Repo.Migrations.AddPipelineClosureTime do
- use Ecto.Migration
+  use Ecto.Migration
 
- alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.PipelineStatus
 
- def change do
-   alter table(:candidates) do
-     add :pipeline_closure_time, :datetime
-   end
+  def change do
+    alter table(:candidates) do
+      add :pipeline_closure_time, :datetime
+    end
 
- closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
+    closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
- flush
+    flush
 
- execute "UPDATE candidates SET pipeline_closure_time = candidates.updated_at WHERE pipeline_status_id = #{closed_pipeline_status_id}"
- end
-
+    execute "UPDATE candidates SET pipeline_closure_time = candidates.updated_at WHERE pipeline_status_id = #{closed_pipeline_status_id}"
+  end
 end

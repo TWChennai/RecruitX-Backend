@@ -5,7 +5,7 @@ defmodule RecruitxBackend.Repo.Migrations.AddSignUpLimitForInterviewType do
 
   def change do
     alter table(:interview_types) do
-      add :max_sign_up_limit, :integer , null: false, default: 2
+      add :max_sign_up_limit, :integer, null: false, default: 2
     end
 
     flush

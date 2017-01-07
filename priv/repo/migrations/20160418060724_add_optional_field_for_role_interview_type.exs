@@ -8,7 +8,7 @@
 
   def change do
     alter table(:role_interview_types) do
-      add :optional, :boolean , null: false, default: false
+      add :optional, :boolean, null: false, default: false
     end
 
     flush

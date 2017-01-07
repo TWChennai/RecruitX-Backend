@@ -10,6 +10,5 @@ defmodule RecruitxBackend.Repo.Migrations.CreateSlot do
 
       timestamps
     end
-
   end
 end
