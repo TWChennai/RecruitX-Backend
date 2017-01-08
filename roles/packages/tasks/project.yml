@@ -40,3 +40,15 @@
   apt:
     deb: https://packages.erlang-solutions.com/erlang/elixir/FLAVOUR_2_download/elixir_{{ elixir_version }}~ubuntu~trusty_amd64.deb
   become: yes
+
+- name: Install prerequisites for database
+  become: yes
+  apt: name={{ item }} state=latest
+  with_items:
+    - libpq-dev
+    - python-psycopg2
+
+- name: Create database
+  postgresql_db: name="recruitx_backend" encoding="UTF-8"
+  become: yes
+  become_user: postgres
