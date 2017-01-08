@@ -4,8 +4,8 @@ defmodule RecruitxBackend.Role do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.RoleSkill
 
   def dev, do: "Dev"
   def qa, do: "QA"

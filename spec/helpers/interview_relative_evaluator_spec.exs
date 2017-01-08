@@ -3,12 +3,12 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
 
   alias Decimal
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewRelativeEvaluator
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
   alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.SignUpEvaluator
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   let :role, do: create(:role)
 
@@ -103,7 +103,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
   end
 
   describe "is_tech1_got_sign_up" do
-    let :now, do: Date.now()
+    let :now, do: TimexHelper.utc_now()
 
     it "should be valid if current interview round is not Tech2" do
       tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
@@ -154,8 +154,8 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
       candidate = create(:candidate)
       tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id,
-                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
-      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> Date.shift(hours: 4))
+                        start_time: now |> TimexHelper.add(2, :hours), end_time: now |> TimexHelper.add(3, :hours))
+      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> TimexHelper.add(4, :hours))
       create(:interview_panelist, interview_id: tech1_interview.id)
       create(:interview_panelist, interview_id: tech1_interview.id)
       slot_panelist = fields_for(:slot_panelist, interview_id: tech2_slot.id)
@@ -172,10 +172,10 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
       candidate = create(:candidate)
       tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id,
-                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
+                        start_time: now |> TimexHelper.add(2, :hours), end_time: now |> TimexHelper.add(3, :hours))
       tech1_interview2 = create(:interview, interview_type_id: tech1_round.id,
-                        start_time: now |> Date.shift(hours: 2), end_time: now |> Date.shift(hours: 3))
-      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> Date.shift(hours: 4))
+                        start_time: now |> TimexHelper.add(2, :hours), end_time: now |> TimexHelper.add(3, :hours))
+      tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> TimexHelper.add(4, :hours))
       create(:interview_panelist, interview_id: tech1_interview.id)
       create(:interview_panelist, interview_id: tech1_interview2.id)
       create(:interview_panelist, interview_id: tech1_interview2.id)
@@ -193,7 +193,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 1))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(1, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(1), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
@@ -205,7 +205,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should not allow panelist to sign up if he has another interview within time buffer of 2 hours" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -1))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(-1, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(1), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
@@ -217,7 +217,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours later" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 3))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(3, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
@@ -229,7 +229,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should allow panelist to sign up if he has other interviews beyond time buffer of 2 hours before" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -3))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(-3, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
@@ -241,7 +241,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours later" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(2, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)
@@ -253,7 +253,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
     it "should allow panelist to sign up if he has other interviews at exactly time buffer of 2 hours before" do
       interview_signed_up = create(:interview_panelist)
       signed_up_interview = Interview |> Repo.get(interview_signed_up.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: -2))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(-2, :hours))
       sign_up_data_container = SignUpEvaluator.populate_sign_up_data_container(interview_signed_up.panelist_login_name, Decimal.new(2), role)
 
       %{valid?: validity, errors: errors} = InterviewRelativeEvaluator.evaluate(%SignUpEvaluationStatus{}, sign_up_data_container, new_interview)

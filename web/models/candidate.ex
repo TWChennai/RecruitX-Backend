@@ -4,13 +4,12 @@ defmodule RecruitxBackend.Candidate do
   alias RecruitxBackend.AppConstants
   alias RecruitxBackend.CandidateSkill
   alias RecruitxBackend.Interview
+  alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.Skill
-  alias RecruitxBackend.Role
   alias RecruitxBackend.Repo
-  alias Timex.Date
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.Skill
   alias RecruitxBackend.TimexHelper
 
   schema "candidates" do
@@ -50,7 +49,7 @@ defmodule RecruitxBackend.Candidate do
     pipeline_status_id = existing_changeset |> get_field(:pipeline_status_id)
     if !is_nil(pipeline_status_id) do
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
-      if pipeline_status_id == closed_pipeline_status_id, do: existing_changeset = existing_changeset |> put_change(:pipeline_closure_time, Date.now())
+      if pipeline_status_id == closed_pipeline_status_id, do: existing_changeset = existing_changeset |> put_change(:pipeline_closure_time, TimexHelper.utc_now())
     end
     existing_changeset
   end
@@ -86,7 +85,7 @@ defmodule RecruitxBackend.Candidate do
     Enum.count(candidates_passed, fn(candidate) ->
       Enum.any?(last_interviews_data, fn (last_interview) ->
         [candidate_id, max_start_time, _] = last_interview
-        pass_interview_start_time = Date.from(max_start_time)
+        pass_interview_start_time = Timex.Date.from(max_start_time)
         candidate_id == candidate.id &&
         TimexHelper.compare(pass_interview_start_time, start_date) &&
         TimexHelper.compare(end_date, pass_interview_start_time)
@@ -128,9 +127,9 @@ defmodule RecruitxBackend.Candidate do
   end
 
   def get_candidates_scheduled_for_date_and_interview_round(slot_time, interview_type_id, role_id) do
-    beginning_of_slotted_day = slot_time |> Date.beginning_of_day
+    beginning_of_slotted_day = slot_time |> TimexHelper.beginning_of_day
     interview_round = InterviewType |> Repo.get(interview_type_id)
-    (from i in Interview ,
+    (from i in Interview,
       join: it in assoc(i, :interview_type),
       join: c in assoc(i, :candidate),
       where: it.priority < ^interview_round.priority and i.start_time < ^slot_time and i.start_time > ^beginning_of_slotted_day and c.role_id == ^role_id,

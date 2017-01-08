@@ -1,14 +1,13 @@
 defmodule RecruitxBackend.Panel do
-
-  alias RecruitxBackend.SlotPanelist
-  alias RecruitxBackend.SignUpEvaluator
-  alias RecruitxBackend.InterviewTypeRelativeEvaluator
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.Role
-  alias RecruitxBackend.Repo
-  alias Timex.Date
   import Ecto.Query
+
+  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.InterviewTypeRelativeEvaluator
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.SignUpEvaluator
+  alias RecruitxBackend.SlotPanelist
+  alias RecruitxBackend.TimexHelper
 
   def get_start_times_interviewed_by(panelist_login_name) do
     ((from ip in InterviewPanelist,
@@ -29,8 +28,8 @@ defmodule RecruitxBackend.Panel do
   end
 
   def now_or_in_next_seven_days(model) do
-    start_of_today = Date.beginning_of_day(Date.now)
-    seven_days_from_now = start_of_today |> Date.shift(days: 7)
+    start_of_today = TimexHelper.beginning_of_day(TimexHelper.utc_now())
+    seven_days_from_now = start_of_today |> TimexHelper.add(7, :days)
     within_date_range(model, start_of_today, seven_days_from_now)
   end
 

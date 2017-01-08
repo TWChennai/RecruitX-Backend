@@ -4,19 +4,15 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.Slot
   alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
-  alias Timex.Date
-  alias Timex.DateFormat
-  alias Timex.Timezone
-
-  @interview_time_zone_name "Asia/Kolkata"
+  alias RecruitxBackend.RoleInterviewType
+  alias RecruitxBackend.Slot
+  alias RecruitxBackend.TimexHelper
 
   let :valid_attrs, do: fields_for(:interview)
   let :invalid_attrs, do: %{}
@@ -35,7 +31,7 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is in the future" do
-      future_interview = Map.merge(valid_attrs, %{start_time: (Date.now |> Date.shift(hours: 2))})
+      future_interview = Map.merge(valid_attrs, %{start_time: (TimexHelper.utc_now() |> TimexHelper.add(2, :hours))})
 
       result = Interview.changeset(%Interview{}, future_interview)
 
@@ -46,23 +42,23 @@ defmodule RecruitxBackend.InterviewSpec do
       result = Interview.changeset(%Interview{}, Map.delete(valid_attrs, :end_time))
 
       expect(result) |> to(be_valid)
-      expect(result.changes.end_time) |> to(be(result.changes.start_time |> Date.shift(hours: 1)))
+      expect(result.changes.end_time) |> to(be(result.changes.start_time |> TimexHelper.add(1, :hours)))
     end
 
     it "when end_time is given and is replaced by default value" do
       result = Interview.changeset(%Interview{}, valid_attrs)
 
       expect(result) |> to(be_valid)
-      expect(result.changes.end_time) |> to(be(valid_attrs.start_time |> Date.shift(hours: 1)))
+      expect(result.changes.end_time) |> to(be(valid_attrs.start_time |> TimexHelper.add(1, :hours)))
     end
 
     it "when start_time is updated  and end_time is re-calculated" do
-      new_start_time = Date.now |> Date.shift(hours: 2)
+      new_start_time = TimexHelper.utc_now() |> TimexHelper.add(2, :hours)
       attrs_new_start_time = Map.merge(valid_attrs, %{start_time: new_start_time})
       result = Interview.changeset(%Interview{}, attrs_new_start_time)
 
       expect(result) |> to(be_valid)
-      expect(result.changes.end_time) |> to(be(new_start_time |> Date.shift(hours: 1)))
+      expect(result.changes.end_time) |> to(be(new_start_time |> TimexHelper.add(1, :hours)))
     end
   end
 
@@ -129,7 +125,7 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "when interview date time is in the past" do
-      past_interview = Map.merge(valid_attrs, %{start_time: (Date.now |> Date.shift(hours: -2))})
+      past_interview = Map.merge(valid_attrs, %{start_time: (TimexHelper.utc_now() |> TimexHelper.add(-2, :hours))})
 
       result = Interview.changeset(%Interview{}, past_interview)
 
@@ -298,7 +294,7 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should update status and not delete other interviews,panelists for a candidate when status is not Pass" do
       interview = create(:interview)
       interview_status = create(:interview_status)
-      interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, start_time: Date.now |> Date.shift(days: 7))
+      interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, start_time: TimexHelper.utc_now() |> TimexHelper.add(7, :days))
       panelists_to_be_retained = create(:interview_panelist, interview_id: interview_to_be_retained.id)
 
       Interview.update_status(interview.id, interview_status.id)
@@ -312,8 +308,8 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should update status and delete future interviews,panelists when status is Pass" do
       Repo.delete_all InterviewStatus
 
-      future_date = Date.now |> Date.shift(days: 7)
-      interview = create(:interview, start_time: Date.now)
+      future_date = TimexHelper.utc_now() |> TimexHelper.add(7, :days)
+      interview = create(:interview, start_time: TimexHelper.utc_now())
       future_interview = create(:interview, candidate_id: interview.candidate_id, start_time: future_date)
       future_panelist = create(:interview_panelist, interview_id: future_interview.id)
       interview_status = create(:interview_status, name: PipelineStatus.pass)
@@ -332,8 +328,8 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should update status and not delete past interviews,panelists when status is Pass" do
       Repo.delete_all InterviewStatus
 
-      past_date = Date.now |> Date.shift(days: -7)
-      interview = create(:interview, start_time: Date.now)
+      past_date = TimexHelper.utc_now() |> TimexHelper.add(-7, :days)
+      interview = create(:interview, start_time: TimexHelper.utc_now())
       interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, start_time: past_date)
       panelists_to_be_retained = create(:interview_panelist, interview_id: interview_to_be_retained.id)
       interview_status = create(:interview_status, name: PipelineStatus.pass)
@@ -368,7 +364,7 @@ defmodule RecruitxBackend.InterviewSpec do
   describe "get_last_completed_rounds_start_time_for_candidate" do
     it "should return the minimum possible date if no interviews are there for a candidate" do
       candidate = create(:candidate)
-      expected_value = Date.set(Date.epoch, date: {0, 0, 1})
+      expected_value = TimexHelper.from_epoch(date: {0, 0, 1})
 
       actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
 
@@ -379,7 +375,7 @@ defmodule RecruitxBackend.InterviewSpec do
       interview1 = create(:interview)
       create(:interview, candidate_id: interview1.candidate_id)
       candidate = Candidate |> Repo.get(interview1.candidate_id)
-      expected_value = Date.set(Date.epoch, date: {0, 0, 1})
+      expected_value = TimexHelper.from_epoch(date: {0, 0, 1})
 
       actual_value = Interview.get_last_completed_rounds_start_time_for(candidate.id)
 
@@ -398,10 +394,10 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should return the maximum start date of a interview with if candidate have more than one interview with status_id as not nil" do
-      now = Date.now
+      now = TimexHelper.utc_now()
       interview_status = create(:interview_status)
       interview1 = create(:interview, interview_status_id: interview_status.id, start_time: now)
-      interview2 = create(:interview, interview_status_id: interview_status.id, start_time: now |> Date.shift(hours: 1), candidate_id: interview1.candidate_id)
+      interview2 = create(:interview, interview_status_id: interview_status.id, start_time: now |> TimexHelper.add(1, :hours), candidate_id: interview1.candidate_id)
       candidate = Candidate |> Repo.get(interview2.candidate_id)
       expected_value = interview2.start_time
 
@@ -423,8 +419,8 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should return true if previous interview has feedback" do
       candidate = create(:candidate)
-      create(:interview, candidate_id: candidate.id, start_time: Date.now()|> Date.shift(days: -1), interview_status_id: 1)
-      interview2 = create(:interview, candidate_id: candidate.id, start_time: Date.now())
+      create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now()|> TimexHelper.add(-1, :days), interview_status_id: 1)
+      interview2 = create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now())
 
       actual_value = Interview.get_last_completed_rounds_status_for(candidate.id, interview2.start_time )
 
@@ -433,8 +429,8 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should return false if previous interview has NO feedback" do
       candidate = create(:candidate)
-      create(:interview, candidate_id: candidate.id, start_time: Date.now()|> Date.shift(days: -1))
-      interview2 = create(:interview, candidate_id: candidate.id, start_time: Date.now())
+      create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now()|> TimexHelper.add(-1, :days))
+      interview2 = create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now())
 
       actual_value = Interview.get_last_completed_rounds_status_for(candidate.id, interview2.start_time )
 
@@ -468,7 +464,7 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "validation for updating the interview schedule" do
-    let :tomorrow, do: Date.now() |> Date.shift(days: 1)
+    let :tomorrow, do: TimexHelper.utc_now() |> TimexHelper.add(1, :days)
     let :candidate, do: create(:candidate)
     let :code_pairing_interview_type, do: create(:interview_type, priority: 0, name: "CP")
     let :technical_one_interview_type, do: create(:interview_type, priority: 2, name: "T1")
@@ -478,19 +474,19 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should not allow interview with less priority to happen before interview with high priority" do
       code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
-      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
+      create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(2, :hours))
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 1.01)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(1.01, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be before T1 atleast by 1 hour"))
     end
 
     it "should not allow interview with high priority to happen after interview with low priority" do
-      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow, end_time: tomorrow |> Date.shift(hours: 1))
-      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
+      create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow, end_time: tomorrow |> TimexHelper.add(1, :hours))
+      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(2, :hours))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -1.01)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(-1.01, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be after CP atleast by 1 hour"))
@@ -498,11 +494,11 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should not allow interview to be scheduled after interview with high priority and before interview with low priority" do
       create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
-      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 1))
+      technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(1, :hours))
       create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> Date.shift(hours: 1.5))
+      |> TimexHelper.add(1.5, :hours))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 0.75)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(0.75, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be("should be after CP and before T2 atleast by 1 hour"))
@@ -511,9 +507,9 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should allow interview with high priority to happen after interview with low priority" do
       create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
       technical_one = create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> Date.shift(hours: 2))
+      |> TimexHelper.add(2, :hours))
 
-      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(days: 2)})
+      changeset = Interview.changeset(technical_one |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(2, :days)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
@@ -522,9 +518,9 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should allow interview with low priority to happen before interview with high priority" do
       code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
       create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> Date.shift(hours: 4))
+      |> TimexHelper.add(4, :hours))
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -2)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(-2, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
@@ -533,7 +529,7 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should allow interview with lowest priority to be modified without any constraint" do
       code_pairing = create(:interview, interview_type_id: code_pairing_interview_type.id, candidate_id: candidate.id, start_time: tomorrow)
 
-      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: -2)})
+      changeset = Interview.changeset(code_pairing |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(-2, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
@@ -541,18 +537,18 @@ defmodule RecruitxBackend.InterviewSpec do
 
     describe "comparison with interviews of same priority based on start_time" do
       before do
-        create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 1))
+        create(:interview, interview_type_id: technical_one_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(1, :hours))
       end
 
-      let :technical_two, do: create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
+      let :technical_two, do: create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(2, :hours))
 
       it "should use the interview with lowest start time for comparison" do
         create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-        |> Date.shift(hours: 3))
+        |> TimexHelper.add(3, :hours))
         create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-        |> Date.shift(hours: 6))
+        |> TimexHelper.add(6, :hours))
 
-        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(4, :hours)})
         changeset = Interview.validate_with_other_rounds(changeset)
 
         expect changeset.errors[:start_time] |> to(be("should be after T1 and before Pthree atleast by 1 hour"))
@@ -560,11 +556,11 @@ defmodule RecruitxBackend.InterviewSpec do
 
       it "should use the interview with lowest start time for comparison" do
         create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-        |> Date.shift(hours: 6))
+        |> TimexHelper.add(6, :hours))
         create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-        |> Date.shift(hours: 3))
+        |> TimexHelper.add(3, :hours))
 
-        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
+        changeset = Interview.changeset(technical_two |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(4, :hours)})
         changeset = Interview.validate_with_other_rounds(changeset)
 
         expect changeset.errors[:start_time] |> to(be("should be after T1 and before LD atleast by 1 hour"))
@@ -573,26 +569,26 @@ defmodule RecruitxBackend.InterviewSpec do
 
     describe "comparison with interviews of same priority" do
       before do
-        create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 2))
+        create(:interview, interview_type_id: technical_two_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(2, :hours))
       end
 
       it "should return nil when there is no clash with same priority round" do
       p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> Date.shift(hours: 6))
+      |> TimexHelper.add(6, :hours))
       create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> Date.shift(hours: 3))
+      |> TimexHelper.add(3, :hours))
 
-      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 4)})
+      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(4, :hours)})
       changeset = Interview.validate_with_other_rounds(changeset)
 
       expect changeset.errors[:start_time] |> to(be(nil))
     end
 
       it "should return error message when there is clash with same priority round" do
-        p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 6), end_time: tomorrow |> Date.shift(hours: 7))
-        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> Date.shift(hours: 3), end_time: tomorrow |> Date.shift(hours: 4))
+        p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(6, :hours), end_time: tomorrow |> TimexHelper.add(7, :hours))
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(3, :hours), end_time: tomorrow |> TimexHelper.add(4, :hours))
 
-        changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> Date.shift(hours: 2.1)})
+        changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(2.1, :hours)})
         changeset = Interview.validate_with_other_rounds(changeset)
 
         expect changeset.errors[:start_time] |> to(be("should be after T2 and before/after LD atleast by 1 hour"))
@@ -605,13 +601,13 @@ defmodule RecruitxBackend.InterviewSpec do
     before do: Repo.delete_all Slot
     before do: Repo.delete_all InterviewType
     it "should return all candidates who have completed no of rounds with start_time of last interview" do
-      interview1 = create(:interview, start_time: Date.now)
-      interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: Date.now |> Date.shift(hours: 1))
+      interview1 = create(:interview, start_time: TimexHelper.utc_now())
+      interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
 
       [[candidate_id, last_interview_start_time, completed_rounds]] = (Interview.get_candidates_with_all_rounds_completed) |> Repo.all
 
       expect(candidate_id) |> to(be(interview2.candidate_id))
-      expect(Date.from(last_interview_start_time)) |> to(be(interview2.start_time))
+      expect(Timex.Date.from(last_interview_start_time)) |> to(be(interview2.start_time))
       expect(completed_rounds) |> to(be(2))
     end
 
@@ -635,12 +631,12 @@ defmodule RecruitxBackend.InterviewSpec do
       candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id)
       create(:role_interview_type, role_id: candidate.role_id, interview_type_id: interview_type1.id)
       create(:role_interview_type, role_id: candidate.role_id, interview_type_id: interview_type2.id)
-      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: TimexHelper.utc_now())
       interview_data2 = fields_for(:interview,
         candidate_id: candidate.id,
         interview_type_id: interview_type2.id,
         interview_status_id: create(:interview_status).id,
-        start_time: Date.now |> Date.shift(hours: 1))
+        start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       total_no_of_interview_types = Enum.count(Repo.all(RoleInterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
@@ -655,12 +651,12 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
       candidate = create(:candidate, pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id)
-      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: TimexHelper.utc_now())
       interview_data2 = fields_for(:interview,
         candidate_id: candidate.id,
         interview_type_id: interview_type2.id,
         interview_status_id: pass_id,
-        start_time: Date.now |> Date.shift(hours: 1))
+        start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
@@ -674,12 +670,12 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_type1 = create(:interview_type)
       interview_type2 = create(:interview_type)
       candidate = create(:candidate)
-      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: Date.now)
+      interview_data1 = fields_for(:interview, candidate_id: candidate.id, interview_type_id: interview_type1.id, start_time: TimexHelper.utc_now())
       interview_data2 = fields_for(:interview,
         candidate_id: candidate.id,
         interview_type_id: interview_type2.id,
         interview_status_id: create(:interview_status).id,
-        start_time: Date.now |> Date.shift(hours: 1))
+        start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       total_no_of_interview_types = Enum.count(Repo.all(InterviewType))
       Repo.insert(Interview.changeset(%Interview{}, interview_data1))
       Repo.insert(Interview.changeset(%Interview{}, interview_data2))
@@ -692,14 +688,14 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "should_less_than_a_month" do
     it "should insert error into changeset if start_time is more than a month" do
-      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(days: 32)})
+      interview = Map.merge(valid_attrs, %{start_time: TimexHelper.utc_now() |> TimexHelper.add(32, :days)})
 
       result = Interview.changeset(%Interview{}, interview)
       expect(result) |> to(have_errors(start_time: "should be less than a month"))
     end
 
     it "should not insert error into changeset if start_time is less than a month" do
-      interview = Map.merge(valid_attrs, %{start_time: Date.now})
+      interview = Map.merge(valid_attrs, %{start_time: TimexHelper.utc_now()})
 
       result = Interview.changeset(%Interview{}, interview)
       expect(result) |> to(be_valid)
@@ -708,14 +704,14 @@ defmodule RecruitxBackend.InterviewSpec do
 
   context "is_in_future" do
     it "should insert error into changeset if start_time is in past" do
-      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(hours: -1)})
+      interview = Map.merge(valid_attrs, %{start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :hours)})
 
       result = Interview.changeset(%Interview{}, interview)
       expect(result) |> to(have_errors(start_time: "should be in the future"))
     end
 
     it "should not insert error into changeset if start_time is in future" do
-      interview = Map.merge(valid_attrs, %{start_time: Date.now |> Date.shift(hours: 1)})
+      interview = Map.merge(valid_attrs, %{start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours)})
 
       result = Interview.changeset(%Interview{}, interview)
       expect(result) |> to(be_valid)
@@ -733,7 +729,7 @@ defmodule RecruitxBackend.InterviewSpec do
         |> Interview.format
 
         expect(formatted_interview.name) |> to(be(interview_type.name))
-        expect(formatted_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
+        expect(formatted_interview.date) |> to(be(TimexHelper.format(interview.start_time, "%b-%d")))
       end
   end
 
@@ -745,7 +741,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should contain interview names, date, result, panelists for the candidate in the result" do
       interview_panelist = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
-      {:ok , interview_date} = interview.start_time |> Timezone.convert(@interview_time_zone_name) |> DateFormat.format("%d/%m/%y", :strftime)
+      interview_date = TimexHelper.format(interview.start_time, "%d/%m/%y")
 
       input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
 
@@ -762,8 +758,8 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should return the interview from the past 5 days" do
       Repo.delete_all(Interview)
       create(:interview, id: 900, start_time: get_start_of_current_week)
-      create(:interview, id: 901, start_time: get_start_of_current_week |> Date.shift(days: -1))
-      create(:interview, id: 902, start_time: get_start_of_current_week |> Date.shift(days: +7))
+      create(:interview, id: 901, start_time: get_start_of_current_week |> TimexHelper.add(-1, :days))
+      create(:interview, id: 902, start_time: get_start_of_current_week |> TimexHelper.add(+7, :days))
 
       actual_result = Interview |> Interview.working_days_in_current_week |> Repo.one
 
@@ -774,9 +770,9 @@ defmodule RecruitxBackend.InterviewSpec do
   context "get the tuesday to friday of a week" do
     it "should return the interview from the next week" do
       Repo.delete_all(Interview)
-      create(:interview, id: 900, start_time: get_start_of_current_week |> Date.shift(days: +3))
-      create(:interview, id: 901, start_time: get_start_of_current_week |> Date.shift(days: -8))
-      create(:interview, id: 902, start_time: get_start_of_current_week |> Date.shift(days: +6))
+      create(:interview, id: 900, start_time: get_start_of_current_week |> TimexHelper.add(+3, :days))
+      create(:interview, id: 901, start_time: get_start_of_current_week |> TimexHelper.add(-8, :days))
+      create(:interview, id: 902, start_time: get_start_of_current_week |> TimexHelper.add(+6, :days))
 
       actual_result = Interview |> Interview.tuesday_to_friday_of_the_current_week |> Repo.one
 

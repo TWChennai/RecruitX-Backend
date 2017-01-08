@@ -16,13 +16,13 @@ alias RecruitxBackend.CandidateSkill
 alias RecruitxBackend.Interview
 alias RecruitxBackend.InterviewPanelist
 alias RecruitxBackend.InterviewType
+alias RecruitxBackend.PipelineStatus
 alias RecruitxBackend.Repo
 alias RecruitxBackend.Role
 alias RecruitxBackend.Skill
-alias RecruitxBackend.PipelineStatus
 alias RecruitxBackend.Slot
 alias RecruitxBackend.SlotPanelist
-alias Timex.Date
+alias RecruitxBackend.TimexHelper
 
 import Ecto.Query, only: [from: 2, where: 2]
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
@@ -57,14 +57,14 @@ end)
 panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vsiva", "subham", "vraravam"]
 
 for interview_round_number <- 1..:rand.uniform(4) do
-  now = Date.now
-  random_start_time = now |> Date.shift(hours: interview_round_number)
+  now = TimexHelper.utc_now()
+  random_start_time = now |> TimexHelper.add(interview_round_number, :hours)
   interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
 
   slot = Repo.insert!(%Slot{
     role_id: Enum.random(roles).id,
     start_time: random_start_time,
-    end_time: random_start_time |> Date.shift(hours: 1),
+    end_time: random_start_time |> TimexHelper.add(1, :hours),
     average_experience: Decimal.new(Enum.random(1..10)),
     interview_type_id: interview_type.id,
   })
@@ -75,11 +75,11 @@ for interview_round_number <- 1..:rand.uniform(4) do
 end
 
 Enum.each(candidates, fn candidate ->
-  now = Date.now
+  now = TimexHelper.utc_now()
   for interview_round_number <- 1..:rand.uniform(4) do
-    random_start_time = now |> Date.shift(hours: interview_round_number)
+    random_start_time = now |> TimexHelper.add(interview_round_number, :hours)
     interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
-    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> Date.shift(hours: 2)})
+    interview = Repo.insert!(%Interview{candidate_id: candidate.id, interview_type_id: interview_type.id, start_time: random_start_time, end_time: random_start_time |> TimexHelper.add(2, :hours)})
     for _ <- 1..:rand.uniform(2) do
         try do
           Repo.insert!(%InterviewPanelist{interview_id: interview.id, panelist_login_name: Enum.random(panelist_names)})

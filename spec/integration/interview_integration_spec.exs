@@ -2,13 +2,13 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.InterviewController
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewStatus
-  alias RecruitxBackend.Slot
+  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
-  alias Timex.Date
+  alias RecruitxBackend.Slot
+  alias RecruitxBackend.TimexHelper
 
   import Ecto.Query, only: [preload: 2]
 
@@ -117,15 +117,15 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
     let :technical_one_id, do: InterviewType.retrieve_by_name(InterviewType.technical_1).id
 
     it "should give list of tech one interview ids between given two date ranges" do
-      now = Date.now()
-      _non_tech_one = create(:interview, start_time: now |> Date.shift(hours: -2), end_time: now |> Date.shift(hours: -1))
-      interview1 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -2), end_time: now |> Date.shift(hours: -1))
-      interview2 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -1), end_time: now |> Date.shift(hours: -0))
-      interview3 = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -3), end_time: now |> Date.shift(hours: -2))
-      _before_start_time = create(:interview, interview_type_id: technical_one_id, start_time: now |> Date.shift(hours: -4), end_time: now |> Date.shift(hours: -3))
-      _after_end_time = create(:interview, interview_type_id: technical_one_id, start_time: now, end_time: now |> Date.shift(hours: 1))
+      now = TimexHelper.utc_now()
+      _non_tech_one = create(:interview, start_time: now |> TimexHelper.add(-2, :hours), end_time: now |> TimexHelper.add(-1, :hours))
+      interview1 = create(:interview, interview_type_id: technical_one_id, start_time: now |> TimexHelper.add(-2, :hours), end_time: now |> TimexHelper.add(-1, :hours))
+      interview2 = create(:interview, interview_type_id: technical_one_id, start_time: now |> TimexHelper.add(-1, :hours), end_time: now |> TimexHelper.add(-0, :hours))
+      interview3 = create(:interview, interview_type_id: technical_one_id, start_time: now |> TimexHelper.add(-3, :hours), end_time: now |> TimexHelper.add(-2, :hours))
+      _before_start_time = create(:interview, interview_type_id: technical_one_id, start_time: now |> TimexHelper.add(-4, :hours), end_time: now |> TimexHelper.add(-3, :hours))
+      _after_end_time = create(:interview, interview_type_id: technical_one_id, start_time: now, end_time: now |> TimexHelper.add(1, :hours))
 
-      interview_ids = Interview.tech_one_interview_ids_between(now |> Date.shift(hours: -3), now)
+      interview_ids = Interview.tech_one_interview_ids_between(now |> TimexHelper.add(-3, :hours), now)
       expect(interview_ids) |> to(be([interview1.id, interview2.id, interview3.id]))
     end
   end

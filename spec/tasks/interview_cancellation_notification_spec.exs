@@ -1,11 +1,11 @@
 defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewCancellationNotification
 
-  alias RecruitxBackend.Repo
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewCancellationNotification
   alias RecruitxBackend.MailHelper
-  alias Timex.Date
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.TimexHelper
 
   describe "execute" do
     it "should not send mail when there are no interviews to be cancelled" do
@@ -34,7 +34,7 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
       interview = create(:interview,
         candidate_id: candidate.id,
         interview_type_id: interview_type.id,
-        start_time: Date.set(Date.epoch, [datetime: {{2011,1,1}, {12,30,0}}]))
+        start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
       create(:interview_panelist, panelist_login_name: "test", interview_id: interview.id)
 
       allow MailHelper |> to(accept(:deliver, fn(%{subject: subject, to: to_addresses, html_body: {

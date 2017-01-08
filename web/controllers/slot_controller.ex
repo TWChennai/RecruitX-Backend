@@ -1,17 +1,16 @@
 defmodule RecruitxBackend.SlotController do
   use RecruitxBackend.Web, :controller
 
-  alias RecruitxBackend.Slot
-  alias RecruitxBackend.SlotPanelist
+  alias Ecto.Changeset
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONError
+  alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotCancellationNotification
-  alias Ecto.Changeset
-  alias Timex.Date
-  alias Timex.DateFormat
+  alias RecruitxBackend.SlotPanelist
+  alias RecruitxBackend.TimexHelper
 
   # plug :scrub_params, "slot" when action in [:create, :update]
 
@@ -99,8 +98,8 @@ defmodule RecruitxBackend.SlotController do
 
   def index(conn, %{"interview_type_id" => interview_type_id, "previous_rounds_start_time" => previous_rounds_start_time, "role_id" => role_id}) do
     previous_rounds_end_time = previous_rounds_start_time
-                                |> DateFormat.parse!("%Y-%m-%dT%H:%M:%SZ", :strftime)
-                                |> Date.shift(hours: 1)
+                                |> TimexHelper.parse("%Y-%m-%dT%H:%M:%SZ")
+                                |> TimexHelper.add(1, :hours)
     slots = if interview_type_id == InterviewType.retrieve_by_name(InterviewType.p3).id
               |> Integer.to_string or interview_type_id == InterviewType.retrieve_by_name(InterviewType.leadership).id
               |> Integer.to_string do

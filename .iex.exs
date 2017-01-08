@@ -1,4 +1,4 @@
 import Ecto.Query
 
-alias RecruitxBackend.{Repo, Interview, InterviewPanelist, InterviewType, Candidate, Skill, Role, CandidateSkill, ExperienceMatrix, FeedbackImage, InterviewStatus, PipelineStatus, RoleSkill, WeeklySignupReminder}
+alias RecruitxBackend.{Candidate, CandidateSkill, ExperienceMatrix, FeedbackImage, Interview, InterviewPanelist, InterviewStatus, InterviewType, PipelineStatus, Repo, Role, RoleSkill, Skill, Slot, Timer, TimexHelper, WeeklySignupReminder}
 alias Timex.{Date, DateTime, DateTimeFormatter}

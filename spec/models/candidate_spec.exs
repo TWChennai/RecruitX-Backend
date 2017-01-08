@@ -8,7 +8,7 @@ defmodule RecruitxBackend.CandidateSpec do
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Skill
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   let :valid_attrs, do: fields_for(:candidate, other_skills: "other skills", role_id: create(:role).id, pipeline_status_id: create(:pipeline_status).id)
   let :invalid_attrs, do: %{}
@@ -191,8 +191,8 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should return candidates in FIFO order" do
       Repo.delete_all(Candidate)
 
-      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
-      interview2 = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      interview1 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
+      interview2 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       candidate_id1 = interview1.candidate_id
       candidate_id2 = interview2.candidate_id
 
@@ -205,7 +205,7 @@ defmodule RecruitxBackend.CandidateSpec do
       Repo.delete_all(Candidate)
       closed_candidate = create(:candidate, pipeline_status_id: closed_pipeline_status.id)
 
-      interview = create(:interview, interview_type_id: 1, start_time: Date.now)
+      interview = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
       candidate_with_interview_id = interview.candidate_id
 
       [result1, result2] = Candidate.get_candidates_in_fifo_order |> Repo.all
@@ -215,9 +215,9 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return candidates in FIFO order and with pipeline_status_id" do
       Repo.delete_all(Candidate)
-      closed_candidate_interview = create(:interview, interview_type_id: 1, start_time: Date.now)
-      in_progress_candidate_interview_starts_lately = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
-      in_progress_candidate_interview_starts_quickly = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: -1))
+      closed_candidate_interview = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
+      in_progress_candidate_interview_starts_lately = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
+      in_progress_candidate_interview_starts_quickly = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :hours))
       Repo.get(Candidate, closed_candidate_interview.candidate_id)
                       |> Ecto.Changeset.change(pipeline_status_id: closed_pipeline_status.id)
                       |> Repo.update
@@ -232,7 +232,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
   context "updateCandidateStatusAsPass" do
     it "should update candidate status as Pass" do
-      interview = create(:interview, interview_type_id: 1, start_time: Date.now)
+      interview = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
       candidate_id = interview.candidate_id
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 
@@ -414,7 +414,7 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should NOT return candidate who is pass in one interview after pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
       pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
-      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
+      candidate1 = create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: TimexHelper.utc_now() |> TimexHelper.add(-2, :days))
       create(:interview, interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
       {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(current_week, role1.id)
@@ -424,7 +424,7 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should NOT return candidate who is not completed all interviews after pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
-      create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: Date.now |> Date.shift(days: -2))
+      create(:candidate, role_id: role1.id, pipeline_status_id: closed_pipeline_status.id, pipeline_closure_time: TimexHelper.utc_now() |> TimexHelper.add(-2, :days))
 
       {candidates, _} = Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(current_week, role1.id)
 
@@ -445,8 +445,8 @@ defmodule RecruitxBackend.CandidateSpec do
     it "should NOT return candidate who is pursue in all interviews and pipeline is closed" do
       create(:role_interview_type, role_id: role1.id,interview_type_id: interview_type1.id)
       pursue = InterviewStatus.retrieve_by_name(InterviewStatus.pursue)
-      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: Date.now |> Date.shift(days: -1))
-      create(:interview, start_time: get_start_of_current_week , interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
+      candidate1 = create(:candidate, pipeline_status_id: closed_pipeline_status.id, role_id: role1.id, pipeline_closure_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :days))
+      create(:interview, start_time: get_start_of_current_week, interview_type_id: interview_type1.id, interview_status_id: pursue.id, candidate_id: candidate1.id)
 
       {_, candidates}= Candidate.get_candidates_pursued_and_rejected_after_pipeline_closure_separately(current_week, role1.id)
 
@@ -508,7 +508,7 @@ defmodule RecruitxBackend.CandidateSpec do
       pass_pipeline_status = PipelineStatus.retrieve_by_name(PipelineStatus.pass)
       pass = InterviewStatus.retrieve_by_name(InterviewStatus.pass)
       candidate1 = create(:candidate, pipeline_status_id: pass_pipeline_status.id, role_id: role1.id)
-      create(:interview, start_time: Date.now |> Date.end_of_week |> Date.shift(days: +1), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
+      create(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.end_of_week |> TimexHelper.add(+1, :days), interview_type_id: interview_type1.id, interview_status_id: pass.id, candidate_id: candidate1.id)
 
       candidates_count = Candidate.get_no_of_pass_candidates_within_range(current_week, role1.id)
 
@@ -541,15 +541,15 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return empty array when there are no interviews with lesser priority on the day" do
-      create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 2).id)
+      create(:interview, start_time: get_start_of_next_week, interview_type_id: create(:interview_type, priority: 2).id)
       result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week, interview_type.id, Enum.random([1, 2, 3])) |> Repo.all
 
       expect(result) |> to(be([]))
     end
 
     it "should return empty array when there are no interviews on the day" do
-      create(:interview, start_time: get_start_of_next_week |> Date.shift(days: 1) , interview_type_id: create(:interview_type, priority: 1).id)
-      create(:interview, start_time: get_start_of_next_week |> Date.shift(days: -1) , interview_type_id: create(:interview_type, priority: 1).id)
+      create(:interview, start_time: get_start_of_next_week |> TimexHelper.add(1, :days), interview_type_id: create(:interview_type, priority: 1).id)
+      create(:interview, start_time: get_start_of_next_week |> TimexHelper.add(-1, :days), interview_type_id: create(:interview_type, priority: 1).id)
       result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week, interview_type.id, Enum.random([1, 2, 3])) |> Repo.all
 
       expect(result) |> to(be([]))
@@ -557,22 +557,21 @@ defmodule RecruitxBackend.CandidateSpec do
 
     it "should return empty array when there is an interviews on the day with lesser priority for different role" do
       candidate = create(:candidate)
-      create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id, candidate_id: candidate.id)
+      create(:interview, start_time: get_start_of_next_week, interview_type_id: create(:interview_type, priority: 1).id, candidate_id: candidate.id)
 
-      result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week |> Date.shift(hours: 5), interview_type.id, candidate.role_id + 1) |> Repo.all
+      result = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week |> TimexHelper.add(5, :hours), interview_type.id, candidate.role_id + 1) |> Repo.all
       expect(result) |> to(be([]))
     end
 
     it "should return candidate when there is an interviews on the day with lesser priority for same role" do
       candidate = create(:candidate)
-      interview = create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id, candidate_id: candidate.id)
+      interview = create(:interview, start_time: get_start_of_next_week, interview_type_id: create(:interview_type, priority: 1).id, candidate_id: candidate.id)
 
-      [result] = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week |> Date.shift(hours: 5), interview_type.id, candidate.role_id) |> Repo.all
+      [result] = Candidate.get_candidates_scheduled_for_date_and_interview_round(get_start_of_next_week |> TimexHelper.add(5, :hours), interview_type.id, candidate.role_id) |> Repo.all
 
       expect([result]) |> to_not(be([]))
       expect(result.id) |> to(be(interview.candidate_id))
     end
-
   end
 
   context "get_unique_skills_formatted" do

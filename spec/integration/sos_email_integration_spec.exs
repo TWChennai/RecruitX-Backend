@@ -3,7 +3,7 @@ defmodule RecruitxBackend.SosEmailIntegrationSpec do
 
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
@@ -22,7 +22,7 @@ defmodule RecruitxBackend.SosEmailIntegrationSpec do
     it "should return sos_validity as true when there are interviews with insufficient panelists" do
       Repo.delete_all InterviewPanelist
       Repo.delete_all Interview
-      create(:interview, start_time: Date.now |> Date.shift(days: 1))
+      create(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days))
 
       response = get conn_with_dummy_authorization(), "/sos_email", %{"get_status" => ""}
 

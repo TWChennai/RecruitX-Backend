@@ -2,11 +2,12 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   use ESpec.Phoenix, model: RecruitxBackend.WeeklySignupReminder
 
   import Ecto.Query
+
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Skill
-  alias RecruitxBackend.WeeklySignupReminder
-  alias Timex.Date
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Skill
+  alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.WeeklySignupReminder
 
   let :role, do: create(:role, name: "Role Name")
   let :candidate, do: create(:candidate, role_id: role.id, other_skills: "Other Skills", experience: Decimal.new(5.46))
@@ -73,7 +74,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       [ actual_interview | _ ] = actual_data.interviews
 
       expect(actual_interview.name) |> to(be(interview_type.name))
-      expect(actual_interview.date) |> to(be(Timex.DateFormat.format!(interview.start_time, "%b-%d", :strftime)))
+      expect(actual_interview.date) |> to(be(TimexHelper.format(interview.start_time, "%b-%d")))
     end
 
     it "should contain concatenated skills for the candidate in the result" do
@@ -106,9 +107,9 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   describe "get interview sub-query" do
     before do
       Repo.delete_all(Interview)
-      create(:interview, id: 1, start_time: get_start_of_current_week |> Date.shift(days: 2))
-      create(:interview, id: 2, start_time: get_start_of_current_week |> Date.shift(days: 2))
-      create(:interview, id: 3, start_time: get_start_of_current_week |> Date.shift(days: 2))
+      create(:interview, id: 1, start_time: get_start_of_current_week |> TimexHelper.add(2, :days))
+      create(:interview, id: 2, start_time: get_start_of_current_week |> TimexHelper.add(2, :days))
+      create(:interview, id: 3, start_time: get_start_of_current_week |> TimexHelper.add(2, :days))
     end
 
     it "should return interviews with given interview ids and remaining ids in a different list" do
@@ -133,7 +134,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should not return interviews that is not in next 7 days" do
-      create(:interview, id: 4, start_time: Date.now |> Date.shift(days: -10))
+      create(:interview, id: 4, start_time: TimexHelper.utc_now() |> TimexHelper.add(-10, :days))
       {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([])
       interviews_with_insufficient_panelists = insufficient_panelists_query |> Repo.all
       [interview1, interview2, interview3] = sufficient_panelists_query |> Repo.all
@@ -145,7 +146,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
     end
 
     it "should not return signed up interviews that is not in next 7 days" do
-      create(:interview, id: 4, start_time: get_start_of_next_week |> Date.shift(days: 10))
+      create(:interview, id: 4, start_time: get_start_of_next_week |> TimexHelper.add(10, :days))
       {insufficient_panelists_query, sufficient_panelists_query} = WeeklySignupReminder.get_interview_sub_queries([1])
       [interview1] = insufficient_panelists_query |> Repo.all
       [interview2, interview3] = sufficient_panelists_query |> Repo.all
@@ -159,7 +160,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   describe "execute weekly signup reminder" do
 
     it "should call Swoosh deliver with correct arguments" do
-      create(:interview, start_time: get_start_of_current_week |> Date.shift(days: 2))
+      create(:interview, start_time: get_start_of_current_week |> TimexHelper.add(2, :days))
       RecruitxBackend.MailHelper.default_mail
 
       allow Swoosh.Templates |> to(accept(:weekly_signup_reminder, fn(_, _) -> "html content"  end))

@@ -1,5 +1,5 @@
 defmodule RecruitxBackend.TestHelpers do
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   def conn_with_dummy_authorization() do
     Plug.Conn.put_req_header(Phoenix.ConnTest.conn(), "authorization", System.get_env("API_KEY"))
@@ -14,14 +14,14 @@ defmodule RecruitxBackend.TestHelpers do
   end
 
   def get_start_of_current_week,
-  do: Date.now |> Date.beginning_of_week |> Date.shift(mins: 1)
+  do: TimexHelper.utc_now() |> TimexHelper.beginning_of_week |> TimexHelper.add(1, :minutes)
 
   def get_date_of_previous_month,
-  do: Date.now |> Date.beginning_of_month |> Date.shift(days: -2)
+  do: TimexHelper.utc_now() |> TimexHelper.beginning_of_month |> TimexHelper.add(-2, :days)
 
   def get_date_of_previous_quarter,
-  do: Date.now |> Date.beginning_of_quarter |> Date.shift(days: -2)
+  do: TimexHelper.utc_now() |> TimexHelper.beginning_of_quarter |> TimexHelper.add(-2, :days)
 
   def get_start_of_next_week,
-  do: Date.now |> Date.end_of_week |> Date.shift(mins: 1)
+  do: TimexHelper.utc_now() |> TimexHelper.end_of_week |> TimexHelper.add(1, :minutes)
 end

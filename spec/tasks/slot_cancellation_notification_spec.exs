@@ -1,11 +1,11 @@
 defmodule RecruitxBackend.SlotCancellationNotificationSpec do
   use ESpec.Phoenix, model: RecruitxBackend.SlotCancellationNotification
 
+  alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotCancellationNotification
-  alias RecruitxBackend.MailHelper
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   describe "execute" do
     it "should not send mail when there are no slots to be cancelled" do
@@ -32,7 +32,7 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
       interview_type = create(:interview_type, name: "roundone")
       slot = create(:slot,
         interview_type_id: interview_type.id,
-        start_time: Date.set(Date.epoch, [datetime: {{2011,1,1}, {12,30,0}}]))
+        start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
       create(:slot_panelist, panelist_login_name: "test", slot_id: slot.id)
 
       allow MailHelper |> to(accept(:deliver, fn(%{subject: subject, to: to_addresses, html_body: {

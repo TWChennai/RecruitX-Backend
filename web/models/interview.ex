@@ -1,25 +1,22 @@
 defmodule RecruitxBackend.Interview do
-
   use RecruitxBackend.Web, :model
 
   alias Ecto.Changeset
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.FeedbackImage
+  alias RecruitxBackend.InterviewCancellationNotification
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.JSONErrorReason
+  alias RecruitxBackend.Panel
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.TimexHelper
-  alias RecruitxBackend.JSONErrorReason
-  alias RecruitxBackend.Panel
-  alias Timex.Date
-  alias Timex.DateFormat
   alias RecruitxBackend.Timer
-  alias RecruitxBackend.InterviewCancellationNotification
+  alias RecruitxBackend.TimexHelper
 
   import Ecto.Query
 
@@ -42,8 +39,8 @@ defmodule RecruitxBackend.Interview do
   @optional_fields ~w(interview_status_id)
 
   def tuesday_to_friday_of_the_current_week(query) do
-    start_of_tuesday = Date.now |> Date.beginning_of_week(:mon) |> Date.shift(days: 1)
-    end_of_friday = start_of_tuesday |> Date.shift(days: 4)
+    start_of_tuesday = TimexHelper.utc_now() |> TimexHelper.beginning_of_week() |> TimexHelper.add(1, :days)
+    end_of_friday = start_of_tuesday |> TimexHelper.add(4, :days)
     Panel.within_date_range(query, start_of_tuesday, end_of_friday)
   end
 
@@ -76,7 +73,7 @@ defmodule RecruitxBackend.Interview do
                               limit: 1)
                               |> Repo.one
     case interview_with_feedback_and_maximum_start_time do
-      nil -> Date.set(Date.epoch, date: {0, 0, 1})
+      nil -> TimexHelper.from_epoch(date: {0, 0, 1})
       _ -> interview_with_feedback_and_maximum_start_time.start_time
     end
   end
@@ -86,7 +83,7 @@ defmodule RecruitxBackend.Interview do
                               (from i in __MODULE__,
                               where: i.candidate_id == ^candidate_id and
                               is_nil(i.interview_status_id) and
-                              i.start_time < ^ interview_start_time,
+                              i.start_time < ^interview_start_time,
                               select: count(i.id)
                               )
                               |> Repo.one
@@ -312,17 +309,10 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-  def format(interview) do
+  def format(interview, date_format \\ "%b-%d") do
     %{
       name: interview.interview_type.name,
-      date: DateFormat.format!(interview.start_time, "%b-%d", :strftime)
-    }
-  end
-
-  def format(interview, date_format) do
-    %{
-      name: interview.interview_type.name,
-      date: interview.start_time |> TimexHelper.format(date_format)
+      date: TimexHelper.format(interview.start_time, date_format)
     }
   end
 
@@ -331,7 +321,7 @@ defmodule RecruitxBackend.Interview do
     if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
     %{
       name: interview.interview_type.name,
-      date: interview.start_time |> TimexHelper.format(date_format),
+      date: TimexHelper.format(interview.start_time, date_format),
       result: status,
       panelists: get_formatted_interview_panelists(interview)
     }

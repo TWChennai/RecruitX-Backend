@@ -2,11 +2,11 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewPanelist
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.SignUpEvaluationStatus
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.SignUpEvaluator
   alias RecruitxBackend.Repo
-  alias Timex.Date
+  alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.SignUpEvaluator
+  alias RecruitxBackend.TimexHelper
 
   let :valid_attrs, do: fields_for(:interview_panelist)
   let :invalid_attrs, do: %{}
@@ -93,7 +93,7 @@ defmodule RecruitxBackend.InterviewPanelistSpec do
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{panelist_experience: 2, panelist_role: role.name})))
       Repo.insert(changeset)
       signed_up_interview = Interview |> Repo.get(valid_attrs.interview_id)
-      new_interview = create(:interview, start_time: signed_up_interview.start_time |> Date.shift(hours: 2))
+      new_interview = create(:interview, start_time: signed_up_interview.start_time |> TimexHelper.add(2, :hours))
       changeset = InterviewPanelist.changeset(%InterviewPanelist{}, convertKeysFromAtomsToStrings(Map.merge(valid_attrs, %{interview_id: new_interview.id, panelist_experience: 2, panelist_role: role.name})))
 
       {status, _} = Repo.insert(changeset)

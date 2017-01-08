@@ -6,19 +6,19 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   @lower_bound "LB"
   @upper_bound "UB"
 
-  alias RecruitxBackend.QueryFilter
-  alias RecruitxBackend.SlotPanelist
-  alias RecruitxBackend.Repo
-  alias RecruitxBackend.ExperienceMatrix
+  alias Decimal, as: D
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.InterviewType
+  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.Role
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.MailHelper
+  alias RecruitxBackend.QueryFilter
+  alias RecruitxBackend.Repo
+  alias RecruitxBackend.Role
+  alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.TeamDetailsUpdate
-  alias Timex.Date
-  alias Decimal, as: D
+  alias RecruitxBackend.TimexHelper
 
   let :jigsaw_result, do: %{body: "{\"employeeId\":\"17991\",\"role\":{\"name\":\"Dev\"},\"project\":{\"name\":\"Recruitx\"}}", status_code: 200}
   let :role, do: create(:role)
@@ -35,7 +35,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     it "should get weekly signups by default" do
       team = create(:team, %{name: "test_team"})
       role = create(:role, %{name: "test_role"})
-      interview_within_range = create(:interview, %{start_time: Date.now})
+      interview_within_range = create(:interview, %{start_time: TimexHelper.utc_now()})
       create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
         interview_id: interview_within_range.id})
       create(:panelist_details, %{panelist_login_name: "test", role_id: role.id})
@@ -55,10 +55,10 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       team1 = create(:team, %{name: "test_team1", active: true})
       role = create(:role, %{name: "test_role"})
       role1 = create(:role, %{name: "test_role1"})
-      interview_within_range1 = create(:interview, %{start_time: Date.now |> Date.beginning_of_month})
-      interview_within_range2 = create(:interview, %{start_time: Date.now |> Date.end_of_month})
-      interview_within_range3 = create(:interview, %{start_time: Date.now})
-      interview_out_of_range = create(:interview, %{start_time: Date.now() |> Date.beginning_of_month |>  Date.shift(days: -1)})
+      interview_within_range1 = create(:interview, %{start_time: TimexHelper.utc_now() |> TimexHelper.beginning_of_month})
+      interview_within_range2 = create(:interview, %{start_time: TimexHelper.utc_now() |> TimexHelper.end_of_month})
+      interview_within_range3 = create(:interview, %{start_time: TimexHelper.utc_now()})
+      interview_out_of_range = create(:interview, %{start_time: TimexHelper.utc_now() |> TimexHelper.beginning_of_month |>  TimexHelper.add(-1, :days)})
 
       create(:interview_panelist, %{panelist_login_name: "test", team_id: team.id,
       interview_id: interview_within_range1.id})
@@ -159,7 +159,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       role = create(:role)
       candidate = create(:candidate, role_id: role.id)
       interview1 = create(:interview, candidate_id: candidate.id)
-      interview2 = create(:interview, candidate_id: candidate.id, start_time: interview1.start_time |> Date.shift(hours: 2))
+      interview2 = create(:interview, candidate_id: candidate.id, start_time: interview1.start_time |> TimexHelper.add(2, :hours))
       interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
       interview_panelist2 = %{interview_id: interview2.id, panelist_login_name: interview_panelist1.panelist_login_name, panelist_experience: 2, panelist_role: role.name}
 
@@ -430,7 +430,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     let :candidate, do: create(:candidate)
     let :interview, do: create(:interview, candidate_id: candidate.id)
     let :interview_panelist, do: create(:interview_panelist, interview_id: interview.id)
-
 
     it "should send email to signed up panelist" do
       email = %{subject: "[RecruitX] Change in interview panel", to: interview_panelist.panelist_login_name <> System.get_env("EMAIL_POSTFIX") |> String.split, html_body: "html content"}

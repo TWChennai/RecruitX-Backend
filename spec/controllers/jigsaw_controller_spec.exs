@@ -3,8 +3,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
 
   alias RecruitxBackend.JigsawController
   alias RecruitxBackend.Role
-  alias Timex.Date
-  alias Timex.DateFormat
+  alias RecruitxBackend.TimexHelper
 
   @recruitment_department "People Recruiting"
   @office_princinpal Role.office_principal
@@ -13,7 +12,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
   @specialist "Specialist"
 
   let :panelist_role, do: create(:role)
-  let :hire_date, do: Date.now() |> Date.shift(months: -5) |> DateFormat.format!("%Y-%m-%d", :strftime)
+  let :hire_date, do: TimexHelper.utc_now() |> TimexHelper.add(-5, :months) |> TimexHelper.format("%Y-%m-%d")
   let :past_exp, do: 5.34
 
   describe "get_jigsaw_data" do
@@ -29,7 +28,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
       expect(is_super_user) |> to(be(false))
       expect(role) |> to(be(panelist_role))
       expect(past_experience) |> to(be(Decimal.new(7.5)))
-      expect(calculated_hire_date) |> to(be(Date.now() |> Date.shift(months: -round(past_exp * 12))))
+      expect(calculated_hire_date) |> to(be(TimexHelper.utc_now() |> TimexHelper.add(-round(past_exp * 12), :months)))
     end
 
     it "should return the is_recruiter true for recruiters" do

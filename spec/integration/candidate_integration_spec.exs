@@ -8,14 +8,14 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.PipelineStatus
-  alias Timex.Date
+  alias RecruitxBackend.TimexHelper
 
   describe "get /candidates" do
     before do:  Repo.delete_all(Candidate)
 
     it "should return a list of candidates" do
-      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
-      interview2 = create(:interview, interview_type_id: 1, start_time: Date.now |> Date.shift(hours: 1))
+      interview1 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
+      interview2 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       candidate1 = Candidate |> Repo.get(interview1.candidate_id)
       candidate2 = Candidate |> Repo.get(interview2.candidate_id)
 
@@ -27,7 +27,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
     end
 
     it "should return a candidates with and without interviews " do
-      interview1 = create(:interview, interview_type_id: 1, start_time: Date.now)
+      interview1 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
       candidate1 = Candidate |> Repo.get(interview1.candidate_id)
       candidate2 = create(:candidate)
 
@@ -68,7 +68,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should update the candidate and delete the successive interviews and panelists if the update is for closing the pipeline" do
       candidate = create(:candidate)
-      interview = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: 1)})
+      interview = create(:interview, %{candidate_id: candidate.id, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days)})
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
@@ -85,7 +85,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should update the candidate and delete previous interviews and panelists if the update is for closing the pipeline and if interview_status_id is nil" do
       candidate = create(:candidate)
-      interview = create(:interview, candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1))
+      interview = create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :days))
       create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
@@ -101,7 +101,7 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should update the candidate and not delete previous interviews and panelists if the update is for closing the pipeline and if interview_status_id is not nil" do
       candidate = create(:candidate)
-      interview = create(:interview, candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1), interview_status_id: 1)
+      interview = create(:interview, candidate_id: candidate.id, start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :days), interview_status_id: 1)
       interview_panelist = create(:interview_panelist, interview_id: interview.id)
       closed_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.closed).id
 
@@ -118,8 +118,8 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
 
     it "should update the candidate and not delete the successive and past interviews and panelists if the update is for not closing the pipeline" do
       candidate = create(:candidate)
-      interview1 = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: 1)})
-      interview2 = create(:interview, %{candidate_id: candidate.id, start_time: Date.now |> Date.shift(days: -1)})
+      interview1 = create(:interview, %{candidate_id: candidate.id, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days)})
+      interview2 = create(:interview, %{candidate_id: candidate.id, start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :days)})
       interview_panelist1 = create(:interview_panelist, interview_id: interview1.id)
       interview_panelist2 = create(:interview_panelist, interview_id: interview2.id)
       pipeline_status = create(:pipeline_status)

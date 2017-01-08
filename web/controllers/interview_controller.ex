@@ -29,7 +29,7 @@ defmodule RecruitxBackend.InterviewController do
     retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
                                                 |> Enum.sort(fn (first, second) -> first.signup || !second.signup end)
-    conn |> render("interviews_preload.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
+    conn |> render("interviews_preload.json", interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
   def index(conn, %{"panelist_login_name" => panelist_login_name, "panelist_experience" => panelist_experience,  "panelist_role" => panelist_role}) do
@@ -45,7 +45,7 @@ defmodule RecruitxBackend.InterviewController do
     retrieved_panelist_role = Role.retrieve_by_name(panelist_role)
     interviews_and_slots_with_signup_status = Panel.add_signup_eligibity_for(slots, interviews, panelist_login_name, panelist_experience, retrieved_panelist_role)
                                                 |> Enum.sort(fn (first, second) -> first.signup || !second.signup end)
-    conn |> render("index.json" , interviews_with_signup: interviews_and_slots_with_signup_status)
+    conn |> render("index.json", interviews_with_signup: interviews_and_slots_with_signup_status)
   end
 
   def index(conn, %{"all" => _all}) do

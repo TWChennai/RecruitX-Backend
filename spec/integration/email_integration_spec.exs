@@ -1,10 +1,10 @@
 defmodule RecruitxBackend.EmailIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.WeeklySignupReminder
 
-  alias RecruitxBackend.WeeklySignupReminder
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Skill
-  alias Timex.DateFormat
+  alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.WeeklySignupReminder
 
   @moduletag :integration
 
@@ -21,7 +21,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       create(:candidate_skill, skill_id: skill.id, candidate_id: candidate.id)
       create(:candidate_skill, skill_id: Skill.other_skill.id, candidate_id: candidate.id)
       create(:interview, interview_type_id: interview_type.id, start_time:
-      get_start_of_current_week |> Timex.Date.shift(days: 2), candidate_id: candidate.id)
+      get_start_of_current_week |> TimexHelper.add(2, :days), candidate_id: candidate.id)
     end
 
     it "should send multiple interview signup as email for each role" do
@@ -29,7 +29,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       candidate_of_another_role = create(:candidate, other_skills: "Other Skill",
           role_id: another_role.id)
       create(:interview, interview_type_id: interview_type.id,
-        start_time: get_start_of_current_week |> Timex.Date.shift(days: 2),
+        start_time: get_start_of_current_week |> TimexHelper.add(2, :days),
         candidate_id: candidate_of_another_role.id)
 
         WeeklySignupReminder.execute
@@ -60,8 +60,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       expect(mail_content) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
       expect(mail_content) |> to(have("Special Skill, Other Skill"))
       expect(mail_content) |> to(have("Round 1 on " <>
-      DateFormat.format!(get_start_of_current_week |> Timex.Date.shift(days: 2), "%b-%d",
-      :strftime) ))
+      TimexHelper.format(get_start_of_current_week |> TimexHelper.add(2, :days), "%b-%d")))
     end
   end
 end

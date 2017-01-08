@@ -57,11 +57,11 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluator do
 
   defp is_eligible_with_UB_filters(sign_up_evaluation_status, _experience_matrix_filters, _candidate_experience, _interview_type_id), do: sign_up_evaluation_status
 
-  defp get_existing_satisfied_criteria(interview_id , true), do: (from i in SlotPanelist, select: i.satisfied_criteria, where: i.slot_id == ^interview_id)
+  defp get_existing_satisfied_criteria(interview_id, true), do: (from i in SlotPanelist, select: i.satisfied_criteria, where: i.slot_id == ^interview_id)
 
-  defp get_existing_satisfied_criteria(interview_id , false), do: (from i in InterviewPanelist, select: i.satisfied_criteria, where: i.interview_id == ^interview_id)
+  defp get_existing_satisfied_criteria(interview_id, false), do: (from i in InterviewPanelist, select: i.satisfied_criteria, where: i.interview_id == ^interview_id)
 
-  defp find_the_best_fit_criteria(%{valid?: true} = sign_up_evaluation_status, interview_id , is_slot) do
+  defp find_the_best_fit_criteria(%{valid?: true} = sign_up_evaluation_status, interview_id, is_slot) do
     existing_satisfied_criteria = get_existing_satisfied_criteria(interview_id, is_slot) |> Repo.one
     sign_up_evaluation_status |> update_best_satisfied_criteria(sign_up_evaluation_status.satisfied_criteria, sign_up_evaluation_status.satisfied_criteria == existing_satisfied_criteria)
   end

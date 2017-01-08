@@ -2,8 +2,8 @@ defmodule RecruitxBackend.JigsawController do
   use RecruitxBackend.Web, :controller
 
   alias Poison.Parser
-  alias Timex.Date
   alias RecruitxBackend.Role
+  alias RecruitxBackend.TimexHelper
 
   @recruitment_department "People Recruiting"
   @office_princinpal Role.office_principal
@@ -28,10 +28,10 @@ defmodule RecruitxBackend.JigsawController do
     other_role = Role.retrieve_by_name(Role.other)
     recruiter_role = Map.merge(other_role, %{name: "Specialist"})
     user_details = case id do
-      # "ppanelist" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false} #for_uat
-      # "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false} #for_uat
-      # "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -12), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
-      # "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: Date.now |> Date.shift(months: -18), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
+      # "ppanelist" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false} #for_uat
+      # "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false} #for_uat
+      # "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
+      # "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
       _  -> response = get_data_safely("#{@jigsaw_url}/people/#{id}")
         case response.status_code do
           200 -> case response.body |> Parser.parse do
@@ -41,8 +41,8 @@ defmodule RecruitxBackend.JigsawController do
                                       past_experience = Decimal.new(total_experience - tw_experience)
                                                        |> Decimal.round(2)
                                       tw_experience_in_month = tw_experience |> year_to_month
-                                      calculated_hire_date = Date.now
-                                                            |> Date.shift(months: -tw_experience_in_month)
+                                      calculated_hire_date = TimexHelper.utc_now()
+                                                            |> TimexHelper.add(-tw_experience_in_month, :months)
 
                                       is_super_user = case role_name do
                                         @office_princinpal -> true
@@ -61,10 +61,10 @@ defmodule RecruitxBackend.JigsawController do
 
                                         _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user, error: ""}
                                       end
-                      {:error, reason} -> %{is_recruiter: false, calculated_hire_date: Date.now, past_experience: 0, role: other_role, error: reason}
+                      {:error, reason} -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, error: reason}
                     end   #end of Parser stmt
-            408 -> %{is_recruiter: false, calculated_hire_date: Date.now, past_experience: 0, role: other_role, is_super_user: false, error: @time_out_error}
-            _ -> %{is_recruiter: false, calculated_hire_date: Date.now, past_experience: 0, role: other_role, is_super_user: false, error: @invalid_user}
+            408 -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @time_out_error}
+            _ -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @invalid_user}
       end #end of response status_code
     end   # end of user_details case stmt
     %{user_details: user_details}

@@ -1,12 +1,10 @@
 defmodule RecruitxBackend.InterviewCancellationNotification do
   import Ecto.Query, only: [preload: 2, from: 2, select: 3]
 
+  alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Panel
   alias RecruitxBackend.Repo
-  alias RecruitxBackend.MailHelper
-  alias Timex.DateFormat
-  alias Timex.Date
-  alias Timex.Timezone
+  alias RecruitxBackend.TimexHelper
   alias Swoosh.Templates
 
   def execute(interviews_to_delete_query) do
@@ -21,10 +19,7 @@ defmodule RecruitxBackend.InterviewCancellationNotification do
   def deliver_mail_for_cancelled_interview_rounds([]), do: :ok
 
   def deliver_mail_for_cancelled_interview_rounds([{interview_round, interview_panelist} | rest]) do
-    formatted_date = interview_round.start_time
-    |> Date.from
-    |> Timezone.convert("Asia/Kolkata")
-    |> DateFormat.format!("%d/%m/%y %H:%M", :strftime)
+    formatted_date = TimexHelper.format(interview_round.start_time, "%d/%m/%y %H:%M")
 
     MailHelper.deliver %{
       subject: "[RecruitX] " <> interview_round.interview_type.name <> " on " <> formatted_date <> " is cancelled",

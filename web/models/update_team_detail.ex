@@ -21,5 +21,4 @@ defmodule RecruitxBackend.UpdateTeamDetails do
     |> cast(params, @required_fields, @optional_fields)
     |> unique_constraint(:panelist_login_id, name: :interview_panelist_login_id_index, message: "Details are already updated")
   end
-
 end

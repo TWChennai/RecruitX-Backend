@@ -2,17 +2,17 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   use ESpec.Phoenix, model: RecruitxBackend.StatusUpdate
 
   import Ecto.Query
-  alias RecruitxBackend.Interview
+
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.PanelistDetails
-  alias RecruitxBackend.StatusUpdate
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.MailHelper
+  alias RecruitxBackend.PanelistDetails
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Role
   alias RecruitxBackend.Slot
-  alias Timex.Date
-  alias Timex.DateFormat
+  alias RecruitxBackend.StatusUpdate
   alias RecruitxBackend.Timer
+  alias RecruitxBackend.TimexHelper
 
   describe "status update spec" do
     before do: Repo.delete_all Interview
@@ -63,8 +63,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_current_week_weekdays
-        {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
-        {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
+        from_date = start_date |> TimexHelper.format("%D")
+        to_date = end_date |> TimexHelper.format("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
@@ -108,7 +108,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous week" do
-        create(:interview, interview_type_id: 1, start_time: get_start_of_current_week |> Date.shift(days: -1))
+        create(:interview, interview_type_id: 1, start_time: get_start_of_current_week |> TimexHelper.add(-1, :days))
         email = %{
             subject: "[RecruitX] Weekly Status Update",
             to: System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -137,14 +137,13 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     describe "execute monthly status update" do
 
       it "should filter previous months interviews and construct email" do
-
         interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_previous_month
-        {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
-        {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
+        from_date = start_date |> TimexHelper.format("%D")
+        to_date = end_date |> TimexHelper.format("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
@@ -172,7 +171,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
       it "should call MailmanExtensions deliver with correct arguments" do
         create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
-        {:ok, subject_suffix } = DateFormat.format(Timer.get_previous_month.starting, " - %b %Y", :strftime)
+        subject_suffix = TimexHelper.format(Timer.get_previous_month.starting, " - %b %Y")
         email = %{
             subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
             to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -195,9 +194,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous month" do
-        {:ok, subject_suffix } = DateFormat.format(Timer.get_previous_month.starting, " - %b %Y", :strftime)
+        subject_suffix = TimexHelper.format(Timer.get_previous_month.starting, " - %b %Y")
 
-        create(:interview, interview_type_id: 1, start_time: Date.now )
+        create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() )
         email = %{
             subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
             to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -225,8 +224,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_previous_quarter
-        {:ok, from_date} = start_date |> DateFormat.format("{D}/{M}/{YY}")
-        {:ok, to_date} = end_date |> DateFormat.format("{D}/{M}/{YY}")
+        from_date = start_date |> TimexHelper.format("%D")
+        to_date = end_date |> TimexHelper.format("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
@@ -299,7 +298,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous month" do
-        create(:interview, interview_type_id: 1, start_time: Date.now )
+        create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() )
         time = Timer.get_previous_quarter
         subject_suffix = " - Q" <> to_string(div(time.starting.month + 2, 4) + 1) <> " " <> to_string(time.starting.year)
 

@@ -34,7 +34,7 @@ defmodule RecruitxBackend.QueryFilter do
         :string ->
           # TODO: Try to move away from prepared statements/fragments, and instead use first-class functions defined by Ecto
           # This will make upgrades much easier in the future.
-          from c in acc, where: fragment("? ILIKE ANY(?)", field(c, ^key) , ^field_value)
+          from c in acc, where: fragment("? ILIKE ANY(?)", field(c, ^key), ^field_value)
         _ ->
           from c in acc, where: field(c, ^key) in ^field_value
         end

@@ -1,8 +1,8 @@
 defmodule RecruitxBackend.SlotControllerSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.SlotController
 
-  alias Timex.Date
   alias RecruitxBackend.SlotCancellationNotification
+  alias RecruitxBackend.TimexHelper
 
   let :post_parameters, do: Map.merge(convertKeysFromAtomsToStrings(%{count: 1}), convertKeysFromAtomsToStrings(fields_for(:slot)))
 
@@ -12,8 +12,8 @@ defmodule RecruitxBackend.SlotControllerSpec do
     context "valid params" do
       before do: allow Repo |> to(accept(:insert, fn(_) -> {:ok, created_slot} end))
       it "should return 201 and be successful" do
-        create(:interview, start_time: get_start_of_next_week , interview_type_id: create(:interview_type, priority: 1).id)
-        post_parameters = Map.put(post_parameters, "start_time", get_start_of_next_week |> Date.shift(hours: 5))
+        create(:interview, start_time: get_start_of_next_week, interview_type_id: create(:interview_type, priority: 1).id)
+        post_parameters = Map.put(post_parameters, "start_time", get_start_of_next_week |> TimexHelper.add(5, :hours))
         conn = action(:create, %{"slot" => post_parameters})
 
         conn |> should(be_successful)

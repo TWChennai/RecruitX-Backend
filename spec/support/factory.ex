@@ -2,27 +2,25 @@ defmodule RecruitxBackend.Factory do
   use ExMachina.Ecto, repo: RecruitxBackend.Repo
 
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.CandidateSkill
+  alias RecruitxBackend.ExperienceMatrix
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.PanelistDetails
+  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.UpdateTeamDetails
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
   alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Team
-  alias Timex.Date
-  alias Timex.DateFormat
-  alias Timex.Ecto.DateTime
+  alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.UpdateTeamDetails
 
   import Ecto.Query
 
@@ -83,7 +81,7 @@ defmodule RecruitxBackend.Factory do
       candidate_id: create(:candidate).id,
       interview_type_id: create(:interview_type).id,
       start_time: random_time,
-      end_time: random_time |> Date.shift(hours: 2),
+      end_time: random_time |> TimexHelper.add(2, :hours),
       interview_status_id: nil
     }
   end
@@ -103,7 +101,7 @@ defmodule RecruitxBackend.Factory do
     %Slot{
       role_id: create(:role).id,
       start_time: random_time,
-      end_time: random_time |> Date.shift(hours: 1),
+      end_time: random_time |> TimexHelper.add(1, :hours),
       interview_type_id: create(:interview_type).id,
     }
   end
@@ -181,12 +179,7 @@ defmodule RecruitxBackend.Factory do
   end
 
   defp getRandomDateTime do
-    {_, value} = DateTime.cast(getRandomDateTimeString)
-    value
-  end
-
-  defp getRandomDateTimeString do
-    DateFormat.format!(Date.now, "%Y-%m-%d %H:%M:%S", :strftime)
+    TimexHelper.utc_now()
   end
 
   defp sanitize_name(name) do

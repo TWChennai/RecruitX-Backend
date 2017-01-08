@@ -1,11 +1,11 @@
 defmodule RecruitxBackend.InterviewRelativeEvaluator do
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
-  alias Timex.Date
+  alias RecruitxBackend.SignUpEvaluationStatus
+  alias RecruitxBackend.TimexHelper
 
   @time_buffer_between_sign_ups 2
   @tech2_interview_type_id 5
@@ -34,7 +34,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
   defp is_tech1_got_enough_sign_up(sign_up_evaluation_status, %{interview_type_id: @tech2_interview_type_id} = slot) do
     technical_one = InterviewType.retrieve_by_name(InterviewType.technical_1)
     is_any_tech_one_not_satisfied =
-        Interview.tech_one_interview_ids_between(Date.now(), slot.start_time)
+        Interview.tech_one_interview_ids_between(TimexHelper.utc_now(), slot.start_time)
           |> Enum.any?(fn tech_one_interview_id ->
             InterviewPanelist.get_signup_count_for_interview_id(tech_one_interview_id)
               |> Repo.one != technical_one.max_sign_up_limit end)
@@ -83,7 +83,7 @@ defmodule RecruitxBackend.InterviewRelativeEvaluator do
 
   defp is_within_time_buffer_of_my_previous_sign_ups(model, my_sign_up_start_times) do
     Enum.all?(my_sign_up_start_times, fn(sign_up_start_time) ->
-      abs(Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
+      abs(Timex.Date.diff(model.start_time, sign_up_start_time, :hours)) >= @time_buffer_between_sign_ups
     end)
   end
 
