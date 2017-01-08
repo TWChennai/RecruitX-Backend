@@ -573,16 +573,16 @@ defmodule RecruitxBackend.InterviewSpec do
       end
 
       it "should return nil when there is no clash with same priority round" do
-      p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> TimexHelper.add(6, :hours))
-      create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
-      |> TimexHelper.add(3, :hours))
+        p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+        |> TimexHelper.add(6, :hours))
+        create(:interview, interview_type_id: leadership_interview_type.id, candidate_id: candidate.id, start_time: tomorrow
+        |> TimexHelper.add(3, :hours))
 
-      changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(4, :hours)})
-      changeset = Interview.validate_with_other_rounds(changeset)
+        changeset = Interview.changeset(p3 |> Repo.preload(:interview_type), %{"start_time" => tomorrow |> TimexHelper.add(4, :hours)})
+        changeset = Interview.validate_with_other_rounds(changeset)
 
-      expect changeset.errors[:start_time] |> to(be(nil))
-    end
+        expect changeset.errors[:start_time] |> to(be(nil))
+      end
 
       it "should return error message when there is clash with same priority round" do
         p3 = create(:interview, interview_type_id: p3_interview_type.id, candidate_id: candidate.id, start_time: tomorrow |> TimexHelper.add(6, :hours), end_time: tomorrow |> TimexHelper.add(7, :hours))
@@ -600,6 +600,7 @@ defmodule RecruitxBackend.InterviewSpec do
     before do: Repo.delete_all Candidate
     before do: Repo.delete_all Slot
     before do: Repo.delete_all InterviewType
+
     it "should return all candidates who have completed no of rounds with start_time of last interview" do
       interview1 = create(:interview, start_time: TimexHelper.utc_now())
       interview2 = create(:interview, candidate_id: interview1.candidate_id, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
