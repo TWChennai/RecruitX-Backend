@@ -8,7 +8,6 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.PipelineStatus
-  alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Slot
@@ -229,10 +228,7 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "interviews_with_insufficient_panelists" do
-    before do
-      Repo.delete_all(InterviewPanelist)
-      Repo.delete_all(Interview)
-    end
+    before do: Enum.each([InterviewPanelist, Interview], &Repo.delete_all/1)
 
     it "should return interviews with no panelists" do
       interview = create(:interview)
@@ -251,7 +247,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should return interview when the max_sign_up_limit is one and the interview has no sign_up" do
-      Repo.delete_all Interview
       interview_type = create(:interview_type, max_sign_up_limit: 1)
       interview = create(:interview, interview_type_id: interview_type.id)
 
@@ -272,6 +267,8 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   describe "update_status" do
+    before do: Repo.delete_all(InterviewStatus)
+
     it "should not update interview when status is already entered" do
       interview = create(:interview)
       interview_status = create(:interview_status)
@@ -306,8 +303,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should update status and delete future interviews,panelists when status is Pass" do
-      Repo.delete_all InterviewStatus
-
       future_date = TimexHelper.utc_now() |> TimexHelper.add(7, :days)
       interview = create(:interview, start_time: TimexHelper.utc_now())
       future_interview = create(:interview, candidate_id: interview.candidate_id, start_time: future_date)
@@ -326,8 +321,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should update status and not delete past interviews,panelists when status is Pass" do
-      Repo.delete_all InterviewStatus
-
       past_date = TimexHelper.utc_now() |> TimexHelper.add(-7, :days)
       interview = create(:interview, start_time: TimexHelper.utc_now())
       interview_to_be_retained = create(:interview, candidate_id: interview.candidate_id, start_time: past_date)
@@ -346,8 +339,6 @@ defmodule RecruitxBackend.InterviewSpec do
     end
 
     it "should update status when status is Pass and there are no successive rounds" do
-      Repo.delete_all InterviewStatus
-
       interview = create(:interview)
       interview_status = create(:interview_status, name: PipelineStatus.pass)
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
@@ -597,9 +588,7 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get_candidates_with_all_rounds_completed" do
-    before do: Repo.delete_all Candidate
-    before do: Repo.delete_all Slot
-    before do: Repo.delete_all InterviewType
+    before do: Enum.each([Candidate, Slot, InterviewType], &Repo.delete_all/1)
 
     it "should return all candidates who have completed no of rounds with start_time of last interview" do
       interview1 = create(:interview, start_time: TimexHelper.utc_now())
@@ -621,10 +610,7 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get_last_interview_status_for" do
-    before do: Repo.delete_all Candidate
-    before do: Repo.delete_all Slot
-    before do: Repo.delete_all InterviewType
-    before do: Repo.delete_all RoleInterviewType
+    before do: Enum.each([Candidate, Slot, InterviewType, RoleInterviewType], &Repo.delete_all/1)
 
     it "should add status of last interview if pipeline is closed and candidate has finished all rounds" do
       interview_type1 = create(:interview_type)
@@ -729,9 +715,9 @@ defmodule RecruitxBackend.InterviewSpec do
         |> Repo.get(interview.id)
         |> Interview.format
 
-        expect(formatted_interview.name) |> to(be(interview_type.name))
-        expect(formatted_interview.date) |> to(be(TimexHelper.format(interview.start_time, "%b-%d")))
-      end
+      expect(formatted_interview.name) |> to(be(interview_type.name))
+      expect(formatted_interview.date) |> to(be(TimexHelper.format_with_timezone(interview.start_time, "%b-%d")))
+    end
   end
 
   context "format interview with result and panelist" do
@@ -742,7 +728,7 @@ defmodule RecruitxBackend.InterviewSpec do
 
     it "should contain interview names, date, result, panelists for the candidate in the result" do
       interview_panelist = create(:interview_panelist, interview_id: interview.id, panelist_login_name: "test1")
-      interview_date = TimexHelper.format(interview.start_time, "%d/%m/%y")
+      interview_date = TimexHelper.format_with_timezone(interview.start_time, "%d/%m/%y")
 
       input_interview = Interview |> preload([:interview_panelist, :interview_status, :interview_type]) |> Repo.get(interview.id)
 
@@ -756,8 +742,9 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get the interviews in the past 5 days" do
+    before do: Repo.delete_all(Interview)
+
     it "should return the interview from the past 5 days" do
-      Repo.delete_all(Interview)
       create(:interview, id: 900, start_time: get_start_of_current_week)
       create(:interview, id: 901, start_time: get_start_of_current_week |> TimexHelper.add(-1, :days))
       create(:interview, id: 902, start_time: get_start_of_current_week |> TimexHelper.add(+7, :days))
@@ -769,8 +756,9 @@ defmodule RecruitxBackend.InterviewSpec do
   end
 
   context "get the tuesday to friday of a week" do
+    before do: Repo.delete_all(Interview)
+
     it "should return the interview from the next week" do
-      Repo.delete_all(Interview)
       create(:interview, id: 900, start_time: get_start_of_current_week |> TimexHelper.add(+3, :days))
       create(:interview, id: 901, start_time: get_start_of_current_week |> TimexHelper.add(-8, :days))
       create(:interview, id: 902, start_time: get_start_of_current_week |> TimexHelper.add(+6, :days))

@@ -67,7 +67,13 @@ defmodule RecruitxBackend.TimexHelper do
   end
 
   def format(input_date_time, date_format) do
-    {:ok, result} = input_date_time |> Timex.Timezone.convert(@time_zone_name) |> Timex.DateFormat.format(date_format, :strftime)
-    result
+    {:ok, formatted} = input_date_time |> Timex.DateFormat.format(date_format, :strftime)
+    formatted
+  end
+
+  def format_with_timezone(input_date_time, date_format) do
+    time_in_new_zone = input_date_time |> Timex.Timezone.convert(@time_zone_name)
+    {:ok, formatted} = time_in_new_zone |> Timex.DateFormat.format(date_format, :strftime)
+    formatted
   end
 end

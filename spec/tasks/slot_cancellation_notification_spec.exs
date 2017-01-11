@@ -8,8 +8,9 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
   alias RecruitxBackend.TimexHelper
 
   describe "execute" do
+    before do: Repo.delete_all(Slot)
+
     it "should not send mail when there are no slots to be cancelled" do
-      Repo.delete_all Slot
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       Slot |> SlotCancellationNotification.execute
@@ -18,7 +19,6 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
     end
 
     it "should not send mail when the cancelled slots do not have sign ups" do
-      Repo.delete_all Slot
       create(:slot)
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
@@ -28,7 +28,6 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
     end
 
     it "should send mail to the panelist of the deleted slots" do
-      Repo.delete_all Slot
       interview_type = create(:interview_type, name: "roundone")
       slot = create(:slot,
         interview_type_id: interview_type.id,
@@ -48,7 +47,7 @@ defmodule RecruitxBackend.SlotCancellationNotificationSpec do
 
       (from i in Slot, where: i.id == ^slot.id) |> SlotCancellationNotification.execute
 
-       expect MailHelper |> to(accept(:deliver))
+      expect MailHelper |> to(accept(:deliver))
     end
   end
 end

@@ -12,9 +12,10 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
   @upper_bound "UB"
   @empty ""
 
+  before do: Repo.delete_all(ExperienceMatrix)
+
   context "evaluate" do
     it "should return true if experience is greater than maximum experience with filter (for interview)" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
@@ -29,7 +30,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if experience is greater than maximum experience with filter (for slot)" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(2)
       role = create(:role)
@@ -41,7 +41,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if current interview type has no filters and panelist is equal to maximum experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
@@ -56,7 +55,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if current interview type has no filters and panelist is below minimum experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix,panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(0.5)
       candidate_experience = D.new(0)
@@ -71,7 +69,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if current interview type has no filters and panelist is above minimum experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       panelist_experience = D.new(2)
       candidate_experience = D.new(0)
@@ -86,7 +83,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if current interview type has no filters and panelist is within experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       create(:experience_matrix, panelist_experience_lower_bound: D.new(1))
       create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
       panelist_experience = D.new(2)
@@ -102,7 +98,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return false if current interview type has filters and panelist is below minimum experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2), role_id: role.id)
       _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3), role_id: role.id)
@@ -117,7 +112,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true if role has no filters but current interview type has filters and panelist is below minimum experience level in experience matrix" do
-      Repo.delete_all ExperienceMatrix
       experience_matrix_create_1 = create(:experience_matrix, panelist_experience_lower_bound: D.new(2))
       _experience_matrix_create_2 = create(:experience_matrix, panelist_experience_lower_bound: D.new(3))
       panelist_experience = D.new(1)
@@ -132,7 +126,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true when the panelist is experienced for the current interview and candidate" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1),candidate_experience_upper_bound: D.new(2), role_id: role.id)
       panelist_experience = D.new(2)
@@ -147,7 +140,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return false when the panelist is not experienced for the interview" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       _experience_matrix_panelist_is_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), role_id: role.id)
       experience_matrix_panelist_is_not_eligible_for = create(:experience_matrix, panelist_experience_lower_bound: D.new(2), role_id: role.id)
@@ -163,7 +155,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return false when panelist is experienced for the interview but not for the candidate" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(2), candidate_experience_lower_bound: D.new(-1), role_id: role.id)
       panelist_experience = D.new(1)
@@ -179,7 +170,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true when the panelist is eligible as the panelist 2 and not eligible for panelist 1 for any candidate" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(5), candidate_experience_lower_bound: D.new(-1), role_id: role.id)
 
@@ -193,7 +183,6 @@ defmodule RecruitxBackend.ExperienceMatrixRelativeEvaluatorSpec do
     end
 
     it "should return true when the panelist is eligible as the panelist 2 not eligible for panelist 1 for this candidate" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       experience_matrix = create(:experience_matrix, panelist_experience_lower_bound: D.new(1), candidate_experience_upper_bound: D.new(99), candidate_experience_lower_bound: D.new(5), role_id: role.id)
 

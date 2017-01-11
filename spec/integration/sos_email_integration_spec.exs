@@ -8,11 +8,10 @@ defmodule RecruitxBackend.SosEmailIntegrationSpec do
   @moduletag :integration
   @endpoint RecruitxBackend.Endpoint
 
+  before do: Enum.each([InterviewPanelist, Interview], &Repo.delete_all/1)
+
   describe "index" do
     it "should return sos_validity as false if there are no interviews with insufficient panelists" do
-      Repo.delete_all InterviewPanelist
-      Repo.delete_all Interview
-
       response = get conn_with_dummy_authorization(), "/sos_email", %{"get_status" => ""}
 
       parsed_response = response.resp_body |> Poison.Parser.parse!
@@ -20,8 +19,6 @@ defmodule RecruitxBackend.SosEmailIntegrationSpec do
     end
 
     it "should return sos_validity as true when there are interviews with insufficient panelists" do
-      Repo.delete_all InterviewPanelist
-      Repo.delete_all Interview
       create(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days))
 
       response = get conn_with_dummy_authorization(), "/sos_email", %{"get_status" => ""}

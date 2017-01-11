@@ -179,7 +179,7 @@ defmodule RecruitxBackend.Factory do
   end
 
   defp getRandomDateTime do
-    TimexHelper.utc_now()
+    TimexHelper.utc_now() |> TimexHelper.add(1, :hours)
   end
 
   defp sanitize_name(name) do

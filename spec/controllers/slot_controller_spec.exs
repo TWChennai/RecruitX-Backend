@@ -26,24 +26,24 @@ defmodule RecruitxBackend.SlotControllerSpec do
         response = action(:create, %{"slot" => Map.delete(post_parameters, "role_id")})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => %{"role_id" => ["can't be blank"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason =  %{"errors" => %{"role_id" => ["can't be blank"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when interview_type_id is empty" do
         response = action(:create, %{"slot" => Map.delete(post_parameters, "interview_type_id")})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => %{"interview_type_id" => ["can't be blank"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason =  %{"errors" => %{"interview_type_id" => ["can't be blank"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when start_time is empty" do
         response = action(:create, %{"slot" => Map.delete(post_parameters, "start_time")})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => %{"start_time" => ["can't be blank"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason =  %{"errors" => %{"start_time" => ["can't be blank"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
     end
   end
@@ -51,15 +51,15 @@ defmodule RecruitxBackend.SlotControllerSpec do
   describe "delete" do
     let :created_slot, do: create(:slot)
 
-      before do: allow Repo |> to(accept(:get!, fn(_) -> {:ok, created_slot} end))
-      before do: allow Repo |> to(accept(:delete!, fn(_) -> {:ok, created_slot} end))
-      before do: allow SlotCancellationNotification |> to(accept(:execute, fn(_) -> :ok end))
-      it "should return 200 and be successful" do
-        conn = action(:delete, %{"id" => created_slot.id})
+    before do: allow Repo |> to(accept(:get!, fn(_) -> {:ok, created_slot} end))
+    before do: allow Repo |> to(accept(:delete!, fn(_) -> {:ok, created_slot} end))
+    before do: allow SlotCancellationNotification |> to(accept(:execute, fn(_) -> :ok end))
 
-        conn |> should(be_successful)
-        conn |> should(have_http_status(:no_content))
-      end
+    it "should return 200 and be successful" do
+      conn = action(:delete, %{"id" => created_slot.id})
+
+      conn |> should(be_successful)
+      conn |> should(have_http_status(:no_content))
+    end
   end
-
 end

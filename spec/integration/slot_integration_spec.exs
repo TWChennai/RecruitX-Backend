@@ -2,10 +2,9 @@ defmodule SlotIntegrationSpec do
   use ESpec.Phoenix, controller: RecruitxBackend.SlotController
 
   alias RecruitxBackend.Repo
-  alias Timex.Date
-  alias Timex.DateFormat
   alias RecruitxBackend.Slot
   alias RecruitxBackend.TimexHelper
+  alias Timex.Date
 
   let :candidate, do: create(:candidate)
   let :post_parameters, do: convertKeysFromAtomsToStrings(fields_for(:slot, role_id: candidate.role_id))
@@ -42,38 +41,40 @@ defmodule SlotIntegrationSpec do
     let :created_slot, do: create(:slot)
 
     it "should return 200 with no slots when there are no slots" do
-      conn = action(:index, %{"interview_type_id" => 1, "previous_rounds_start_time" => DateFormat.format!(Date.now, "%Y-%m-%dT%H:%M:%SZ", :strftime), "role_id" => 1})
+      conn = action(:index, %{"interview_type_id" => 1, "previous_rounds_start_time" => format_datetime(Date.now), "role_id" => 1})
 
       conn |> should(be_successful)
       expect(conn.assigns.slots) |> to(be([]))
     end
 
     it "should return 200 with no slots when there are past slots" do
-      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => DateFormat.format!((created_slot.start_time |> Date.shift(hours: 2)), "%Y-%m-%dT%H:%M:%SZ", :strftime), "role_id" => created_slot.role_id})
+      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => format_datetime(created_slot.start_time |> Date.shift(hours: 2)), "role_id" => created_slot.role_id})
 
       conn |> should(be_successful)
       expect(conn.assigns.slots) |> to(be([]))
     end
 
     it "should return 200 with no slots when there are no slots for matching role" do
-      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => DateFormat.format!((created_slot.start_time |> Date.shift(hours: 2)), "%Y-%m-%dT%H:%M:%SZ", :strftime), "role_id" => (created_slot.role_id + 1)})
+      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => format_datetime(created_slot.start_time |> Date.shift(hours: 2)), "role_id" => (created_slot.role_id + 1)})
 
       conn |> should(be_successful)
       expect(conn.assigns.slots) |> to(be([]))
     end
 
     it "should return 200 with no slots when there are no slots for matching interview type" do
-      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id + 1, "previous_rounds_start_time" => DateFormat.format!((created_slot.start_time |> Date.shift(hours: 2)), "%Y-%m-%dT%H:%M:%SZ", :strftime), "role_id" => created_slot.role_id})
+      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id + 1, "previous_rounds_start_time" => format_datetime(created_slot.start_time |> Date.shift(hours: 2)), "role_id" => created_slot.role_id})
 
       conn |> should(be_successful)
       expect(conn.assigns.slots) |> to(be([]))
     end
 
     it "should return 200 with slots when there are slots" do
-      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => DateFormat.format!((created_slot.start_time |> Date.shift(hours: -2)), "%Y-%m-%dT%H:%M:%SZ", :strftime), "role_id" => created_slot.role_id})
+      conn = action(:index, %{"interview_type_id" => created_slot.interview_type_id, "previous_rounds_start_time" => format_datetime(created_slot.start_time |> Date.shift(hours: -2)), "role_id" => created_slot.role_id})
 
       conn |> should(be_successful)
       expect(conn.assigns.slots) |> to(be([created_slot]))
     end
   end
+
+  defp format_datetime(datetime), do: TimexHelper.format(datetime, "%Y-%m-%dT%H:%M:%SZ")
 end

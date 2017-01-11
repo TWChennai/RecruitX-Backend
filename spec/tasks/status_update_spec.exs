@@ -35,7 +35,6 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     end
 
     describe "construct view data" do
-
       it "should return name, role and interviews of candidates" do
         candidate = %{a: "a", last_name: "last_name", first_name: "first_name", role: %{ name: "role" }, interviews: ["a"]}
         candidates = [candidate]
@@ -55,7 +54,6 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
 
     describe "execute weekly status update" do
-
       it "should filter previous weeks interviews and construct email" do
 
         interview = create(:interview, interview_type_id: 1, start_time: get_start_of_current_week )
@@ -63,8 +61,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_current_week_weekdays
-        from_date = start_date |> TimexHelper.format("%D")
-        to_date = end_date |> TimexHelper.format("%D")
+        from_date = start_date |> TimexHelper.format_with_timezone("%D")
+        to_date = end_date |> TimexHelper.format_with_timezone("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
@@ -142,8 +140,8 @@ defmodule RecruitxBackend.StatusUpdateSpec do
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_previous_month
-        from_date = start_date |> TimexHelper.format("%D")
-        to_date = end_date |> TimexHelper.format("%D")
+        from_date = start_date |> TimexHelper.format_with_timezone("%D")
+        to_date = end_date |> TimexHelper.format_with_timezone("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 
@@ -171,7 +169,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
 
       it "should call MailmanExtensions deliver with correct arguments" do
         create(:interview, interview_type_id: 1, start_time: get_date_of_previous_month)
-        subject_suffix = TimexHelper.format(Timer.get_previous_month.starting, " - %b %Y")
+        subject_suffix = TimexHelper.format_with_timezone(Timer.get_previous_month.starting, " - %b %Y")
         email = %{
             subject: "[RecruitX] Monthly Status Update" <> subject_suffix,
             to: System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES") |> String.split,
@@ -194,7 +192,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should send a default mail if there are no interview in previous month" do
-        subject_suffix = TimexHelper.format(Timer.get_previous_month.starting, " - %b %Y")
+        subject_suffix = TimexHelper.format_with_timezone(Timer.get_previous_month.starting, " - %b %Y")
 
         create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() )
         email = %{
@@ -216,16 +214,14 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     end
 
     describe "execute quarterly status update" do
-
       it "should filter previous quarters interviews and construct email" do
-
         interview = create(:interview, interview_type_id: 1, start_time: get_date_of_previous_quarter)
         candidate_pipeline_status_id = Repo.get(Candidate, interview.candidate_id).pipeline_status_id
         candidate_pipeline_status = Repo.get(PipelineStatus, candidate_pipeline_status_id)
 
         %{starting: start_date, ending: end_date} = Timer.get_previous_quarter
-        from_date = start_date |> TimexHelper.format("%D")
-        to_date = end_date |> TimexHelper.format("%D")
+        from_date = start_date |> TimexHelper.format_with_timezone("%D")
+        to_date = end_date |> TimexHelper.format_with_timezone("%D")
 
         allow PipelineStatus |> to(accept(:in_progress, fn()-> candidate_pipeline_status.name end))
 

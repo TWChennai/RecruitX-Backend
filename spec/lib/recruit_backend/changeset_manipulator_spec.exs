@@ -18,22 +18,22 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
     end
 
     it "should not insert a changeset into db when there are changeset errors" do
-      expectedNameErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
+      expectedErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
       changesets = [Role.changeset(%Role{}, %{name: nil})]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_insert)
 
-      expect result |> to(be({false, [expectedNameErrorReason]}))
+      expect result |> to(be({false, [expectedErrorReason]}))
     end
 
     it "should not insert a changeset into db when there are constraint errors on db insertion" do
-      expectedRoleErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
+      expectedErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
       candidate = fields_for(:candidate)
       changesets = [Candidate.changeset(%Candidate{}, Map.merge(candidate, %{role_id: -1}))]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_insert)
 
-      expect result |> to(be({false, [expectedRoleErrorReason]}))
+      expect result |> to(be({false, [expectedErrorReason]}))
     end
   end
 
@@ -49,23 +49,23 @@ defmodule RecruitxBackend.ChangesetManipulatorSpec do
     end
 
     it "should not update a changeset into db when there are changeset errors" do
-      expectedRoleErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
+      expectedErrorReason = %JSONErrorReason{field_name: :name, reason: "can't be blank"}
       role = create(:role)
       changesets = [Role.changeset(role, %{"name": nil})]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_update)
 
-      expect result |> to(be({false, [expectedRoleErrorReason]}))
+      expect result |> to(be({false, [expectedErrorReason]}))
     end
 
     it "should not update a changeset into db when there are constraint errors on db insertion" do
-      expectedRoleErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
+      expectedErrorReason = %JSONErrorReason{field_name: :role, reason: "does not exist"}
       candidate = create(:candidate)
       changesets = [Candidate.changeset(candidate, %{role_id: -1})]
 
       result = changesets |> ChangesetManipulator.validate_and(Repo.custom_update)
 
-      expect result |> to(be({false, [expectedRoleErrorReason]}))
+      expect result |> to(be({false, [expectedErrorReason]}))
     end
   end
 

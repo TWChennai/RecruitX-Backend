@@ -19,7 +19,7 @@ defmodule RecruitxBackend.SlotCancellationNotification do
   def deliver_mail_for_cancelled_slots([]), do: :ok
 
   def deliver_mail_for_cancelled_slots([{slot, slot_panelist} | rest]) do
-    formatted_date = TimexHelper.format(slot.start_time, "%d/%m/%y %H:%M")
+    formatted_date = TimexHelper.format_with_timezone(slot.start_time, "%d/%m/%y %H:%M")
 
     MailHelper.deliver %{
       subject: "[RecruitX] " <> slot.interview_type.name <> " on " <> formatted_date <> " is cancelled",

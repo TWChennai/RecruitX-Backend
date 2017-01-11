@@ -12,7 +12,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
   @specialist "Specialist"
 
   let :panelist_role, do: create(:role)
-  let :hire_date, do: TimexHelper.utc_now() |> TimexHelper.add(-5, :months) |> TimexHelper.format("%Y-%m-%d")
+  let :hire_date, do: TimexHelper.utc_now() |> TimexHelper.add(-5, :months) |> TimexHelper.format_with_timezone("%Y-%m-%d")
   let :past_exp, do: 5.34
 
   describe "get_jigsaw_data" do

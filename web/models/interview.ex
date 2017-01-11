@@ -312,7 +312,7 @@ defmodule RecruitxBackend.Interview do
   def format(interview, date_format \\ "%b-%d") do
     %{
       name: interview.interview_type.name,
-      date: TimexHelper.format(interview.start_time, date_format)
+      date: TimexHelper.format_with_timezone(interview.start_time, date_format)
     }
   end
 
@@ -321,7 +321,7 @@ defmodule RecruitxBackend.Interview do
     if not(is_nil(interview.interview_status)), do: status = interview.interview_status.name
     %{
       name: interview.interview_type.name,
-      date: TimexHelper.format(interview.start_time, date_format),
+      date: TimexHelper.format_with_timezone(interview.start_time, date_format),
       result: status,
       panelists: get_formatted_interview_panelists(interview)
     }

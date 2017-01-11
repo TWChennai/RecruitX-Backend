@@ -1,5 +1,4 @@
 defmodule RecruitxBackend.InterviewRelativeEvaluator do
-
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType

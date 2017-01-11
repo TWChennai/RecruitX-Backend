@@ -25,10 +25,11 @@ alias RecruitxBackend.SlotPanelist
 alias RecruitxBackend.TimexHelper
 
 import Ecto.Query, only: [from: 2, where: 2]
+
 # NOTE: Non-transactional data should never be in this file - only as part of migrations.
 roles = Repo.all(from r in Role, where: r.name != ^Role.other)
 skills = Repo.all(Skill)
-in_progress_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
+in_progress = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
 
 candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Kausalya M" => "Hbase",
@@ -41,7 +42,7 @@ candidates = Enum.map(%{"Dinesh B" => "Hadoop",
           "Subha M" => "NodeJS",
           "Vijay A" => "Haskell"}, fn {name_value, other_skills} ->
   [first_name, last_name] = String.split(name_value, " ")
-  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: in_progress_id})
+  Repo.insert!(%Candidate{first_name: first_name, last_name: last_name, experience: Decimal.new(Float.round(:rand.uniform * 10, 2)), other_skills: other_skills, role_id: Enum.random(roles).id, pipeline_status_id: in_progress.id})
 end)
 
 Enum.each(candidates, fn candidate ->
@@ -59,12 +60,13 @@ panelist_names = ["dineshb", "kausalym", "mahalaks", "navaneth", "pranjald", "vs
 for interview_round_number <- 1..:rand.uniform(4) do
   now = TimexHelper.utc_now()
   random_start_time = now |> TimexHelper.add(interview_round_number, :hours)
+  random_end_time = random_start_time |> TimexHelper.add(1, :hours)
   interview_type = (from it in InterviewType, where: it.priority == ^interview_round_number, limit: 1) |> Repo.one
 
   slot = Repo.insert!(%Slot{
     role_id: Enum.random(roles).id,
     start_time: random_start_time,
-    end_time: random_start_time |> TimexHelper.add(1, :hours),
+    end_time: random_end_time,
     average_experience: Decimal.new(Enum.random(1..10)),
     interview_type_id: interview_type.id,
   })

@@ -8,8 +8,9 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
   alias RecruitxBackend.TimexHelper
 
   describe "execute" do
+    before do: Repo.delete_all(Interview)
+
     it "should not send mail when there are no interviews to be cancelled" do
-      Repo.delete_all Interview
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
       Interview |> InterviewCancellationNotification.execute
@@ -18,7 +19,6 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
     end
 
     it "should not send mail when the cancelled interviews do not have sign ups" do
-      Repo.delete_all Interview
       create(:interview)
       allow MailHelper |> to(accept(:deliver, fn(_) -> "" end))
 
@@ -28,7 +28,6 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
     end
 
     it "should send mail to the panelist of the cancelled interview" do
-      Repo.delete_all Interview
       candidate = create(:candidate, first_name: "testing", last_name: "last")
       interview_type = create(:interview_type, name: "roundone")
       interview = create(:interview,
@@ -52,7 +51,7 @@ defmodule RecruitxBackend.InterviewCancellationNotificationSpec do
 
       (from i in Interview, where: i.id == ^interview.id) |> InterviewCancellationNotification.execute
 
-       expect MailHelper |> to(accept(:deliver))
+      expect MailHelper |> to(accept(:deliver))
     end
   end
 end

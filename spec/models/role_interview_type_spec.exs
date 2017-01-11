@@ -1,10 +1,10 @@
 defmodule RecruitxBackend.RoleInterviewTypeSpec do
   use ESpec.Phoenix, model: RecruitxBackend.RoleInterviewType
 
+  alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Role
   alias RecruitxBackend.RoleInterviewType
-  alias RecruitxBackend.InterviewType
 
   let :role, do: create(:role)
   let :interview_type, do: create(:interview_type)

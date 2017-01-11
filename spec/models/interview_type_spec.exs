@@ -2,17 +2,15 @@ defmodule RecruitxBackend.InterviewTypeSpec do
   use ESpec.Phoenix, model: RecruitxBackend.InterviewType
 
   alias RecruitxBackend.Interview
-  alias RecruitxBackend.Slot
   alias RecruitxBackend.InterviewType
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Slot
 
   let :valid_attrs, do: fields_for(:interview_type, priority: trunc(:rand.uniform * 10))
   let :invalid_attrs, do: %{}
 
   context "interview type spec" do
-    before do: Repo.delete_all(Interview)
-    before do: Repo.delete_all(Slot)
-    before do: Repo.delete_all(InterviewType)
+    before do: Enum.each([Interview, Slot, InterviewType], &Repo.delete_all/1)
 
     context "valid changeset" do
       subject do: InterviewType.changeset(%InterviewType{}, valid_attrs)

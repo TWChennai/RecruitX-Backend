@@ -9,9 +9,9 @@ defmodule RecruitxBackend.SosEmailSpec do
   alias RecruitxBackend.TimexHelper
 
   describe "execute" do
-    it "should not send an email when there all interviews have sufficient signups" do
-      Repo.delete_all Interview
+    before do: Repo.delete_all(Interview)
 
+    it "should not send an email when there all interviews have sufficient signups" do
       interview = create(:interview)
       Repo.insert(%InterviewPanelist{panelist_login_name: "test1", interview_id: interview.id})
       Repo.insert(%InterviewPanelist{panelist_login_name: "test2", interview_id: interview.id})
@@ -26,8 +26,6 @@ defmodule RecruitxBackend.SosEmailSpec do
     end
 
     it "should send an email with the formatted data ordered by start time within the next 48 hours only" do
-      Repo.delete_all Interview
-
       allow Timex.Date |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
       create(:interview, start_time: TimexHelper.from_epoch([datetime: {{2011,1,1}, {12,30,0}}]))
       create(:interview, start_time: TimexHelper.from_epoch([date: {2011, 3, 1}]))
@@ -40,7 +38,6 @@ defmodule RecruitxBackend.SosEmailSpec do
     end
 
     it "should send an email with the formatted data when there are interviews with less than required signups" do
-      Repo.delete_all Interview
       Repo.delete_all InterviewPanelist
       interview = create(:interview, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :days))
       Repo.insert(%InterviewPanelist{panelist_login_name: "test", interview_id: interview.id})
@@ -53,7 +50,6 @@ defmodule RecruitxBackend.SosEmailSpec do
     end
 
     it "should send an email with the formatted data when there are interviews with zero signups" do
-      Repo.delete_all Interview
       allow Timex.Date |> to(accept(:now, fn()-> TimexHelper.from_epoch([date: {2010, 12, 31}]) end))
       role = create(:role)
       candidate = create(:candidate, role_id: role.id, experience: Decimal.new(1))
@@ -67,17 +63,17 @@ defmodule RecruitxBackend.SosEmailSpec do
 
       %{subject: subject, to: to_addresses, html_body: [interview]} = SosEmail.execute
 
-     expect MailHelper |> to(accept(:deliver))
-     expect subject |> to(eql("[RecruitX] Signup Reminder - Urgent"))
-     expect to_addresses |> to(eql(["WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES"]))
-     expect interview.candidate.name |> to(eql(candidate.first_name <> " " <> candidate.last_name))
-     expect interview.candidate.role |> to(eql(role.name))
-     expect interview.candidate.experience |> to(eql("1.0"))
-     expect interview.name |> to(eql(interview_type.name))
-     expect interview.date |> to(eql("01/01/11 18:00"))
-     expect interview.candidate.skills |> to(have("test skill1"))
-     expect interview.candidate.skills |> to(have("test skill2"))
-     expect interview.count_of_panelists_required |> to(eql(interview_type.max_sign_up_limit))
+      expect MailHelper |> to(accept(:deliver))
+      expect subject |> to(eql("[RecruitX] Signup Reminder - Urgent"))
+      expect to_addresses |> to(eql(["WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES"]))
+      expect interview.candidate.name |> to(eql(candidate.first_name <> " " <> candidate.last_name))
+      expect interview.candidate.role |> to(eql(role.name))
+      expect interview.candidate.experience |> to(eql("1.0"))
+      expect interview.name |> to(eql(interview_type.name))
+      expect interview.date |> to(eql("01/01/11 18:00"))
+      expect interview.candidate.skills |> to(have("test skill1"))
+      expect interview.candidate.skills |> to(have("test skill2"))
+      expect interview.count_of_panelists_required |> to(eql(interview_type.max_sign_up_limit))
     end
   end
 end

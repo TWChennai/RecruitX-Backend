@@ -16,6 +16,7 @@
 
   "skip_files": [
     "lib/recruitx_backend/endpoint.ex",
+    "lib/swoosh_extensions/mailer.ex",
     "spec/*",
     "web/gettext.ex",
     "web/views/layout_view.ex",

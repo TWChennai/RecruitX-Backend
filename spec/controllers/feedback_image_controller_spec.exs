@@ -22,7 +22,7 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
 
       response = action(:show, %{"id" => 1})
 
-      response |> should(have_http_status(404))
+      response |> should(have_http_status(:not_found))
     end
 
     it "should send 404 when feedback image does not exist in S3" do
@@ -31,7 +31,7 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
 
       response = action(:show, %{"id" => 1})
 
-      response |> should(have_http_status(404))
+      response |> should(have_http_status(:not_found))
     end
   end
 end

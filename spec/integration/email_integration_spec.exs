@@ -59,8 +59,7 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
       mail_content = first_email.html_body
       expect(mail_content) |> to(have(to_string(Decimal.round(candidate.experience, 1))))
       expect(mail_content) |> to(have("Special Skill, Other Skill"))
-      expect(mail_content) |> to(have("Round 1 on " <>
-      TimexHelper.format(get_start_of_current_week |> TimexHelper.add(2, :days), "%b-%d")))
+      expect(mail_content) |> to(have("Round 1 on " <> TimexHelper.format_with_timezone(get_start_of_current_week |> TimexHelper.add(2, :days), "%b-%d")))
     end
   end
 end

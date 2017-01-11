@@ -91,32 +91,32 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => []})})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when skill_ids is not given" do
         response = action(:create, %{"candidate" => Map.delete(post_parameters, "skill_ids")})
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
+        expectedErrorReason =  %{"errors" => %{"skill_ids" => ["missing/empty required key"]}}
         response |> should(have_http_status(:unprocessable_entity))
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when interview_rounds is empty" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"interview_rounds" => []})})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
 
       it "returns error when interview_rounds is not given" do
         response = action(:create, %{"candidate" => Map.delete(post_parameters, "interview_rounds")})
         response |> should(have_http_status(:unprocessable_entity))
         parsed_response = response.resp_body |> Poison.Parser.parse!
-        expectedNameErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
-        expect(parsed_response) |> to(be(expectedNameErrorReason))
+        expectedErrorReason = %{"errors" => %{"interview_rounds" => ["missing/empty required key"]}}
+        expect(parsed_response) |> to(be(expectedErrorReason))
       end
     end
 
@@ -126,8 +126,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
       it "should return 422(Unprocessable entity) and the reason" do
         response = action(:create, %{"candidate" => post_parameters})
         response |> should(have_http_status(:unprocessable_entity))
-        expectedNameErrorReason = %JSONErrorReason{field_name: "test", reason: "does not exist"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "test", reason: "does not exist"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
     end
 
@@ -136,66 +136,66 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"first_name" => "1test"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedNameErrorReason = %JSONErrorReason{field_name: "first_name", reason: "has invalid format"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "first_name", reason: "has invalid format"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when last_name is of invalid format" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"last_name" => "1test"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedNameErrorReason = %JSONErrorReason{field_name: "last_name", reason: "has invalid format"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedNameErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "last_name", reason: "has invalid format"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when role_id is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"role_id" => "1.2"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedRoleErrorReason = %JSONErrorReason{field_name: "role_id", reason: "is invalid"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedRoleErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "role_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when experience is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => ""})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "is invalid"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "experience", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when experience is out of range" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "-1"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when experience is out of range" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"experience" => "100"})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "experience", reason: "must be in the range 0-100"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when skill_id is invalid" do
         response = action(:create, %{"candidate" => Map.merge(post_parameters, %{"skill_ids" => [1.2]})})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "skill_id", reason: "is invalid"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "skill_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when start_time is invalid" do
-        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1,"start_time" => ""}]})
+        post_params_with_invalid_interview_id = Map.merge(post_parameters, %{"interview_rounds" => [%{"interview_type_id" => 1, "start_time" => ""}]})
 
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "start_time", reason: "is invalid"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "start_time", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
 
       it "when interview_type_id is invalid" do
@@ -204,8 +204,8 @@ defmodule RecruitxBackend.CandidateControllerSpec do
         response = action(:create, %{"candidate" => post_params_with_invalid_interview_id})
 
         response |> should(have_http_status(:unprocessable_entity))
-        expectedExperienceErrorReason = %JSONErrorReason{field_name: "interview_type_id", reason: "is invalid"}
-        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedExperienceErrorReason]})))
+        expectedErrorReason = %JSONErrorReason{field_name: "interview_type_id", reason: "is invalid"}
+        expect(response.resp_body) |> to(be(Poison.encode!(%JSONError{errors: [expectedErrorReason]})))
       end
     end
   end

@@ -171,10 +171,12 @@ defmodule RecruitxBackend.InterviewRelativeEvaluatorSpec do
       tech1_round = InterviewType.retrieve_by_name(InterviewType.technical_1)
       tech2_round = InterviewType.retrieve_by_name(InterviewType.technical_2)
       candidate = create(:candidate)
+      start_time = now |> TimexHelper.add(2, :hours)
+      end_time = start_time |> TimexHelper.add(1, :hours)
       tech1_interview = create(:interview, candidate_id: candidate.id, interview_type_id: tech1_round.id,
-                        start_time: now |> TimexHelper.add(2, :hours), end_time: now |> TimexHelper.add(3, :hours))
+                        start_time: start_time, end_time: end_time)
       tech1_interview2 = create(:interview, interview_type_id: tech1_round.id,
-                        start_time: now |> TimexHelper.add(2, :hours), end_time: now |> TimexHelper.add(3, :hours))
+                        start_time: start_time, end_time: end_time)
       tech2_slot = create(:slot, interview_type_id: tech2_round.id, start_time: now |> TimexHelper.add(4, :hours))
       create(:interview_panelist, interview_id: tech1_interview.id)
       create(:interview_panelist, interview_id: tech1_interview2.id)

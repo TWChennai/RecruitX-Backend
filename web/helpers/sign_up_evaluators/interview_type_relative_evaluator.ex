@@ -15,9 +15,11 @@ defmodule RecruitxBackend.InterviewTypeRelativeEvaluator do
 
   defp is_eligible_based_on_interview_type(sign_up_evaluation_status, interview_type_specfic_criteria, panelist_login_name, interview) do
     if is_interview_type_with_specific_panelists(interview, interview_type_specfic_criteria)
-    and !is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name), do:
-      sign_up_evaluation_status = sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this interview"})
-    sign_up_evaluation_status
+    and !is_allowed_panelist(interview, interview_type_specfic_criteria, panelist_login_name) do
+      sign_up_evaluation_status |> SignUpEvaluationStatus.add_errors({:signup, "You are not eligible to sign up for this interview"})
+    else
+      sign_up_evaluation_status
+    end
   end
 
   defp is_eligible_based_on_role(%{valid?: false} = sign_up_evaluation_status, _, _, _, _, _), do: sign_up_evaluation_status

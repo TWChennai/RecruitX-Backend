@@ -34,12 +34,12 @@ defmodule RecruitxBackend.Candidate do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
-    |> add_default_pipeline_status
     |> validate_length(:first_name, min: 1)
     |> validate_format(:first_name, AppConstants.name_format)
     |> validate_length(:last_name, min: 1)
     |> validate_format(:last_name, AppConstants.name_format)
     |> validate_number(:experience, greater_than_or_equal_to: Decimal.new(0),less_than: Decimal.new(100), message: "must be in the range 0-100")
+    |> add_default_pipeline_status
     |> assoc_constraint(:role)
     |> assoc_constraint(:pipeline_status)
     |> populate_pipeline_closure_time
@@ -102,8 +102,8 @@ defmodule RecruitxBackend.Candidate do
   defp add_default_pipeline_status(existing_changeset) do
     incoming_id = existing_changeset |> get_field(:pipeline_status_id)
     if is_nil(incoming_id) do
-      in_progess_id = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress).id
-      existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess_id)
+      in_progess = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
+      existing_changeset = existing_changeset |> put_change(:pipeline_status_id, in_progess.id)
     end
     existing_changeset
   end

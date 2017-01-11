@@ -78,7 +78,7 @@ defmodule RecruitxBackend.PanelistController do
     {candidate_first_name, candidate_last_name, interview_name, panelist_login_name, start_time} =
       (from c in Candidate, join: i in assoc(c, :interviews), join: ip in assoc(i, :interview_panelist), join: it in assoc(i, :interview_type), where: ip.id == ^id, select: {c.first_name, c.last_name, it.name, ip.panelist_login_name, i.start_time}) |> Repo.one
 
-    interview_date = start_time |> TimexHelper.format("%b-%d")
+    interview_date = start_time |> TimexHelper.format_with_timezone("%b-%d")
     email_content = Templates.panelist_removal_notification(true, candidate_first_name, candidate_last_name, interview_name, interview_date)
     send_mail_with_content(panelist_login_name, email_content)
   end
@@ -88,7 +88,7 @@ defmodule RecruitxBackend.PanelistController do
     other_panelist = (from c in Candidate, join: i in assoc(c, :interviews), join: ip in assoc(i, :interview_panelist), join: it in assoc(i, :interview_type), where: ip.id != ^id and ip.interview_id == ^interview_id, select: {c.first_name, c.last_name, it.name, ip.panelist_login_name, i.start_time}) |> Repo.one
     if !is_nil(other_panelist) do
       {candidate_first_name, candidate_last_name, interview_name, panelist_login_name, start_time} = other_panelist
-      interview_date = start_time |> TimexHelper.format("%b-%d")
+      interview_date = start_time |> TimexHelper.format_with_timezone("%b-%d")
       email_content = Templates.panelist_removal_notification(false, candidate_first_name, candidate_last_name, interview_name, interview_date)
       send_mail_with_content(panelist_login_name, email_content)
     end

@@ -188,9 +188,9 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "query" do
-    it "should return candidates in FIFO order" do
-      Repo.delete_all(Candidate)
+    before do: Repo.delete_all(Candidate)
 
+    it "should return candidates in FIFO order" do
       interview1 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
       interview2 = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       candidate_id1 = interview1.candidate_id
@@ -202,7 +202,6 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return candidates without interviews last in FIFO order" do
-      Repo.delete_all(Candidate)
       closed_candidate = create(:candidate, pipeline_status_id: closed_pipeline_status.id)
 
       interview = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
@@ -214,7 +213,6 @@ defmodule RecruitxBackend.CandidateSpec do
     end
 
     it "should return candidates in FIFO order and with pipeline_status_id" do
-      Repo.delete_all(Candidate)
       closed_candidate_interview = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now())
       in_progress_candidate_interview_starts_lately = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(1, :hours))
       in_progress_candidate_interview_starts_quickly = create(:interview, interview_type_id: 1, start_time: TimexHelper.utc_now() |> TimexHelper.add(-1, :hours))
@@ -364,9 +362,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get the total no. of candidates in progress" do
-    before do
-      Repo.delete_all(Candidate)
-    end
+    before do: Repo.delete_all(Candidate)
 
     it "should return the total no. of candidates in progress" do
       in_progress_pipeline = PipelineStatus.retrieve_by_name(PipelineStatus.in_progress)
@@ -379,9 +375,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get all candidates pursued after pipeline closure" do
-    before do
-      Repo.delete_all(Candidate)
-    end
+    before do: Repo.delete_all(Candidate)
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
@@ -433,9 +427,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get all candidates rejected after pipeline closure" do
-    before do
-      Repo.delete_all(Candidate)
-    end
+    before do: Repo.delete_all(Candidate)
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
@@ -486,9 +478,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get_no_of_pass_candidates_within_range" do
-    before do
-      Repo.delete_all(Candidate)
-    end
+    before do: Repo.delete_all(Candidate)
 
     let :role1, do: create(:role, role_id: 1 ,name: "Role1")
     let :interview_type1, do: create(:interview_type, name: "interview_type1")
@@ -528,9 +518,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get_candidates_scheduled_for_date_and_interview_round" do
-    before do
-      Repo.delete_all(Interview)
-    end
+    before do: Repo.delete_all(Interview)
 
     let :interview_type, do: create(:interview_type, priority: 2)
 
@@ -575,9 +563,7 @@ defmodule RecruitxBackend.CandidateSpec do
   end
 
   context "get_unique_skills_formatted" do
-    before do
-      Repo.delete_all(Candidate)
-    end
+    before do: Repo.delete_all(Candidate)
 
     it "should concat all skills of given candidates" do
       candidate1 = create(:candidate)
@@ -593,6 +579,4 @@ defmodule RecruitxBackend.CandidateSpec do
       expect(result) |> to_not(have("Skill 3"))
     end
   end
-
-
 end

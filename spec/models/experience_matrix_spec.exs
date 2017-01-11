@@ -119,23 +119,23 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
   end
 
   context "get_interview_types_with_filter" do
+    before do: Repo.delete_all(ExperienceMatrix)
+
     it "should return the interview types with filter" do
-      Repo.delete_all ExperienceMatrix
       experience_matrix = create(:experience_matrix)
 
       expect(ExperienceMatrix.get_interview_types_with_filter) |> to(eq([experience_matrix.interview_type_id]))
     end
 
     it "should return [] if there are no interviews with filters" do
-      Repo.delete_all ExperienceMatrix
-
       expect(ExperienceMatrix.get_interview_types_with_filter) |> to(eq([]))
     end
   end
 
   context "get_max_experience_with_filter" do
+    before do: Repo.delete_all(ExperienceMatrix)
+
     it "should return maximum experience for specific role" do
-      Repo.delete_all ExperienceMatrix
       role1 = create(:role)
       role2 = create(:role)
       create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role1.id})
@@ -147,18 +147,18 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
 
     it "should return max experience if no filters are specified for a role" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       expect(ExperienceMatrix.get_max_experience_with_filter(role)) |> to(be(nil))
     end
 
     it "should return max experience if role is nil" do
-      Repo.delete_all ExperienceMatrix
       expect(ExperienceMatrix.get_max_experience_with_filter(nil)) |> to(be(nil))
     end
   end
 
   context "filter" do
+    before do: Repo.delete_all(ExperienceMatrix)
+
     it "should return empty array if the panelist role is nil" do
       result = ExperienceMatrix.filter(Decimal.new(5), nil)
 
@@ -166,7 +166,6 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
 
     it "should return all the filters with lower bound less than panelist experience of the same role" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role.id})
       expected_filter = create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: role.id})
@@ -179,7 +178,6 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
 
     it "should return all the filters with lower bound equal to panelist experience of the same role" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(90), role_id: role.id})
       expected_filter = create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10), role_id: role.id})
@@ -192,7 +190,6 @@ defmodule RecruitxBackend.ExperienceMatrixSpec do
     end
 
     it "should not return all the filters with lower bound equal to panelist experience of different role" do
-      Repo.delete_all ExperienceMatrix
       role = create(:role)
       create(:experience_matrix, %{panelist_experience_lower_bound: Decimal.new(10)})
 

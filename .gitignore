@@ -128,3 +128,4 @@ fabric.properties
 
 # Data directory
 data
+.vagrant

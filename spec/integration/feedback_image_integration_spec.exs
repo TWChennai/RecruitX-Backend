@@ -98,8 +98,8 @@ defmodule RecruitxBackend.FeedbackImageIntegrationSpec do
 
       response |> should(have_http_status(:unprocessable_entity))
       parsed_response = response.resp_body |> Poison.Parser.parse!
-      expectedNameErrorReason =  %{"errors" => %{"status_id" => ["missing/empty required key"]}}
-      expect(parsed_response) |> to(be(expectedNameErrorReason))
+      expectedErrorReason =  %{"errors" => %{"status_id" => ["missing/empty required key"]}}
+      expect(parsed_response) |> to(be(expectedErrorReason))
       expect(interview.interview_status_id) |> to(be(nil))
     end
   end

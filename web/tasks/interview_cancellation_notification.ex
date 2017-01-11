@@ -19,7 +19,7 @@ defmodule RecruitxBackend.InterviewCancellationNotification do
   def deliver_mail_for_cancelled_interview_rounds([]), do: :ok
 
   def deliver_mail_for_cancelled_interview_rounds([{interview_round, interview_panelist} | rest]) do
-    formatted_date = TimexHelper.format(interview_round.start_time, "%d/%m/%y %H:%M")
+    formatted_date = TimexHelper.format_with_timezone(interview_round.start_time, "%d/%m/%y %H:%M")
 
     MailHelper.deliver %{
       subject: "[RecruitX] " <> interview_round.interview_type.name <> " on " <> formatted_date <> " is cancelled",

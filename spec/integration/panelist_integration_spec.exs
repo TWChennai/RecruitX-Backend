@@ -27,6 +27,7 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update, fn() -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
+  before do: Repo.delete_all(ExperienceMatrix)
 
   describe "index" do
     before do: Repo.delete_all(Interview)
@@ -216,8 +217,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should accept sign up if experience is above maximum experience with filter" do
-      Repo.delete_all ExperienceMatrix
-
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -231,8 +230,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should accept sign up if there is no filter for the interview type" do
-      Repo.delete_all ExperienceMatrix
-
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -295,8 +292,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should accept sign up if the panelist is experienced for the interview type and the candidate" do
-      Repo.delete_all ExperienceMatrix
-
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -310,8 +305,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should not accept sign up if the panelist is experienced for the interview type and the candidate of a different_role" do
-      Repo.delete_all ExperienceMatrix
-
       role = create(:role)
       candidate = create(:candidate, role_id: role.id)
       interview = create(:interview, candidate_id: candidate.id)
@@ -326,8 +319,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should accept sign up if the panelist is experienced for the interview type and the candidate when already lower_bound is met" do
-      Repo.delete_all ExperienceMatrix
-
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -345,8 +336,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should not accept sign up if the panelist is experienced for the interview type and the candidate when already upper_bound is met" do
-      Repo.delete_all ExperienceMatrix
-
       interview = create(:interview)
       role_id = (Repo.preload interview, :candidate).candidate.role_id
       role = Role |> Repo.get(role_id)
@@ -364,7 +353,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
     end
 
     it "should not accept sign up if the panelist is experienced for the interview type but not for the candidate" do
-      Repo.delete_all ExperienceMatrix
       Repo.delete_all Candidate
 
       candidate = create(:candidate, experience: D.new(5))
@@ -382,7 +370,6 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
 
     it "should accept sign up if the panelist is experienced for the interview type but not for the candidate and the role has no filters" do
       allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> false end))
-      Repo.delete_all ExperienceMatrix
       Repo.delete_all Candidate
       candidate = create(:candidate, experience: D.new(5))
       interview = create(:interview, candidate_id: candidate.id)

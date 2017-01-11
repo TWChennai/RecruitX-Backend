@@ -15,9 +15,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
   let :interview, do: create(:interview, candidate_id: candidate.id, interview_type_id: interview_type.id)
 
   describe "get candidates and interviews" do
-    before do
-      Repo.delete_all(Interview)
-    end
+    before do: Repo.delete_all(Interview)
 
     it "should return candidates of the given role with interviews based on sub query" do
       another_role = create(:role, name: "Another Role Name")
@@ -74,7 +72,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       [ actual_interview | _ ] = actual_data.interviews
 
       expect(actual_interview.name) |> to(be(interview_type.name))
-      expect(actual_interview.date) |> to(be(TimexHelper.format(interview.start_time, "%b-%d")))
+      expect(actual_interview.date) |> to(be(TimexHelper.format_with_timezone(interview.start_time, "%b-%d")))
     end
 
     it "should contain concatenated skills for the candidate in the result" do

@@ -139,5 +139,5 @@ defmodule RecruitxBackend.InterviewView do
     }
   end
 
-  defp format_datetime(datetime), do: TimexHelper.format(datetime, "%Y-%m-%dT%H:%M:%SZ")
+  defp format_datetime(datetime), do: TimexHelper.format_with_timezone(datetime, "%Y-%m-%dT%H:%M:%SZ")
 end
