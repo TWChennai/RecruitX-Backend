@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Mixfile do
   def project do
     [app: :recruitx_backend,
      version: "1.0.0",
-     elixir: "1.3.4",
+     elixir: "1.4.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -30,9 +30,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-     # TODO: Need to verify that we actually need all the below (:connection, :corsica)
-     applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection, :httpotion, :gen_smtp,
-                    :phoenix_ecto, :postgrex, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
+     extra_applications: [:logger]]
   end
 
   # Specifies which paths to compile per environment.

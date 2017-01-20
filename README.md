@@ -10,10 +10,10 @@ After cloning the git repository, you will need the following pre-requisites
   asdf install
   ```
   * asdf might not work as expected when you dont have ~/.tool-versions file. Please create this file and put the installed packages version for things to work
-  the versions of tools installed can be found in .asdf/installs/erlang/19.1
+  the versions of tools installed can be found in .asdf/installs/erlang/19.2
   ```
-  elixir 1.3.4
-  erlang 19.1
+  elixir 1.4.0
+  erlang 19.2
   ```
 
   * Ensure that you have Postgres installed. Once this is present, create a user with the correct role/permissions using the following psql invocation:
@@ -30,22 +30,22 @@ After cloning the git repository, you will need the following pre-requisites
   ```
 
 #### Dependencies (If you are not using the `asdf` package manager)
-  * Ensure `erlang 19.1` is installed before proceeding further. To check the erlang version execute:
+  * Ensure `erlang 19.2` is installed before proceeding further. To check the erlang version execute:
     ```bash
     erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
     ```
-  You should get "18" as the output. To install `erlang 19.1` execute:
+  You should get "18" as the output. To install `erlang 19.2` execute:
     ```bash
     brew uninstall --force erlang
     brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/77f353913f1e0edd7ba592308da2aa70e26570e1/Formula/erlang.rb
     brew pin erlang
     ```
 
-  * Ensure `elixir 1.3.4` is installed before proceeding further. To check the elixir version execute:
+  * Ensure `elixir 1.4.0` is installed before proceeding further. To check the elixir version execute:
     ```bash
     elixir -v
     ```
-  You should get "Elixir 1.3.4" as the output. To install `elixir 1.3.4` execute:
+  You should get "Elixir 1.4.0" as the output. To install `elixir 1.4.0` execute:
     ```bash
     brew uninstall --force elixir
     brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f47cde4e2b771b4a8d170038a20ca703d20bdf0d/Formula/elixir.rb
