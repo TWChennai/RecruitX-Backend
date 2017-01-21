@@ -65,6 +65,7 @@ defmodule RecruitxBackend.Mixfile do
       {:quantum, "~> 1.8"},
       {:scrivener_ecto, "~> 1.1"},
       {:timex_ecto, "~> 3.1.0"},
+      {:sweet_xml, "~> 0.5"},
     ]
   end
 
