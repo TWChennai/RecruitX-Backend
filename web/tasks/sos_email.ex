@@ -35,7 +35,7 @@ defmodule RecruitxBackend.SosEmail do
   defp construct_view_data(interviews) do
     Enum.map(interviews, fn({interview, count_of_panelists_required}) ->
       %{candidate: interview.candidate |> Candidate.format, count_of_panelists_required: count_of_panelists_required}
-      |> Map.merge(interview |> Interview.format("%d/%m/%y %H:%M"))
+      |> Map.merge(interview |> Interview.format_with_timezone("%d/%m/%y %H:%M"))
     end)
     |> Enum.sort_by(fn (row) -> row.candidate.role end)
   end

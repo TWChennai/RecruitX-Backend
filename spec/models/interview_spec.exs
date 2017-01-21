@@ -713,7 +713,7 @@ defmodule RecruitxBackend.InterviewSpec do
         |> Interview.format
 
       expect(formatted_interview.name) |> to(be(interview_type.name))
-      expect(formatted_interview.date) |> to(be(TimexHelper.format_with_timezone(interview.start_time, "%b-%d")))
+      expect(formatted_interview.date) |> to(be(TimexHelper.format(interview.start_time, "%b-%d")))
     end
   end
 

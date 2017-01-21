@@ -17,7 +17,7 @@ defmodule RecruitxBackend.StatusUpdate do
 
   def execute_monthly do
     time = Timer.get_previous_month
-    subject_suffix = TimexHelper.format_with_timezone(time.starting, " - %b %Y")
+    subject_suffix = TimexHelper.format(time.starting, " - %b %Y")
     execute(time, "Monthly", System.get_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES"), true, subject_suffix)
   end
 
@@ -39,8 +39,8 @@ defmodule RecruitxBackend.StatusUpdate do
                   |> construct_view_data
     summary = Role.get_all_roles()
       |> Enum.reduce(%{}, fn role, acc -> Map.put(acc, role.name, construct_summary_data(Enum.filter(candidates, fn x -> x.role == role.name end), time_range, role.id)) end)
-    start_date = TimexHelper.format_with_timezone(starting, "%D")
-    to_date = TimexHelper.format_with_timezone(ending, "%D")
+    start_date = TimexHelper.format(starting, "%D")
+    to_date = TimexHelper.format(ending, "%D")
     email_content = if candidates != [], do: Templates.status_update(start_date, to_date, summary, exclude_details),
                     else: Templates.status_update_default(start_date, to_date)
 

@@ -72,7 +72,7 @@ defmodule RecruitxBackend.WeeklySignupReminderSpec do
       [ actual_interview | _ ] = actual_data.interviews
 
       expect(actual_interview.name) |> to(be(interview_type().name))
-      expect(actual_interview.date) |> to(be(TimexHelper.format_with_timezone(interview().start_time, "%b-%d")))
+      expect(actual_interview.date) |> to(be(TimexHelper.format(interview().start_time, "%b-%d")))
     end
 
     it "should contain concatenated skills for the candidate in the result" do

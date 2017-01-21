@@ -311,7 +311,14 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-  def format(interview, date_format \\ "%b-%d") do
+  def format(interview) do
+    %{
+      name: interview.interview_type.name,
+      date: TimexHelper.format(interview.start_time, "%b-%d")
+    }
+  end
+
+  def format_with_timezone(interview, date_format) do
     %{
       name: interview.interview_type.name,
       date: TimexHelper.format_with_timezone(interview.start_time, date_format)
