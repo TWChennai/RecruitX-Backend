@@ -24,14 +24,14 @@ defmodule RecruitxBackend.JigsawController do
 
   @lint [{Credo.Check.Refactor.ABCSize, false}, {Credo.Check.Refactor.CyclomaticComplexity, false}]
   def get_jigsaw_data(id) do
-    # {experience, id} = parse_experience(id) #for_uat
+    {experience, id} = parse_experience(id) #for_uat
     other_role = Role.retrieve_by_name(Role.other)
-    # recruiter_role = Map.merge(other_role, %{name: "Specialist"})
+    recruiter_role = Map.merge(other_role, %{name: "Specialist"})
     user_details = case id do
-      # "ppanelist" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false} #for_uat
-      # "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false} #for_uat
-      # "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
-      # "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: recruiter_role, is_super_user: false} #for_uat
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false, error: nil} #for_uat
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false, error: nil} #for_uat
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil} #for_uat
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil} #for_uat
       _  -> response = get_data_safely("#{@jigsaw_url}/people/#{id}")
         case response.status_code do
           200 -> case response.body |> Parser.parse do
