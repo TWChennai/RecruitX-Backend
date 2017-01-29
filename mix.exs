@@ -31,7 +31,7 @@ defmodule RecruitxBackend.Mixfile do
   def application do
     [mod: {RecruitxBackend, []},
      # TODO: Need to verify that we actually need all the below (:connection, :corsica)
-     applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection, :httpotion,
+     applications: [:timex, :timex_ecto, :phoenix, :cowboy, :logger, :connection, :httpotion, :gen_smtp,
                     :phoenix_ecto, :postgrex, :scrivener, :gettext, :plug, :arc, :quantum, :swoosh]]
   end
 
@@ -55,6 +55,7 @@ defmodule RecruitxBackend.Mixfile do
       {:excoveralls, "~> 0.6", only: :test, app: false},
       {:faker, "~> 0.7.0", only: :test, app: false}, # TODO: Replace with: {:faker_elixir_octopus, "~> 0.12.0", only: [:dev, :test]},
       {:gettext, "~> 0.12"},
+      {:gen_smtp, "~> 0.11.0"},
       {:httpotion, "~> 3.0"},
       {:phoenix, "~> 1.2", override: true},
       {:phoenix_ecto, "~> 3.2"},
