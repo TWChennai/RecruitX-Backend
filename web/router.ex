@@ -37,19 +37,11 @@ defmodule RecruitxBackend.Router do
     resources "/slot_to_interview", SlotController, only: [:create]
   end
 
-  if Mix.env == :dev do
-    scope "/dev" do
+  if Mix.env == :dev || Mix.env == :test do
+    scope "/#{Mix.env}" do
       pipe_through :browser
 
-      forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/dev/mailbox"]
-    end
-  end
-
-  if Mix.env == :test do
-    scope "/test" do
-      pipe_through :browser
-
-      forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/test/mailbox"]
+      forward "/mailbox", Plug.Swoosh.MailboxPreview, [base_path: "/#{Mix.env}/mailbox"]
     end
   end
 
