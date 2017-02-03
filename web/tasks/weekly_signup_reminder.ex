@@ -1,6 +1,6 @@
 defmodule RecruitxBackend.WeeklySignupReminder do
   import Ecto.Query
-  require IEx
+
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.Role
   alias RecruitxBackend.Interview
@@ -21,7 +21,7 @@ defmodule RecruitxBackend.WeeklySignupReminder do
         |> construct_view_data
 
       candidates_with_sufficient_signups = sufficient_signups_query
-        |> get_candidates_and_interviews((role_id))
+        |> get_candidates_and_interviews(role_id)
         |> construct_view_data
 
       if candidates_with_insufficient_signups != [] or candidates_with_sufficient_signups != [] do
