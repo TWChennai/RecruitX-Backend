@@ -82,7 +82,7 @@
         {Credo.Check.Refactor.PipeChainStart, false},
         {Credo.Check.Refactor.CyclomaticComplexity},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
-        {Credo.Check.Refactor.NegatedConditionsWithElse},
+        {Credo.Check.Refactor.NegatedConditionsWithElse, false},
         {Credo.Check.Refactor.Nesting, false},
         {Credo.Check.Refactor.UnlessWithElse},
 

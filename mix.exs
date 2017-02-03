@@ -82,9 +82,7 @@ defmodule RecruitxBackend.Mixfile do
       "ecto.seed": "run priv/repo/seeds.exs",
       "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      # TODO: Turning off 'credo' till the elixir upgrade is completed
-      # commit: ["deps.get --only #{Mix.env}", "coveralls.html", "credo --strict"]
-      commit: ["deps.get --only #{Mix.env}", "coveralls.html"]
+      commit: ["deps.get --only #{Mix.env}", "coveralls.html", "credo --strict"]
     ]
   end
 end

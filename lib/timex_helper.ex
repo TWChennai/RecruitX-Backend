@@ -1,4 +1,8 @@
 defmodule RecruitxBackend.TimexHelper do
+
+  alias Timex.Duration
+  alias Timex.Timezone
+
   @time_zone_name "Asia/Kolkata"
   @time_zone_string_length 19
 
@@ -15,19 +19,19 @@ defmodule RecruitxBackend.TimexHelper do
   end
 
   def add(start_time, minutes, :minutes) do
-    Timex.add(start_time, Timex.Duration.from_minutes(minutes))
+    Timex.add(start_time, Duration.from_minutes(minutes))
   end
 
   def add(start_time, hours, :hours) do
-    Timex.add(start_time, Timex.Duration.from_hours(hours))
+    Timex.add(start_time, Duration.from_hours(hours))
   end
 
   def add(start_time, days, :days) do
-    Timex.add(start_time, Timex.Duration.from_days(days))
+    Timex.add(start_time, Duration.from_days(days))
   end
 
   def add(start_time, months, :months) do
-    Timex.add(start_time, Timex.Duration.from_days(months * 30))
+    Timex.add(start_time, Duration.from_days(months * 30))
   end
 
   def compare(time_one, time_two) do
@@ -72,7 +76,7 @@ defmodule RecruitxBackend.TimexHelper do
 
   def parse(input_date_time, format) do
     {:ok, result} = Timex.parse(input_date_time, format, :strftime)
-    result |> Timex.Timezone.convert("UTC")
+    result |> Timezone.convert("UTC")
   end
 
   def format(input_date_time, date_format) do
@@ -81,7 +85,7 @@ defmodule RecruitxBackend.TimexHelper do
   end
 
   def format_with_timezone(input_date_time, date_format) do
-    time_in_new_zone = input_date_time |> Timex.Timezone.convert(@time_zone_name)
+    time_in_new_zone = input_date_time |> Timezone.convert(@time_zone_name)
     {:ok, formatted} = time_in_new_zone |> Timex.format(date_format, :strftime)
     formatted
   end
