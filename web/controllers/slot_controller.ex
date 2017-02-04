@@ -19,6 +19,7 @@ defmodule RecruitxBackend.SlotController do
     interview_changeset = Interview.changeset(%Interview{}, %{candidate_id: candidate_id, interview_type_id: interview_type_id, start_time: start_time})
     signup_panelists_and_satisfied_criteria_for_slot = SlotPanelist.get_panelists_and_satisfied_criteria(slot_id)
     {status, result_of_db_transaction} = Repo.transaction fn ->
+        # TODO: Use Ecto.Multi for performing all these within the same transaction
         {status, interview} = [interview_changeset] |> ChangesetManipulator.validate_and(Repo.custom_insert)
         if status do
           generateInterviewPanelistChangesets(interview.id, signup_panelists_and_satisfied_criteria_for_slot) |> ChangesetManipulator.validate_and(Repo.custom_insert)

@@ -23,7 +23,7 @@ defmodule RecruitxBackend.CandidateController do
 
   def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = candidate}) when skill_ids != [] and interview_rounds != [] do
       {transaction_status, result_of_db_transaction} = Repo.transaction fn ->
-        # TODO: Use Ecto Multi for performing all these within the same transaction
+        # TODO: Use Ecto.Multi for performing all these within the same transaction
         {transaction_status, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.validate_and(Repo.custom_insert)
         if transaction_status do
           if transaction_status, do: {transaction_status, result} = insertSkills(candidate, skill_ids)

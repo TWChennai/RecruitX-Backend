@@ -13,7 +13,7 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
     {status, result_of_db_transaction} = Repo.transaction fn ->
-        # TODO: Use Ecto Multi for performing all these within the same transaction
+        # TODO: Use Ecto.Multi for performing all these within the same transaction
         {transaction_status, result_of_db_transaction} = Interview.update_status(id, String.to_integer(status_id))
         {transaction_status, result_of_db_transaction} = if transaction_status, do: store_image_and_generate_changesets(data, id) |> ChangesetManipulator.validate_and(Repo.custom_insert), else: {transaction_status, result_of_db_transaction}
         case transaction_status do

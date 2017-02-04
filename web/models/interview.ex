@@ -235,6 +235,7 @@ defmodule RecruitxBackend.Interview do
     if is_nil(interview) do
       {false, [%JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}]}
     else
+      # TODO: Use Ecto.Multi for performing all these within the same transaction
       {status, result} = [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
       if status && is_pass(status_id) do
         Repo.transaction fn ->
