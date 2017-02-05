@@ -229,13 +229,13 @@ defmodule RecruitxBackend.CandidateSpec do
     end
   end
 
-  context "updateCandidateStatusAsPass" do
+  context "updateQueryForCandidateStatusAsPass" do
     it "should update candidate status as Pass" do
       interview = insert(:interview, start_time: TimexHelper.utc_now())
       candidate_id = interview.candidate_id
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 
-      Candidate.updateCandidateStatusAsPass(candidate_id)
+      Candidate.updateQueryForCandidateStatusAsPass(candidate_id) |> Repo.update
 
       updated_candidate = Candidate |> Repo.get(candidate_id)
 

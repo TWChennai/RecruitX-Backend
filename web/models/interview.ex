@@ -17,6 +17,7 @@ defmodule RecruitxBackend.Interview do
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.Timer
   alias RecruitxBackend.TimexHelper
+  alias Ecto.Multi
 
   import Ecto.Query
 
@@ -235,13 +236,12 @@ defmodule RecruitxBackend.Interview do
     if is_nil(interview) do
       {false, [%JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}]}
     else
-      # TODO: Use Ecto.Multi for performing all these within the same transaction
       {status, result} = [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
       if status && is_pass(status_id) do
-        Repo.transaction fn ->
-          delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time)
-          Candidate.updateCandidateStatusAsPass(interview.candidate_id)
-        end
+        Multi.new
+        |> Multi.delete_all(:other_interviews, delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time))
+        |> Multi.update(:status_as_pass, Candidate.updateQueryForCandidateStatusAsPass(interview.candidate_id))
+        |> Repo.transaction
       end
       {status, result}
     end
@@ -257,7 +257,7 @@ defmodule RecruitxBackend.Interview do
     where: i.candidate_id == ^candidate_id,
     where: (i.start_time > ^start_time)
     interviews_to_delete_query |> InterviewCancellationNotification.execute
-    interviews_to_delete_query |> Repo.delete_all
+    interviews_to_delete_query
   end
 
   defp retrieve_interview(id) do

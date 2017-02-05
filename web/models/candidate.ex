@@ -114,13 +114,13 @@ defmodule RecruitxBackend.Candidate do
     end
   end
 
-  def updateCandidateStatusAsPass(id) do
+  def updateQueryForCandidateStatusAsPass(id) do
     candidate = __MODULE__ |> Repo.get(id)
     pass_pipeline_status_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
     candidate_params = %{
       "pipeline_status_id": pass_pipeline_status_id
     }
-    __MODULE__.changeset(candidate, candidate_params) |> Repo.update
+    __MODULE__.changeset(candidate, candidate_params)
   end
 
   def get_candidates_in_fifo_order do
