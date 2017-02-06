@@ -3,6 +3,8 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
 
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Repo
+  alias RecruitxBackend.Interview
+  alias RecruitxBackend.ChangesetManipulator
 
   describe "show" do
     it "should send file when file is downloaded from S3" do
@@ -32,6 +34,45 @@ defmodule RecruitxBackend.FeedbackImageControllerSpec do
       response = action(:show, %{"id" => 1})
 
       response |> should(have_http_status(:not_found))
+    end
+  end
+
+  describe "create" do
+    it "should update interview status and store image" do
+      interview = params_with_assocs(:interview)
+      allow Interview |> to(accept(:update_status, fn(1, 1) -> {true, "result_of_db_transaction"} end))
+      allow ChangesetManipulator |> to(accept(:validate_and, fn(_, _) -> {true, interview} end))
+
+      response = action(:create, %{"feedback_images" => %{}, "interview_id" => 1, "status_id" => "1"})
+
+      response |> should(have_http_status(:created))
+    end
+
+    it "should update interview status even if images is not sent (image optional)" do
+      allow Interview |> to(accept(:update_status, fn(1, 1) -> {true, "result_of_db_transaction"} end))
+
+      response = action(:create, %{"interview_id" => 1, "status_id" => "1"})
+
+      response |> should(have_http_status(:created))
+    end
+
+    it "should not update interview status and store image if any one fails" do
+      interview = params_with_assocs(:interview)
+      allow Interview |> to(accept(:update_status, fn(1, 1) -> {false, interview} end))
+
+      response = action(:create, %{"feedback_images" => %{}, "interview_id" => 1, "status_id" => "1"})
+
+      response |> should(have_http_status(:unprocessable_entity))
+    end
+
+    it "should not update interview status and store image if any one fails" do
+      interview = params_with_assocs(:interview)
+      allow Interview |> to(accept(:update_status, fn(1, 1) -> {true, interview} end))
+      allow ChangesetManipulator |> to(accept(:validate_and, fn(_, _) -> {false, interview} end))
+
+      response = action(:create, %{"feedback_images" => %{}, "interview_id" => 1, "status_id" => "1"})
+
+      response |> should(have_http_status(:unprocessable_entity))
     end
   end
 end
