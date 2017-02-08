@@ -3,14 +3,12 @@ defmodule RecruitxBackend.Interview do
 
   alias Ecto.Changeset
   alias RecruitxBackend.Candidate
-  alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.InterviewCancellationNotification
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Panel
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
@@ -232,19 +230,19 @@ defmodule RecruitxBackend.Interview do
   end
 
   def update_status(id, status_id) do
+    multi = Multi.new
     interview = id |> retrieve_interview
     if is_nil(interview) do
-      {false, [%JSONErrorReason{field_name: "interview", reason: "Interview has been deleted"}]}
+      multi = multi |> Multi.error(:interview_not_found, %{errors: [interview: "Interview has been deleted"]})
     else
-      {status, result} = [changeset(interview, %{"interview_status_id": status_id})] |> ChangesetManipulator.validate_and(Repo.custom_update)
-      if status && is_pass(status_id) do
-        Multi.new
+      multi = multi |> Multi.update(:status_update, changeset(interview, %{"interview_status_id": status_id}))
+      if is_pass(status_id) do
+        multi = multi
         |> Multi.delete_all(:other_interviews, delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time))
         |> Multi.update(:status_as_pass, Candidate.updateQueryForCandidateStatusAsPass(interview.candidate_id))
-        |> Repo.transaction
       end
-      {status, result}
     end
+    multi
   end
 
   defp is_pass(status_id) do

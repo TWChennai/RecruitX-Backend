@@ -6,7 +6,6 @@ defmodule RecruitxBackend.InterviewSpec do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewStatus
   alias RecruitxBackend.InterviewType
-  alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.PipelineStatus
   alias RecruitxBackend.Repo
   alias RecruitxBackend.RoleInterviewType
@@ -270,20 +269,20 @@ defmodule RecruitxBackend.InterviewSpec do
     it "should not update interview when status is already entered" do
       interview = insert(:interview)
       interview_status = insert(:interview_status)
-      Interview.update_status(interview.id, interview_status.id)
+      Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
-      update = Interview.update_status(interview.id, 0)
+      {_, _, changeset, _} = Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
-      expected_error = {false, [%JSONErrorReason{field_name: :interview_status, reason: "Feedback has already been entered"}]}
-      expect update |> to(be(expected_error))
+      expected_error = [interview_status: {"Feedback has already been entered", []}]
+      expect changeset.errors |> to(be(expected_error))
     end
 
     it "should not update interview when status is invalid" do
       interview = insert(:interview)
-      update = Interview.update_status(interview.id, 0)
-      expected_error = {false, [%JSONErrorReason{field_name: :interview_status, reason: "does not exist"}]}
+      {_, _, changeset, _} = Interview.update_status(interview.id, 0) |> Repo.transaction
+      expected_error = [interview_status: {"does not exist", []}]
 
-      expect update |> to(be(expected_error))
+      expect changeset.errors |> to(be(expected_error))
     end
 
     it "should update status and not delete other interviews,panelists for a candidate when status is not Pass" do
@@ -292,7 +291,7 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_to_be_retained = insert(:interview, candidate: interview.candidate, start_time: TimexHelper.utc_now() |> TimexHelper.add(7, :days))
       panelists_to_be_retained = insert(:interview_panelist, interview: interview_to_be_retained)
 
-      Interview.update_status(interview.id, interview_status.id)
+      Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
       updated_interview = Interview |> Repo.get(interview.id)
       expect(updated_interview.interview_status_id) |> to(be(interview_status.id))
@@ -308,7 +307,7 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_status = insert(:interview_status, name: PipelineStatus.pass)
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 
-      Interview.update_status(interview.id, interview_status.id)
+      Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
       updated_interview = Interview |> Repo.get(interview.id)
       updated_candidate = Candidate |> Repo.get(interview.candidate_id)
@@ -326,7 +325,7 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_status = insert(:interview_status, name: PipelineStatus.pass)
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 
-      Interview.update_status(interview.id, interview_status.id)
+      Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
       updated_interview = Interview |> Repo.get(interview.id)
       updated_candidate = Candidate |> Repo.get(interview.candidate_id)
@@ -341,7 +340,7 @@ defmodule RecruitxBackend.InterviewSpec do
       interview_status = insert(:interview_status, name: PipelineStatus.pass)
       pass_id = PipelineStatus.retrieve_by_name(PipelineStatus.pass).id
 
-      Interview.update_status(interview.id, interview_status.id)
+      Interview.update_status(interview.id, interview_status.id) |> Repo.transaction
 
       updated_interview = Interview |> Repo.get(interview.id)
       updated_candidate = Candidate |> Repo.get(interview.candidate_id)

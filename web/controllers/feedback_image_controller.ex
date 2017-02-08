@@ -3,29 +3,28 @@ defmodule RecruitxBackend.FeedbackImageController do
 
   alias Ecto.UUID
   alias RecruitxBackend.Avatar
-  alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.FeedbackImage
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.JSONErrorReason
   alias RecruitxBackend.Avatar
+  alias Ecto.Multi
 
   def create(conn, %{"feedback_images" => data, "interview_id" => id, "status_id" => status_id}) do
-    {status, result_of_db_transaction} = Repo.transaction fn ->
-        # TODO: Use Ecto.Multi for performing all these within the same transaction
-        {transaction_status, result_of_db_transaction} = Interview.update_status(id, String.to_integer(status_id))
-        {transaction_status, result_of_db_transaction} = if transaction_status, do: store_image_and_generate_changesets(data, id) |> ChangesetManipulator.validate_and(Repo.custom_insert), else: {transaction_status, result_of_db_transaction}
-        case transaction_status do
-          true -> "Thanks for submitting feedback!"
-          false -> Repo.rollback(result_of_db_transaction)
+        result = Interview.update_status(id, String.to_integer(status_id))
+        |> Multi.append(store_image_and_generate_changesets(data, id))
+        |> Repo.transaction
+        {status, result_of_db_transaction} = case result do
+          {:ok, _} -> {:ok, "Thanks for submitting feedback!"}
+          {:error, _, changeset, _} -> {key, value} = get_key_value(Enum.at(changeset.errors, 0))
+                                      {:error, [%JSONErrorReason{field_name: key, reason: value}]}
         end
-    end
     conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
   def create(conn, %{"interview_id" => id, "status_id" => status_id}) do
-    Interview.update_status(id, String.to_integer(status_id))
+    Interview.update_status(id, String.to_integer(status_id)) |> Repo.transaction
     conn
     |> put_status(:created)
     |> json("Thanks for submitting feedback!")
@@ -54,14 +53,14 @@ defmodule RecruitxBackend.FeedbackImageController do
   end
 
   defp store_image_and_generate_changesets(data, id) do
-    Enum.reduce(Map.keys(data), [], fn(key, acc) ->
+    Enum.reduce(Map.keys(data), Multi.new, fn(key, acc) ->
       {_, random_file_name_suffix} = UUID.load(UUID.bingenerate)
       new_file_name = "interview_#{id}_#{random_file_name_suffix}.jpg"
       plug_to_upload = Map.get(data, key)
       {status, _} = Avatar.store(Map.merge(plug_to_upload, %{filename: new_file_name}))
       case status do
-        :ok -> acc ++ [FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id})]
-        :error -> throw {:error, [%JSONErrorReason{field_name: "upload", reason: "Failed to upload feedback images"}]}
+        :ok -> acc |> Multi.insert(:feedback, FeedbackImage.changeset(%FeedbackImage{}, %{file_name: new_file_name, interview_id: id}))
+        :error -> acc |> Multi.error(:upload_failed, [%JSONErrorReason{field_name: "upload", reason: "Failed to upload feedback images"}])
       end
     end)
   end
@@ -78,4 +77,8 @@ defmodule RecruitxBackend.FeedbackImageController do
         |> json(%JSONError{errors: response})
     end
   end
+
+  defp get_key_value({key, {value, _args}}), do: {key, value}
+  defp get_key_value({key, value}), do: {key, value}
+
 end

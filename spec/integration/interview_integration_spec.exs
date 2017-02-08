@@ -97,7 +97,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       candidate = Candidate |> Repo.get(interview.candidate_id)
       insert(:candidate_skill, candidate: candidate)
       pass_id = InterviewStatus.retrieve_by_name(InterviewStatus.pass).id
-      Interview.update_status(interview.id, pass_id)
+      Interview.update_status(interview.id, pass_id) |> Repo.transaction
       candidate_changeset = Candidate.changeset(candidate, %{pipeline_status_id: PipelineStatus.retrieve_by_name(PipelineStatus.closed).id})
       Repo.update(candidate_changeset)
       response = get conn_with_dummy_authorization(), "/panelists/test/interviews?page"
