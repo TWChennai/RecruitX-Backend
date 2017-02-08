@@ -1,5 +1,5 @@
+# TODO: Remove this file when the codebase has been converted to use Ecto.Multi
 defmodule RecruitxBackend.ChangesetManipulator do
-
   alias RecruitxBackend.ChangesetErrorParser
 
   def validate_and([], _insert_or_update), do: []

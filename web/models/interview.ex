@@ -246,6 +246,7 @@ defmodule RecruitxBackend.Interview do
   end
 
   defp is_pass(status_id) do
+    # TODO: Combine into a single db query
     status = (from i in InterviewStatus, where: i.name == ^PipelineStatus.pass) |> Repo.one
     !is_nil(status) and status.id == status_id
   end
