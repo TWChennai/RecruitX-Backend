@@ -2,7 +2,6 @@ defmodule RecruitxBackend.SlotController do
   use RecruitxBackend.Web, :controller
 
   alias Ecto.Changeset
-  alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.Interview
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.InterviewType
@@ -11,6 +10,7 @@ defmodule RecruitxBackend.SlotController do
   alias RecruitxBackend.SlotCancellationNotification
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.TimexHelper
+  alias Ecto.Multi
 
   # plug :scrub_params, "slot" when action in [:create, :update]
 
@@ -18,18 +18,20 @@ defmodule RecruitxBackend.SlotController do
     %{start_time: start_time, interview_type_id: interview_type_id} = Repo.get!(Slot, slot_id)
     interview_changeset = Interview.changeset(%Interview{}, %{candidate_id: candidate_id, interview_type_id: interview_type_id, start_time: start_time})
     signup_panelists_and_satisfied_criteria_for_slot = SlotPanelist.get_panelists_and_satisfied_criteria(slot_id)
-    {status, result_of_db_transaction} = Repo.transaction fn ->
-        # TODO: Use Ecto.Multi for performing all these within the same transaction
-        {status, interview} = [interview_changeset] |> ChangesetManipulator.validate_and(Repo.custom_insert)
+    result = Repo.transaction fn ->
+        {status, interview} = interview_changeset |> Repo.insert
         if status do
-          generateInterviewPanelistChangesets(interview.id, signup_panelists_and_satisfied_criteria_for_slot) |> ChangesetManipulator.validate_and(Repo.custom_insert)
-          Repo.delete_all(from i in Slot, where: i.id == ^slot_id)
-          Repo.delete_all(from i in SlotPanelist, where: i.slot_id == ^slot_id)
-          interview
-        else
-          Repo.rollback(interview)
+          Multi.new
+          |> Multi.append(changeset_list_to_multi(generateInterviewPanelistChangesets(interview.id, signup_panelists_and_satisfied_criteria_for_slot)))
+          |> Multi.delete_all(:slot, (from i in Slot, where: i.id == ^slot_id))
+          |> Multi.delete_all(:slot_panelist, (from i in SlotPanelist, where: i.slot_id == ^slot_id))
+          |> Repo.transaction
+        end
       end
-    end
+      {status, result_of_db_transaction} = case result do
+        {:ok, _} -> {:ok, "Successfully converted slot to interview!"}
+        _ -> {:error, "Unable to converted slot into interview!"}
+      end
     conn |> sendResponseBasedOnResult(:create, status, result_of_db_transaction)
   end
 
@@ -39,6 +41,10 @@ defmodule RecruitxBackend.SlotController do
 
   defp generateInterviewPanelistChangesets(_interview_id, []), do: []
   defp generateInterviewPanelistChangesets(interview_id, [{panelist_login_name, satisfied_criteria} | tail]), do: [Changeset.cast(%InterviewPanelist{}, %{interview_id: interview_id, panelist_login_name: panelist_login_name, satisfied_criteria: satisfied_criteria}, [:interview_id, :panelist_login_name, :satisfied_criteria]) | generateInterviewPanelistChangesets(interview_id, tail)]
+
+  defp changeset_list_to_multi(list), do: _changeset_list_to_multi(list, Multi.new)
+  defp _changeset_list_to_multi([], acc), do: acc
+  defp _changeset_list_to_multi([h | t], acc), do: _changeset_list_to_multi(t, acc |> Multi.insert(:insert_head, h))
 
   def sendResponseBasedOnResult(conn, action, status, interview) do
     case {action, status} do
