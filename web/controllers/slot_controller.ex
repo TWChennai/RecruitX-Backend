@@ -38,7 +38,7 @@ defmodule RecruitxBackend.SlotController do
   end
 
   defp generateInterviewPanelistChangesets(_interview_id, []), do: []
-  defp generateInterviewPanelistChangesets(interview_id, [{panelist_login_name, satisfied_criteria} | tail]), do: [Changeset.cast(%InterviewPanelist{}, %{interview_id: interview_id, panelist_login_name: panelist_login_name, satisfied_criteria: satisfied_criteria}, ~w(interview_id panelist_login_name), ~w(satisfied_criteria)) | generateInterviewPanelistChangesets(interview_id, tail)]
+  defp generateInterviewPanelistChangesets(interview_id, [{panelist_login_name, satisfied_criteria} | tail]), do: [Changeset.cast(%InterviewPanelist{}, %{interview_id: interview_id, panelist_login_name: panelist_login_name, satisfied_criteria: satisfied_criteria}, [:interview_id, :panelist_login_name, :satisfied_criteria]) | generateInterviewPanelistChangesets(interview_id, tail)]
 
   def sendResponseBasedOnResult(conn, action, status, interview) do
     case {action, status} do

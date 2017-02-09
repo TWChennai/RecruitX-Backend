@@ -3,20 +3,50 @@ defmodule SlotIntegrationSpec do
 
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Slot
+  alias RecruitxBackend.SlotPanelist
+  alias RecruitxBackend.InterviewPanelist
+  alias RecruitxBackend.Interview
   alias RecruitxBackend.TimexHelper
 
   describe "create" do
-    xit "should return 201 and be successful" do
+    it "should return 201 and be successful" do
+      number_of_slots_to_be_inserted = 2
+      number_of_slots_before = Slot.count
       candidate = insert(:candidate)
       insert(:interview, start_time: get_start_of_next_week(), interview_type: insert(:interview_type, priority: 1), candidate: candidate)
-      number_of_slots_before = (from s in Slot, select: count(s.id)) |> Repo.one
-      post_parameters = convertKeysFromAtomsToStrings(params_for(:slot, role_id: candidate.role_id, start_time: get_start_of_next_week() |> TimexHelper.add(5, :hours), count: 2))
+      slot_params = params_for(:slot, role_id: candidate.role_id, start_time: get_start_of_next_week() |> TimexHelper.add(5, :hours), interview_type_id: insert(:interview_type, priority: 2).id)
+      post_parameters = convertKeysFromAtomsToStrings(Map.merge(slot_params, %{count: number_of_slots_to_be_inserted}))
       conn = action(:create, %{"slot" => post_parameters})
-      number_of_slots_after = (from s in Slot, select: count(s.id)) |> Repo.one
 
       conn |> should(be_successful())
       conn |> should(have_http_status(:created))
-      expect(number_of_slots_after) |> to(be(number_of_slots_before + 2))
+      expect(Slot.count) |> to(be(number_of_slots_before + number_of_slots_to_be_inserted))
+    end
+
+    it "should convert the slot to interview" do
+      candidate = insert(:candidate)
+      number_of_slots_before = Slot.count
+      number_of_interviews_before = Interview.count
+      slot = insert(:slot)
+      conn = action(:create, %{"slot_id" => slot.id, "candidate_id" => candidate.id})
+
+      conn |> should(be_successful())
+      conn |> should(have_http_status(:created))
+      expect(Slot.count) |> to(be(number_of_slots_before))
+      expect(Interview.count) |> to(be(number_of_interviews_before + 1))
+    end
+
+    it "should convert the slot to interview and add those signup panelists to that interview" do
+      candidate = insert(:candidate)
+      slot_panelist = insert(:slot_panelist)
+      number_of_slot_panelists_before = SlotPanelist.count
+      number_of_interview_panelists_before = InterviewPanelist.count
+      conn = action(:create, %{"slot_id" => slot_panelist.slot.id, "candidate_id" => candidate.id})
+
+      conn |> should(be_successful())
+      conn |> should(have_http_status(:created))
+      expect(SlotPanelist.count) |> to(be(number_of_slot_panelists_before - 1))
+      expect(InterviewPanelist.count) |> to(be(number_of_interview_panelists_before + 1))
     end
   end
 
