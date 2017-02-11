@@ -68,7 +68,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
 
       expect(response.status) |> to(be(200))
       [result_interview] = response.assigns.interviews.entries
-      expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true())
+      expect(compare_fields(result_interview, interview, [:id])) |> to(be_true())
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true())
     end
 
@@ -84,7 +84,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
       [result_slot, result_interview] = response.assigns.interviews.entries
 
       expect(response.status) |> to(be(200))
-      expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true())
+      expect(compare_fields(result_interview, interview, [:id])) |> to(be_true())
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true())
       expect(compare_fields(result_slot, slot, [:id, :role_id, :interview_type_id])) |> to(be_true())
       expect(Enum.at(result_slot.slot_panelists, 0).panelist_login_name) |> to(be("test"))
@@ -104,7 +104,7 @@ defmodule RecruitxBackend.InterviewIntegrationSpec do
 
       expect(response.status) |> to(be(200))
       [result_interview] = response.assigns.interviews.entries
-      expect(compare_fields(result_interview, interview, [:id, :start_time])) |> to(be_true())
+      expect(compare_fields(result_interview, interview, [:id])) |> to(be_true())
       expect(compare_fields(result_interview.candidate, Repo.get(Candidate, interview.candidate_id), [:name, :experience, :role_id, :other_skills])) |> to(be_true())
       expect(result_interview.last_interview_status) |> to(be(pass_id))
     end
