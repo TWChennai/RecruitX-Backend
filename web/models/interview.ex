@@ -233,16 +233,17 @@ defmodule RecruitxBackend.Interview do
     multi = Multi.new
     interview = id |> retrieve_interview
     if is_nil(interview) do
-      multi = multi |> Multi.error(:interview_not_found, %{errors: [interview: "Interview has been deleted"]})
+      multi |> Multi.error(:interview_not_found, %{errors: [interview: "Interview has been deleted"]})
     else
       multi = multi |> Multi.update(:status_update, changeset(interview, %{"interview_status_id": status_id}))
       if is_pass(status_id) do
-        multi = multi
+        multi
         |> Multi.delete_all(:other_interviews, delete_successive_interviews_and_panelists(interview.candidate_id, interview.start_time))
         |> Multi.update(:status_as_pass, Candidate.updateQueryForCandidateStatusAsPass(interview.candidate_id))
+      else
+        multi
       end
     end
-    multi
   end
 
   defp is_pass(status_id) do
