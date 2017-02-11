@@ -3,14 +3,15 @@ defmodule RecruitxBackend.CandidateController do
 
   alias RecruitxBackend.Candidate
   alias RecruitxBackend.CandidateSkill
-  alias RecruitxBackend.ChangesetManipulator
   alias RecruitxBackend.ChangesetView
   alias RecruitxBackend.ErrorView
   alias RecruitxBackend.Interview
   alias RecruitxBackend.JSONError
   alias RecruitxBackend.PipelineStatus
+  alias RecruitxBackend.JSONErrorReason
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
+  alias Ecto.Multi
 
   # TODO: Need to fix the spec to pass context "invalid params" and check whether scrub_params is needed
   plug :scrub_params, "candidate" when action in [:create, :update]
@@ -21,19 +22,27 @@ defmodule RecruitxBackend.CandidateController do
     render(conn, "index.json", candidates: candidates)
   end
 
-  def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = candidate}) when skill_ids != [] and interview_rounds != [] do
-      {transaction_status, result_of_db_transaction} = Repo.transaction fn ->
-        # TODO: Use Ecto.Multi for performing all these within the same transaction
-        {transaction_status, candidate} = [Candidate.changeset(%Candidate{}, candidate)] |> ChangesetManipulator.validate_and(Repo.custom_insert)
-        if transaction_status do
-          if transaction_status, do: {transaction_status, result} = insertSkills(candidate, skill_ids)
-          if transaction_status, do: {transaction_status, result} = insertInterviews(candidate, interview_rounds)
-          unless transaction_status, do: Repo.rollback(result)
-          candidate |> Repo.preload(:candidate_skills)
-        else
-          Repo.rollback(candidate)
+  @lint {Credo.Check.Refactor.ABCSize, false}
+  def create(conn, %{"candidate" => %{"skill_ids" => skill_ids, "interview_rounds" => interview_rounds} = post_params}) when skill_ids != [] and interview_rounds != [] do
+      result = Repo.transaction fn ->
+        candidate_insert_result = Candidate.changeset(%Candidate{}, post_params) |> Repo.insert
+        case candidate_insert_result do
+          {:ok, candidate} -> multi = Multi.new
+                              |> Multi.append(insertSkills(candidate, skill_ids))
+                              |> Multi.append(insertInterviews(candidate, interview_rounds))
+                              |> Repo.transaction
+                              case multi do
+                                {:ok, _} -> candidate
+                                {:error, _, changeset, _} -> Repo.rollback(get_error_response(changeset))
+                              end
+          {:error, changeset} -> Repo.rollback(get_error_response(changeset))
         end
       end
+      {transaction_status, result_of_db_transaction} = case result do
+        {:error, _, changeset, _} -> get_error_response(changeset)
+        {:error, changeset} -> {:error, changeset}
+        {:ok, candidate} -> {:ok, candidate}
+        end
       conn |> sendResponseBasedOnResult(:create, transaction_status, result_of_db_transaction)
   end
 
@@ -120,17 +129,25 @@ defmodule RecruitxBackend.CandidateController do
     })
   end
 
-  defp insertSkills(candidate, skill_ids), do: candidate |> generateCandidateSkillChangesets(skill_ids) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+  defp insertSkills(candidate, skill_ids), do: candidate |> generateCandidateSkillChangesets(skill_ids, Multi.new)
 
-  defp insertInterviews(candidate, interview_rounds), do: candidate |> generateCandidateInterviewRoundChangesets(interview_rounds) |> ChangesetManipulator.validate_and(Repo.custom_insert)
+  defp insertInterviews(candidate, interview_rounds), do: candidate |> generateCandidateInterviewRoundChangesets(interview_rounds, Multi.new)
 
-  defp generateCandidateSkillChangesets(_candidate, []), do: []
+  defp generateCandidateSkillChangesets(_candidate, [], acc), do: acc
 
-  defp generateCandidateSkillChangesets(candidate, [head | tail]), do: [CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: head}) | generateCandidateSkillChangesets(candidate, tail)]
+  defp generateCandidateSkillChangesets(candidate, [head | tail], acc), do: generateCandidateSkillChangesets(candidate, tail, acc |> Multi.insert(String.to_atom("skill_#{Enum.count(tail)}"), CandidateSkill.changeset(%CandidateSkill{}, %{candidate_id: candidate.id, skill_id: head})))
 
-  defp generateCandidateInterviewRoundChangesets(_candidate, []), do: []
+  defp generateCandidateInterviewRoundChangesets(_candidate, [], acc), do: acc
 
-  defp generateCandidateInterviewRoundChangesets(candidate, [head | tail]), do: [Interview.changeset(%Interview{}, %{candidate_id: candidate.id, interview_type_id: head["interview_type_id"], start_time: head["start_time"]}) | generateCandidateInterviewRoundChangesets(candidate, tail)]
+  defp generateCandidateInterviewRoundChangesets(candidate, [head | tail], acc), do: generateCandidateInterviewRoundChangesets(candidate, tail, acc |> Multi.insert(String.to_atom("interview_#{Enum.count(tail)}"), Interview.changeset(%Interview{}, %{candidate_id: candidate.id, interview_type_id: head["interview_type_id"], start_time: head["start_time"]})))
+
+  defp get_key_value({key, {value, _args}}), do: {key, value}
+  defp get_key_value({key, value}), do: {key, value}
+
+  defp get_error_response(changeset) do
+    {key, value} = get_key_value(Enum.at(changeset.errors, 0))
+    [%JSONErrorReason{field_name: key, reason: value}]
+  end
 
   #
   # def delete(conn, %{"id" => id}) do

@@ -170,6 +170,20 @@ defmodule RecruitxBackend.CandidateIntegrationSpec do
         new_candidate_count = Candidate.count
         expect(new_candidate_count) |> to(be(orig_candidate_count))
       end
+
+      it "should not create a new candidate in the db if skill is not correct" do
+        orig_candidate_count = Candidate.count
+        post_skill_params = %{skill_ids: [1.23]}
+        candidate_params = params_with_assocs(:candidate, experience: 6.21)
+        interview_round_params = build(:interview_rounds)
+        post_parameters = Map.merge(candidate_params, Map.merge(post_skill_params, interview_round_params))
+
+        response = post conn_with_dummy_authorization(), "/candidates", %{"candidate" => post_parameters}
+
+        expect(response.status) |> to(be(422))
+        new_candidate_count = Candidate.count
+        expect(new_candidate_count) |> to(be(orig_candidate_count))
+      end
     end
 
     context "with no POST params" do
