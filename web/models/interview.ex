@@ -186,30 +186,30 @@ defmodule RecruitxBackend.Interview do
       # (2) (one array for interviews for all interview_types >= current priority - self) and from this find the earliest one
       # (3) check for overlap between results of (1) and (2) in case of non-nil value
       error_message = ""
-      result = case {previous_interview, next_interview, interview_with_same_priority} do
-        {nil, nil, nil} -> 1
+      {error_message, result} = case {previous_interview, next_interview, interview_with_same_priority} do
+        {nil, nil, nil} -> {error_message, 1}
         {nil, next_interview, nil} ->
           error_message = error_message <> "should be before #{next_interview.interview_type.name} atleast by 1 hour"
-          TimexHelper.compare(next_interview.start_time, new_end_time)
+          {error_message, TimexHelper.compare(next_interview.start_time, new_end_time)}
         {previous_interview, nil, nil} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name} atleast by 1 hour"
-          TimexHelper.compare(new_start_time, previous_interview.end_time)
+          {error_message, TimexHelper.compare(new_start_time, previous_interview.end_time)}
         {previous_interview, next_interview, nil} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before #{next_interview.interview_type.name} atleast by 1 hour"
-          TimexHelper.compare(next_interview.start_time, new_end_time) && TimexHelper.compare(new_start_time, previous_interview.end_time)
+          {error_message, TimexHelper.compare(next_interview.start_time, new_end_time) && TimexHelper.compare(new_start_time, previous_interview.end_time)}
         {nil, nil, interview_with_same_priority} ->
           error_message = error_message <> "before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
-          (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time))
+          {error_message, (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time))}
         {nil, next_interview, interview_with_same_priority} ->
           error_message = error_message <> "should be before #{next_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
           (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) &&
-          TimexHelper.compare(next_interview.start_time, new_end_time)
+          {error_message, TimexHelper.compare(next_interview.start_time, new_end_time)}
         {previous_interview, nil, interview_with_same_priority} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
-          (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) && TimexHelper.compare(new_start_time, previous_interview.end_time)
+          {error_message, (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) && TimexHelper.compare(new_start_time, previous_interview.end_time)}
         {previous_interview, next_interview, interview_with_same_priority} ->
           error_message = error_message <> "should be after #{previous_interview.interview_type.name}, before #{next_interview.interview_type.name} and before/after #{interview_with_same_priority.interview_type.name} atleast by 1 hour"
-          (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) && TimexHelper.compare(new_start_time, previous_interview.send_time) && TimexHelper.compare(next_interview.start_time, new_end_time)
+          {error_message, (TimexHelper.compare(interview_with_same_priority.start_time, new_end_time) || TimexHelper.compare(new_start_time, interview_with_same_priority.end_time)) && TimexHelper.compare(new_start_time, previous_interview.send_time) && TimexHelper.compare(next_interview.start_time, new_end_time)}
       end
 
       if !result, do: Changeset.add_error(existing_changeset, :start_time, error_message), else: existing_changeset

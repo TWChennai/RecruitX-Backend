@@ -8,7 +8,7 @@ defmodule RecruitxBackend.TimexHelper do
 
   def add_timezone_if_not_present(%{start_time: <<start_time::binary-size(@time_zone_string_length)>>} = params) do
     start_time = start_time |> String.replace(" ", "T")
-    unless String.ends_with?(start_time, "Z"), do: start_time = start_time <> "Z"
+    start_time = if !String.ends_with?(start_time, "Z"), do: start_time <> "Z", else: start_time
     Map.put(params, :start_time, start_time)
   end
 
