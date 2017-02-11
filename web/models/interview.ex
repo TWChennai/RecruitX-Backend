@@ -246,11 +246,8 @@ defmodule RecruitxBackend.Interview do
     end
   end
 
-  defp is_pass(status_id) do
-    # TODO: Combine into a single db query
-    status = (from i in InterviewStatus, where: i.name == ^PipelineStatus.pass) |> Repo.one
-    !is_nil(status) and status.id == status_id
-  end
+  defp is_pass(nil), do: false
+  defp is_pass(status_id), do: !is_nil((from i in InterviewStatus, where: i.name == ^PipelineStatus.pass and i.id == ^status_id) |> Repo.one)
 
   def delete_successive_interviews_and_panelists(candidate_id, start_time) do
     interviews_to_delete_query = from i in __MODULE__,
