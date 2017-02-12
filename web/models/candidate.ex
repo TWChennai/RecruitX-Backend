@@ -201,7 +201,7 @@ defmodule RecruitxBackend.Candidate do
   def get_rounded_experience(candidate) do
     experience_as_string = Decimal.to_string(candidate.experience)
     experience_as_float = String.to_float(experience_as_string)
-    Float.to_string(experience_as_float, decimals: 1)
+    :erlang.float_to_binary(experience_as_float, decimals: 1)
   end
 
   def format(candidate) do
