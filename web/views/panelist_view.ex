@@ -1,6 +1,22 @@
 defmodule RecruitxBackend.PanelistView do
   use RecruitxBackend.Web, :view
 
+  alias RecruitxBackend.TimexHelper
+
+  def render("statistics_range.json", %{statistics_range: statistics_range}) do
+    render_many(statistics_range, __MODULE__, "statistics_for_a_week.json")
+  end
+
+  def render("statistics_for_a_week.json", %{panelist: statistics_for_a_week}) do
+    %{
+      range: %{
+        start: TimexHelper.format(statistics_for_a_week.range.starting, "%Y-%m-%d"),
+        end: TimexHelper.format(statistics_for_a_week.range.ending, "%Y-%m-%d")
+        },
+      statistics: render_many(statistics_for_a_week.statistics, __MODULE__, "statistic.json")
+    }
+  end
+
   def render("statistics.json", %{statistics: statistics}) do
     render_many(statistics, __MODULE__, "statistic.json")
   end

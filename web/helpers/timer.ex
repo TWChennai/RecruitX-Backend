@@ -1,13 +1,14 @@
 defmodule RecruitxBackend.Timer do
   alias Ecto.Changeset
   alias RecruitxBackend.TimexHelper
+  alias Timex.Duration
 
   def get_current_week_weekdays do
     %{starting: TimexHelper.beginning_of_week(TimexHelper.utc_now()), ending: TimexHelper.end_of_week(TimexHelper.utc_now()) |> TimexHelper.add(-2, :days)}
   end
 
-  def get_current_week do
-    %{starting: TimexHelper.beginning_of_week(TimexHelper.utc_now()), ending: TimexHelper.end_of_week(TimexHelper.utc_now())}
+  def get_current_week(any_day_of_week \\ TimexHelper.utc_now()) do
+    %{starting: TimexHelper.beginning_of_week(any_day_of_week), ending: TimexHelper.end_of_week(any_day_of_week)}
   end
 
   def get_previous_month do
@@ -22,6 +23,14 @@ defmodule RecruitxBackend.Timer do
   def get_previous_quarter do
     day_from_previous_quarter = TimexHelper.utc_now() |> TimexHelper.beginning_of_quarter |> TimexHelper.add(-1, :days)
     %{starting: TimexHelper.beginning_of_quarter(day_from_previous_quarter), ending: TimexHelper.end_of_quarter(day_from_previous_quarter)}
+  end
+
+  def get_week_ranges(0), do: []
+  def get_week_ranges(n), do: _get_week_ranges(n , TimexHelper.utc_now())
+  defp _get_week_ranges(0, _any_day_of_week), do: []
+  defp _get_week_ranges(n, any_day_of_week) do
+    week_range = get_current_week(any_day_of_week)
+    [week_range | _get_week_ranges(n-1, Timex.subtract(week_range.starting, Duration.from_days(1)))]
   end
 
   def add_end_time(existing_changeset, duration_of_interview) do

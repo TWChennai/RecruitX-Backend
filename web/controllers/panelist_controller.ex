@@ -12,6 +12,18 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.TimexHelper
   alias Swoosh.Templates
 
+  def index(conn, %{"number_of_weeks" => number_of_weeks}) do
+    week_ranges = Timer.get_week_ranges(String.to_integer(number_of_weeks))
+    statistics_range = Enum.map(week_ranges, fn week_range ->
+                statistics_for_a_week = week_range
+                  |> InterviewPanelist.get_statistics
+                  |> Repo.all
+                  |> Enum.group_by(&Enum.at(&1, 0))
+                %{range: week_range,
+                statistics: statistics_for_a_week} end)
+    conn |> render("statistics_range.json", statistics_range: statistics_range)
+  end
+
   def index(conn, params) do
      statistics = params
                   |> get_date_range

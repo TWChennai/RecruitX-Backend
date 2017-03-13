@@ -5,6 +5,7 @@ defmodule RecruitxBackend.TimerSpec do
   alias RecruitxBackend.Interview
   alias RecruitxBackend.Timer
   alias RecruitxBackend.TimexHelper
+  alias Timex.Duration
 
   @duration_of_interview 1
 
@@ -54,6 +55,23 @@ defmodule RecruitxBackend.TimerSpec do
         %{starting: starting, ending: ending} = Timer.get_current_week
         expect(TimexHelper.compare(starting, TimexHelper.beginning_of_week(TimexHelper.utc_now()))) |> to(be_true())
         expect(TimexHelper.compare(ending, TimexHelper.end_of_week(TimexHelper.utc_now()))) |> to(be_true())
+      end
+    end
+
+    context "get_week_ranges" do
+      it "should return current week range when requested count is one" do
+        expect([]) |> to(be(Timer.get_week_ranges(0)))
+        [%{starting: starting, ending: ending}] = Timer.get_week_ranges(1)
+        expect(TimexHelper.compare(starting, TimexHelper.beginning_of_week(TimexHelper.utc_now()))) |> to(be_true())
+        expect(TimexHelper.compare(ending, TimexHelper.end_of_week(TimexHelper.utc_now()))) |> to(be_true())
+
+        [%{starting: starting1, ending: ending1},
+          %{starting: starting2, ending: ending2}] = Timer.get_week_ranges(2)
+          expect(TimexHelper.compare(starting1, TimexHelper.beginning_of_week(TimexHelper.utc_now()))) |> to(be_true())
+          expect(TimexHelper.compare(ending1, TimexHelper.end_of_week(TimexHelper.utc_now()))) |> to(be_true())
+          some_day_in_previous_week = Timex.subtract(TimexHelper.utc_now(), Duration.from_days(8))
+          expect(TimexHelper.compare(starting2, TimexHelper.beginning_of_week(some_day_in_previous_week))) |> to(be_true())
+          expect(TimexHelper.compare(ending2, TimexHelper.end_of_week(some_day_in_previous_week))) |> to(be_true())
       end
     end
 
