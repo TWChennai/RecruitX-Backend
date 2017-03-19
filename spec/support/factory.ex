@@ -16,6 +16,7 @@ defmodule RecruitxBackend.Factory do
   alias RecruitxBackend.RoleInterviewType
   alias RecruitxBackend.RoleSkill
   alias RecruitxBackend.Skill
+  alias RecruitxBackend.SignupCop
   alias RecruitxBackend.Slot
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.Team
@@ -26,6 +27,12 @@ defmodule RecruitxBackend.Factory do
 
   def role_factory do
     %Role{
+      name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
+    }
+  end
+
+  def signup_cop_factory do
+    %SignupCop{
       name: sanitize_name("#{Faker.Name.first_name} #{Faker.Name.last_name}")   # TODO: Find a way to specify from a list of known langugages
     }
   end

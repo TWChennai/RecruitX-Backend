@@ -30,14 +30,15 @@ defmodule RecruitxBackend.JigsawControllerSpec do
       expect(Timex.diff(calculated_hire_date, TimexHelper.utc_now() |> TimexHelper.add(-round(past_exp * 12), :months), :seconds)) |> to(be(0))
     end
 
-    it "should return the is_recruiter true for recruiters" do
+    it "should return the is_recruiter and is_signup_cop true for recruiters" do
       jigsaw_result = %{body: "{\"role\":{\"name\":\"#{panelist_role().name}\"},\"department\":{\"name\":\"#{@recruitment_department}\"},
                               \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
       allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
       %{user_details: %{is_recruiter: is_recruiter, calculated_hire_date: _calculated_hire_date,
-                         is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
+                         is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = JigsawController.get_jigsaw_data("")
 
       expect(is_recruiter) |> to(be(true))
+      expect(is_signup_cop) |> to(be(true))
       expect(is_super_user) |> to(be(false))
     end
 
@@ -47,10 +48,11 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                                 \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
         allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
 
-        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
+        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = JigsawController.get_jigsaw_data("")
 
         expect(is_recruiter) |> to(be(false))
         expect(is_super_user) |> to(be(true))
+        expect(is_signup_cop) |> to(be(false))
       end
 
       it "for PSMs" do

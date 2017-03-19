@@ -3,6 +3,7 @@ defmodule RecruitxBackend.JigsawController do
 
   alias Poison.Parser
   alias RecruitxBackend.Role
+  alias RecruitxBackend.SignupCop
   alias RecruitxBackend.TimexHelper
 
   @recruitment_department "People Recruiting"
@@ -28,10 +29,10 @@ defmodule RecruitxBackend.JigsawController do
     other_role = Role.retrieve_by_name(Role.other)
     recruiter_role = Map.merge(other_role, %{name: "Specialist"})
     user_details = case id do
-      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false, error: nil} #for_uat
-      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false, error: nil} #for_uat
-      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil} #for_uat
-      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil} #for_uat
+      "ppanelist" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: Role.retrieve_by_name(Role.dev), is_super_user: false, error: nil, is_signup_cop: true} #for_uat
+      "ppanelistp" -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: Role.retrieve_by_name(Role.qa), is_super_user: false, error: nil, is_signup_cop: false} #for_uat
+      "rrecruitx" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-12, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil, is_signup_cop: false} #for_uat
+      "rrecruitxr" -> %{is_recruiter: true, calculated_hire_date: TimexHelper.utc_now() |> TimexHelper.add(-18, :months), past_experience: experience, role: recruiter_role, is_super_user: false, error: nil, is_signup_cop: false} #for_uat
       _  -> response = get_data_safely("#{@jigsaw_url}/people/#{id}")
         case response.status_code do
           200 -> case response.body |> Parser.parse do
@@ -56,14 +57,13 @@ defmodule RecruitxBackend.JigsawController do
                                       role = if is_super_user, do: Role.retrieve_by_name(@ops), else: role
 
                                       case department_name do
-                                        @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user, error: ""}
-
-                                        _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user, error: ""}
+                                        @recruitment_department -> %{is_recruiter: true, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user, error: "", is_signup_cop: true}
+                                        _ -> %{is_recruiter: false, calculated_hire_date: calculated_hire_date, past_experience: past_experience, role: role, is_super_user: is_super_user, error: "", is_signup_cop: SignupCop.is_signup_cop(id)}
                                       end
-                      {:error, reason} -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, error: reason}
+                      {:error, reason} -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, error: reason, is_signup_cop: false}
                     end   #end of Parser stmt
-            408 -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @time_out_error}
-            _ -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @invalid_user}
+            408 -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @time_out_error, is_signup_cop: false}
+            _ -> %{is_recruiter: false, calculated_hire_date: TimexHelper.utc_now(), past_experience: 0, role: other_role, is_super_user: false, error: @invalid_user, is_signup_cop: false}
       end #end of response status_code
     end   # end of user_details case stmt
     %{user_details: user_details}

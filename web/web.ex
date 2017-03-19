@@ -28,6 +28,7 @@ defmodule RecruitxBackend.Web do
       def all, do: Repo.all(__MODULE__)
       def count, do: Repo.aggregate(__MODULE__, :count, :id)
       def max(key), do: Repo.aggregate(__MODULE__, :max, key) || 0
+      def is_not_nil(value), do: !is_nil(value)
     end
   end
 
