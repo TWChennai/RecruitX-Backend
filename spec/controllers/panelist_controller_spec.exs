@@ -3,8 +3,10 @@ defmodule RecruitxBackend.PanelistControllerSpec do
 
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.TeamDetailsUpdate
+  alias RecruitxBackend.JigsawController
 
   let :post_parameters, do: convertKeysFromAtomsToStrings(Map.merge(params_with_assocs(:interview_panelist), %{"panelist_experience" => 2, "panelist_role" => "Dev"}))
+  before do: allow JigsawController |> to(accept(:get_jigsaw_data, fn(_) -> %{user_details: %{is_recruiter: false, is_super_user: false, is_signup_cop: false, error: ""}} end))
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
 
   describe "create" do

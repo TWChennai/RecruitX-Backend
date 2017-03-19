@@ -19,13 +19,12 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.TeamDetailsUpdate
   alias RecruitxBackend.TimexHelper
+  alias RecruitxBackend.JigsawController
 
-  let :jigsaw_result, do: %{body: "{\"employeeId\":\"17991\",\"role\":{\"name\":\"Dev\"},\"project\":{\"name\":\"Recruitx\"}}", status_code: 200}
-
-  before do: allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result() end))
   before do: allow ExperienceMatrix |> to(accept(:should_filter_role, fn(_) -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update, fn() -> true end))
   before do: allow TeamDetailsUpdate |> to(accept(:update_in_background, fn(_, _) -> true end))
+  before do: allow JigsawController |> to(accept(:get_jigsaw_data, fn(_) -> %{user_details: %{is_recruiter: false, is_super_user: false, is_signup_cop: false, error: ""}} end))
   before do: Repo.delete_all(ExperienceMatrix)
 
   describe "index" do

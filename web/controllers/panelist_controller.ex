@@ -6,11 +6,13 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Panel
+  alias RecruitxBackend.JigsawController
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.TeamDetailsUpdate
   alias RecruitxBackend.Timer
   alias RecruitxBackend.TimexHelper
   alias Swoosh.Templates
+  alias Ecto.Changeset
 
   def index(conn, %{"number_of_weeks" => number_of_weeks}) do
     week_ranges = Timer.get_week_ranges(String.to_integer(number_of_weeks))
@@ -35,6 +37,10 @@ defmodule RecruitxBackend.PanelistController do
 
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _, "panelist_experience" => _, "panelist_login_name" => panelist_login_name} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
+    %{user_details: user_details} = JigsawController.get_jigsaw_data(panelist_login_name)
+    if user_details.error != "" do
+      interview_panelist_changeset = Changeset.add_error(interview_panelist_changeset, :user, "Not a valid name")
+    end
     case Repo.insert(interview_panelist_changeset) do
       {:ok, interview_panelist} ->
         TeamDetailsUpdate.update_in_background(panelist_login_name, interview_panelist.id)
