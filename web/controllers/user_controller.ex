@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.JigsawController do
+defmodule RecruitxBackend.UserController do
   use RecruitxBackend.Web, :controller
 
   alias Poison.Parser
@@ -91,7 +91,7 @@ defmodule RecruitxBackend.JigsawController do
 
   def is_valid_user(user_name) do
     has_signed_up_before = InterviewPanelist.has_signed_up_before(user_name)
-    is_valid_twer = if(!has_signed_up_before) do
+    is_valid_twer = if !has_signed_up_before do
       %{user_details: user_details} = get_jigsaw_data(user_name)
       user_details.error == ""
     end

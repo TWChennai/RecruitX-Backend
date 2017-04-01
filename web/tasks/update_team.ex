@@ -1,14 +1,14 @@
 defmodule RecruitxBackend.UpdateTeam do
 
   alias Poison.Parser
-  alias RecruitxBackend.JigsawController
+  alias RecruitxBackend.UserController
   alias RecruitxBackend.Repo
   alias RecruitxBackend.Team
 
   @jigsaw_url System.get_env("JIGSAW_URL")
 
   def execute(employee_id, _interview_panelist_id) do
-    response = "#{@jigsaw_url}/assignments?employee_ids[]=#{employee_id}&current_only=true" |> JigsawController.get_data_safely
+    response = "#{@jigsaw_url}/assignments?employee_ids[]=#{employee_id}&current_only=true" |> UserController.get_data_safely
     case response.status_code do
       200 ->
         case response.body |> Parser.parse do

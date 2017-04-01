@@ -1,7 +1,7 @@
-defmodule RecruitxBackend.JigsawControllerSpec do
-  use ESpec.Phoenix, controller: RecruitxBackend.JigsawController
+defmodule RecruitxBackend.UserControllerSpec do
+  use ESpec.Phoenix, controller: RecruitxBackend.UserController
 
-  alias RecruitxBackend.JigsawController
+  alias RecruitxBackend.UserController
   alias RecruitxBackend.Role
   alias RecruitxBackend.TimexHelper
 
@@ -21,7 +21,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                               \"hireDate\":\"#{hire_date()}\",\"totalExperience\":12.84,\"twExperience\":#{past_exp}}", status_code: 200}
       allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
       %{user_details: %{is_recruiter: is_recruiter, calculated_hire_date: calculated_hire_date, past_experience: past_experience,
-                                  role: role, is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
+                                  role: role, is_super_user: is_super_user}} = UserController.get_jigsaw_data("")
 
       expect(is_recruiter) |> to(be(false))
       expect(is_super_user) |> to(be(false))
@@ -35,7 +35,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                               \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
       allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
       %{user_details: %{is_recruiter: is_recruiter, calculated_hire_date: _calculated_hire_date,
-                         is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = JigsawController.get_jigsaw_data("")
+                         is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = UserController.get_jigsaw_data("")
 
       expect(is_recruiter) |> to(be(true))
       expect(is_signup_cop) |> to(be(true))
@@ -48,7 +48,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                                 \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
         allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
 
-        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = JigsawController.get_jigsaw_data("")
+        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user, is_signup_cop: is_signup_cop}} = UserController.get_jigsaw_data("")
 
         expect(is_recruiter) |> to(be(false))
         expect(is_super_user) |> to(be(true))
@@ -60,7 +60,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                                 \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
         allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
 
-        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
+        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user}} = UserController.get_jigsaw_data("")
 
         expect(is_recruiter) |> to(be(false))
         expect(is_super_user) |> to(be(true))
@@ -71,7 +71,7 @@ defmodule RecruitxBackend.JigsawControllerSpec do
                                 \"hireDate\":\"2011-05-05\",\"totalExperience\":12.84,\"twExperience\":5.34}", status_code: 200}
         allow HTTPotion |> to(accept(:get, fn(_, _) -> jigsaw_result end))
 
-        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user}} = JigsawController.get_jigsaw_data("")
+        %{user_details: %{is_recruiter: is_recruiter, is_super_user: is_super_user}} = UserController.get_jigsaw_data("")
 
         expect(is_recruiter) |> to(be(false))
         expect(is_super_user) |> to(be(true))

@@ -1,4 +1,4 @@
-defmodule RecruitxBackend.JigsawView do
+defmodule RecruitxBackend.UserView do
   use RecruitxBackend.Web, :view
 
   alias RecruitxBackend.RoleView

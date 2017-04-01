@@ -6,7 +6,7 @@ defmodule RecruitxBackend.PanelistController do
   alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.MailHelper
   alias RecruitxBackend.Panel
-  alias RecruitxBackend.JigsawController
+  alias RecruitxBackend.UserController
   alias RecruitxBackend.SlotPanelist
   alias RecruitxBackend.TeamDetailsUpdate
   alias RecruitxBackend.Timer
@@ -37,7 +37,7 @@ defmodule RecruitxBackend.PanelistController do
 
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _, "panelist_experience" => _, "panelist_login_name" => panelist_login_name} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
-    if !JigsawController.is_valid_user(panelist_login_name) do
+    if !UserController.is_valid_user(panelist_login_name) do
       interview_panelist_changeset = Changeset.add_error(interview_panelist_changeset, :user, "Not a valid name")
     end
     case Repo.insert(interview_panelist_changeset) do
