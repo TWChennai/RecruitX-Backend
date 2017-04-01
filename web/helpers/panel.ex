@@ -37,6 +37,10 @@ defmodule RecruitxBackend.Panel do
     from i in model, order_by: [asc: i.start_time, asc: i.id]
   end
 
+  def role_order(model) do
+    from i in model, join: candi in assoc(i, :candidate), order_by: [asc: candi.role_id]
+  end
+
   def descending_order(model) do
     from i in model, order_by: [desc: i.start_time, asc: i.id]
   end

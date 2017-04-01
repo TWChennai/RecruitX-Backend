@@ -34,6 +34,7 @@ defmodule RecruitxBackend.InterviewController do
     interviews = Interview.get_interviews_with_associated_data
                   |> preload([:interview_type, candidate: :role, candidate: :skills]) # TODO: This line is not needed in case the request being served is json, only needed for html web version - please optimize
                   |> Panel.now_or_in_next_seven_days
+                  |> Panel.role_order
                   |> Panel.default_order
                   |> Repo.all
     slots = Slot |> preload([:slot_panelists, :role, :interview_type])

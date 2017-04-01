@@ -30,7 +30,7 @@ defmodule RecruitxBackend.Timer do
   defp _get_week_ranges(0, _any_day_of_week), do: []
   defp _get_week_ranges(n, any_day_of_week) do
     week_range = get_current_week(any_day_of_week)
-    [week_range | _get_week_ranges(n-1, Timex.subtract(week_range.starting, Duration.from_days(1)))]
+    [week_range | _get_week_ranges(n - 1, Timex.subtract(week_range.starting, Duration.from_days(1)))]
   end
 
   def add_end_time(existing_changeset, duration_of_interview) do
