@@ -4,6 +4,7 @@ defmodule RecruitxBackend.JigsawController do
   alias Poison.Parser
   alias RecruitxBackend.Role
   alias RecruitxBackend.SignupCop
+  alias RecruitxBackend.InterviewPanelist
   alias RecruitxBackend.TimexHelper
 
   @recruitment_department "People Recruiting"
@@ -86,5 +87,14 @@ defmodule RecruitxBackend.JigsawController do
 
   defp year_to_month(experience) do
     round(experience * 12)
+  end
+
+  def is_valid_user(user_name) do
+    has_signed_up_before = InterviewPanelist.has_signed_up_before(user_name)
+    is_valid_twer = if(!has_signed_up_before) do
+      %{user_details: user_details} = get_jigsaw_data(user_name)
+      user_details.error == ""
+    end
+    has_signed_up_before || is_valid_twer
   end
 end

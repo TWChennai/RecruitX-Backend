@@ -37,8 +37,7 @@ defmodule RecruitxBackend.PanelistController do
 
   def create(conn, %{"interview_panelist" => %{"panelist_role" => _, "panelist_experience" => _, "panelist_login_name" => panelist_login_name} = post_params}) do
     interview_panelist_changeset = InterviewPanelist.changeset(%InterviewPanelist{}, post_params)
-    %{user_details: user_details} = JigsawController.get_jigsaw_data(panelist_login_name)
-    if user_details.error != "" do
+    if !JigsawController.is_valid_user(panelist_login_name) do
       interview_panelist_changeset = Changeset.add_error(interview_panelist_changeset, :user, "Not a valid name")
     end
     case Repo.insert(interview_panelist_changeset) do

@@ -105,4 +105,12 @@ defmodule RecruitxBackend.InterviewPanelist do
       where: t.active == true,
       select: [t.name, r.name, ip.panelist_login_name, count(ip.panelist_login_name)])
     end
+
+    def has_signed_up_before(panelist_name) do
+      (from ip in __MODULE__,
+      where: ip.panelist_login_name == ^panelist_name,
+      limit: 1)
+        |> Repo.one
+        |> is_not_nil
+    end
 end
