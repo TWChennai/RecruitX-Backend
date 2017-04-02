@@ -65,7 +65,7 @@ config :logger, level: :info
 config :recruitx_backend, RecruitxBackend.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
-  pool_size: 20
+  pool_size: 18
 
 config :recruitx_backend, RecruitxBackend.Mailer,
   adapter: Swoosh.Adapters.SMTP,
