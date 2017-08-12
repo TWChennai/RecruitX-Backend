@@ -17,5 +17,4 @@ RUN mix local.hex --force && \
 
 WORKDIR /opt/app
 
-ENV MIX_ENV=docker
-ENV DB_ENV_POSTGRES_HOST=db
+

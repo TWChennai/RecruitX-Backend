@@ -134,3 +134,4 @@ data
 *.tar.gz
 .mix/
 .hex/
+.ash_history
