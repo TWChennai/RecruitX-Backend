@@ -16,6 +16,8 @@ services:
     image: recruitx_db
     ports:
       - "5432:5432"
+    volumes:
+      - ./database:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=recruitx
       - POSTGRES_PASSWORD=recruitx
