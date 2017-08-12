@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Mixfile do
   def project do
     [app: :recruitx_backend,
      version: "1.0.0",
-     elixir: "1.4.0",
+     elixir: "1.4.5",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -30,7 +30,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {RecruitxBackend, []},
-     extra_applications: [:logger]]
+     extra_applications: [:logger, :phoenix_pubsub]]
   end
 
   # Specifies which paths to compile per environment.
@@ -46,6 +46,7 @@ defmodule RecruitxBackend.Mixfile do
       {:cors_plug, "~> 1.1"},
       {:cowboy, "~> 1.0"},
       {:credo, "~> 0.5.3", only: :test, app: false},
+      {:distillery, "~> 1.4"},
       {:espec_phoenix, "~> 0.6", only: :test, app: false, override: true},
       {:espec_phoenix_helpers, "~> 0.3.3", only: :test},
       {:ex_aws, "~> 1.0"},

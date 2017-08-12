@@ -1,0 +1,21 @@
+version: '2'
+services:
+  web:
+    image: recruitx_release
+    volumes:
+      - ./_build/docker/rel/recruitx_backend/:/opt/app
+      - ./run/:/opt/run
+    command: /opt/run/run_docker.sh
+    ports: 
+      - "4000:4000"
+    links:
+      - db
+  db:
+    image: recruitx_db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=recruitx
+      - POSTGRES_PASSWORD=recruitx
+      - POSTGRES_HOST=db
+
