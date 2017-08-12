@@ -10,3 +10,17 @@
 #### ToDO
 
   * Use hot code reload when the bug in the ansible-elixir-stack is fixed
+
+#Docker Deployment
+
+#### Steps to deploy
+
+  * docker build -f ./Dockerfile.build . -t recruitx_base
+  * docker run -v $PROJECT_DIR:/opt/app recruitx_base ./build_docker.sh
+  * mv _build/docker/rel/recruitx_backend/releases/1.0.0/recruitx_backend.tar.gz .
+  * docker-compose up
+
+#### TODO
+
+  * Automate first 3 steps in deploy section
+  * mount data to database so that data will not get lost during deployments
