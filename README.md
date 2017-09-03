@@ -10,7 +10,7 @@
   Note: `brew` installation is not working as expected :(
 
   ```bash
-  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.3.0
+  rm -rf ~/.asdf && git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.3.0
 
   # if you are using bash
   echo -e '\n. $HOME/.asdf/asdf.sh' >> ~/.bash_profile
@@ -67,19 +67,19 @@ Note: The versions of tools installed can be found in `.asdf/installs/`
 
 ### Postgres
 
-  * Download and install Postgress App from [here](https://github.com/PostgresApp/PostgresApp/releases/download/9.4.11/Postgres-9.4.11.zip).
+  * Download and install Postgress App from [here](https://github.com/PostgresApp/PostgresApp/releases/download/v2.0.5/Postgres-2.0.5.dmg).
 
   * Add Postgres binaries to PATH
 
   ```bash
     # if using bash
-    echo "export POSTGRES_PATH=\"/Applications/Postgres.app/Contents/Versions/9.4\"" >> ~/.bash_profile
+    echo "export POSTGRES_PATH=\"/Applications/Postgres.app/Contents/Versions/latest\"" >> ~/.bash_profile
     echo "export PATH=\$PATH:\$POSTGRES_PATH/bin" >> ~/.bash_profile
   ```
 
   ```bash
     # if using zsh
-    echo "export POSTGRES_PATH=\"/Applications/Postgres.app/Contents/Versions/9.4\"" >> ~/.zshrc
+    echo "export POSTGRES_PATH=\"/Applications/Postgres.app/Contents/Versions/latest\"" >> ~/.zshrc
     echo "export PATH=\$PATH:\$POSTGRES_PATH/bin" >> ~/.zshrc
   ```
 
