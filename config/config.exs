@@ -33,45 +33,18 @@ config :ex_aws,
   access_key_id: [System.get_env("AWS_ACCESS_KEY_ID"), :instance_role],
   secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY"), :instance_role]
 
-config :quantum, cron: [
-  remove_unused_slots: [
-    schedule: "@daily",
-    task: "RecruitxBackend.Slot.delete_unused_slots"
-  ],
-  weekly_signup_reminder: [
-    schedule: "30 02 * * 2",
-    task: "RecruitxBackend.WeeklySignupReminder.execute"
-  ],
-  weekly_status_update: [
-    schedule: "30 0 * * 6",
-    task: "RecruitxBackend.StatusUpdate.execute_weekly",
-  ],
-  monthly_status_update: [
-    schedule: "30 0 1 * *",
-    task: "RecruitxBackend.StatusUpdate.execute_monthly",
-  ],
-  jan_status_update: [
-    schedule: "30 0 1 1 *",
-    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
-  ],
-  april_status_update: [
-    schedule: "30 0 1 4 *",
-    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
-  ],
-  july_status_update: [
-    schedule: "30 0 1 7 *",
-    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
-  ],
-  oct_status_update: [
-    schedule: "30 0 1 10 *",
-    task: "RecruitxBackend.StatusUpdate.execute_quarterly",
-  ],
-  team_details_update: [
-    schedule: "0 * * * *",
-    task: "RecruitxBackend.TeamDetailsUpdate.execute",
-  ]
+config :recruitx_backend, RecruitxBackend.Scheduler,
+  jobs: [
+    [name: :remove_unused_slots, schedule: "@daily", task: {RecruitxBackend.Slot, :delete_unused_slots, []}],
+    [name: :weekly_signup_reminder, schedule: "30 02 * * 2", task: {RecruitxBackend.WeeklySignupReminder, :execute, []}],
+    [name: :weekly_status_update, schedule: "30 0 * * 6", task: {RecruitxBackend.StatusUpdate, :execute_weekly, []},],
+    [name: :monthly_status_update, schedule: "30 0 1 * *", task: {RecruitxBackend.StatusUpdate, :execute_monthly, []},],
+    [name: :jan_status_update, schedule: "30 0 1 1 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
+    [name: :april_status_update, schedule: "30 0 1 4 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
+    [name: :july_status_update, schedule: "30 0 1 7 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
+    [name: :oct_status_update, schedule: "30 0 1 10 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
+    [name: :team_details_update, schedule: "0 * * * *", task: {RecruitxBackend.TeamDetailsUpdate, :execute, []}]
 ]
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

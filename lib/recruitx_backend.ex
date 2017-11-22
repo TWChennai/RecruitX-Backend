@@ -13,6 +13,7 @@ defmodule RecruitxBackend do
       supervisor(Endpoint, []),
       # Start the Ecto repository
       worker(RecruitxBackend.Repo, []),
+      worker(RecruitxBackend.Scheduler, []),
       # Here you could define other workers and supervisors as children
       # worker(RecruitxBackend.Worker, [arg1, arg2, arg3]),
     ]

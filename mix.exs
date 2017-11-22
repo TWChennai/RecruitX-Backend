@@ -4,7 +4,7 @@ defmodule RecruitxBackend.Mixfile do
   def project do
     [app: :recruitx_backend,
      version: "1.0.0",
-     elixir: "1.4.0",
+     elixir: "1.5.1",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
@@ -42,7 +42,7 @@ defmodule RecruitxBackend.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:arc, "~> 0.6.0"},
+      {:arc, "~> 0.8.0"},
       {:cors_plug, "~> 1.1"},
       {:cowboy, "~> 1.0"},
       {:credo, "~> 0.5.3", only: :test, app: false},
@@ -61,7 +61,7 @@ defmodule RecruitxBackend.Mixfile do
       {:phoenix_swoosh, "~> 0.1.3"},
       {:poison, "~> 2.2"},
       {:postgrex, "~> 0.12"},
-      {:quantum, "~> 1.8"},
+      {:quantum, "~> 2.2"},
       {:scrivener_ecto, "~> 1.1"},
       {:timex_ecto, "~> 3.1.0"},
       {:sweet_xml, "~> 0.5"},

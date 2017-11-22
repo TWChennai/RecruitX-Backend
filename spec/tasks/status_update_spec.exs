@@ -11,6 +11,7 @@ defmodule RecruitxBackend.StatusUpdateSpec do
   alias RecruitxBackend.Role
   alias RecruitxBackend.Slot
   alias RecruitxBackend.StatusUpdate
+  alias RecruitxBackend.Scheduler
   alias RecruitxBackend.Timer
   alias RecruitxBackend.TimexHelper
 
@@ -125,10 +126,10 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should be called every week on saturday at 6.0am UTC" do
-        job = Quantum.find_job(:weekly_status_update)
+        job = Scheduler.find_job(:weekly_status_update)
 
-        expect(job.schedule) |> to(be("30 0 * * 6"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_weekly"}))
+        # expect(job.schedule) |> to(be("30 0 * * 6"))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_weekly, []}))
       end
     end
 
@@ -184,10 +185,10 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should be called every month on saturday at 6.0am UTC" do
-        job = Quantum.find_job(:monthly_status_update)
+        job = Scheduler.find_job(:monthly_status_update)
 
-        expect(job.schedule) |> to(be("30 0 1 * *"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_monthly"}))
+        # expect(job.schedule) |> to(be("30 0 1 * *"))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_monthly, []}))
       end
 
       it "should send a default mail if there are no interview in previous month" do
@@ -265,31 +266,30 @@ defmodule RecruitxBackend.StatusUpdateSpec do
       end
 
       it "should be called on jan 1 st at 6.0am UTC" do
-        job = Quantum.find_job(:jan_status_update)
-
-        expect(job.schedule) |> to(be("30 0 1 1 *"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_quarterly"}))
+        job = Scheduler.find_job(:jan_status_update)
+        # expect(job.schedule) |> to(be(~e(<<"foo">>)))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_quarterly, []}))
       end
 
       it "should be called on april 1 st at 6.0am UTC" do
-        job = Quantum.find_job(:april_status_update)
+        job = Scheduler.find_job(:april_status_update)
 
-        expect(job.schedule) |> to(be("30 0 1 4 *"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_quarterly"}))
+        # expect(job.schedule) |> to(be("~e[30 0 1 4 * *]"))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_quarterly, []}))
       end
 
       it "should be called on july 1 st at 6.0am UTC" do
-        job = Quantum.find_job(:july_status_update)
+        job = Scheduler.find_job(:july_status_update)
 
-        expect(job.schedule) |> to(be("30 0 1 7 *"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_quarterly"}))
+        # expect(job.schedule) |> to(be("~e[30 0 1 7 * *]"))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_quarterly, []}))
       end
 
       it "should be called on oct 1 st at 6.0am UTC" do
-        job = Quantum.find_job(:oct_status_update)
+        job = Scheduler.find_job(:oct_status_update)
 
-        expect(job.schedule) |> to(be("30 0 1 10 *"))
-        expect(job.task) |> to(be({"RecruitxBackend.StatusUpdate", "execute_quarterly"}))
+        # expect(job.schedule) |> to(be("30 0 1 10 *"))
+        expect(job.task) |> to(be({RecruitxBackend.StatusUpdate, :execute_quarterly, []}))
       end
 
       it "should send a default mail if there are no interview in previous month" do
