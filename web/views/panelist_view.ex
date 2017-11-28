@@ -32,7 +32,7 @@ defmodule RecruitxBackend.PanelistView do
   def render("statistic.json", %{panelist: {team, signups}}) do
     %{
       team: team,
-      count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1+&2)),
+      count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2)),
       signups: render_one(signups, RecruitxBackend.SignUpView, "index.json")
     }
   end

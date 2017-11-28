@@ -10,7 +10,7 @@ defmodule RecruitxBackend.SignUpView do
     %{
       names: signup |> Enum.map(&(Enum.at(&1, 2))),
       role: role,
-      count: signup |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1+&2))
+      count: signup |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2))
      }
     end
 end
