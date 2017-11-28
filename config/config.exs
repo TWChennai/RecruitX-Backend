@@ -43,7 +43,8 @@ config :recruitx_backend, RecruitxBackend.Scheduler,
     [name: :april_status_update, schedule: "30 0 1 4 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
     [name: :july_status_update, schedule: "30 0 1 7 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
     [name: :oct_status_update, schedule: "30 0 1 10 *", task: {RecruitxBackend.StatusUpdate, :execute_quarterly, []},],
-    [name: :team_details_update, schedule: "0 * * * *", task: {RecruitxBackend.TeamDetailsUpdate, :execute, []}]
+    [name: :team_details_update, schedule: "0 * * * *", task: {RecruitxBackend.TeamDetailsUpdate, :execute, []}],
+    [name: :team_status_update, schedule: "@daily", task: {RecruitxBackend.TeamStatusUpdate, :execute, []}]
 ]
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

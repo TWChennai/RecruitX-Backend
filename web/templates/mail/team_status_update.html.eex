@@ -1,0 +1,32 @@
+<p>Hi all,</p>
+<p>Here is a quick update on the team sign up status over the period of "<%=start_date%>" to "<%=to_date%>" </p>
+<h4>Summary</h4>
+<table cellpadding="10" style="border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th width="25%" style="border: 1px solid #000;">Team</th>
+      <th width="25%" style="border: 1px solid #000;">Count</th>
+      <th width="25%" style="border: 1px solid #000;">Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= Enum.map(summary, fn(%{team: team, count: count, signups: signups})->  %>
+    <tr>
+      <td style="border: 1px solid #000;">
+        <%= team %>
+      </td>
+      <td style="border: 1px solid #000;">
+        <%= count %>
+      </td>
+      <td style="border: 1px solid #000;">
+        <%= signups |> Enum.map(fn {role, signup} ->
+          "#{role}-->#{signup |> Enum.map(&Enum.at(&1, 1)) |> Enum.reduce(0, fn(x, acc) -> x + acc end)} " end) %>
+      </td>
+    </tr>
+    <% end) %>
+  </tbody>
+</table>
+
+<br />
+<strong>Thanks</strong><br />
+RecruitX Team
