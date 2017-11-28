@@ -6,11 +6,11 @@ defmodule RecruitxBackend.SignUpView do
     render_many(group_by_role, __MODULE__, "sign_up_group_by_role.json")
   end
 
-  def render("sign_up_group_by_role.json", %{sign_up: {role, singups}}) do
+  def render("sign_up_group_by_role.json", %{sign_up: {role, signup}}) do
     %{
-      names: singups |> Enum.map(&(Enum.at(&1, 2))),
+      names: signup |> Enum.map(&(Enum.at(&1, 2))),
       role: role,
-      count: singups |> Enum.count
+      count: signup |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1+&2))
      }
     end
 end

@@ -35,8 +35,11 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       team = insert(:team, %{name: "test_team"})
       role = insert(:role, %{name: "test_role"})
       interview_within_range = insert(:interview, %{start_time: TimexHelper.utc_now()})
+      interview_within_range1 = insert(:interview, %{start_time: TimexHelper.utc_now()})
       insert(:interview_panelist, %{panelist_login_name: "test", team: team,
         interview: interview_within_range})
+      insert(:interview_panelist, %{panelist_login_name: "test", team: team,
+          interview: interview_within_range1})
       insert(:panelist_details, %{panelist_login_name: "test", role: role})
 
       response = get conn_with_dummy_authorization(), "/panelists"
@@ -45,8 +48,8 @@ defmodule RecruitxBackend.PanelistIntegrationSpec do
       parsed_response = response.resp_body |> Poison.Parser.parse!
       expect(parsed_response) |> to(have(%{
         "team" => "test_team",
-        "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 1}],
-        "count" => 1}))
+        "signups" => [%{"role" => "test_role", "names" => ["test"],"count" => 2}],
+        "count" => 2}))
     end
 
     it "should get monthly signups" do
