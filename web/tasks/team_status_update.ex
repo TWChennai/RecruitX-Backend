@@ -28,14 +28,12 @@ defmodule RecruitxBackend.TeamStatusUpdate do
     })
   end
 
-  defp format_signups(signups), do: signups |> Enum.group_by(&Enum.at(&1, 1)) |> Enum.map(fn {a,b} -> {a, Enum.map(b, &tl(&1)) |> Enum.map(&tl(&1))} end)
-
   defp construct_summary_data(status) do
     status
     |> Enum.map(fn a ->
         case a do
           {team, [[_, nil, nil, 0]]} -> %{team: team, count: 0, signups: []}
-          {team, signups} -> %{team: team, count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2)), signups: format_signups(signups)}
+          {team, signups} -> %{team: team, count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2)), signups: signups |> Enum.map(fn x -> Enum.at(x, 2) end)}
         end
       end)
     |> Enum.sort(&(&1.count >= &2.count))
