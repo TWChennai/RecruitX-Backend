@@ -43,12 +43,14 @@ defmodule RecruitxBackend.EmailIntegrationSpec do
     end
 
     it "should send interview signup details as email" do
+      System.put_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES", "recipient@tw.com another-recipient@tw.com")
       WeeklySignupReminder.execute
+
       mail_box = Swoosh.Adapters.Local.Storage.Memory.all
 
       expect(mail_box |> Enum.count) |> to(be(1))
       [first_email] = mail_box
-      expect(first_email.to) |> to(be([{"", System.get_env("WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES")}]))
+      expect(first_email.to) |> to(be([{"", "recipient@tw.com"}, {"", "another-recipient@tw.com"}]))
       expect(first_email.subject) |> to(have("[RecruitX] " <> role().name <> " Signup Reminder"))
       expect(first_email.html_body) |> to(have(candidate().first_name <> " " <> candidate().last_name))
       mail_content = first_email.html_body

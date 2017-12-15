@@ -98,10 +98,12 @@ defmodule RecruitxBackend.FeedbackImageSpec do
 
   context "get_full_path" do
     it "should return the full path when given a feedback image" do
+      System.put_env("AWS_DOWNLOAD_URL", "some-awesome-storage/files/")
       feedback_image = insert(:feedback_image)
+
       full_path = FeedbackImage.get_full_path(feedback_image)
 
-      expect(full_path) |> to(be("https://s3.amazonaws.com/recruitx-feedback-image/uploads/" <> feedback_image.file_name))
+      expect(full_path) |> to(be("https://some-awesome-storage/files/" <> feedback_image.file_name))
     end
   end
 end
