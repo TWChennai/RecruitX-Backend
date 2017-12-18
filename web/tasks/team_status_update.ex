@@ -36,6 +36,6 @@ defmodule RecruitxBackend.TeamStatusUpdate do
           {team, signups} -> %{team: team, count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2)), signups: signups |> Enum.map(fn x -> Enum.at(x, 2) end)}
         end
       end)
-    |> Enum.sort(&(&1.count >= &2.count))
+    |> Enum.sort(&(&1.team >= &2.team))
   end
 end
