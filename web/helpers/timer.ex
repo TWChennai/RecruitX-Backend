@@ -11,6 +11,14 @@ defmodule RecruitxBackend.Timer do
     %{starting: TimexHelper.beginning_of_week(any_day_of_week), ending: TimexHelper.end_of_week(any_day_of_week)}
   end
 
+  def get_previous_week() do
+    today = TimexHelper.utc_now()
+    last_day_of_previous_week = today
+                            |> TimexHelper.beginning_of_week()
+                            |> Timex.subtract(Duration.from_days(1))
+    %{starting: TimexHelper.beginning_of_week(last_day_of_previous_week), ending: TimexHelper.end_of_week(last_day_of_previous_week)}
+  end
+
   def get_previous_month do
     day_from_previous_month = TimexHelper.utc_now() |> TimexHelper.beginning_of_month |>  TimexHelper.add(-1, :days)
     %{starting: TimexHelper.beginning_of_month(day_from_previous_month), ending: TimexHelper.end_of_month(day_from_previous_month)}

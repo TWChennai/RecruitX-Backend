@@ -58,6 +58,15 @@ defmodule RecruitxBackend.TimerSpec do
       end
     end
 
+    context "get_previous_week" do
+      it "should return from monday to sunday of the previous week" do
+        %{starting: starting, ending: ending} = Timer.get_previous_week
+        some_day_in_previous_week = TimexHelper.utc_now() |> TimexHelper.beginning_of_week |> Timex.subtract(Duration.from_days(1))
+        expect(TimexHelper.compare(starting, TimexHelper.beginning_of_week(some_day_in_previous_week))) |> to(be_true())
+        expect(TimexHelper.compare(ending, TimexHelper.end_of_week(some_day_in_previous_week))) |> to(be_true())
+      end
+    end
+
     context "get_week_ranges" do
       it "should return current week range when requested count is one" do
         expect([]) |> to(be(Timer.get_week_ranges(0)))

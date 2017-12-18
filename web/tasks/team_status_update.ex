@@ -8,8 +8,8 @@ defmodule RecruitxBackend.TeamStatusUpdate do
   alias RecruitxBackend.MailHelper
 
   def execute do
-    %{starting: starting, ending: ending} = current_week = Timer.get_current_week
-    status = current_week
+    %{starting: starting, ending: ending} = previous_week = Timer.get_previous_week
+    status = previous_week
               |> InterviewPanelist.get_statistics
               |> Repo.all
               |> Enum.group_by(&Enum.at(&1, 0))
