@@ -158,6 +158,7 @@ defmodule RecruitxBackend.Candidate do
     where: not(is_nil(c.other_skills)),
     select: c.other_skills)
     |> Repo.all))
+    |> Enum.sort(&(&1<&2))
     |> Enum.reduce("", fn(skill, acc) -> acc <> "/" <> skill end)
     |> String.lstrip(?/)
   end

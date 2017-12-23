@@ -570,13 +570,13 @@ defmodule RecruitxBackend.CandidateSpec do
       candidate1 = insert(:candidate)
       candidate2 = insert(:candidate)
       candidate_excluded = insert(:candidate)
-      insert(:candidate_skill, skill: build(:skill, name: "Skill 1"), candidate: candidate1)
-      insert(:candidate_skill, skill: build(:skill, name: "Skill 2"), candidate: candidate1)
+      insert(:candidate_skill, skill: build(:skill, name: "Java8"), candidate: candidate1)
+      insert(:candidate_skill, skill: build(:skill, name: "objc"), candidate: candidate1)
       insert(:candidate_skill, skill: build(:skill, name: "Skill 3"), candidate: candidate_excluded)
 
       result = Candidate.get_unique_skills_formatted([candidate1.id, candidate2.id])
 
-      expect(result) |> to(be("Skill 1/Skill 2"))
+      expect(result) |> to(be("Java8/objc"))
       expect(result) |> to_not(have("Skill 3"))
     end
   end
