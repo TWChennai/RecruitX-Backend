@@ -104,6 +104,8 @@ defmodule RecruitxBackend.InterviewPanelist do
       group_by: [r.name, ip.panelist_login_name, t.name],
       where: t.active == true,
       select: [t.name, r.name, ip.panelist_login_name, count(ip.panelist_login_name)])
+      |> Repo.all
+      |> Enum.group_by(&Enum.at(&1, 0))
     end
 
     def has_signed_up_before(panelist_name) do

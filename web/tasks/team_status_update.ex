@@ -11,9 +11,6 @@ defmodule RecruitxBackend.TeamStatusUpdate do
     %{starting: starting, ending: ending} = previous_week = Timer.get_previous_week
     status = previous_week
               |> InterviewPanelist.get_statistics
-              |> Repo.all
-              |> Enum.group_by(&Enum.at(&1, 0))
-
     summary = status |> construct_summary_data
 
     recepient = System.get_env("TW_CHENNAI_EMAIL_ADDRESS")

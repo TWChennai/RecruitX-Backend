@@ -19,8 +19,6 @@ defmodule RecruitxBackend.PanelistController do
     statistics_range = Enum.map(week_ranges, fn week_range ->
                 statistics_for_a_week = week_range
                   |> InterviewPanelist.get_statistics
-                  |> Repo.all
-                  |> Enum.group_by(&Enum.at(&1, 0))
                 %{range: week_range,
                 statistics: statistics_for_a_week} end)
     conn |> render("statistics_range.json", statistics_range: statistics_range)
@@ -30,8 +28,6 @@ defmodule RecruitxBackend.PanelistController do
      statistics = params
                   |> get_date_range
                   |> InterviewPanelist.get_statistics
-                  |> Repo.all
-                  |> Enum.group_by(&Enum.at(&1, 0))
     conn |> render("statistics.json", statistics: statistics)
   end
 
