@@ -34,15 +34,16 @@ defmodule RecruitxBackend.TeamStatusUpdateSpec do
         expect(Timer) |> to(accepted(:get_previous_week))
         expect(InterviewPanelist) |> to(accepted(:get_statistics))
         expect(MailHelper) |> to(accepted(:deliver))
-        summary_data = [%{count: 5,
-                          signups: ["panelist2", "panelist3", "panelist4", "panelist5"],
-                          team: "Team2"},
+        summary_data = [%{count: 6,
+                          signups: ["panelist6", "panelist7", "panelist8", "panelist9", "panelist10"],
+                          team: "Beach"},
                         %{count: 1,
                           signups: ["panelist1"],
                           team: "Team1"},
-                        %{count: 6,
-                          signups: ["panelist6", "panelist7", "panelist8", "panelist9", "panelist10"],
-                          team: "Beach"}]
+                        %{count: 5,
+                          signups: ["panelist2", "panelist3", "panelist4", "panelist5"],
+                          team: "Team2"},
+                        ]
         expect(Templates) |> to(accepted(:team_status_update, [TimexHelper.format(starting, "%D"), TimexHelper.format(starting, "%D"), summary_data]))
       end
     end
