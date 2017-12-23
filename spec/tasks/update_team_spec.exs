@@ -3,33 +3,48 @@ defmodule RecruitxBackend.UpdateTeamSpec do
 
   alias RecruitxBackend.UpdateTeam
   alias RecruitxBackend.Team
+  alias RecruitxBackend.UserController
 
   @jigsaw_url System.get_env("JIGSAW_URL")
 
   describe "execute" do
-    let :assignment, do: %{body: "{\"project\":{\"name\":\"Recruitx\"}}", status_code: 200}
-    let :panelist_details, do: insert(:panelist_details)
-    let :url, do: "#{@jigsaw_url}/assignments?employee_ids[]=#{panelist_details().employee_id}&current_only=true"
+    let :assignment, do: %{body: "[{\"project\":{\"name\":\"Recruitx\"}}]", status_code: 200}
+    let :employee_id, do: 12345
 
-    before do: allow HTTPotion |> to(accept(:get, fn(_, _) -> assignment() end))
-    before do: allow Repo |> to(accept(:insert!, fn(_, _) -> :ok end))
+    describe "panelist assigned to some project" do
+      before do: allow UserController |> to(accept(:get_data_safely, fn("#{@jigsaw_url}/assignments?employee_ids[]=12345&current_only=true") -> assignment() end))
 
-    it "should fetch and update team details" do
-      UpdateTeam.execute("test", panelist_details().employee_id)
+      it "should fetch and update team details" do
+        allow Repo |> to(accept(:insert!, fn(%{changes: %{name: "Recruitx"}}) -> :ok end))
+        UpdateTeam.execute(employee_id())
 
-      expect(HTTPotion) |> to(accepted(:get))
-      expect(Repo) |> to(accepted(:insert!))
+        expect(UserController) |> to(accepted(:get_data_safely))
+        expect(Repo) |> to(accepted(:insert!))
+      end
+
+      it "should not update team details if it already exists" do
+        insert(:team, name: "Recruitx")
+        allow Repo |> to(accept(:insert!, fn(%{changes: %{name: "Recruitx"}}) -> :ok end))
+        previous_count = Team.count
+
+        UpdateTeam.execute(employee_id())
+        current_count = Team.count
+
+        expect(UserController) |> to(accepted(:get_data_safely))
+        expect(previous_count) |> to(be(current_count))
+      end
     end
 
-    it "should not update team details if it already exists" do
-      insert(:team, name: "Recruitx")
-      previous_count = Team.count
+    describe "panelist not assigned to any project" do
+      before do: allow UserController |> to(accept(:get_data_safely, fn("#{@jigsaw_url}/assignments?employee_ids[]=12345&current_only=true") -> %{body: "[]", status_code: 200} end))
+      before do: allow Repo |> to(accept(:insert!, fn(%{changes: %{name: "Other Projects"}}) -> :ok end))
 
-      UpdateTeam.execute("test", panelist_details().employee_id)
-      current_count = Team.count
+      it "should fetch and update team details" do
+        UpdateTeam.execute(employee_id())
 
-      expect(HTTPotion) |> to(accepted(:get))
-      expect(previous_count) |> to(be(current_count))
+        expect(UserController) |> to(accepted(:get_data_safely))
+        expect(Repo) |> to(accepted(:insert!))
+      end
     end
   end
 end

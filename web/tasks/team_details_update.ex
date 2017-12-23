@@ -16,7 +16,7 @@ defmodule RecruitxBackend.TeamDetailsUpdate do
     case new_interview_panelist.panelist_login_name |> UpdatePanelistDetails.execute do
       :error -> :do_nothing
       %{employee_id: employee_id} ->
-            case employee_id |> UpdateTeam.execute(new_interview_panelist.interview_panelist_id) do
+            case employee_id |> UpdateTeam.execute do
               %{id: team_id} ->
                 Repo.update(InterviewPanelist.changeset(Repo.get!(InterviewPanelist, new_interview_panelist.interview_panelist_id), %{"team_id" => team_id}))
                 Repo.update(UpdateTeamDetails.changeset(Repo.get!(UpdateTeamDetails, new_interview_panelist.id), %{processed: true}))

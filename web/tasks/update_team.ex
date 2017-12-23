@@ -7,7 +7,7 @@ defmodule RecruitxBackend.UpdateTeam do
 
   @jigsaw_url System.get_env("JIGSAW_URL")
 
-  def execute(employee_id, _interview_panelist_id) do
+  def execute(employee_id) do
     response = "#{@jigsaw_url}/assignments?employee_ids[]=#{employee_id}&current_only=true" |> UserController.get_data_safely
     case response.status_code do
       200 ->
