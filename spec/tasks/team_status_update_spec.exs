@@ -20,7 +20,8 @@ defmodule RecruitxBackend.TeamStatusUpdateSpec do
                                           ["Beach", "QA", "panelist8", 1],
                                           ["Beach", "Dev", "panelist9", 1],
                                           ["Beach", "PM", "panelist10", 1],
-                                        ]
+                                        ],
+                            "Team3" => [["Team1", nil, nil, 0]]
                             }
     describe "execute" do
       it "should send in correct format with stubing Templates" do
@@ -43,6 +44,9 @@ defmodule RecruitxBackend.TeamStatusUpdateSpec do
                         %{count: 5,
                           signups: ["panelist2", "panelist3", "panelist4", "panelist5"],
                           team: "Team2"},
+                        %{count: 0,
+                          signups: [],
+                          team: "Team3"},
                         ]
         expect(Templates) |> to(accepted(:team_status_update, [TimexHelper.format(starting, "%D"), TimexHelper.format(starting, "%D"), summary_data]))
       end
