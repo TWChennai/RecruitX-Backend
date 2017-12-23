@@ -21,6 +21,9 @@ defmodule RecruitxBackend.StatusUpdateSpec do
     before do: Repo.delete_all Candidate
     before do: Repo.delete_all PanelistDetails
     before do: Repo.delete_all Role
+    before do: System.put_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES", "addresses")
+    before do: System.put_env("MONTHLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES", "addresses")
+    before do: System.put_env("QUARTERLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES", "addresses")
 
     describe "filter out candidates without interviews" do
 
