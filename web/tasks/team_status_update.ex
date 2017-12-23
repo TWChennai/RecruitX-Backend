@@ -16,7 +16,7 @@ defmodule RecruitxBackend.TeamStatusUpdate do
 
     summary = status |> construct_summary_data
 
-    recepient = System.get_env("WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES")
+    recepient = System.get_env("TW_CHENNAI_EMAIL_ADDRESS")
     start_date = TimexHelper.format(starting, "%D")
     to_date = TimexHelper.format(ending, "%D")
     email_content = Templates.team_status_update(start_date, to_date, summary)

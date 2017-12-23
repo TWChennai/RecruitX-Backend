@@ -114,7 +114,7 @@ You have to set following environment variables
   export CONSOLIDATED_FEEDBACK_RECIPIENT_EMAIL_ADDRESSES="email addressess"
   export WEEKLY_SIGNUP_REMINDER_RECIPIENT_EMAIL_ADDRESSES="email addressess"
   export WEEKLY_STATUS_UPDATE_RECIPIENT_EMAIL_ADDRESSES="email addresses"
-
+  export TW_CHENNAI_EMAIL_ADDRESS="email addresses"
   export QR_CODE_URL="QR_CODE_URL"
   export APK_URL="APK_URL"
   export LOGO_URL="LOGO_URL"
