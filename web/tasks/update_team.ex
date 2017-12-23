@@ -12,7 +12,7 @@ defmodule RecruitxBackend.UpdateTeam do
     case response.status_code do
       200 ->
         case response.body |> Parser.parse do
-          {:ok, []} -> update("Other Projects")
+          {:ok, []} -> update("Beach")
           {:ok, [%{"project" => %{"name" => project_name}} | _other_projects]} -> update(project_name)
           _ -> :do_nothing
         end

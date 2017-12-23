@@ -37,7 +37,7 @@ defmodule RecruitxBackend.UpdateTeamSpec do
 
     describe "panelist not assigned to any project" do
       before do: allow UserController |> to(accept(:get_data_safely, fn("#{@jigsaw_url}/assignments?employee_ids[]=12345&current_only=true") -> %{body: "[]", status_code: 200} end))
-      before do: allow Repo |> to(accept(:insert!, fn(%{changes: %{name: "Other Projects"}}) -> :ok end))
+      before do: allow Repo |> to(accept(:insert!, fn(%{changes: %{name: "Beach"}}) -> :ok end))
 
       it "should fetch and update team details" do
         UpdateTeam.execute(employee_id())
