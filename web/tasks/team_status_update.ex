@@ -3,7 +3,6 @@ defmodule RecruitxBackend.TeamStatusUpdate do
   alias RecruitxBackend.Timer
   alias RecruitxBackend.TimexHelper
   alias RecruitxBackend.InterviewPanelist
-  alias RecruitxBackend.Repo
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
 
