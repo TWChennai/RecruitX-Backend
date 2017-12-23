@@ -45,7 +45,7 @@ defmodule RecruitxBackend.TeamStatusUpdateSpec do
                           signups: ["panelist2", "panelist3", "panelist4", "panelist5"],
                           team: "Team2"},
                         %{count: 0,
-                          signups: [],
+                          signups: ["We will sign up next time for sure !"],
                           team: "Team3"},
                         ]
         expect(Templates) |> to(accepted(:team_status_update, [TimexHelper.format(starting, "%D"), TimexHelper.format(starting, "%D"), summary_data]))

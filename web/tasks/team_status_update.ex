@@ -6,6 +6,8 @@ defmodule RecruitxBackend.TeamStatusUpdate do
   alias Swoosh.Templates
   alias RecruitxBackend.MailHelper
 
+  @message_for_no_signup "We will sign up next time for sure !"
+
   def execute do
     %{starting: starting, ending: ending} = previous_week = Timer.get_previous_week
     status = previous_week
@@ -28,7 +30,7 @@ defmodule RecruitxBackend.TeamStatusUpdate do
     status
     |> Enum.map(fn a ->
         case a do
-          {team, [[_, nil, nil, 0]]} -> %{team: team, count: 0, signups: []}
+          {team, [[_, nil, nil, 0]]} -> %{team: team, count: 0, signups: [@message_for_no_signup]}
           {team, signups} -> %{team: team, count: signups |> Enum.map(&Enum.at(&1, 3)) |> Enum.reduce(0, &(&1 + &2)), signups: signups |> Enum.map(fn x -> Enum.at(x, 2) end)}
         end
     end)
