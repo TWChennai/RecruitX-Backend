@@ -23,8 +23,8 @@
 
   * Use `~/.tool-versions` file to specify the version of elixir and erlang needs to used system level. asdf can be used to setup project specific tool versions also (please refer [this](https://github.com/asdf-vm/asdf#set-current-version))
   ```
-  echo "elixir 1.4.0" >> ~/.tool-versions
-  echo "erlang 19.2" >> ~/.tool-versions
+  echo "elixir 1.5.2" >> ~/.tool-versions
+  echo "erlang 20.2" >> ~/.tool-versions
   ```
 
   * Install
@@ -36,34 +36,18 @@
 
 Note: The versions of tools installed can be found in `.asdf/installs/`
 
-#### Using Brew
-
-  * To install `erlang 19.2` execute:
-    ```bash
-    brew uninstall --force erlang
-    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/77f353913f1e0edd7ba592308da2aa70e26570e1/Formula/erlang.rb
-    brew pin erlang
-    ```
-
-  * To install `elixir 1.4.0` execute:
-    ```bash
-    brew uninstall --force elixir
-    brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f47cde4e2b771b4a8d170038a20ca703d20bdf0d/Formula/elixir.rb
-    brew pin elixir
-    ```
-
 ### Checking Installation
   * To check the erlang version execute:
     ```bash
     erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
     ```
-    You should get "18" as the output.
+    You should get "20" as the output.
 
   * To check the elixir version execute:
     ```bash
     elixir -v
     ```
-    You should get "Elixir 1.4.0" as the output.
+    You should get "Elixir 1.5.2" as the output.
 
 ### Postgres
 
