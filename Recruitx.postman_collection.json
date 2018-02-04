@@ -1,0 +1,234 @@
+{
+	"info": {
+		"name": "Recruitx",
+		"_postman_id": "263d9777-b31b-0c6c-f9c4-1d9aa97252ca",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Interviews and slots",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/interviews?panelist_login_name={{user-name}}&panelist_experience=10&panelist_role=ops",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"interviews"
+					],
+					"query": [
+						{
+							"key": "panelist_login_name",
+							"value": "{{user-name}}",
+							"equals": true
+						},
+						{
+							"key": "panelist_experience",
+							"value": "10",
+							"equals": true
+						},
+						{
+							"key": "panelist_role",
+							"value": "ops",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "My Interviews",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}//panelists/{{user-name}}/interviews?page=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"",
+						"panelists",
+						"{{user-name}}",
+						"interviews"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Roles",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/roles",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"roles"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Skills",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/skills",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"skills"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Interview Types",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/interview_types",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"interview_types"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Pipeline status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/pipeline_statuses",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"pipeline_statuses"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Candidates",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{host}}/candidates?page=1",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"candidates"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "63b294f6-9b17-41a0-84f0-f91a5b2908cd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "5d1d5340-a1e3-442e-b22d-6e2a0b3cae28",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
