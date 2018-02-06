@@ -207,6 +207,37 @@
 				"description": null
 			},
 			"response": []
+		},
+		{
+			"name": "Create Candidate and interview",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{api-key}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"candidate\": {\n\t\t\"skill_ids\": [1, 2],\n\t\t\"first_name\": \"Dinesh\",\n\t\t\"last_name\": \"B\",\n\t\t\"role_id\": 2,\n\t\t\"experience\": 4,\n\t\t\"interview_rounds\": [{\n\t\t\t\"interview_type_id\": 2,\n\t\t\t\"start_time\": \"2018-02-06T19:00:00Z\"\n\t\t}, {\n\t\t\t\"interview_type_id\": 3,\n\t\t\t\"start_time\": \"2018-02-06T22:00:00Z\"\n\t\t}]\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{host}}/candidates",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"candidates"
+					]
+				},
+				"description": null
+			},
+			"response": []
 		}
 	],
 	"event": [
