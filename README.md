@@ -22,6 +22,9 @@
   ```
 
   * Use `~/.tool-versions` file to specify the version of elixir and erlang needs to used system level. asdf can be used to setup project specific tool versions also (please refer [this](https://github.com/asdf-vm/asdf#set-current-version))
+  
+  brew install autoconf , if autoconf is not present already.
+  
   ```
   echo "elixir 1.5.2" >> ~/.tool-versions
   echo "erlang 20.2" >> ~/.tool-versions
