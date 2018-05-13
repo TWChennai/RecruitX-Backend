@@ -1,5 +1,5 @@
-# RecruitxBackend [![Build Status](https://semaphoreci.com/api/v1/dineshdiny/recruitx-backend/branches/master/badge.svg)](https://semaphoreci.com/dineshdiny/recruitx-backend)
-
+# RecruitxBackend
+This project has been moved into  `Labs` and if you want to contribute, you can go to `Labs on the cloud` from `OKTA` and you can get the access to the repo and CI
 ## Dev Setup
 
 ### Erlang and Elixir
